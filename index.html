@@ -48,7 +48,31 @@ function displayTime(value){if(!value)return '';const v=String(value).trim().rep
 function formatTimeField(el){const v=String(el.value||'').trim().replace(':','.');if(!v){el.value='';return;}const m=v.match(/^(\d{1,2})[.:]?(\d{2})$/);if(m)el.value=String(Number(m[1])).padStart(2,'0')+'.'+m[2];}
 function requireValidTime(value){const normalized=normalizeTimeInput(value);if(value&&!normalized){showError(new Error('Время должно быть от 07.00 до 23.00 с шагом 5 минут, например 15.05'));return null;}return normalized;}
 async function db(path,opt={}){const r=await fetch(API+path,{...opt,headers:{...headers,...(opt.headers||{})}});const text=await r.text();if(!r.ok)throw new Error(text||r.statusText);if(!text.trim())return null;try{return JSON.parse(text);}catch(e){throw new Error('Сервер вернул некорректный JSON: '+text.slice(0,200));}}
-async function loadData(){[students,lessons,payments]=await Promise.all([db('/students?select=*'),db('/lessons?select=*'),db('/payments?select=*')]);students=students||[];lessons=lessons||[];payments=payments||[];}
+
+async function loadData(){
+  [students,lessons,payments]=await Promise.all([db('/students?select=*'),db('/lessons?select=*'),db('/payments?select=*')]);
+  students=students||[]; lessons=lessons||[]; payments=payments||[];
+  
+  // Автоматически переводим прошедшие «Запланированные» занятия в статус «Проведено»
+  const now = new Date();
+  let updatedCount = 0;
+  for(let l of lessons){
+    if(l.status === 'pending' && l.date && l.time){
+      const lessonDateTime = new Date(l.date + 'T' + (l.time.length === 5 ? l.time : '12:00') + ':00');
+      if(lessonDateTime < now){
+        l.status = 'conducted';
+        updatedCount++;
+        // Тихо сохраняем в базу
+        db('/lessons?id=eq.'+encodeURIComponent(l.id),{
+          method:'PATCH',
+          headers:{...headers,Prefer:'return=minimal'},
+          body:JSON.stringify({status:'conducted'})
+        }).catch(()=>{});
+      }
+    }
+  }
+}
+
 function switchTab(t){['calendar','students','finance'].forEach(x=>{document.getElementById('tab-'+x).classList.toggle('hidden',x!==t);document.getElementById('nav-'+x).className='px-4 py-2 rounded-xl font-semibold transition '+(x===t?'bg-indigo-600 text-white shadow-sm':'bg-slate-100 hover:bg-slate-200');});if(t==='calendar'){renderMain();renderWeek();}if(t==='students')renderStudents();if(t==='finance')renderFinance();}
 function fillStudentSelects(){['new-lesson-student','edit-student','payment-student'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=students.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');});}
 function lessonVisual(l){if(l.status==='conducted')return {row:'',icon:'✓',iconClass:'lesson-icon-done',muted:false,label:'Проведено'};if(l.status==='rescheduled')return {row:'lesson-rescheduled',icon:'↪',iconClass:'lesson-icon-moved',muted:true,label:'Перенесено'};if(l.status==='cancelled_free')return {row:'lesson-cancelled-free',icon:'×',iconClass:'lesson-icon-free',muted:true,label:'Отменено — не списывать'};if(l.status==='cancelled_charge')return {row:'lesson-cancelled-charge',icon:'×',iconClass:'lesson-icon-charge',muted:true,label:'Отменено — списать'};return {row:'',icon:'',iconClass:'',muted:false,label:'Запланировано'};}
@@ -285,20 +309,5 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
 document.addEventListener('DOMContentLoaded',boot);
 </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
