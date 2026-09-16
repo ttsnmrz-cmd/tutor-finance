@@ -24,7 +24,7 @@
             </div>
         </header>
 
-        <!-- ОКНО ВВОДА ПИН-КОДА ДЛЯ ПРЕПОДАВАТЕЛЯ (МАСТЕР-ПАРОЛЬ) -->
+        <!-- ОКНО ВВОДА ПИН-КОДА ДЛЯ ПРЕПОДАВАТЕЛЯ -->
         <div id="teacher-pin-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
             <div class="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full space-y-4 text-center">
                 <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">🔑</div>
@@ -120,7 +120,6 @@
                     <div id="students-balance-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                <!-- БЛОК ДЕТАЛЬНЫХ СПИСАНИЙ ЗА УРОКИ -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="font-bold text-base mb-4">📉 Детализация списаний за проведенные уроки</h3>
                     <div class="overflow-x-auto">
@@ -209,13 +208,41 @@
         let lessons = JSON.parse(localStorage.getItem('tut_lessons')) || [];
         let payments = JSON.parse(localStorage.getItem('tut_payments')) || [];
 
+        // Функция транслитерации для красивого URL (кириллица -> латиница)
+        function transliterate(word) {
+            const map = {
+                'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+                'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'j', 'к': 'k', 'л': 'l', 'м': 'm',
+                'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+                'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+                'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo',
+                'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'J', 'К': 'K', 'Л': 'L', 'М': 'M',
+                'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U',
+                'Ф': 'F', 'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Sch',
+                'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+            };
+            return word.split('').map(char => map[char] || char).join('');
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
-        const targetStudent = urlParams.get('student');
+        const rawTargetStudent = urlParams.get('student');
+        // Поиск ученика: проверяем совпадение как по оригинальному имени, так и по его транслиту
+        let targetStudent = null;
+        if (rawTargetStudent) {
+            const decoded = decodeURIComponent(rawTargetStudent).trim().toLowerCase();
+            const found = students.find(s => 
+                s.name.toLowerCase() === decoded || 
+                transliterate(s.name).toLowerCase() === decoded
+            );
+            targetStudent = found ? found.name : decodeURIComponent(rawTargetStudent).trim();
+        }
         
         let authenticatedStudent = sessionStorage.getItem('auth_student');
+        if (authenticatedStudent) authenticatedStudent = authenticatedStudent.trim();
+
         let isTeacherAuth = sessionStorage.getItem('auth_teacher') === 'true';
 
-        // Проверка блокировки ввода пароля преподавателя
         function checkTeacherLock() {
             let lockUntil = localStorage.getItem('teacher_lock_until');
             if (lockUntil && Date.now() < parseInt(lockUntil)) {
@@ -251,7 +278,7 @@
             if (checkTeacherLock()) return;
 
             const pin = document.getElementById('teacher-pin-input').value.trim();
-            if(pin === "2003") { // Мастер-пароль преподавателя
+            if(pin === "2003") { 
                 localStorage.removeItem('teacher_wrong_attempts');
                 localStorage.removeItem('teacher_lock_until');
                 sessionStorage.setItem('auth_teacher', 'true');
@@ -284,7 +311,7 @@
             const name = document.getElementById('new-student-name').value.trim();
             const pin = document.getElementById('new-student-pin').value.trim();
             if(!name || !pin) return alert("Введите имя и пин-код ученика!");
-            if(students.some(s => s.name === name)) return alert("Такой ученик уже есть!");
+            if(students.some(s => s.name.toLowerCase() === name.toLowerCase())) return alert("Такой ученик уже есть!");
             students.push({ name, pin });
             document.getElementById('new-student-name').value = '';
             document.getElementById('new-student-pin').value = '';
@@ -308,8 +335,8 @@
             student.pin = trimmedPin;
 
             if(trimmedName !== oldName) {
-                lessons.forEach(l => { if(l.student === oldName) l.student = trimmedName; });
-                payments.forEach(p => { if(p.student === oldName) p.student = trimmedName; });
+                lessons.forEach(l => { if(l.student.toLowerCase() === oldName.toLowerCase()) l.student = trimmedName; });
+                payments.forEach(p => { if(p.student.toLowerCase() === oldName.toLowerCase()) p.student = trimmedName; });
             }
             saveData();
         }
@@ -354,9 +381,11 @@
             saveData();
         }
 
+        // Генерация ссылки на основе транслита
         function getStudentLink(studentName) {
             const baseUrl = window.location.href.split('?')[0];
-            return `${baseUrl}?student=${encodeURIComponent(studentName)}`;
+            const safeName = transliterate(studentName);
+            return `${baseUrl}?student=${encodeURIComponent(safeName)}`;
         }
 
         function copyStudentLink(studentName) {
@@ -367,11 +396,11 @@
 
         function verifyStudentPin() {
             const enteredPin = document.getElementById('student-pin-input').value.trim();
-            const studentObj = students.find(s => s.name === targetStudent);
+            const studentObj = students.find(s => s.name.toLowerCase() === targetStudent.toLowerCase());
             
             if(studentObj && studentObj.pin === enteredPin) {
-                sessionStorage.setItem('auth_student', targetStudent);
-                authenticatedStudent = targetStudent;
+                sessionStorage.setItem('auth_student', studentObj.name);
+                authenticatedStudent = studentObj.name;
                 document.getElementById('pin-modal').classList.add('hidden');
                 render();
             } else {
@@ -397,20 +426,22 @@
             });
 
             if (targetStudent) {
-                // РЕЖИМ УЧЕНИКА
-                if (authenticatedStudent === targetStudent) {
+                const matchedStudent = students.find(s => s.name.toLowerCase() === targetStudent.toLowerCase());
+                const exactTargetName = matchedStudent ? matchedStudent.name : targetStudent;
+
+                if (authenticatedStudent && authenticatedStudent.toLowerCase() === exactTargetName.toLowerCase()) {
                     document.getElementById('teacher-view').classList.add('hidden');
                     document.getElementById('nav-tabs').classList.add('hidden');
                     document.getElementById('student-view').classList.remove('hidden');
                     document.getElementById('pin-modal').classList.add('hidden');
                     document.getElementById('teacher-pin-modal').classList.add('hidden');
 
-                    document.getElementById('student-cabinet-title').textContent = `Личный кабинет: ${targetStudent}`;
-                    document.getElementById('main-title').textContent = `Привет, ${targetStudent}!`;
+                    document.getElementById('student-cabinet-title').textContent = `Личный кабинет: ${exactTargetName}`;
+                    document.getElementById('main-title').textContent = `Привет, ${exactTargetName}!`;
                     document.getElementById('main-subtitle').textContent = `Ваш баланс и история занятий`;
 
-                    const totalPaid = payments.filter(p => p.student === targetStudent).reduce((sum, p) => sum + p.amount, 0);
-                    const totalSpent = lessons.filter(l => l.student === targetStudent && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
+                    const totalPaid = payments.filter(p => p.student.toLowerCase() === exactTargetName.toLowerCase()).reduce((sum, p) => sum + p.amount, 0);
+                    const totalSpent = lessons.filter(l => l.student.toLowerCase() === exactTargetName.toLowerCase() && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
                     const balance = totalPaid - totalSpent;
 
                     document.getElementById('student-summary-card').innerHTML = `
@@ -432,7 +463,7 @@
 
                     const spBody = document.getElementById('student-payments-body');
                     spBody.innerHTML = '';
-                    const myPayments = payments.filter(p => p.student === targetStudent);
+                    const myPayments = payments.filter(p => p.student.toLowerCase() === exactTargetName.toLowerCase());
                     if(myPayments.length === 0) spBody.innerHTML = `<tr><td colspan="2" class="p-4 text-gray-400 italic">Платежей пока нет</td></tr>`;
                     myPayments.forEach(p => {
                         spBody.innerHTML += `<tr class="hover:bg-gray-50/50"><td class="p-3">${p.date}</td><td class="p-3 text-emerald-600 font-bold">+${p.amount} р.</td></tr>`;
@@ -440,7 +471,7 @@
 
                     const slBody = document.getElementById('student-lessons-body');
                     slBody.innerHTML = '';
-                    const myLessons = lessons.filter(l => l.student === targetStudent);
+                    const myLessons = lessons.filter(l => l.student.toLowerCase() === exactTargetName.toLowerCase());
                     if(myLessons.length === 0) slBody.innerHTML = `<tr><td colspan="3" class="p-4 text-gray-400 italic">Занятий пока нет</td></tr>`;
                     
                     const statusLabels = {
@@ -467,7 +498,6 @@
                     document.getElementById('teacher-pin-modal').classList.add('hidden');
                 }
             } else {
-                // РЕЖИМ ПРЕПОДАВАТЕЛЯ
                 if (!isTeacherAuth) {
                     document.getElementById('teacher-view').classList.add('hidden');
                     document.getElementById('student-view').classList.add('hidden');
@@ -530,8 +560,8 @@
                 balanceContainer.innerHTML = '';
                 students.forEach(s => {
                     const studentName = s.name;
-                    const totalPaid = payments.filter(p => p.student === studentName).reduce((sum, p) => sum + p.amount, 0);
-                    const totalSpent = lessons.filter(l => l.student === studentName && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
+                    const totalPaid = payments.filter(p => p.student.toLowerCase() === studentName.toLowerCase()).reduce((sum, p) => sum + p.amount, 0);
+                    const totalSpent = lessons.filter(l => l.student.toLowerCase() === studentName.toLowerCase() && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
                     const balance = totalPaid - totalSpent;
 
                     balanceContainer.innerHTML += `
@@ -541,48 +571,38 @@
                                 <div class="text-xs text-gray-500 mt-1">Всего внесено: <span class="font-semibold text-gray-700">${totalPaid} р.</span></div>
                                 <div class="text-xs text-gray-500">Списано за уроки: <span class="font-semibold text-gray-700">${totalSpent} р.</span></div>
                             </div>
-                            <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-                                <span class="text-xs font-medium text-gray-500">Баланс:</span>
-                                <span class="text-lg font-bold ${balance >= 0 ? 'text-emerald-600' : 'text-red-600'}">${balance} р.</span>
+                            <div class="mt-3 pt-3 border-t border-gray-200/60 flex justify-between items-center">
+                                <span class="text-xs text-gray-400 uppercase font-semibold">Баланс:</span>
+                                <span class="text-lg font-black ${balance >= 0 ? 'text-emerald-600' : 'text-red-600'}">${balance} р.</span>
                             </div>
                         </div>
                     `;
                 });
 
-                // ЗАПОЛНЕНИЕ ТАБЛИЦЫ СПИСАНИЙ ПО УРОКАМ
-                const deductionsBody = document.getElementById('deductions-table-body');
-                if (deductionsBody) {
-                    deductionsBody.innerHTML = '';
-                    const activeDeductions = lessons.filter(l => l.status === 'conducted' || l.status === 'cancelled_charge');
-                    
-                    if (activeDeductions.length === 0) {
-                        deductionsBody.innerHTML = `<tr><td colspan="4" class="p-4 text-gray-400 italic">Списаний по урокам пока нет</td></tr>`;
-                    } else {
-                        const statusNames = {
-                            'conducted': '✅ Проведено',
-                            'cancelled_charge': '❌ Отменено (со списанием)'
-                        };
-                        activeDeductions.forEach(l => {
-                            deductionsBody.innerHTML += `
-                                <tr class="hover:bg-gray-50/50">
-                                    <td class="p-3 font-medium">${l.date}</td>
-                                    <td class="p-3 font-semibold text-indigo-600">${l.student}</td>
-                                    <td class="p-3 text-xs font-semibold text-gray-600">${statusNames[l.status]}</td>
-                                    <td class="p-3 text-right text-red-600 font-bold">-${l.price} р.</td>
-                                </tr>
-                            `;
-                        });
-                    }
-                }
-
-                const pTable = document.getElementById('payments-table-body');
-                pTable.innerHTML = '';
-                payments.forEach(p => {
-                    pTable.innerHTML += `
+                const deductionsTable = document.getElementById('deductions-table-body');
+                deductionsTable.innerHTML = '';
+                const conductedLessons = lessons.filter(l => l.status === 'conducted' || l.status === 'cancelled_charge');
+                if(conductedLessons.length === 0) deductionsTable.innerHTML = `<tr><td colspan="4" class="p-4 text-gray-400 italic">Списаний пока нет</td></tr>`;
+                conductedLessons.forEach(l => {
+                    deductionsTable.innerHTML += `
                         <tr class="hover:bg-gray-50/50">
-                            <td class="p-3">${p.date}</td>
+                            <td class="p-3 font-medium">${l.date}</td>
+                            <td class="p-3 font-semibold text-indigo-600">${l.student}</td>
+                            <td class="p-3 text-xs font-semibold">${l.status === 'conducted' ? '✅ Проведено' : '❌ Отменено (списано)'}</td>
+                            <td class="p-3 text-right font-bold text-red-600">-${l.price} р.</td>
+                        </tr>
+                    `;
+                });
+
+                const paymentsTable = document.getElementById('payments-table-body');
+                paymentsTable.innerHTML = '';
+                if(payments.length === 0) paymentsTable.innerHTML = `<tr><td colspan="4" class="p-4 text-gray-400 italic">История платежей пуста</td></tr>`;
+                payments.forEach(p => {
+                    paymentsTable.innerHTML += `
+                        <tr class="hover:bg-gray-50/50">
+                            <td class="p-3 font-medium">${p.date}</td>
                             <td class="p-3 font-semibold text-indigo-600">${p.student}</td>
-                            <td class="p-3 text-emerald-600 font-bold">+${p.amount} р.</td>
+                            <td class="p-3 font-bold text-emerald-600">+${p.amount} р.</td>
                             <td class="p-3 text-right"><button onclick="deletePayment(${p.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold">Удалить</button></td>
                         </tr>
                     `;
