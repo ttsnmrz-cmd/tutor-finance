@@ -70,264 +70,357 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
 document.addEventListener('DOMContentLoaded',boot);
 </script>
-<script id="hide-student-lessons-block-v1">(function(){function hideLessonsBlock(){const el=document.getElementById('tab-lessons');if(el)el.classList.add('hidden');}hideLessonsBlock();document.addEventListener('DOMContentLoaded',hideLessonsBlock);setTimeout(hideLessonsBlock,100);setTimeout(hideLessonsBlock,500);setTimeout(hideLessonsBlock,1000);})();</script>
-<script id="calendar-day-popup-v1">
+
+<script id="clean-fixes-v1">
 (function(){
-function isoFromWeekDay(dayEl,index){if(typeof weekAnchor==='undefined'||typeof startOfWeek!=='function')return null;const d=startOfWeek(new Date(weekAnchor));d.setDate(d.getDate()+index);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function bindDayClicks(){document.querySelectorAll('#week-calendar .week-day').forEach((day,i)=>{if(day.dataset.popupBound)return;day.dataset.popupBound='1';day.addEventListener('click',function(e){if(e.target.closest('.week-lesson'))return;const date=isoFromWeekDay(day,i);if(date)openNewLessonModal(date);});});}
-function hideOldPanel(){const cal=document.getElementById('tab-calendar');if(cal){const first=cal.querySelector(':scope > .app-card');if(first&&!first.querySelector('#week-calendar'))first.remove();}}
-function injectRecurringUI(){const modal=document.querySelector('#lesson-modal .app-card');if(!modal||document.getElementById('recurring-options'))return;const status=document.getElementById('edit-status').parentElement;const box=document.createElement('div');box.id='recurring-options';box.className='hidden rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 space-y-3';box.innerHTML='<label class="flex items-center gap-2 text-sm font-semibold cursor-pointer"><input id="lesson-recurring" type="checkbox" class="w-4 h-4"><span>Повторять занятие</span></label><div id="recurring-fields" class="hidden space-y-3"><div><div class="text-xs font-semibold text-slate-500 mb-2">Дни недели</div><div class="grid grid-cols-7 gap-1">'+[['1','Пн'],['2','Вт'],['3','Ср'],['4','Чт'],['5','Пт'],['6','Сб'],['0','Вс']].map(x=>'<label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="'+x[0]+'">'+x[1]+'</label>').join('')+'</div></div><label class="text-sm font-semibold block">Повторять до<input id="recurring-end" type="date" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label></div>';status.insertAdjacentElement('afterend',box);document.getElementById('lesson-recurring').addEventListener('change',e=>{document.getElementById('recurring-fields').classList.toggle('hidden',!e.target.checked);});}
-window.openNewLessonModal=function(date){injectRecurringUI();fillStudentSelects();document.getElementById('edit-id').value='';document.getElementById('edit-student').value='';document.getElementById('edit-date').value=date||'';document.getElementById('edit-time').value='';document.getElementById('edit-price').value='40';document.getElementById('edit-status').innerHTML='<option value="pending">Запланировано</option><option value="conducted">Проведено</option><option value="rescheduled">Перенесено</option><option value="cancelled_charge">Отменено — списать</option><option value="cancelled_free">Отменено — не списывать</option>';document.getElementById('edit-status').value='pending';document.getElementById('lesson-modal-title').textContent='Добавить занятие';document.getElementById('lesson-save-btn').textContent='Добавить';document.getElementById('recurring-options').classList.remove('hidden');document.getElementById('lesson-recurring').checked=false;document.getElementById('recurring-fields').classList.add('hidden');document.querySelectorAll('.rec-day').forEach(x=>x.checked=false);document.getElementById('recurring-end').value='';const modal=document.getElementById('lesson-modal');modal.classList.remove('hidden');modal.classList.add('flex');};
-const originalSave=window.saveEditedLesson;window.saveEditedLesson=async function(){const id=document.getElementById('edit-id').value;if(id)return originalSave();const student=document.getElementById('edit-student').value,date=document.getElementById('edit-date').value,time=requireValidTime(document.getElementById('edit-time').value),price=Number(document.getElementById('edit-price').value||0),status=document.getElementById('edit-status').value||'pending';if(!student||!date||!time)return;try{const recurring=document.getElementById('lesson-recurring')?.checked;let dates=[date];if(recurring){const selected=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));const end=document.getElementById('recurring-end').value;if(!selected.length){showError(new Error('Выберите хотя бы один день недели'));return;}if(!end||end<date){showError(new Error('Укажите дату окончания повторения не раньше даты первого занятия'));return;}const cur=new Date(date+'T12:00:00');const last=new Date(end+'T12:00:00');dates=[];while(cur<=last){if(selected.includes(cur.getDay()))dates.push(cur.toISOString().slice(0,10));cur.setDate(cur.getDate()+1);}}const rows=dates.map(d=>({student,date:d,time,price,status}));await db('/lessons',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(rows)});await loadData();renderMain();renderWeek();if(typeof renderFinance==='function')renderFinance();closeLessonModal();}catch(e){showError(e)}};
-const originalEdit=window.openEditLesson;window.openEditLesson=function(id){injectRecurringUI();originalEdit(id);document.getElementById('recurring-options').classList.add('hidden');document.getElementById('lesson-recurring').checked=false;document.getElementById('recurring-fields').classList.add('hidden');document.getElementById('lesson-save-btn').textContent='Сохранить';document.getElementById('lesson-modal-title').textContent='Редактировать занятие';};
-function bind(){hideOldPanel();bindDayClicks();injectRecurringUI();}const originalRender=window.renderWeek;if(originalRender)window.renderWeek=function(){const r=originalRender.apply(this,arguments);setTimeout(bind,0);return r;};document.addEventListener('DOMContentLoaded',()=>{bind();setTimeout(bind,300);setTimeout(bind,1000);});new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});})();
-</script>
-<script id="calendar-day-click-v2">
-(function(){function isoForIndex(i){if(typeof weekAnchor==='undefined'||typeof startOfWeek!=='function')return null;const d=startOfWeek(new Date(weekAnchor));d.setDate(d.getDate()+i);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}function handle(e){const cal=document.getElementById('week-calendar');if(!cal)return;const day=e.target.closest&&e.target.closest('.week-day');if(!day||!cal.contains(day))return;if(e.target.closest('.week-lesson'))return;if(e.target.closest('button,a,input,select,textarea'))return;const days=Array.from(cal.querySelectorAll(':scope > .week-day'));const i=days.indexOf(day);if(i<0)return;const date=isoForIndex(i);if(date&&typeof window.openNewLessonModal==='function'){e.preventDefault();e.stopPropagation();window.openNewLessonModal(date);}}function bind(){const cal=document.getElementById('week-calendar');if(!cal||cal.dataset.dayClickV2)return;cal.dataset.dayClickV2='1';cal.addEventListener('click',handle,true);}document.addEventListener('DOMContentLoaded',bind);new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});setTimeout(bind,500);setTimeout(bind,1500);})();
-</script>
-<script id="recurring-enhancement-v2">
-(function(){
+  'use strict';
+
+  function localISO(d){
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  /* ---------- Calendar: click empty day ---------- */
+  function bindCalendarClicks(){
+    const cal=document.getElementById('week-calendar');
+    if(!cal || cal.dataset.cleanClicks==='1') return;
+    cal.dataset.cleanClicks='1';
+
+    cal.addEventListener('click',function(e){
+      if(e.target.closest('.week-lesson')) return;
+      const day=e.target.closest('.week-day');
+      if(!day || !cal.contains(day)) return;
+
+      const days=[...cal.children];
+      const index=days.indexOf(day);
+      if(index<0 || typeof startOfWeek!=='function') return;
+
+      const d=startOfWeek(new Date(weekAnchor));
+      d.setDate(d.getDate()+index);
+      openNewLessonModal(localISO(d));
+    });
+  }
+
+  /* ---------- Recurring lessons ---------- */
   function ensureRecurringUI(){
     const modal=document.querySelector('#lesson-modal .app-card');
-    if(!modal)return;
+    const status=document.getElementById('edit-status');
+    if(!modal || !status) return null;
+
     let box=document.getElementById('recurring-options');
-    if(!box){
-      const status=document.getElementById('edit-status');
-      if(!status)return;
-      box=document.createElement('div');
-      box.id='recurring-options';
-      box.className='hidden rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 space-y-3';
-      box.innerHTML='<label class="flex items-center gap-2 text-sm font-semibold cursor-pointer"><input id="lesson-recurring" type="checkbox" class="w-4 h-4"><span>Повторять занятие</span></label><div id="recurring-fields" class="hidden space-y-3"><label class="text-sm font-semibold block">Как часто<select id="recurring-frequency" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="1">Каждую неделю</option><option value="2">Раз в 2 недели</option><option value="3">Раз в 3 недели</option><option value="4">Раз в 4 недели</option></select></label><div><div class="text-xs font-semibold text-slate-500 mb-2">По каким дням</div><div class="grid grid-cols-7 gap-1">'+[['1','Пн'],['2','Вт'],['3','Ср'],['4','Чт'],['5','Пт'],['6','Сб'],['0','Вс']].map(x=>'<label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="'+x[0]+'">'+x[1]+'</label>').join('')+'</div></div><label class="text-sm font-semibold block">Повторять до<input id="recurring-end" type="date" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label></div>';
-      status.parentElement.insertAdjacentElement('afterend',box);
-      document.getElementById('lesson-recurring').addEventListener('change',function(){document.getElementById('recurring-fields').classList.toggle('hidden',!this.checked);});
-    }else if(!document.getElementById('recurring-frequency')){
-      const fields=document.getElementById('recurring-fields');
-      const lab=document.createElement('label');lab.className='text-sm font-semibold block';lab.innerHTML='Как часто<select id="recurring-frequency" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="1">Каждую неделю</option><option value="2">Раз в 2 недели</option><option value="3">Раз в 3 недели</option><option value="4">Раз в 4 недели</option></select>';if(fields)fields.insertBefore(lab,fields.firstElementChild);
-    }
+    if(box) return box;
+
+    box=document.createElement('div');
+    box.id='recurring-options';
+    box.className='hidden rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 space-y-3';
+    box.innerHTML=
+      '<label class="flex items-center gap-2 text-sm font-semibold cursor-pointer">'+
+        '<input id="lesson-recurring" type="checkbox" class="w-4 h-4">'+
+        '<span>Повторять занятие</span>'+
+      '</label>'+
+      '<div id="recurring-fields" class="hidden space-y-3">'+
+        '<label class="text-sm font-semibold block">Как часто'+
+          '<select id="recurring-frequency" class="soft-input mt-1 w-full rounded-xl px-3 py-2">'+
+            '<option value="1">Каждую неделю</option>'+
+            '<option value="2">Раз в 2 недели</option>'+
+            '<option value="3">Раз в 3 недели</option>'+
+            '<option value="4">Раз в 4 недели</option>'+
+          '</select>'+
+        '</label>'+
+        '<div>'+
+          '<div class="text-xs font-semibold text-slate-500 mb-2">По каким дням</div>'+
+          '<div class="grid grid-cols-7 gap-1">'+
+            [['1','Пн'],['2','Вт'],['3','Ср'],['4','Чт'],['5','Пт'],['6','Сб'],['0','Вс']]
+              .map(x=>'<label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="'+x[0]+'">'+x[1]+'</label>')
+              .join('')+
+          '</div>'+
+        '</div>'+
+        '<label class="text-sm font-semibold block">Повторять до'+
+          '<input id="recurring-end" type="date" class="soft-input mt-1 w-full rounded-xl px-3 py-2">'+
+        '</label>'+
+      '</div>';
+
+    status.parentElement.insertAdjacentElement('afterend',box);
+
+    document.getElementById('lesson-recurring').addEventListener('change',function(){
+      document.getElementById('recurring-fields').classList.toggle('hidden',!this.checked);
+    });
     return box;
   }
-  function resetRecurring(date){const box=ensureRecurringUI();if(!box)return;box.classList.remove('hidden');const cb=document.getElementById('lesson-recurring'),fields=document.getElementById('recurring-fields');if(cb)cb.checked=false;if(fields)fields.classList.add('hidden');const freq=document.getElementById('recurring-frequency');if(freq)freq.value='1';document.querySelectorAll('.rec-day').forEach(x=>x.checked=false);const end=document.getElementById('recurring-end');if(end)end.value='';if(date){const d=new Date(date+'T12:00:00'),dow=d.getDay(),day=document.querySelector('.rec-day[value="'+dow+'"]');if(day)day.checked=true;}}
-  const originalOpen=window.openNewLessonModal;window.openNewLessonModal=function(date){if(typeof originalOpen==='function')originalOpen(date);setTimeout(()=>resetRecurring(date),0);};
-  const originalEdit=window.openEditLesson;window.openEditLesson=function(id){if(typeof originalEdit==='function')originalEdit(id);setTimeout(()=>{const b=document.getElementById('recurring-options');if(b)b.classList.add('hidden');},0);};
-  const originalSave=window.saveEditedLesson;window.saveEditedLesson=async function(){const id=document.getElementById('edit-id')?.value;if(id)return originalSave();const student=document.getElementById('edit-student')?.value,date=document.getElementById('edit-date')?.value,time=typeof requireValidTime==='function'?requireValidTime(document.getElementById('edit-time')?.value):null,price=Number(document.getElementById('edit-price')?.value||0),status=document.getElementById('edit-status')?.value||'pending';if(!student||!date||!time)return;const recurring=document.getElementById('lesson-recurring')?.checked;let dates=[date];if(recurring){const selected=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));const freq=Number(document.getElementById('recurring-frequency')?.value||1);const end=document.getElementById('recurring-end')?.value;if(!selected.length){showError(new Error('Выберите хотя бы один день недели'));return;}if(!end||end<date){showError(new Error('Укажите дату окончания повторения не раньше даты первого занятия'));return;}const start=new Date(date+'T12:00:00'),last=new Date(end+'T12:00:00'),monday=d=>{const x=new Date(d),day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));x.setHours(12,0,0,0);return x;},firstMonday=monday(start);dates=[];for(let d=new Date(start);d<=last;d.setDate(d.getDate()+1)){const weeks=Math.round((monday(d)-firstMonday)/604800000);if(weeks%freq===0&&selected.includes(d.getDay()))dates.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));}}try{await db('/lessons',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(dates.map(d=>({student,date:d,time,price,status})))});await loadData();renderMain();renderWeek();if(typeof renderFinance==='function')renderFinance();closeLessonModal();}catch(e){showError(e);}};
-  window.deleteFutureLessonsForStudent=async function(studentId){const st=(students||[]).find(s=>String(s.id)===String(studentId));if(!st)return;const today=new Date(),iso=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0'),count=(lessons||[]).filter(l=>String(l.student)===String(st.name)&&l.date>=iso&&l.status==='pending').length;if(!count){alert('У этого ученика нет будущих запланированных занятий.');return;}if(!confirm('Удалить все будущие запланированные занятия ученика «'+st.name+'»?\n\nБудут удалены '+count+' занятий. Проведённые и уже отменённые занятия не изменятся.'))return;try{await db('/lessons?student=eq.'+encodeURIComponent(st.name)+'&date=gte.'+iso+'&status=eq.pending',{method:'DELETE',headers:{'Prefer':'return=minimal'}});await loadData();renderMain();renderWeek();if(typeof renderStudents==='function')renderStudents();if(typeof renderFinance==='function')renderFinance();}catch(e){showError(e);}};
-  function addFutureButtons(){document.querySelectorAll('#students-container .student-card').forEach(card=>{if(card.querySelector('[data-delete-future]'))return;const trigger=card.querySelector('[onclick*="toggleStudentMenu"]');if(!trigger)return;const m=(trigger.getAttribute('onclick')||'').match(/toggleStudentMenu\((['"])(.*?)\1\)/);if(!m)return;const id=m[2],wrap=document.createElement('div');wrap.className='mt-3 pt-3 border-t border-slate-100';wrap.innerHTML='<button type="button" data-delete-future class="w-full text-left text-sm font-semibold text-red-600 hover:text-red-700 py-1" onclick="deleteFutureLessonsForStudent('+JSON.stringify(id)+')">Удалить все будущие занятия</button>';card.appendChild(wrap);});}
-  const originalRenderStudents=window.renderStudents;if(originalRenderStudents)window.renderStudents=function(){const r=originalRenderStudents.apply(this,arguments);setTimeout(addFutureButtons,0);return r;};document.addEventListener('DOMContentLoaded',()=>{ensureRecurringUI();setTimeout(addFutureButtons,300);setTimeout(addFutureButtons,1000);});
-})();
-</script>
-<script id="ui-final-v3">
-(function(){
-  function localISO(d){
-    return d.getFullYear()+'-'+
-      String(d.getMonth()+1).padStart(2,'0')+'-'+
-      String(d.getDate()).padStart(2,'0');
-  }
 
-  function hideEnd(){
-    const e=document.getElementById('recurring-end');
-    if(e){
-      const p=e.closest('label');
-      if(p)p.remove();
-      else e.remove();
+  function resetRecurring(date){
+    const box=ensureRecurringUI();
+    if(!box) return;
+    box.classList.remove('hidden');
+
+    const cb=document.getElementById('lesson-recurring');
+    const fields=document.getElementById('recurring-fields');
+    const freq=document.getElementById('recurring-frequency');
+    const end=document.getElementById('recurring-end');
+
+    if(cb) cb.checked=false;
+    if(fields) fields.classList.add('hidden');
+    if(freq) freq.value='1';
+    document.querySelectorAll('.rec-day').forEach(x=>x.checked=false);
+    if(end) end.value='';
+
+    if(date){
+      const d=new Date(date+'T12:00:00');
+      const day=document.querySelector('.rec-day[value="'+d.getDay()+'"]');
+      if(day) day.checked=true;
     }
   }
 
-  function recurringSavePatch(){
-    const old=window.saveEditedLesson;
-    if(!old || old.__v3)return;
+  window.openNewLessonModal=function(date){
+    ensureRecurringUI();
+    fillStudentSelects();
 
-    async function save(){
-      const id=document.getElementById('edit-id')?.value;
+    document.getElementById('edit-id').value='';
+    document.getElementById('edit-student').value='';
+    document.getElementById('edit-date').value=date||'';
+    document.getElementById('edit-time').value='';
+    document.getElementById('edit-price').value='40';
+    document.getElementById('edit-status').innerHTML=Object.entries(statusLabels)
+      .map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('');
+    document.getElementById('edit-status').value='pending';
+    document.getElementById('lesson-modal-title').textContent='Добавить занятие';
+    document.getElementById('lesson-save-btn').textContent='Добавить';
 
-      if(id)return old();
+    resetRecurring(date);
 
-      const recurring=document.getElementById('lesson-recurring')?.checked;
+    const modal=document.getElementById('lesson-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  };
 
-      if(!recurring)return old();
+  const baseOpenEdit=window.openEditLesson;
+  window.openEditLesson=function(id){
+    ensureRecurringUI();
+    baseOpenEdit(id);
+    const box=document.getElementById('recurring-options');
+    if(box) box.classList.add('hidden');
+    const cb=document.getElementById('lesson-recurring');
+    const fields=document.getElementById('recurring-fields');
+    if(cb) cb.checked=false;
+    if(fields) fields.classList.add('hidden');
+  };
 
-      const student=document.getElementById('edit-student')?.value;
-      const date=document.getElementById('edit-date')?.value;
-      const time=requireValidTime(
-        document.getElementById('edit-time')?.value
-      );
-      const price=Number(
-        document.getElementById('edit-price')?.value||0
-      );
-      const status=
-        document.getElementById('edit-status')?.value||'pending';
+  const baseSave=window.saveEditedLesson;
+  window.saveEditedLesson=async function(){
+    const id=document.getElementById('edit-id').value;
 
-      if(!student || !date || !time)return;
+    /* Existing lesson: use the original edit logic. */
+    if(id) return baseSave();
 
-      const selected=[
-        ...document.querySelectorAll('.rec-day:checked')
-      ].map(x=>Number(x.value));
+    const student=document.getElementById('edit-student').value;
+    const date=document.getElementById('edit-date').value;
+    const rawTime=document.getElementById('edit-time').value;
+    const time=requireValidTime(rawTime);
+    const price=Number(document.getElementById('edit-price').value||0);
+    const status=document.getElementById('edit-status').value||'pending';
 
-      const freq=Number(
-        document.getElementById('recurring-frequency')?.value||1
-      );
+    if(rawTime && !time) return;
+    if(!student || !date){
+      showError(new Error('Выберите ученика и дату'));
+      return;
+    }
+    if(!time){
+      showError(new Error('Укажите время занятия'));
+      return;
+    }
+
+    const recurring=document.getElementById('lesson-recurring')?.checked;
+    let dates=[date];
+
+    if(recurring){
+      const selected=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
+      const freq=Number(document.getElementById('recurring-frequency')?.value||1);
+      const end=document.getElementById('recurring-end')?.value;
 
       if(!selected.length){
         showError(new Error('Выберите хотя бы один день недели'));
         return;
       }
+      if(!end || end<date){
+        showError(new Error('Укажите дату окончания повторения не раньше даты первого занятия'));
+        return;
+      }
 
       const start=new Date(date+'T12:00:00');
-      const last=new Date(start);
-      last.setFullYear(last.getFullYear()+1);
+      const last=new Date(end+'T12:00:00');
 
-      const monday=d=>{
+      const monday=function(d){
         const x=new Date(d);
         const day=x.getDay();
-
-        x.setDate(
-          x.getDate()+(day===0?-6:1-day)
-        );
-
+        x.setDate(x.getDate()+(day===0?-6:1-day));
         x.setHours(12,0,0,0);
-
         return x;
       };
 
       const firstMonday=monday(start);
-      const dates=[];
+      dates=[];
 
-      for(
-        let d=new Date(start);
-        d<=last;
-        d.setDate(d.getDate()+1)
-      ){
-        const weeks=Math.round(
-          (monday(d)-firstMonday)/604800000
-        );
-
-        if(
-          weeks%freq===0 &&
-          selected.includes(d.getDay())
-        ){
+      for(let d=new Date(start);d<=last;d.setDate(d.getDate()+1)){
+        const weeks=Math.round((monday(d)-firstMonday)/604800000);
+        if(weeks%freq===0 && selected.includes(d.getDay())){
           dates.push(localISO(d));
         }
       }
-
-      try{
-        await db('/lessons',{
-          method:'POST',
-          headers:{'Prefer':'return=minimal'},
-          body:JSON.stringify(
-            dates.map(d=>({
-              student,
-              date:d,
-              time,
-              price,
-              status
-            }))
-          )
-        });
-
-        await loadData();
-        renderMain();
-        renderWeek();
-
-        if(typeof renderFinance==='function'){
-          renderFinance();
-        }
-
-        closeLessonModal();
-
-      }catch(e){
-        showError(e);
-      }
     }
 
-    save.__v3=true;
-    window.saveEditedLesson=save;
-  }
-
-  function style(){
-    if(document.getElementById('schedule-v3-style'))return;
-
-    const s=document.createElement('style');
-
-    s.id='schedule-v3-style';
-
-    s.textContent=
-      '.schedule-scroll-v3{max-height:1010px;overflow-y:auto;padding-right:4px}' +
-      '.schedule-scroll-v3 thead{position:sticky;top:0;z-index:3;background:#fff}' +
-      '.schedule-scroll-v3 table{min-width:900px}';
-
-    document.head.appendChild(s);
-  }
-
-  function schedulePatch(){
-    const body=document.getElementById('main-lessons');
-    const wrap=document.getElementById('schedule-scroll-wrap');
-
-    if(!body || !wrap)return;
-
-    wrap.classList.add('schedule-scroll-v3');
-
-    const rows=[
-      ...body.querySelectorAll('tr')
-    ].filter(r=>r.querySelector('td'));
-
-    rows.forEach(r=>{
-      const c=r.querySelector('td');
-
-      if(c){
-        r.dataset.date=c.textContent.trim();
-      }
-    });
-
-    rows.sort((a,b)=>{
-      const da=a.dataset.date||'';
-      const db=b.dataset.date||'';
-
-      return da.localeCompare(db);
-    });
-
-    /*
-      ВАЖНО:
-      Не используем MutationObserver здесь.
-      Иначе appendChild() снова запускает observer
-      и создаёт бесконечный цикл.
-    */
-
-    const fragment=document.createDocumentFragment();
-
-    rows.forEach(r=>{
-      fragment.appendChild(r);
-    });
-
-    body.appendChild(fragment);
-
-    const today=localISO(new Date());
-
-    const target=rows.find(
-      r=>(r.dataset.date||'')>=today
-    );
-
-    if(target){
-      requestAnimationFrame(()=>{
-        wrap.scrollTop=Math.max(
-          0,
-          target.offsetTop-wrap.offsetTop
-        );
+    try{
+      await db('/lessons',{
+        method:'POST',
+        headers:{'Prefer':'return=minimal'},
+        body:JSON.stringify(dates.map(d=>({student,date:d,time,price,status})))
       });
+      await loadData();
+      renderMain();
+      renderWeek();
+      if(typeof renderFinance==='function') renderFinance();
+      closeLessonModal();
+    }catch(e){
+      showError(e);
     }
+  };
+
+  /* ---------- Student menus: one delegated handler for every card ---------- */
+  function prepareStudentMenus(){
+    const c=document.getElementById('students-container');
+    if(!c || c.dataset.cleanMenus==='1') return;
+    c.dataset.cleanMenus='1';
+
+    c.addEventListener('click',function(e){
+      const trigger=e.target.closest('[data-student-menu-trigger]');
+      if(trigger){
+        e.preventDefault();
+        e.stopPropagation();
+        toggleStudentMenu(trigger.dataset.studentId);
+        return;
+      }
+
+      const action=e.target.closest('[data-student-action]');
+      if(action){
+        e.preventDefault();
+        e.stopPropagation();
+        const id=action.dataset.studentId;
+        const type=action.dataset.studentAction;
+        if(type==='copy') copyStudentLink(id);
+        else if(type==='edit') openStudentEdit(id);
+        else if(type==='delete') deleteStudent(id);
+        return;
+      }
+    });
+
+    document.addEventListener('click',function(e){
+      if(!e.target.closest('#students-container [data-student-actions]')){
+        document.querySelectorAll('[data-student-menu]').forEach(el=>el.classList.add('hidden'));
+      }
+    });
   }
 
-  function run(){
-    hideEnd();
-    recurringSavePatch();
-    style();
-    schedulePatch();
+  const baseRenderStudents=window.renderStudents;
+  window.renderStudents=function(){
+    baseRenderStudents.apply(this,arguments);
+
+    const c=document.getElementById('students-container');
+    if(!c) return;
+
+    /* Remove inline menu handlers and replace them with stable data attributes. */
+    c.querySelectorAll('[data-student-actions]').forEach(wrap=>{
+      const button=wrap.querySelector('button');
+      const menu=wrap.querySelector('[data-student-menu]');
+      if(!button || !menu) return;
+
+      const match=(menu.id||'').match(/^student-menu-(.*)$/);
+      if(!match) return;
+      const id=match[1];
+
+      button.removeAttribute('onclick');
+      button.dataset.studentMenuTrigger='1';
+      button.dataset.studentId=id;
+
+      menu.querySelectorAll('button').forEach((b,i)=>{
+        b.removeAttribute('onclick');
+        b.dataset.studentAction=['copy','edit','delete'][i]||'';
+        b.dataset.studentId=id;
+      });
+    });
+
+    /* Add the future-lessons button once per card. */
+    c.querySelectorAll('.student-card').forEach(card=>{
+      if(card.querySelector('[data-delete-future]')) return;
+      const menu=card.querySelector('[data-student-menu]');
+      const id=menu?.id?.replace(/^student-menu-/,'');
+      if(!id) return;
+
+      const wrap=document.createElement('div');
+      wrap.className='mt-3 pt-3 border-t border-slate-100';
+      wrap.innerHTML='<button type="button" data-delete-future class="w-full text-left text-sm font-semibold text-red-600 hover:text-red-700 py-1">Удалить все будущие занятия</button>';
+      wrap.firstElementChild.addEventListener('click',function(e){
+        e.stopPropagation();
+        deleteFutureLessonsForStudent(id);
+      });
+      card.appendChild(wrap);
+    });
+  };
+
+  window.deleteFutureLessonsForStudent=async function(studentId){
+    const st=(students||[]).find(s=>String(s.id)===String(studentId));
+    if(!st)return;
+
+    const today=new Date();
+    const iso=localISO(today);
+    const count=(lessons||[]).filter(l=>String(l.student)===String(st.name)&&l.date>=iso&&l.status==='pending').length;
+
+    if(!count){
+      alert('У этого ученика нет будущих запланированных занятий.');
+      return;
+    }
+
+    if(!confirm('Удалить все будущие запланированные занятия ученика «'+st.name+'»?\n\nБудут удалены '+count+' занятий. Проведённые и уже отменённые занятия не изменятся.')) return;
+
+    try{
+      await db('/lessons?student=eq.'+encodeURIComponent(st.name)+'&date=gte.'+iso+'&status=eq.pending',{
+        method:'DELETE',
+        headers:{'Prefer':'return=minimal'}
+      });
+      await loadData();
+      renderMain();
+      renderWeek();
+      renderStudents();
+      if(typeof renderFinance==='function') renderFinance();
+    }catch(e){
+      showError(e);
+    }
+  };
+
+  function addStyles(){
+    if(document.getElementById('clean-fixes-style')) return;
+    const st=document.createElement('style');
+    st.id='clean-fixes-style';
+    st.textContent=
+      '.schedule-scroll-v3{max-height:1010px;overflow-y:auto;padding-right:4px}'+
+      '.schedule-scroll-v3 thead{position:sticky;top:0;z-index:3;background:#fff}'+
+      '.schedule-scroll-v3 table{min-width:900px}';
+    document.head.appendChild(st);
+    const wrap=document.getElementById('schedule-scroll-wrap');
+    if(wrap) wrap.classList.add('schedule-scroll-v3');
   }
 
-  document.addEventListener('DOMContentLoaded',run);
+  function init(){
+    ensureRecurringUI();
+    bindCalendarClicks();
+    prepareStudentMenus();
+    addStyles();
+  }
 
-  setTimeout(run,300);
-  setTimeout(run,1000);
-  setTimeout(run,2000);
+  document.addEventListener('DOMContentLoaded',function(){
+    init();
+    setTimeout(init,300);
+  });
 
+  /* renderWeek replaces the calendar HTML, but the click listener lives on
+     #week-calendar itself, so it survives and no MutationObserver is needed. */
 })();
 </script>
 </body></html>
