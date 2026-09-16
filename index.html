@@ -19,7 +19,7 @@
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentUser = null;
+        let currentUser = JSON.parse(sessionStorage.getItem('auth_user')) || null;
         let students = [], lessons = [], payments = [];
 
         const statusLabels = {
@@ -41,126 +41,101 @@
         const charge = new Set(['conducted', 'cancelled_charge']);
 
         async function loadData() {
-            const [sRes, lRes, pRes] = await Promise.all([
-                supabaseClient.from('students').select('*'),
-                supabaseClient.from('lessons').select('*'),
-                supabaseClient.from('payments').select('*')
-            ]);
-            students = sRes.data || [];
-            lessons = lRes.data || [];
-            payments = pRes.data || [];
+            try {
+                const [sRes, lRes, pRes] = await Promise.all([
+                    supabaseClient.from('students').select('*'),
+                    supabaseClient.from('lessons').select('*'),
+                    supabaseClient.from('payments').select('*')
+                ]);
+                students = sRes.data || [];
+                lessons = lRes.data || [];
+                payments = pRes.data || [];
+            } catch (err) {
+                console.error("Ошибка загрузки данных из базы:", err);
+            }
             render();
         }
 
         function render() {
             const app = document.getElementById('app');
             
-            // Если никто не вошел — показываем только вход для преподавателя (список учеников убран)
+            // Если никто не вошел — показываем экран авторизации
             if (!currentUser) {
                 app.innerHTML = `
                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center max-w-md mx-auto">
-                        <h1 class="text-2xl font-bold mb-6 text-slate-800">Tutor Finance</h1>
+                        <h1 class="text-2xl font-bold mb-2 text-slate-800">Tutor Finance</h1>
+                        <p class="text-slate-400 text-sm mb-6">Система учета занятий</p>
                         <div class="space-y-3">
-                            <button onclick="loginAsTutor()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition">Я преподаватель</button>
+                            <button onclick="loginAsTutor()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition cursor-pointer">Вход для преподавателя</button>
                         </div>
                     </div>
                 `;
                 return;
             }
 
-            if (currentUser.role === 'student') {
-                const name = currentUser.name;
-                const totalPaid = payments.filter(p => p.student === name).reduce((sum, p) => sum + Number(p.amount), 0);
-                const totalSpent = lessons.filter(l => l.student === name && charge.has(l.status)).reduce((sum, l) => sum + Number(l.price), 0);
-                const balance = totalPaid - totalSpent;
-
-                const studentLessons = lessons
-                    .filter(l => l.student === name)
-                    .sort((a, b) => b.date.localeCompare(a.date))
-                    .slice(0, 5);
-
+            // Если вошел преподаватель
+            if (currentUser.role === 'tutor') {
                 app.innerHTML = `
                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
                         <div class="flex justify-between items-center mb-8">
                             <div>
-                                <h1 class="text-xl font-bold text-slate-800">Tutor Finance</h1>
-                                <p class="text-slate-400 text-sm">Личный кабинет ученика</p>
+                                <h1 class="text-xl font-bold text-slate-800">Кабинет преподавателя</h1>
+                                <p class="text-slate-400 text-sm">Добро пожаловать, ${currentUser.name}</p>
                             </div>
-                            <button onclick="logout()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition">Выйти</button>
+                            <button onclick="logout()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition cursor-pointer">Выйти</button>
                         </div>
-                        <div class="mb-6">
-                            <span class="text-slate-400 text-xs uppercase tracking-wider">Ученик</span>
-                            <h2 class="text-2xl font-bold text-slate-800">${name}</h2>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4 mb-8">
-                            <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
-                                <div class="text-emerald-600 text-xs font-semibold mb-1">Внесено</div>
-                                <div class="text-xl font-bold text-emerald-700">${totalPaid} BYN</div>
-                            </div>
-                            <div class="bg-rose-50/50 p-4 rounded-2xl border border-rose-100">
-                                <div class="text-rose-600 text-xs font-semibold mb-1">Списано</div>
-                                <div class="text-xl font-bold text-rose-700">${totalSpent} BYN</div>
-                            </div>
-                            <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
-                                <div class="text-indigo-600 text-xs font-semibold mb-1">Баланс</div>
-                                <div class="text-xl font-bold text-indigo-700">${balance} BYN</div>
+                        <div class="space-y-4">
+                            <p class="text-slate-600">Панель управления активна. База данных подключена успешно.</p>
+                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                <span class="text-xs text-slate-400 uppercase tracking-wider">Статистика</span>
+                                <div class="grid grid-cols-2 gap-4 mt-2">
+                                    <div>Учеников в базе: <b>${students.length}</b></div>
+                                    <div>Всего занятий: <b>${lessons.length}</b></div>
+                                </div>
                             </div>
                         </div>
-                        <h3 class="font-bold text-base mb-4 text-slate-800">Последние занятия</h3>
-                        <div class="divide-y divide-slate-100">
-                            ${studentLessons.length === 0 ? '<p class="text-slate-400 py-4">Нет занятий</p>' : 
-                                studentLessons.map(l => `
-                                    <div class="py-3 flex justify-between items-center text-sm">
-                                        <span class="text-slate-700 font-medium">${l.date} · ${l.time || ''}</span>
-                                        <div class="flex items-center gap-4">
-                                            <span class="font-semibold text-slate-800">${l.price} BYN</span>
-                                            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusClass[l.status] || 'bg-slate-100'}">${statusLabels[l.status] || l.status}</span>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                        </div>
-                    </div>
-                `;
-            } else {
-                // Полноценная панель преподавателя
-                app.innerHTML = `
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                        <div class="flex justify-between items-center mb-8">
-                            <h1 class="text-xl font-bold text-slate-800">Кабинет преподавателя</h1>
-                            <button onclick="logout()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition">Выйти</button>
-                        </div>
-                        <p class="text-slate-600">Добро пожаловать в панель управления. Все функции и ученики доступны для вас.</p>
                     </div>
                 `;
             }
         }
 
-        function loginAsTutor() { 
-            currentUser = { role: 'tutor' }; 
-            render(); 
+        async function loginAsTutor() {
+            const emailInput = prompt("Введите email преподавателя:");
+            if (!emailInput) return;
+
+            const passwordInput = prompt("Введите пароль преподавателя:");
+            if (!passwordInput) return;
+
+            try {
+                // Проверяем данные по таблице tutors в Supabase
+                const { data, error } = await supabaseClient
+                    .from('tutors')
+                    .select('*')
+                    .eq('email', emailInput.trim())
+                    .eq('password', passwordInput.trim());
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    currentUser = { role: 'tutor', name: data[0].name || 'Преподаватель' };
+                    sessionStorage.setItem('auth_user', JSON.stringify(currentUser));
+                    render();
+                } else {
+                    alert("Неверный email или пароль!");
+                }
+            } catch (err) {
+                console.error("Ошибка авторизации:", err);
+                alert("Ошибка при проверке данных. Проверьте подключение к базе.");
+            }
         }
 
         function logout() { 
             currentUser = null; 
+            sessionStorage.removeItem('auth_user');
             render(); 
         }
 
         loadData();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
