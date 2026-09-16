@@ -21,7 +21,7 @@
 
         let currentUser = JSON.parse(sessionStorage.getItem('auth_user')) || null;
         let students = [], lessons = [], payments = [];
-        let activeTab = 'students'; // 'students', 'lessons'
+        let activeTab = 'students'; // 'students', 'lessons', 'finance'
 
         const urlParams = new URLSearchParams(window.location.search);
         const studentParam = urlParams.get('student');
@@ -98,13 +98,16 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-2 border-b border-slate-100 pb-4 mb-6">
-                        <button onclick="switchTab('students')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${activeTab === 'students' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Ученики (${students.length})</button>
-                        <button onclick="switchTab('lessons')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${activeTab === 'lessons' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Занятия (${lessons.length})</button>
+                    <!-- Навигация по трем вкладкам -->
+                    <div class="flex gap-2 border-b border-slate-100 pb-4 mb-6 overflow-x-auto">
+                        <button onclick="switchTab('students')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'students' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Ученики (${students.length})</button>
+                        <button onclick="switchTab('lessons')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'lessons' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Занятия (${lessons.length})</button>
+                        <button onclick="switchTab('finance')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'finance' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Финансы (${payments.length})</button>
                     </div>
 
+                    <!-- Содержимое вкладок -->
                     <div id="tab-content">
-                        ${activeTab === 'students' ? renderStudentsTab() : renderLessonsTab()}
+                        ${activeTab === 'students' ? renderStudentsTab() : activeTab === 'lessons' ? renderLessonsTab() : renderFinanceTab()}
                     </div>
                 </div>
             `;
@@ -135,7 +138,7 @@
                                     <p class="text-xs text-slate-400">Предмет: ${s.subject || 'Не указан'} | Баланс: <span class="${(s.balance || 0) < 0 ? 'text-rose-500 font-bold' : 'text-emerald-600 font-bold'}">${s.balance || 0} руб.</span></p>
                                 </div>
                                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                                    <button onclick="copyStudentLink('${s.id}')" class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-200 transition cursor-pointer">Скопировать ссылку</button>
+                                    <button onclick="copyStudentLink('${s.id}')" class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-200 transition cursor-pointer">Ссылка</button>
                                     <button onclick="deleteStudent('${s.id}')" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-xs font-medium hover:bg-rose-100 transition cursor-pointer">Удалить</button>
                                 </div>
                             </div>
@@ -170,7 +173,41 @@
                                         <span class="font-semibold text-slate-800">${student ? student.name : 'Ученик удален'}</span>
                                         <span class="text-slate-400 text-xs ml-2">${l.date}</span>
                                     </div>
-                                    <div class="font-medium text-slate-700">${l.price} руб.</div>
+                                    <div class="font-medium text-slate-700">-${l.price} руб.</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFinanceTab() {
+            return `
+                <div class="space-y-6">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <h3 class="font-semibold text-slate-700 mb-3 text-sm">Внести оплату от ученика</h3>
+                        <form onsubmit="addPayment(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <select id="paymentStudentId" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                                <option value="">Выберите ученика</option>
+                                ${students.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                            </select>
+                            <input type="date" id="paymentDate" required value="${new Date().toISOString().split('T')[0]}" class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <input type="number" id="paymentAmount" placeholder="Сумма (руб)" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <button type="submit" class="py-2 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition text-sm cursor-pointer">Внести</button>
+                        </form>
+                    </div>
+
+                    <div class="divide-y divide-slate-100">
+                        ${payments.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Платежей пока нет</p>' : payments.map(p => {
+                            const student = students.find(s => s.id == p.student_id);
+                            return `
+                                <div class="py-3 flex justify-between items-center text-sm">
+                                    <div>
+                                        <span class="font-semibold text-slate-800">${student ? student.name : 'Ученик удален'}</span>
+                                        <span class="text-slate-400 text-xs ml-2">${p.date}</span>
+                                    </div>
+                                    <div class="font-bold text-emerald-600">+${p.amount} руб.</div>
                                 </div>
                             `;
                         }).join('')}
@@ -187,7 +224,6 @@
             const { error } = await supabaseClient.from('students').insert([{ name, subject, balance: 0 }]);
             if (error) {
                 alert("Ошибка при добавлении ученика");
-                console.error(error);
             } else {
                 await loadData();
             }
@@ -218,6 +254,25 @@
             }
         }
 
+        async function addPayment(e) {
+            e.preventDefault();
+            const student_id = document.getElementById('paymentStudentId').value;
+            const date = document.getElementById('paymentDate').value;
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+
+            const { error } = await supabaseClient.from('payments').insert([{ student_id, date, amount }]);
+            if (error) {
+                alert("Ошибка при внесении платежа");
+            } else {
+                const student = students.find(s => s.id == student_id);
+                if (student) {
+                    const newBalance = (student.balance || 0) + amount;
+                    await supabaseClient.from('students').update({ balance: newBalance }).eq('id', student_id);
+                }
+                await loadData();
+            }
+        }
+
         function copyStudentLink(studentId) {
             const url = `${window.location.origin}${window.location.pathname}?student=${studentId}`;
             navigator.clipboard.writeText(url);
@@ -235,6 +290,7 @@
             }
 
             const studentLessons = lessons.filter(l => l.student_id == studentId);
+            const studentPayments = payments.filter(p => p.student_id == studentId);
 
             app.innerHTML = `
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
@@ -247,11 +303,20 @@
                         <div class="text-2xl font-bold ${(data.balance || 0) < 0 ? 'text-rose-500' : 'text-emerald-600'} mt-1">${data.balance || 0} руб.</div>
                     </div>
                     <h3 class="font-semibold text-slate-700 text-sm mb-3">История занятий</h3>
-                    <div class="space-y-2 max-h-60 overflow-y-auto">
-                        ${studentLessons.length === 0 ? '<p class="text-slate-400 text-xs text-center py-4">Занятий пока нет</p>' : studentLessons.map(l => `
+                    <div class="space-y-2 mb-6 max-h-40 overflow-y-auto">
+                        ${studentLessons.length === 0 ? '<p class="text-slate-400 text-xs text-center py-2">Занятий пока нет</p>' : studentLessons.map(l => `
                             <div class="py-2 px-3 bg-slate-50 rounded-xl flex justify-between items-center text-sm">
                                 <span class="text-slate-600">${l.date}</span>
                                 <span class="font-medium text-slate-800">-${l.price} руб.</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <h3 class="font-semibold text-slate-700 text-sm mb-3">История платежей</h3>
+                    <div class="space-y-2 max-h-40 overflow-y-auto">
+                        ${studentPayments.length === 0 ? '<p class="text-slate-400 text-xs text-center py-2">Платежей пока нет</p>' : studentPayments.map(p => `
+                            <div class="py-2 px-3 bg-slate-50 rounded-xl flex justify-between items-center text-sm">
+                                <span class="text-slate-600">${p.date}</span>
+                                <span class="font-medium text-emerald-600">+${p.amount} руб.</span>
                             </div>
                         `).join('')}
                     </div>
@@ -294,20 +359,5 @@
 
         init();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
