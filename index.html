@@ -20,8 +20,21 @@
                 <button onclick="switchTab('schedule')" id="btn-schedule" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition">Календарь</button>
                 <button onclick="switchTab('students')" id="btn-students" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition">Ученики</button>
                 <button onclick="switchTab('finance')" id="btn-finance" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition">Финансы</button>
+                <button onclick="teacherLogout()" class="px-3 py-2 rounded-xl text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition">Выйти</button>
             </div>
         </header>
+
+        <!-- ОКНО ВВОДА ПИН-КОДА ДЛЯ ПРЕПОДАВАТЕЛЯ (МАСТЕР-ПАРОЛЬ) -->
+        <div id="teacher-pin-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div class="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full space-y-4 text-center">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">🔑</div>
+                <h3 class="text-xl font-bold text-gray-800">Вход для преподавателя</h3>
+                <p class="text-xs text-gray-500">Введите мастер-пароль (установлен: <span class="font-bold">2003</span>)</p>
+                <input type="password" id="teacher-pin-input" placeholder="Пароль" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest">
+                <button id="teacher-submit-btn" onclick="verifyTeacherPin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 rounded-xl transition">Войти в панель</button>
+                <div id="teacher-pin-error" class="text-xs text-red-500 font-semibold hidden">Неверный пароль!</div>
+            </div>
+        </div>
 
         <!-- ОКНО ВВОДА ПИН-КОДА ДЛЯ УЧЕНИКА -->
         <div id="pin-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
@@ -29,14 +42,14 @@
                 <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">🔒</div>
                 <h3 class="text-xl font-bold text-gray-800">Введите пин-код</h3>
                 <p class="text-xs text-gray-500">Для доступа к личному кабинету ученика введите секретный код, выданный преподавателем.</p>
-                <input type="password" id="student-pin-input" placeholder="Пин-код (например, 1234)" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest">
+                <input type="password" id="student-pin-input" placeholder="Пин-код" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest">
                 <button onclick="verifyStudentPin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 rounded-xl transition">Войти</button>
                 <div id="pin-error" class="text-xs text-red-500 font-semibold hidden">Неверный пин-код!</div>
             </div>
         </div>
 
         <!-- КОНТЕНТ ДЛЯ ПРЕПОДАВАТЕЛЯ -->
-        <div id="teacher-view" class="space-y-6">
+        <div id="teacher-view" class="space-y-6 hidden">
             
             <!-- ВКЛАДКА 1: КАЛЕНДАРЬ И ЗАНЯТИЯ -->
             <div id="tab-schedule" class="space-y-6">
@@ -78,7 +91,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="font-bold text-base mb-4">👤 Добавить нового ученика</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <input type="text" id="new-student-name" placeholder="Имя ученика (например, Алексей)" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <input type="text" id="new-student-name" placeholder="Имя ученика" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
                         <input type="text" id="new-student-pin" placeholder="Пин-код (например, 1234)" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
                         <button onclick="addStudent()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 rounded-xl transition">Добавить</button>
                     </div>
@@ -180,7 +193,25 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const targetStudent = urlParams.get('student');
+        
         let authenticatedStudent = sessionStorage.getItem('auth_student');
+        let isTeacherAuth = sessionStorage.getItem('auth_teacher') === 'true';
+
+        // Проверка блокировки по неудачным попыткам ввода пароля преподавателя
+        function checkTeacherLock() {
+            let lockUntil = localStorage.getItem('teacher_lock_until');
+            if (lockUntil && Date.now() < parseInt(lockUntil)) {
+                let minutesLeft = Math.ceil((parseInt(lockUntil) - Date.now()) / 60000);
+                document.getElementById('teacher-pin-input').disabled = true;
+                document.getElementById('teacher-submit-btn').disabled = true;
+                document.getElementById('teacher-submit-btn').classList.add('opacity-50', 'cursor-not-allowed');
+                const err = document.getElementById('teacher-pin-error');
+                err.textContent = `Превышено число попыток! Блокировка еще на ${minutesLeft} мин.`;
+                err.classList.remove('hidden');
+                return true;
+            }
+            return false;
+        }
 
         function saveData() {
             localStorage.setItem('tut_students_v2', JSON.stringify(students));
@@ -198,6 +229,40 @@
             document.getElementById(`btn-${tab}`).className = "px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition";
         }
 
+        function verifyTeacherPin() {
+            if (checkTeacherLock()) return;
+
+            const pin = document.getElementById('teacher-pin-input').value.trim();
+            if(pin === "2003") { // Мастер-пароль преподавателя
+                localStorage.removeItem('teacher_wrong_attempts');
+                localStorage.removeItem('teacher_lock_until');
+                sessionStorage.setItem('auth_teacher', 'true');
+                isTeacherAuth = true;
+                document.getElementById('teacher-pin-modal').classList.add('hidden');
+                render();
+            } else {
+                let attempts = parseInt(localStorage.getItem('teacher_wrong_attempts') || '0') + 1;
+                localStorage.setItem('teacher_wrong_attempts', attempts);
+
+                const err = document.getElementById('teacher-pin-error');
+                if (attempts >= 3) {
+                    // Блокируем на 5 минут при 3 неверных попытках
+                    let lockTime = Date.now() + 5 * 60 * 1000;
+                    localStorage.setItem('teacher_lock_until', lockTime);
+                    checkTeacherLock();
+                } else {
+                    err.textContent = `Неверный пароль! Осталось попыток: ${3 - attempts}`;
+                    err.classList.remove('hidden');
+                }
+            }
+        }
+
+        function teacherLogout() {
+            sessionStorage.removeItem('auth_teacher');
+            isTeacherAuth = false;
+            render();
+        }
+
         function addStudent() {
             const name = document.getElementById('new-student-name').value.trim();
             const pin = document.getElementById('new-student-pin').value.trim();
@@ -209,35 +274,26 @@
             saveData();
         }
 
-        // Функция редактирования имени и пин-кода ученика
         function editStudent(oldName) {
             const student = students.find(s => s.name === oldName);
             if(!student) return;
-
             const newName = prompt("Введите новое имя ученика:", student.name);
-            if(newName === null) return; // отмена
+            if(newName === null) return;
             const trimmedName = newName.trim();
             if(!trimmedName) return alert("Имя не может быть пустым!");
-
-            if(trimmedName !== oldName && students.some(s => s.name === trimmedName)) {
-                return alert("Ученик с таким именем уже существует!");
-            }
 
             const newPin = prompt("Введите новый пин-код для ученика:", student.pin);
             if(newPin === null) return;
             const trimmedPin = newPin.trim();
             if(!trimmedPin) return alert("Пин-код не может быть пустым!");
 
-            // Обновляем данные ученика
             student.name = trimmedName;
             student.pin = trimmedPin;
 
-            // Также обновляем имя в истории занятий и платежей, если оно изменилось
             if(trimmedName !== oldName) {
                 lessons.forEach(l => { if(l.student === oldName) l.student = trimmedName; });
                 payments.forEach(p => { if(p.student === oldName) p.student = trimmedName; });
             }
-
             saveData();
         }
 
@@ -324,11 +380,13 @@
             });
 
             if (targetStudent) {
+                // РЕЖИМ УЧЕНИКА
                 if (authenticatedStudent === targetStudent) {
                     document.getElementById('teacher-view').classList.add('hidden');
                     document.getElementById('nav-tabs').classList.add('hidden');
                     document.getElementById('student-view').classList.remove('hidden');
                     document.getElementById('pin-modal').classList.add('hidden');
+                    document.getElementById('teacher-pin-modal').classList.add('hidden');
 
                     document.getElementById('student-cabinet-title').textContent = `Личный кабинет: ${targetStudent}`;
                     document.getElementById('main-title').textContent = `Привет, ${targetStudent}!`;
@@ -389,11 +447,27 @@
                     document.getElementById('teacher-view').classList.add('hidden');
                     document.getElementById('student-view').classList.add('hidden');
                     document.getElementById('pin-modal').classList.remove('hidden');
+                    document.getElementById('teacher-pin-modal').classList.add('hidden');
                 }
             } else {
+                // РЕЖИМ ПРЕПОДАВАТЕЛЯ
+                if (!isTeacherAuth) {
+                    // Панель преподавателя закрыта мастер-паролем
+                    document.getElementById('teacher-view').classList.add('hidden');
+                    document.getElementById('student-view').classList.add('hidden');
+                    document.getElementById('pin-modal').classList.add('hidden');
+                    document.getElementById('teacher-pin-modal').classList.remove('hidden');
+                    document.getElementById('nav-tabs').classList.add('hidden');
+                    
+                    checkTeacherLock();
+                    return;
+                }
+
                 document.getElementById('teacher-view').classList.remove('hidden');
                 document.getElementById('student-view').classList.add('hidden');
                 document.getElementById('pin-modal').classList.add('hidden');
+                document.getElementById('teacher-pin-modal').classList.add('hidden');
+                document.getElementById('nav-tabs').classList.remove('hidden');
 
                 const stContainer = document.getElementById('students-list-container');
                 stContainer.innerHTML = '';
