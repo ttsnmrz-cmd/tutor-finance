@@ -29,7 +29,7 @@
             <div class="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full space-y-4 text-center">
                 <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">🔑</div>
                 <h3 class="text-xl font-bold text-gray-800">Вход для преподавателя</h3>
-                <p class="text-xs text-gray-500">Введите мастер-пароль (установлен: <span class="font-bold">2003</span>)</p>
+                <p class="text-xs text-gray-500">Введите мастер-пароль для доступа к панели</p>
                 <input type="password" id="teacher-pin-input" placeholder="Пароль" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest">
                 <button id="teacher-submit-btn" onclick="verifyTeacherPin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 rounded-xl transition">Войти в панель</button>
                 <div id="teacher-pin-error" class="text-xs text-red-500 font-semibold hidden">Неверный пароль!</div>
@@ -120,6 +120,24 @@
                     <div id="students-balance-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
+                <!-- БЛОК ДЕТАЛЬНЫХ СПИСАНИЙ ЗА УРОКИ -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-base mb-4">📉 Детализация списаний за проведенные уроки</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-50 text-gray-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3">Дата урока</th>
+                                    <th class="p-3">Ученик</th>
+                                    <th class="p-3">Статус</th>
+                                    <th class="p-3 text-right">Сумма списания</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deductions-table-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="font-bold text-base mb-4">📜 История всех платежей</h3>
                     <div class="overflow-x-auto">
@@ -197,7 +215,7 @@
         let authenticatedStudent = sessionStorage.getItem('auth_student');
         let isTeacherAuth = sessionStorage.getItem('auth_teacher') === 'true';
 
-        // Проверка блокировки по неудачным попыткам ввода пароля преподавателя
+        // Проверка блокировки ввода пароля преподавателя
         function checkTeacherLock() {
             let lockUntil = localStorage.getItem('teacher_lock_until');
             if (lockUntil && Date.now() < parseInt(lockUntil)) {
@@ -246,7 +264,6 @@
 
                 const err = document.getElementById('teacher-pin-error');
                 if (attempts >= 3) {
-                    // Блокируем на 5 минут при 3 неверных попытках
                     let lockTime = Date.now() + 5 * 60 * 1000;
                     localStorage.setItem('teacher_lock_until', lockTime);
                     checkTeacherLock();
@@ -452,7 +469,6 @@
             } else {
                 // РЕЖИМ ПРЕПОДАВАТЕЛЯ
                 if (!isTeacherAuth) {
-                    // Панель преподавателя закрыта мастер-паролем
                     document.getElementById('teacher-view').classList.add('hidden');
                     document.getElementById('student-view').classList.add('hidden');
                     document.getElementById('pin-modal').classList.add('hidden');
@@ -532,6 +548,32 @@
                         </div>
                     `;
                 });
+
+                // ЗАПОЛНЕНИЕ ТАБЛИЦЫ СПИСАНИЙ ПО УРОКАМ
+                const deductionsBody = document.getElementById('deductions-table-body');
+                if (deductionsBody) {
+                    deductionsBody.innerHTML = '';
+                    const activeDeductions = lessons.filter(l => l.status === 'conducted' || l.status === 'cancelled_charge');
+                    
+                    if (activeDeductions.length === 0) {
+                        deductionsBody.innerHTML = `<tr><td colspan="4" class="p-4 text-gray-400 italic">Списаний по урокам пока нет</td></tr>`;
+                    } else {
+                        const statusNames = {
+                            'conducted': '✅ Проведено',
+                            'cancelled_charge': '❌ Отменено (со списанием)'
+                        };
+                        activeDeductions.forEach(l => {
+                            deductionsBody.innerHTML += `
+                                <tr class="hover:bg-gray-50/50">
+                                    <td class="p-3 font-medium">${l.date}</td>
+                                    <td class="p-3 font-semibold text-indigo-600">${l.student}</td>
+                                    <td class="p-3 text-xs font-semibold text-gray-600">${statusNames[l.status]}</td>
+                                    <td class="p-3 text-right text-red-600 font-bold">-${l.price} р.</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                }
 
                 const pTable = document.getElementById('payments-table-body');
                 pTable.innerHTML = '';
