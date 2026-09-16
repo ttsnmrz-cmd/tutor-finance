@@ -436,5 +436,51 @@ window.switchTab=function(t){
 document.addEventListener('DOMContentLoaded',()=>setTimeout(renderMainLessonsList,500));
 setTimeout(renderMainLessonsList,1000);
 </script>
+<script id="main-lessons-list-v2">
+function renderMainLessonsListV2(){
+  const root=document.getElementById('tab-calendar');
+  if(!root || !Array.isArray(lessons)) return;
+  const past=lessons
+    .filter(l=>['conducted','cancelled_charge'].includes(String(l.status||'').toLowerCase()))
+    .sort((a,b)=>((b.date||'')+' '+(b.time||'')).localeCompare((a.date||'')+' '+(a.time||'')));
+  const planned=lessons
+    .filter(l=>String(l.status||'').toLowerCase()==='pending')
+    .sort((a,b)=>((a.date||'')+' '+(a.time||'')).localeCompare((b.date||'')+' '+(b.time||'')));
+  const fmt=d=>d?new Date(d+'T00:00:00').toLocaleDateString('ru-RU'):'';
+  const row=l=>`<div onclick="openLessonModal(${Number(l.id)})" class="flex items-center justify-between gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
+    <div class="min-w-0"><div class="font-semibold">${esc(l.student||'')}</div><div class="text-sm text-slate-500">${fmt(l.date)}${l.time?' · '+esc(l.time):''}</div></div>
+    <div class="text-right shrink-0"><div class="font-semibold">${money(l.price)}</div><span class="inline-block mt-1 text-xs px-2 py-1 rounded-full border ${statusClasses[l.status]||''}">${esc(statusLabels[l.status]||l.status||'')}</span></div>
+  </div>`;
+  root.innerHTML=`<div class="space-y-5">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Баланс учеников</p><p class="text-2xl font-bold mt-1">${money(students.reduce((a,s)=>a+balance(s.name),0))}</p></div>
+      <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Проведено занятий</p><p class="text-2xl font-bold mt-1">${past.filter(l=>l.status==='conducted').length}</p></div>
+      <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Получено платежей</p><p class="text-2xl font-bold mt-1">${money(payments.reduce((a,p)=>a+Number(p.amount||0),0))}</p></div>
+      <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">К списанию</p><p class="text-2xl font-bold mt-1">${money(past.reduce((a,l)=>a+Number(l.price||0),0))}</p></div>
+    </div>
+    <div class="bg-white border rounded-2xl shadow-sm p-5">
+      <div class="flex justify-between items-center mb-4"><div><h2 class="text-xl font-bold">Прошедшие занятия</h2><p class="text-sm text-slate-500">Проведенные и отмененные со списанием</p></div><button onclick="openLessonModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-semibold">＋ Новое занятие</button></div>
+      <div class="space-y-2">${past.length?past.map(row).join(''):'<div class="py-8 text-center text-slate-400">Прошедших занятий пока нет</div>'}</div>
+    </div>
+    <div class="bg-white border rounded-2xl shadow-sm p-5">
+      <h3 class="font-bold mb-3">Запланированные занятия <span class="text-xs text-slate-400">(${planned.length})</span></h3>
+      <div class="space-y-2">${planned.length?planned.map(row).join(''):'<div class="text-sm text-slate-400">Нет запланированных занятий</div>'}</div>
+    </div>
+  </div>`;
+}
+let mainLessonsAttempts=0;
+function refreshMainLessonsV2(){
+  try{renderMainLessonsListV2();}catch(e){console.error(e);}
+  if(mainLessonsAttempts++<30 && (!lessons.length || !students.length)) setTimeout(refreshMainLessonsV2,500);
+}
+setTimeout(refreshMainLessonsV2,100);
+document.addEventListener('DOMContentLoaded',()=>setTimeout(refreshMainLessonsV2,100));
+const _oldSaveLessonV2=window.saveLesson;
+if(typeof _oldSaveLessonV2==='function'){
+  window.saveLesson=async function(){const r=await _oldSaveLessonV2.apply(this,arguments);setTimeout(refreshMainLessonsV2,200);return r;};
+}
+const _oldSwitchTabV2=window.switchTab;
+window.switchTab=function(t){if(typeof _oldSwitchTabV2==='function')_oldSwitchTabV2(t);if(t==='calendar')setTimeout(refreshMainLessonsV2,100);};
+</script>
 </body>
 </html>
