@@ -17,91 +17,39 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
 
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
 
-          old = '''<section id="tab-students" class="hidden space-y-5">\n <div class="bg-white border rounded-2xl p-5"><h2 class="text-lg font-bold mb-4">Новый ученик</h2><div class="grid grid-cols-1 md:grid-cols-4 gap-3"><input id="new-student-name" class="border rounded-xl px-3 py-2" placeholder="Имя"><input id="new-student-pin" class="border rounded-xl px-3 py-2" placeholder="PIN ученика"><input id="new-student-price" type="number" min="0" step="0.01" value="40" class="border rounded-xl px-3 py-2" placeholder="Стоимость занятия"><button onclick="addStudent()" class="bg-indigo-600 text-white rounded-xl font-semibold">Добавить</button></div></div>\n <div class="bg-white border rounded-2xl p-5"><h2 class="text-lg font-bold mb-4">Ученики</h2><div id="students-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div></div>\n</section>'''
+          old = '''<section id="tab-students" class="hidden space-y-5">\n <div class="bg-white border rounded-2xl p-5"><h2 class="font-bold mb-4">Новый ученик</h2><div class="grid grid-cols-1 md:grid-cols-4 gap-3"><input id="new-student-name" class="border rounded-xl px-3 py-2" placeholder="Имя"><input id="new-student-pin" class="border rounded-xl px-3 py-2" placeholder="PIN"><input id="new-student-price" type="number" value="40" class="border rounded-xl px-3 py-2" placeholder="Стоимость"><button onclick="addStudent()" class="bg-indigo-600 text-white rounded-xl font-semibold">Добавить</button></div></div><div id="students-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div></section>'''
+          new = '''<section id="tab-students" class="hidden space-y-5">\n <div class="bg-white border rounded-2xl p-5"><h2 class="font-bold mb-4">Добавление нового ученика</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><input id="new-student-name" class="border rounded-xl px-3 py-2" placeholder="Имя"><input id="new-student-pin" class="border rounded-xl px-3 py-2" placeholder="PIN-код"><button onclick="addStudent()" class="bg-indigo-600 text-white rounded-xl font-semibold">Добавить</button></div></div><div class="bg-white border rounded-2xl p-5"><h2 class="font-bold mb-4">Ученики</h2><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left border-b text-slate-400"><th class="p-3">Имя</th><th class="p-3">PIN-код</th><th class="p-3">Ссылка</th><th class="p-3 text-right">Действие</th></tr></thead><tbody id="students-container"></tbody></table></div></div></section>'''
+          if old not in s: raise SystemExit('Students HTML block not found')
+          s=s.replace(old,new,1)
 
-          new = '''<section id="tab-students" class="hidden space-y-5">\n <div class="bg-white border rounded-2xl p-5">\n  <h2 class="text-lg font-bold mb-4">Добавление нового ученика</h2>\n  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">\n   <input id="new-student-name" class="border rounded-xl px-3 py-2" placeholder="Имя">\n   <input id="new-student-pin" class="border rounded-xl px-3 py-2" placeholder="PIN-код">\n   <button onclick="addStudent()" class="bg-indigo-600 text-white rounded-xl font-semibold px-4 py-2">Добавить</button>\n  </div>\n </div>\n <div class="bg-white border rounded-2xl p-5">\n  <h2 class="text-lg font-bold mb-4">Ученики</h2>\n  <div class="overflow-x-auto">\n   <table class="w-full text-sm">\n    <thead><tr class="text-left border-b text-slate-400"><th class="p-3">Имя</th><th class="p-3">PIN-код</th><th class="p-3">Ссылка</th><th class="p-3 text-right">Действие</th></tr></thead>\n    <tbody id="students-container"></tbody>\n   </table>\n  </div>\n </div>\n</section>'''
+          def replace_func(src,name,next_name,replacement):
+              start=src.find(name)
+              end=src.find(next_name,start)
+              if start<0 or end<0: raise SystemExit(f'Function not found: {name}')
+              return src[:start]+replacement+src[end:]
 
-          if old not in s:
-              raise SystemExit('Students HTML block not found')
-          s = s.replace(old, new, 1)
+          render_students='''function renderStudents(){\n  fillStudentSelects();\n  const box=document.getElementById('students-container');\n  if(!box)return;\n  if(!students.length){box.innerHTML='<tr><td colspan="4" class="p-6 text-center text-slate-400">Учеников пока нет</td></tr>';return;}\n  box.innerHTML=students.map(s=>{\n    const safe=String(s.name??'').replace(/\\\\/g,'\\\\\\\\').replace(/'/g,"\\\\'");\n    return `<tr class="border-b last:border-0 hover:bg-slate-50"><td class="p-3 font-semibold">${esc(s.name)}</td><td class="p-3">${esc(s.pin)}</td><td class="p-3"><button onclick="openStudentCabinetLink('${safe}')" class="text-indigo-600 font-semibold">Скопировать ссылку</button></td><td class="p-3 text-right whitespace-nowrap"><button onclick="editStudent('${safe}')" class="text-indigo-600 font-semibold mr-4">Изменить</button><button onclick="deleteStudent('${safe}')" class="text-red-600 font-semibold">Удалить</button></td></tr>`;\n  }).join('');\n}\n'''
+          s=replace_func(s,'function renderStudents(){','\nasync function addStudent',render_students)
 
-          start = s.find('function renderStudents(){')
-          end = s.find('\nfunction openStudentCabinetLink', start)
-          if start < 0 or end < 0:
-              raise SystemExit('renderStudents function not found')
-          render_students = r'''function renderStudents(){
-  const box=document.getElementById('students-container');
-  if(!box)return;
-  if(!students.length){box.innerHTML='<tr><td colspan="4" class="p-6 text-center text-slate-400">Учеников пока нет</td></tr>';return;}
-  box.innerHTML=students.map(s=>{
-    const safe=String(s.name??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return `<tr class="border-b last:border-0 hover:bg-slate-50">
-      <td class="p-3 font-semibold">${esc(s.name)}</td>
-      <td class="p-3">${esc(s.pin)}</td>
-      <td class="p-3"><button onclick="openStudentCabinetLink('${safe}')" class="text-indigo-600 font-semibold">Скопировать ссылку</button></td>
-      <td class="p-3 text-right whitespace-nowrap"><button onclick="editStudent('${safe}')" class="text-indigo-600 font-semibold mr-4">Изменить</button><button onclick="deleteStudent('${safe}')" class="text-red-600 font-semibold">Удалить</button></td>
-    </tr>`;
-  }).join('');
-}'''
-          s = s[:start] + render_students + s[end:]
+          add_student='''async function addStudent(){try{const name=document.getElementById('new-student-name').value.trim(),pin=document.getElementById('new-student-pin').value.trim();if(!name||!pin)return alert('Введите имя и PIN-код');if(students.some(s=>s.name.toLowerCase()===name.toLowerCase()))return alert('Такой ученик уже есть');const rows=await db('/students',{method:'POST',headers:{...headers,Prefer:'return=representation'},body:JSON.stringify({name,pin,price:40})});students.push(...rows);document.getElementById('new-student-name').value='';document.getElementById('new-student-pin').value='';renderStudents();fillStudentSelects();}catch(e){showError(e);}}\n'''
+          s=replace_func(s,'async function addStudent(){','\nasync function editStudent',add_student)
 
-          # Replace editStudent so the Students page edits only the two requested fields.
-          start = s.find('async function editStudent(name){')
-          end = s.find('\nasync function deleteStudent', start)
-          if start < 0 or end < 0:
-              raise SystemExit('editStudent function not found')
-          edit_student = r'''async function editStudent(name){
-  const s=getStudent(name);if(!s)return;
-  const n=prompt('Имя ученика:',s.name);if(n===null)return;
-  const p=prompt('PIN-код:',s.pin);if(p===null)return;
-  const newName=n.trim(),newPin=p.trim();
-  if(!newName||!newPin)return alert('Имя и PIN-код обязательны');
-  try{
-    await db('/students?name=eq.'+encodeURIComponent(s.name),{method:'PATCH',body:JSON.stringify({name:newName,pin:newPin})});
-    if(newName!==s.name){
-      await db('/lessons?student=eq.'+encodeURIComponent(s.name),{method:'PATCH',body:JSON.stringify({student:newName})});
-      await db('/payments?student=eq.'+encodeURIComponent(s.name),{method:'PATCH',body:JSON.stringify({student:newName})});
-    }
-    await loadData();renderStudents();fillStudentSelects();
-  }catch(e){showError(e);}
-}'''
-          s = s[:start] + edit_student + s[end:]
+          edit_student='''async function editStudent(name){const s=students.find(x=>x.name===name);if(!s)return;const n=prompt('Имя ученика:',s.name);if(n===null)return;const p=prompt('PIN-код:',s.pin);if(p===null)return;const newName=n.trim(),newPin=p.trim();if(!newName||!newPin)return alert('Имя и PIN-код обязательны');try{await db('/students?name=eq.'+encodeURIComponent(s.name),{method:'PATCH',body:JSON.stringify({name:newName,pin:newPin})});if(newName!==s.name){await db('/lessons?student=eq.'+encodeURIComponent(s.name),{method:'PATCH',body:JSON.stringify({student:newName})});await db('/payments?student=eq.'+encodeURIComponent(s.name),{method:'PATCH',body:JSON.stringify({student:newName})});}await loadData();renderStudents();fillStudentSelects();}catch(e){showError(e);}}\n'''
+          s=replace_func(s,'async function editStudent(name){','\nasync function deleteStudent',edit_student)
 
-          # Make addStudent use only name + PIN while keeping the existing DB price column harmlessly at 40.
-          start = s.find('async function addStudent(){')
-          end = s.find('\nasync function editStudent', start)
-          if start < 0 or end < 0:
-              raise SystemExit('addStudent function not found')
-          add_student = r'''async function addStudent(){
-  const name=document.getElementById('new-student-name').value.trim();
-  const pin=document.getElementById('new-student-pin').value.trim();
-  if(!name||!pin)return alert('Введите имя и PIN-код');
-  if(students.some(s=>s.name.toLowerCase()===name.toLowerCase()))return alert('Такой ученик уже есть');
-  try{
-    const rows=await db('/students',{method:'POST',headers:{...headers,Prefer:'return=representation'},body:JSON.stringify({name,pin,price:40})});
-    students.push(...rows);
-    document.getElementById('new-student-name').value='';
-    document.getElementById('new-student-pin').value='';
-    renderStudents();fillStudentSelects();
-  }catch(e){showError(e);}
-}'''
-          s = s[:start] + add_student + s[end:]
+          # Remove the later legacy card override so it cannot replace the table.
+          marker='<script id="flat-student-cards-v1">'
+          fs=s.find(marker)
+          if fs>=0:
+              rs=s.find('function renderStudents(){',fs)
+              re=s.find('\nfunction openStudentCabinetLink',rs)
+              if rs>=0 and re>=0:s=s[:rs]+render_students+s[re:]
 
-          # The later flat-card override must also be replaced, otherwise it would overwrite the table.
-          marker = '<script id="flat-student-cards-v1">'
-          fs = s.find(marker)
-          if fs < 0: raise SystemExit('flat student script not found')
-          rs = s.find('function renderStudents(){', fs)
-          re_ = s.find('\nfunction openStudentCabinetLink', rs)
-          if rs < 0 or re_ < 0: raise SystemExit('flat renderStudents not found')
-          s = s[:rs] + render_students + s[re_:]
-
-          p.write_text(s, encoding='utf-8')
+          p.write_text(s,encoding='utf-8')
           PY
       - name: Commit Students page
         run: |
