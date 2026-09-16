@@ -22,24 +22,6 @@
         let currentUser = JSON.parse(sessionStorage.getItem('auth_user')) || null;
         let students = [], lessons = [], payments = [];
 
-        const statusLabels = {
-            pending: '⏳ Запланировано',
-            conducted: 'Проведено',
-            rescheduled: 'Перенесено',
-            cancelled_charge: 'Отменено — списать',
-            cancelled_free: 'Отменено — не списывать'
-        };
-
-        const statusClass = {
-            pending: 'bg-amber-100 text-amber-800',
-            conducted: 'bg-emerald-100 text-emerald-800',
-            rescheduled: 'bg-blue-100 text-blue-800',
-            cancelled_charge: 'bg-rose-100 text-rose-800',
-            cancelled_free: 'bg-slate-100 text-slate-700'
-        };
-
-        const charge = new Set(['conducted', 'cancelled_charge']);
-
         async function loadData() {
             try {
                 const [sRes, lRes, pRes] = await Promise.all([
@@ -59,7 +41,6 @@
         function render() {
             const app = document.getElementById('app');
             
-            // Если никто не вошел — показываем экран авторизации
             if (!currentUser) {
                 app.innerHTML = `
                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 text-center max-w-md mx-auto">
@@ -67,13 +48,13 @@
                         <p class="text-slate-400 text-sm mb-6">Система учета занятий</p>
                         <div class="space-y-3">
                             <button onclick="loginAsTutor()" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition cursor-pointer">Вход для преподавателя</button>
+                            <button onclick="loginAsStudentPrompt()" class="w-full py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition cursor-pointer">Вход для ученика (PIN)</button>
                         </div>
                     </div>
                 `;
                 return;
             }
 
-            // Если вошел преподаватель
             if (currentUser.role === 'tutor') {
                 app.innerHTML = `
                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
@@ -85,7 +66,7 @@
                             <button onclick="logout()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition cursor-pointer">Выйти</button>
                         </div>
                         <div class="space-y-4">
-                            <p class="text-slate-600">Панель управления активна. База данных подключена успешно.</p>
+                            <p class="text-slate-600">Панель управления активна. База данных подключена.</p>
                             <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                                 <span class="text-xs text-slate-400 uppercase tracking-wider">Статистика</span>
                                 <div class="grid grid-cols-2 gap-4 mt-2">
@@ -96,18 +77,29 @@
                         </div>
                     </div>
                 `;
+            } else if (currentUser.role === 'student') {
+                app.innerHTML = `
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h1 class="text-xl font-bold text-slate-800">Кабинет ученика</h1>
+                                <p class="text-slate-400 text-sm">Привет, ${currentUser.name}</p>
+                            </div>
+                            <button onclick="logout()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition cursor-pointer">Выйти</button>
+                        </div>
+                        <p class="text-slate-600">Здесь отображается ваш прогресс и расписание.</p>
+                    </div>
+                `;
             }
         }
 
         async function loginAsTutor() {
             const emailInput = prompt("Введите email преподавателя:");
             if (!emailInput) return;
-
             const passwordInput = prompt("Введите пароль преподавателя:");
             if (!passwordInput) return;
 
             try {
-                // Проверяем данные по таблице tutors в Supabase
                 const { data, error } = await supabaseClient
                     .from('tutors')
                     .select('*')
@@ -125,7 +117,60 @@
                 }
             } catch (err) {
                 console.error("Ошибка авторизации:", err);
-                alert("Ошибка при проверке данных. Проверьте подключение к базе.");
+                alert("Ошибка при проверке данных.");
+            }
+        }
+
+        async function loginAsStudentPrompt() {
+            // Проверка блокировки
+            const blockUntil = localStorage.getItem('student_block_until');
+            if (blockUntil) {
+                const now = new Date().getTime();
+                if (now < parseInt(blockUntil)) {
+                    const minutesLeft = Math.ceil((parseInt(blockUntil) - now) / 60000);
+                    alert(`Вход заблокирован из-за трех неверных попыток. Попробуйте через ${minutesLeft} мин.`);
+                    return;
+                } else {
+                    localStorage.removeItem('student_block_until');
+                    localStorage.removeItem('student_failed_attempts');
+                }
+            }
+
+            const pinInput = prompt("Введите ваш PIN-код ученика:");
+            if (!pinInput) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .eq('pin', pinInput.trim());
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    // Успешный вход — сбрасываем счетчик неудач
+                    localStorage.removeItem('student_failed_attempts');
+                    localStorage.removeItem('student_block_until');
+
+                    currentUser = { role: 'student', name: data[0].name || 'Ученик', id: data[0].id };
+                    sessionStorage.setItem('auth_user', JSON.stringify(currentUser));
+                    render();
+                } else {
+                    // Неверный PIN — считаем попытки
+                    let attempts = parseInt(localStorage.getItem('student_failed_attempts') || '0') + 1;
+                    localStorage.setItem('student_failed_attempts', attempts);
+
+                    if (attempts >= 3) {
+                        const blockTime = new Date().getTime() + 15 * 60 * 1000; // 15 минут
+                        localStorage.setItem('student_block_until', blockTime);
+                        alert("Неверный PIN-код. Превышено количество попыток. Вход заблокирован на 15 минут.");
+                    } else {
+                        alert(`Неверный PIN-код. Осталось попыток: ${3 - attempts}`);
+                    }
+                }
+            } catch (err) {
+                console.error("Ошибка входа ученика:", err);
+                alert("Ошибка при проверке PIN-кода.");
             }
         }
 
@@ -137,20 +182,5 @@
 
         loadData();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
