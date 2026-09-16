@@ -23,7 +23,7 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 <div id="teacher-login-modal" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="app-card rounded-3xl p-6 w-full max-w-sm space-y-3"><h2 class="text-xl font-bold">Вход преподавателя</h2><input id="teacher-email-input" type="email" value="ttsnmrz@gmail.com" class="soft-input w-full rounded-xl px-3 py-2"><input id="teacher-password-input" type="password" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Пароль" onkeydown="if(event.key==='Enter')loginTeacher()"><button type="button" onclick="loginTeacher()" class="primary-btn w-full text-white rounded-xl py-2 font-semibold">Войти</button><p id="teacher-login-error" class="text-sm text-red-600"></p></div></div>
 <div id="student-edit-modal" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="app-card rounded-3xl p-6 w-full max-w-md space-y-4"><div class="flex justify-between items-center"><div><h2 class="text-xl font-bold">Редактировать ученика</h2><p class="text-sm text-slate-500">Имя и PIN можно изменить в любой момент</p></div><button type="button" onclick="closeStudentEdit()" class="text-2xl text-slate-400">×</button></div><input type="hidden" id="edit-student-id"><label class="text-sm font-semibold block">Имя<input id="edit-student-name" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><label class="text-sm font-semibold block">PIN<input id="edit-student-pin" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeStudentEdit()" class="px-4 py-2 rounded-xl bg-slate-100 font-semibold">Отмена</button><button type="button" onclick="saveStudentEdit()" class="primary-btn px-5 py-2 rounded-xl text-white font-semibold">Сохранить</button></div></div></div>
 <div id="lesson-modal" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="app-card rounded-3xl p-6 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto"><div class="flex justify-between"><h2 id="lesson-modal-title" class="text-xl font-bold">Редактировать занятие</h2><button type="button" onclick="closeLessonModal()" class="text-2xl text-slate-400">×</button></div><input type="hidden" id="edit-id"><label class="text-sm font-semibold">Ученик<select id="edit-student" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label><div class="grid grid-cols-2 gap-3"><label class="text-sm font-semibold block">Дата<input id="edit-date" type="date" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><label class="text-sm font-semibold block">Время<input id="edit-time" type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="15.00" onblur="formatTimeField(this)" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label></div><label class="text-sm font-semibold block">Стоимость<select id="edit-price" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="40">40 BYN</option><option value="20">20 BYN</option><option value="0">0 BYN</option></select></label><label class="text-sm font-semibold block">Статус<select id="edit-status" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label>
-<div id="recurring-options" class="hidden rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 space-y-3"><label class="flex items-center gap-2 text-sm font-semibold cursor-pointer"><input id="lesson-recurring" type="checkbox" class="w-4 h-4"><span>Повторять занятие</span></label><div id="recurring-fields" class="hidden space-y-3"><label class="text-sm font-semibold block">Как часто<select id="recurring-frequency" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="1">Каждую неделю</option><option value="2">Раз в 2 недели</option><option value="3">Раз в 3 недели</option><option value="4">Раз в 4 недели</option></select></label><div><div class="text-xs font-semibold text-slate-500 mb-2">По каким дням</div><div class="grid grid-cols-7 gap-1"><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="1">Пн</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="2">Вт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="3">Ср</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="4">Чт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="5">Пт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="6">Сб</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="0">Вс</label></div></div><label class="text-sm font-semibold block">Повторять до<input id="recurring-end" type="date" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label></div></div>
+<div id="recurring-options" class="hidden rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 space-y-3"><label class="flex items-center gap-2 text-sm font-semibold cursor-pointer"><input id="lesson-recurring" type="checkbox" class="w-4 h-4"><span>Повторять занятие</span></label><div id="recurring-fields" class="hidden space-y-3"><label class="text-sm font-semibold block">Как часто<select id="recurring-frequency" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="1">Каждую неделю</option><option value="2">Раз в 2 недели</option><option value="3">Раз в 3 недели</option><option value="4">Раз в 4 недели</option></select></label><div><div class="text-xs font-semibold text-slate-500 mb-2">По каким дням</div><div class="grid grid-cols-7 gap-1"><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="1">Пн</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="2">Вт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="3">Ср</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="4">Чт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="5">Пт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="6">Сб</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="0">Вс</label></div></div></div></div>
 <div class="flex justify-between pt-2"><button type="button" onclick="deleteLessonFromModal()" class="px-4 py-2 rounded-xl bg-red-50 text-red-600 font-semibold">Удалить</button><button id="lesson-save-btn" type="button" onclick="saveEditedLesson()" class="primary-btn px-5 py-2 rounded-xl text-white font-semibold">Сохранить</button></div></div></div>
 <main id="teacher-view"><section id="tab-calendar" class="space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div><h2 class="text-lg font-bold">Неделя</h2><p id="week-range" class="text-xs text-slate-400 mt-0.5"></p></div><div class="flex gap-2"><button type="button" onclick="changeWeek(-1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">←</button><button type="button" onclick="goToday()" class="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold">Сегодня</button><button type="button" onclick="changeWeek(1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">→</button></div></div><div class="overflow-x-auto"><div id="week-calendar" class="week-grid"></div></div></div>
 <div class="app-card rounded-3xl p-5"><div class="flex justify-between items-center mb-4"><div><h2 class="text-lg font-bold">Расписание</h2><p class="text-xs text-slate-400 mt-0.5">Все занятия и их текущие статусы</p></div><button type="button" onclick="loadData().then(()=>{renderMain();renderWeek()})" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm">Обновить</button></div><div class="overflow-x-auto schedule-scroll-v3" id="schedule-scroll-wrap"><table class="w-full text-sm"><thead><tr class="text-left border-b text-slate-400"><th class="p-3">Дата занятия</th><th class="p-3">Время</th><th class="p-3">Имя ученика</th><th class="p-3">Стоимость</th><th class="p-3">Статус</th><th class="p-3 text-right">Действие</th></tr></thead><tbody id="main-lessons"></tbody></table></div></div></section>
@@ -56,7 +56,7 @@ function renderWeek(){
   for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d);}
   range.textContent=weekTitle(days[0],days[6]);
   const today=dateKey(new Date());
-  container.innerHTML=days.map((d, index)=>{
+  container.innerHTML=days.map((d)=>{
     const key=dateKey(d),isToday=key===today,dayLessons=[...lessons].filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
     return `<div class="week-day border-r border-slate-100 last:border-r-0 ${isToday?'bg-indigo-50/40':''}" onclick="handleDayClick(event, '${key}')"><div class="p-3 border-b border-slate-100 ${isToday?'bg-indigo-50':''}"><div class="text-xs font-semibold uppercase text-slate-400">${formatDay(d)}</div><div class="text-lg font-bold ${isToday?'text-indigo-600':'text-slate-700'}">${formatShortDate(d)}</div></div><div class="p-2 space-y-2">${dayLessons.map(l=>{const v=lessonVisual(l);const tone=l.status==='cancelled_charge'?'border-red-200 bg-red-50':l.status==='cancelled_free'||l.status==='rescheduled'?'border-slate-200 bg-slate-50':'border-indigo-100 bg-white';return `<button type="button" onclick="event.stopPropagation();openEditLesson('${esc(l.id)}')" class="week-lesson w-full text-left rounded-xl border ${tone} p-2.5"><div class="flex items-center justify-between gap-2"><span class="font-bold text-sm ${v.muted?'line-through text-slate-400':'text-indigo-700'}">${esc(displayTime(l.time)||'—')}</span><span class="text-xs">${v.icon||''}</span></div><div class="font-semibold text-sm mt-1 ${v.muted?'text-slate-400 line-through':'text-slate-700'}">${esc(l.student)}</div><div class="text-[11px] mt-1 ${v.muted?'text-slate-400':'text-slate-500'}">${money(l.price)} · ${v.label}</div></button>`}).join('')||'<div class="text-xs text-slate-400 text-center py-6">Нажмите, чтобы добавить</div>'}</div></div>`
   }).join('');
@@ -77,18 +77,24 @@ function resetRecurring(date){
   const cb=document.getElementById('lesson-recurring');
   const fields=document.getElementById('recurring-fields');
   const freq=document.getElementById('recurring-frequency');
-  const end=document.getElementById('recurring-end');
   if(cb) cb.checked=false;
   if(fields) fields.classList.add('hidden');
   if(freq) freq.value='1';
   document.querySelectorAll('.rec-day').forEach(x=>x.checked=false);
-  if(end) end.value='';
   if(date){
     const d=new Date(date+'T12:00:00');
     const day=document.querySelector('.rec-day[value="'+d.getDay()+'"]');
     if(day) day.checked=true;
   }
 }
+
+// Управляем видимостью чекбоксов дней при включении повторения
+document.addEventListener('change', e => {
+  if(e.target && e.target.id === 'lesson-recurring'){
+    const fields = document.getElementById('recurring-fields');
+    if(fields) fields.classList.toggle('hidden', !e.target.checked);
+  }
+});
 
 function openNewLessonModal(date){
   fillStudentSelects();
@@ -151,12 +157,13 @@ async function saveEditedLesson(){
       if(recurring){
         const selected=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
         const freq=Number(document.getElementById('recurring-frequency')?.value||1);
-        const end=document.getElementById('recurring-end')?.value;
         if(!selected.length){showError(new Error('Выберите хотя бы один день недели'));return;}
-        if(!end||end<date){showError(new Error('Укажите дату окончания повторения не раньше даты первого занятия'));return;}
 
+        // Генерируем занятия автоматически на 2 месяца (8 недель) вперед без даты окончания
         const start=new Date(date+'T12:00:00');
-        const last=new Date(end+'T12:00:00');
+        const last=new Date(start);
+        last.setDate(last.getDate()+60);
+
         const monday=d=>{const x=new Date(d);const day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));x.setHours(12,0,0,0);return x;};
         const firstMonday=monday(start);
         dates=[];
@@ -233,20 +240,5 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
 document.addEventListener('DOMContentLoaded',boot);
 </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
