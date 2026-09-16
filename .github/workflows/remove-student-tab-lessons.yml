@@ -1,0 +1,70 @@
+name: Remove duplicate lessons block from Students tab
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove duplicate block from Students tab
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '<script id="remove-student-tab-lessons-v1">'
+          if marker in s:
+              print('Patch already present')
+              raise SystemExit(0)
+          script = r'''<script id="remove-student-tab-lessons-v1">
+(function(){
+  function removeDuplicate(){
+    const tab=document.getElementById('tab-students');
+    if(!tab) return;
+    const nodes=[...tab.querySelectorAll('h1,h2,h3,h4,h5,h6,p,div')];
+    nodes.forEach(el=>{
+      const text=(el.textContent||'').trim();
+      if(!text || !/^Проведенные занятия$/i.test(text)) return;
+      let block=el;
+      for(let i=0;i<4 && block.parentElement;i++){
+        const parent=block.parentElement;
+        if(parent===tab) break;
+        const t=(parent.textContent||'').trim();
+        if(t.includes('Сначала самые последние') || t.includes('Все проведенные занятия, от новых к старым')){
+          block=parent;
+          break;
+        }
+        block=parent;
+      }
+      if(block!==tab) block.remove();
+    });
+  }
+  function boot(){
+    removeDuplicate();
+    const tab=document.getElementById('tab-students');
+    if(tab && !tab.__lessonsCleanupObserver){
+      const obs=new MutationObserver(removeDuplicate);
+      obs.observe(tab,{childList:true,subtree:true});
+      tab.__lessonsCleanupObserver=obs;
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+  setTimeout(boot,300);
+  setTimeout(boot,1000);
+})();
+</script>'''
+          p.write_text(s + '\n' + script + '\n', encoding='utf-8')
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Remove duplicate conducted lessons from Students tab"
+          git push
