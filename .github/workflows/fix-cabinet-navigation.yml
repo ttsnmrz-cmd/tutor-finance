@@ -1,0 +1,76 @@
+name: Fix cabinet navigation
+on:
+  push:
+    paths:
+      - .github/workflows/fix-cabinet-navigation.yml
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          s = s.replace(
+              '<button onclick="studentLogout()" class="bg-slate-100 px-3 py-2 rounded-xl">Выйти</button>',
+              '<button id="student-logout-btn" onclick="studentLogout()" class="bg-slate-100 px-3 py-2 rounded-xl">Выйти</button>'
+          )
+
+          old = '''function studentLogout(){
+  sessionStorage.removeItem('auth_student');
+  location.reload();
+}'''
+          new = '''function studentLogout(){
+  if(sessionStorage.getItem('teacher_cabinet_student')){
+    sessionStorage.removeItem('teacher_cabinet_student');
+    sessionStorage.removeItem('auth_student');
+    document.getElementById('student-view').classList.add('hidden');
+    document.getElementById('teacher-view').classList.remove('hidden');
+    const btn=document.getElementById('student-logout-btn');
+    if(btn)btn.textContent='Выйти';
+    history.replaceState({},'',location.pathname);
+    switchTab('students');
+    return;
+  }
+  sessionStorage.removeItem('auth_student');
+  history.replaceState({},'',location.pathname);
+  location.reload();
+}'''
+          if old in s:
+              s = s.replace(old, new)
+
+          old = '''function openStudentCabinetLink(name){
+  history.replaceState({},'',location.pathname+'?student='+encodeURIComponent(name));
+  sessionStorage.setItem('auth_student',name);
+  document.getElementById('teacher-view').classList.add('hidden');
+  document.getElementById('student-view').classList.remove('hidden');
+  renderStudentCabinet(name);
+}'''
+          new = '''function openStudentCabinetLink(name){
+  sessionStorage.setItem('teacher_cabinet_student',name);
+  sessionStorage.removeItem('auth_student');
+  history.replaceState({},'',location.pathname);
+  document.getElementById('teacher-view').classList.add('hidden');
+  document.getElementById('student-view').classList.remove('hidden');
+  const btn=document.getElementById('student-logout-btn');
+  if(btn)btn.textContent='← К преподавателю';
+  renderStudentCabinet(name);
+}'''
+          if old in s:
+              s = s.replace(old, new)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Fix return from teacher student cabinet'
+          git push
