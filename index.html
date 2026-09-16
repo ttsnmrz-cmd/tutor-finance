@@ -216,7 +216,7 @@ function renderWeek(){
           const tone=l.status==='cancelled_charge'?'border-red-200 bg-red-50':l.status==='cancelled_free'||l.status==='rescheduled'?'border-slate-200 bg-slate-50':'border-indigo-100 bg-white';
           return `<div draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${esc(l.id)}')" onclick="event.stopPropagation();openEditLesson('${esc(l.id)}')" class="week-lesson w-full text-left rounded-xl border ${tone} p-2.5 select-none">
             <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-sm ${v.muted?'line-through text-slate-400':'text-indigo-700'}">${esc(displayTime(l.time)||'—')}</span>
+              <span class="font-bold text-sm ${v.muted?'line-through text-slate-400':'text-indigo-700'}">${esc(displayTime(l.time||'—')}</span>
               <span class="text-xs">${v.icon||''}</span>
             </div>
             <div class="font-semibold text-sm mt-1 ${v.muted?'text-slate-400 line-through':'text-slate-700'}">${esc(l.student)}</div>
@@ -643,7 +643,7 @@ async function openStudentCabinet(){
       const textClass = v.muted ? 'lesson-muted' : '';
       return `<tr id="public-lesson-row-${esc(l.id)}" class="border-b hover:bg-slate-50 transition ${v.row}">
         <td class="p-3 ${textClass}">${esc(l.date)}</td>
-        <td class="p-3 ${textClass}">${esc(displayTime(l.time)||'—')}</td>
+        <td class="p-3 ${textClass}">${esc(displayTime(l.time||'—')}</td>
         <td class="p-3 ${textClass}">${money(l.price)}</td>
         <td class="p-3"><span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold ${statusClass[l.status]||'bg-slate-100'}">${v.icon?`<span class="lesson-icon ${v.iconClass}">${v.icon}</span>`:''}${v.label}</span></td>
       </tr>`;
@@ -651,13 +651,11 @@ async function openStudentCabinet(){
 
     document.getElementById('public-payments').innerHTML=[...(ps||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(p=>`<div class="flex justify-between py-2 border-b border-slate-100 last:border-0"><span>${esc(p.date)}</span><b>${money(p.amount)}</b></div>`).join('')||'<span class="text-slate-400">Платежей пока нет</span>';
     
-    // Сначала показываем контент, чтобы браузер успел построить DOM и элементы получили размеры
     document.getElementById('student-public-login').classList.add('hidden');
     document.getElementById('student-public-content').classList.remove('hidden');
 
-    // Автопрокрутка к текущей дате с задержкой для надежности
+    // Автопрокрутка к текущей дате с задержкой для надежности рендеринга
     setTimeout(() => {
-      // Ищем занятие, которое совпадает с сегодняшним днем или первое предстоящее
       let targetRow = visibleLessons.find(l => l.date === todayStr);
       if (!targetRow) {
         targetRow = visibleLessons.find(l => l.date > todayStr);
@@ -670,12 +668,12 @@ async function openStudentCabinet(){
         const tr = document.getElementById('public-lesson-row-' + targetRow.id);
         const scrollWrap = document.getElementById('public-schedule-scroll-wrap');
         if (tr && scrollWrap) {
-          scrollWrap.scrollTop = tr.offsetTop - scrollWrap.offsetTop - 10; // небольшой отступ сверху
+          scrollWrap.scrollTop = tr.offsetTop - scrollWrap.offsetTop - 10;
         }
       }
     }, 150);
 
-  }catch(e){document.getElementById('public-error').textContent=e.message||'Ошибка загрузки';}
+  }catch(e){document.getElementById('student-public-error').textContent=e.message||'Ошибка загрузки';}
 }
 
 async function boot(){
@@ -691,20 +689,6 @@ async function boot(){
   }
 }
 document.addEventListener('DOMContentLoaded',boot);
-</script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
 </script>
 
 </body>
