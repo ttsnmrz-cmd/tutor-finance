@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет ученика / Учет занятий</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6 text-gray-800">
+
+    <div class="max-w-4xl mx-auto space-y-6">
+        
+        <!-- Шапка -->
+        <header class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+            <div>
+                <h1 id="main-title" class="text-2xl font-bold">📚 Учет занятий и финансов</h1>
+                <p id="main-subtitle" class="text-sm text-gray-500">Баланс, статусы занятий и история платежей</p>
+            </div>
+            <div id="nav-tabs" class="flex gap-2">
+                <button onclick="switchTab('schedule')" id="btn-schedule" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition">Календарь</button>
+                <button onclick="switchTab('finance')" id="btn-finance" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition">Финансы и Баланс</button>
+            </div>
+        </header>
+
+        <!-- КОНТЕНТ ДЛЯ ПРЕПОДАВАТЕЛЯ (скрывается, если зашел ученик по ссылке) -->
+        <div id="teacher-view" class="space-y-6">
+            
+            <!-- ВКЛАДКА 1: КАЛЕНДАРЬ И ЗАНЯТИЯ -->
+            <div id="tab-schedule" class="space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-base mb-4">➕ Добавить занятие</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <input type="text" id="student-name" placeholder="Имя ученика" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <input type="date" id="lesson-date" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <input type="number" id="lesson-price" value="40" placeholder="Цена за урок (р.)" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <button onclick="addLesson()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 rounded-xl transition">Добавить занятие</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-base mb-4">📅 Расписание и статусы занятий</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-50 text-gray-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3">Дата</th>
+                                    <th class="p-3">Ученик</th>
+                                    <th class="p-3">Стоимость</th>
+                                    <th class="p-3">Статус / Действие</th>
+                                    <th class="p-3">Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lessons-table-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВКЛАДКА 2: ФИНАНСЫ И БАЛАНС -->
+            <div id="tab-finance" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-base mb-4">💰 Внести платеж от ученика</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <input type="text" id="pay-student" placeholder="Имя ученика" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <input type="number" id="pay-amount" placeholder="Сумма (р.)" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <input type="date" id="pay-date" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <button onclick="addPayment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2 rounded-xl transition">Внести оплату</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-base mb-4">👤 Финансовый баланс учеников</h3>
+                    <div id="students-balance-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-base">📜 История всех платежей</h3>
+                        <button onclick="generateStudentLinkModal()" class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition">🔗 Ссылка для ученика</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-50 text-gray-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3">Дата</th>
+                                    <th class="p-3">Ученик</th>
+                                    <th class="p-3">Сумма</th>
+                                    <th class="p-3 text-right">Удалить</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-table-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- КОНТЕНТ ДЛЯ УЧЕНИКА (показывается только по ссылке ?student=Имя) -->
+        <div id="student-view" class="space-y-6 hidden">
+            <div id="student-summary-card" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <!-- Карточка баланса ученика -->
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="font-bold text-base mb-4">📜 История внесенных вами платежей</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-gray-400 uppercase text-xs">
+                            <tr>
+                                <th class="p-3">Дата</th>
+                                <th class="p-3">Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-payments-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="font-bold text-base mb-4">📅 История ваших занятий</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-gray-400 uppercase text-xs">
+                            <tr>
+                                <th class="p-3">Дата</th>
+                                <th class="p-3">Стоимость</th>
+                                <th class="p-3">Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-lessons-body" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Модальное окно для копирования ссылки -->
+    <div id="link-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 rounded-2xl max-w-md w-full space-y-4">
+            <h3 class="font-bold text-base">Ссылка для ученика</h3>
+            <p class="text-xs text-gray-500">Скопируйте эту ссылку и отправьте ученику в мессенджер. Он сможет видеть свой баланс и историю платежей.</p>
+            <input type="text" id="modal-link-input" readonly class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-gray-50 select-all">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-gray-100 rounded-xl text-xs font-semibold">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lessons = JSON.parse(localStorage.getItem('tut_lessons')) || [
+            { id: 1, student: "Алексей", date: "2026-03-20", price: 40, status: "conducted" },
+            { id: 2, student: "Алексей", date: "2026-03-22", price: 40, status: "pending" }
+        ];
+
+        let payments = JSON.parse(localStorage.getItem('tut_payments')) || [
+            { id: 1, student: "Алексей", date: "2026-03-19", amount: 400 }
+        ];
+
+        // Проверяем, перешел ли ученик по персональной ссылке (?student=Имя)
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentMode = urlParams.get('student');
+
+        function saveData() {
+            localStorage.setItem('tut_lessons', JSON.stringify(lessons));
+            localStorage.setItem('tut_payments', JSON.stringify(payments));
+            render();
+        }
+
+        function switchTab(tab) {
+            if(tab === 'schedule') {
+                document.getElementById('tab-schedule').classList.remove('hidden');
+                document.getElementById('tab-finance').classList.add('hidden');
+                document.getElementById('btn-schedule').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition";
+                document.getElementById('btn-finance').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition";
+            } else {
+                document.getElementById('tab-schedule').classList.add('hidden');
+                document.getElementById('tab-finance').classList.remove('hidden');
+                document.getElementById('btn-schedule').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition";
+                document.getElementById('btn-finance').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition";
+            }
+        }
+
+        function addLesson() {
+            const student = document.getElementById('student-name').value.trim();
+            const date = document.getElementById('lesson-date').value;
+            const price = parseFloat(document.getElementById('lesson-price').value) || 40;
+            if(!student || !date) return alert("Заполните имя и дату!");
+            lessons.push({ id: Date.now(), student, date, price, status: 'pending' });
+            document.getElementById('student-name').value = '';
+            saveData();
+        }
+
+        function updateStatus(id, newStatus) {
+            const lesson = lessons.find(l => l.id === id);
+            if(lesson) { lesson.status = newStatus; saveData(); }
+        }
+
+        function deleteLesson(id) {
+            lessons = lessons.filter(l => l.id !== id);
+            saveData();
+        }
+
+        function addPayment() {
+            const student = document.getElementById('pay-student').value.trim();
+            const amount = parseFloat(document.getElementById('pay-amount').value);
+            const date = document.getElementById('pay-date').value;
+            if(!student || isNaN(amount) || !date) return alert("Заполните все поля платежа!");
+            payments.push({ id: Date.now(), student, date, amount });
+            document.getElementById('pay-student').value = '';
+            document.getElementById('pay-amount').value = '';
+            saveData();
+        }
+
+        function deletePayment(id) {
+            payments = payments.filter(p => p.id !== id);
+            saveData();
+        }
+
+        // Генерация ссылки для модального окна
+        function generateStudentLinkModal() {
+            const allStudents = [...new Set([...lessons.map(l => l.student), ...payments.map(p => p.student)])];
+            if(allStudents.length === 0) return alert("Сначала добавьте учеников!");
+            // По умолчанию берем первого попавшегося или спрашиваем
+            const student = prompt("Введите имя ученика для создания ссылки:", allStudents[0]);
+            if(!student) return;
+            
+            const baseUrl = window.location.href.split('?')[0];
+            const link = `${baseUrl}?student=${encodeURIComponent(student)}`;
+            
+            document.getElementById('modal-link-input').value = link;
+            document.getElementById('link-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('link-modal').classList.add('hidden');
+        }
+
+        function render() {
+            if (studentMode) {
+                // РЕЖИМ УЧЕНИКА
+                document.getElementById('teacher-view').classList.add('hidden');
+                document.getElementById('nav-tabs').classList.add('hidden');
+                document.getElementById('student-view').classList.remove('hidden');
+                
+                document.getElementById('main-title').textContent = `Личный кабинет: ${studentMode}`;
+                document.getElementById('main-subtitle').textContent = `Ваш текущий баланс и история занятий`;
+
+                // Считаем финансы ученика
+                const totalPaid = payments.filter(p => p.student === studentMode).reduce((sum, p) => sum + p.amount, 0);
+                const totalSpent = lessons.filter(l => l.student === studentMode && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
+                const balance = totalPaid - totalSpent;
+
+                document.getElementById('student-summary-card').innerHTML = `
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <div class="text-xs text-gray-400 uppercase font-semibold">Всего внесено средств:</div>
+                            <div class="text-xl font-bold text-gray-700">${totalPaid} р.</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-400 uppercase font-semibold">Списано за уроки:</div>
+                            <div class="text-xl font-bold text-gray-700">${totalSpent} р.</div>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 text-right w-full md:w-auto">
+                            <div class="text-xs text-gray-400 uppercase font-semibold">Ваш баланс:</div>
+                            <div class="text-2xl font-black ${balance >= 0 ? 'text-emerald-600' : 'text-red-600'}">${balance} р.</div>
+                        </div>
+                    </div>
+                `;
+
+                // Таблица платежей ученика
+                const spBody = document.getElementById('student-payments-body');
+                spBody.innerHTML = '';
+                const myPayments = payments.filter(p => p.student === studentMode);
+                if(myPayments.length === 0) spBody.innerHTML = `<tr><td colspan="2" class="p-4 text-gray-400 italic">Платежей пока нет</td></tr>`;
+                myPayments.forEach(p => {
+                    spBody.innerHTML += `<tr class="hover:bg-gray-50/50"><td class="p-3">${p.date}</td><td class="p-3 text-emerald-600 font-bold">+${p.amount} р.</td></tr>`;
+                });
+
+                // Таблица занятий ученика
+                const slBody = document.getElementById('student-lessons-body');
+                slBody.innerHTML = '';
+                const myLessons = lessons.filter(l => l.student === studentMode);
+                if(myLessons.length === 0) slBody.innerHTML = `<tr><td colspan="3" class="p-4 text-gray-400 italic">Занятий пока нет</td></tr>`;
+                
+                const statusLabels = {
+                    'pending': '⏳ Запланировано',
+                    'conducted': '✅ Проведено',
+                    'rescheduled': '🔄 Перенесено',
+                    'cancelled_charge': '❌ Отменено (списано)',
+                    'cancelled_free': '🚫 Отменено (бесплатно)'
+                };
+
+                myLessons.forEach(l => {
+                    slBody.innerHTML += `
+                        <tr class="hover:bg-gray-50/50">
+                            <td class="p-3 font-medium">${l.date}</td>
+                            <td class="p-3">${l.price} р.</td>
+                            <td class="p-3 font-semibold text-xs">${statusLabels[l.status] || l.status}</td>
+                        </tr>
+                    `;
+                });
+
+            } else {
+                // РЕЖИМ ПРЕПОДАВАТЕЛЯ
+                document.getElementById('teacher-view').classList.remove('hidden');
+                document.getElementById('student-view').classList.add('hidden');
+
+                // Рендер таблицы занятий
+                const lTable = document.getElementById('lessons-table-body');
+                lTable.innerHTML = '';
+                lessons.forEach(l => {
+                    lTable.innerHTML += `
+                        <tr class="hover:bg-gray-50/50">
+                            <td class="p-3 font-medium">${l.date}</td>
+                            <td class="p-3 font-semibold text-indigo-600">${l.student}</td>
+                            <td class="p-3">${l.price} р.</td>
+                            <td class="p-3">
+                                <select onchange="updateStatus(${l.id}, this.value)" class="border border-gray-200 rounded-lg px-2 py-1 text-xs bg-white font-medium">
+                                    <option value="pending" ${l.status === 'pending' ? 'selected' : ''}>⏳ Запланировано</option>
+                                    <option value="conducted" ${l.status === 'conducted' ? 'selected' : ''}>✅ Проведено (списать)</option>
+                                    <option value="rescheduled" ${l.status === 'rescheduled' ? 'selected' : ''}>🔄 Перенесено (не списывать)</option>
+                                    <option value="cancelled_charge" ${l.status === 'cancelled_charge' ? 'selected' : ''}>❌ Отменено (списать)</option>
+                                    <option value="cancelled_free" ${l.status === 'cancelled_free' ? 'selected' : ''}>🚫 Отменено (не списывать)</option>
+                                </select>
+                            </td>
+                            <td class="p-3"><button onclick="deleteLesson(${l.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold">Удалить</button></td>
+                        </tr>
+                    `;
+                });
+
+                // Баланс учеников у преподавателя
+                const allStudents = [...new Set([...lessons.map(l => l.student), ...payments.map(p => p.student)])];
+                const balanceContainer = document.getElementById('students-balance-container');
+                balanceContainer.innerHTML = '';
+
+                allStudents.forEach(student => {
+                    const totalPaid = payments.filter(p => p.student === student).reduce((sum, p) => sum + p.amount, 0);
+                    const totalSpent = lessons.filter(l => l.student === student && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
+                    const balance = totalPaid - totalSpent;
+
+                    balanceContainer.innerHTML += `
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-bold text-base text-indigo-900">${student}</h4>
+                                <div class="text-xs text-gray-500 mt-1">Всего внесено: <span class="font-semibold text-gray-700">${totalPaid} р.</span></div>
+                                <div class="text-xs text-gray-500">Списано за уроки: <span class="font-semibold text-gray-700">${totalSpent} р.</span></div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
+                                <span class="text-xs font-medium text-gray-500">Баланс:</span>
+                                <span class="text-lg font-bold ${balance >= 0 ? 'text-emerald-600' : 'text-red-600'}">${balance} р.</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // История платежей
+                const pTable = document.getElementById('payments-table-body');
+                pTable.innerHTML = '';
+                payments.forEach(p => {
+                    pTable.innerHTML += `
+                        <tr class="hover:bg-gray-50/50">
+                            <td class="p-3">${p.date}</td>
+                            <td class="p-3 font-semibold text-indigo-600">${p.student}</td>
+                            <td class="p-3 text-emerald-600 font-bold">+${p.amount} р.</td>
+                            <td class="p-3 text-right"><button onclick="deletePayment(${p.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold">Удалить</button></td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>
