@@ -171,7 +171,6 @@
     </div>
 
     <script>
-        // Инициализация данных (ученики теперь хранят имя и пин-код)
         let students = JSON.parse(localStorage.getItem('tut_students_v2')) || [
             { name: "Алексей", pin: "1234" },
             { name: "Мария", pin: "5678" }
@@ -207,6 +206,38 @@
             students.push({ name, pin });
             document.getElementById('new-student-name').value = '';
             document.getElementById('new-student-pin').value = '';
+            saveData();
+        }
+
+        // Функция редактирования имени и пин-кода ученика
+        function editStudent(oldName) {
+            const student = students.find(s => s.name === oldName);
+            if(!student) return;
+
+            const newName = prompt("Введите новое имя ученика:", student.name);
+            if(newName === null) return; // отмена
+            const trimmedName = newName.trim();
+            if(!trimmedName) return alert("Имя не может быть пустым!");
+
+            if(trimmedName !== oldName && students.some(s => s.name === trimmedName)) {
+                return alert("Ученик с таким именем уже существует!");
+            }
+
+            const newPin = prompt("Введите новый пин-код для ученика:", student.pin);
+            if(newPin === null) return;
+            const trimmedPin = newPin.trim();
+            if(!trimmedPin) return alert("Пин-код не может быть пустым!");
+
+            // Обновляем данные ученика
+            student.name = trimmedName;
+            student.pin = trimmedPin;
+
+            // Также обновляем имя в истории занятий и платежей, если оно изменилось
+            if(trimmedName !== oldName) {
+                lessons.forEach(l => { if(l.student === oldName) l.student = trimmedName; });
+                payments.forEach(p => { if(p.student === oldName) p.student = trimmedName; });
+            }
+
             saveData();
         }
 
@@ -293,9 +324,7 @@
             });
 
             if (targetStudent) {
-                // Если открыли по ссылке ученика
                 if (authenticatedStudent === targetStudent) {
-                    // Пин-код введен верно — показываем личный кабинет
                     document.getElementById('teacher-view').classList.add('hidden');
                     document.getElementById('nav-tabs').classList.add('hidden');
                     document.getElementById('student-view').classList.remove('hidden');
@@ -357,13 +386,11 @@
                         `;
                     });
                 } else {
-                    // Пин-код еще не введен — показываем модальное окно
                     document.getElementById('teacher-view').classList.add('hidden');
                     document.getElementById('student-view').classList.add('hidden');
                     document.getElementById('pin-modal').classList.remove('hidden');
                 }
             } else {
-                // РЕЖИМ ПРЕПОДАВАТЕЛЯ
                 document.getElementById('teacher-view').classList.remove('hidden');
                 document.getElementById('student-view').classList.add('hidden');
                 document.getElementById('pin-modal').classList.add('hidden');
@@ -380,6 +407,7 @@
                             </div>
                             <div class="flex gap-2">
                                 <button onclick="copyStudentLink('${s.name}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-semibold transition">🔗 Ссылка</button>
+                                <button onclick="editStudent('${s.name}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition">✏️ Изменить</button>
                                 <button onclick="deleteStudent('${s.name}')" class="text-red-500 hover:text-red-700 px-2 py-1.5 text-xs font-semibold">Удалить</button>
                             </div>
                         </div>
