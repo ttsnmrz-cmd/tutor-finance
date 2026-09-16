@@ -1,6 +1,8 @@
 name: Fix calendar day popup and student block
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-calendar-and-students.yml'
 permissions:
   contents: write
 jobs:
@@ -30,7 +32,6 @@ jobs:
           if old not in s:
               raise SystemExit('calendar date block not found')
           s=s.replace(old,new,1)
-          # Make the student creation block explicitly visible whenever the Students tab is rendered.
           marker="function renderStudents(){"
           inject="function ensureStudentCreateBlock(){const tab=document.getElementById('tab-students');if(!tab)return;const block=tab.querySelector('.app-card');if(block)block.classList.remove('hidden');}"
           if 'function ensureStudentCreateBlock()' not in s:
