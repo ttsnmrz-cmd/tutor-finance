@@ -43,11 +43,20 @@ function dateKey(d){
   return d.getFullYear()+'-'+
     String(d.getMonth()+1).padStart(2,'0')+'-'+
     String(d.getDate()).padStart(2,'0');
-}function startOfWeek(d){const x=new Date(d);x.setHours(0,0,0,0);const day=x.getDay();const diff=day===0?-6:1-day;x.setDate(x.getDate()+diff);return x;}function formatDay(d){return d.toLocaleDateString('ru-RU',{weekday:'short'}).replace('.','');}function formatShortDate(d){return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});}function weekTitle(a,b){return a.getMonth()===b.getMonth()?`${a.toLocaleDateString('ru-RU',{day:'2-digit',month:'long'})} — ${b.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'})}`:`${a.toLocaleDateString('ru-RU',{day:'2-digit',month:'short'})} — ${b.toLocaleDateString('ru-RU',{day:'2-digit',month:'short',year:'numeric'})}`;}
+}
+function startOfWeek(d){const x=new Date(d);x.setHours(0,0,0,0);const day=x.getDay();const diff=day===0?-6:1-day;x.setDate(x.getDate()+diff);return x;}
+function formatDay(d){return d.toLocaleDateString('ru-RU',{weekday:'short'}).replace('.','');}
+function formatShortDate(d){return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});}
+function weekTitle(a,b){return a.getMonth()===b.getMonth()?`${a.toLocaleDateString('ru-RU',{day:'2-digit',month:'long'})} — ${b.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'})}`:`${a.toLocaleDateString('ru-RU',{day:'2-digit',month:'short'})} — ${b.toLocaleDateString('ru-RU',{day:'2-digit',month:'short',year:'numeric'})}`;}
 function renderWeek(){const container=document.getElementById('week-calendar'),range=document.getElementById('week-range');if(!container)return;const start=startOfWeek(weekAnchor),days=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d);}range.textContent=weekTitle(days[0],days[6]);const today=dateKey(new Date());container.innerHTML=days.map(d=>{const key=dateKey(d),isToday=key===today,dayLessons=[...lessons].filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));return `<div class="week-day border-r border-slate-100 last:border-r-0 ${isToday?'bg-indigo-50/40':''}"><div class="p-3 border-b border-slate-100 ${isToday?'bg-indigo-50':''}"><div class="text-xs font-semibold uppercase text-slate-400">${formatDay(d)}</div><div class="text-lg font-bold ${isToday?'text-indigo-600':'text-slate-700'}">${formatShortDate(d)}</div></div><div class="p-2 space-y-2">${dayLessons.map(l=>{const v=lessonVisual(l);const tone=l.status==='cancelled_charge'?'border-red-200 bg-red-50':l.status==='cancelled_free'||l.status==='rescheduled'?'border-slate-200 bg-slate-50':'border-indigo-100 bg-white';return `<button type="button" onclick="openEditLesson('${esc(l.id)}')" class="week-lesson w-full text-left rounded-xl border ${tone} p-2.5"><div class="flex items-center justify-between gap-2"><span class="font-bold text-sm ${v.muted?'line-through text-slate-400':'text-indigo-700'}">${esc(displayTime(l.time)||'—')}</span><span class="text-xs">${v.icon||''}</span></div><div class="font-semibold text-sm mt-1 ${v.muted?'text-slate-400 line-through':'text-slate-700'}">${esc(l.student)}</div><div class="text-[11px] mt-1 ${v.muted?'text-slate-400':'text-slate-500'}">${money(l.price)} · ${v.label}</div></button>`}).join('')||'<div class="text-xs text-slate-400 text-center py-6">Нет занятий</div>'}</div></div>`}).join('');}
-function changeWeek(delta){weekAnchor=startOfWeek(weekAnchor);weekAnchor.setDate(weekAnchor.getDate()+delta*7);renderWeek sahabat();}function goToday(){weekAnchor=new Date();renderWeek();}
+function changeWeek(delta){weekAnchor=startOfWeek(weekAnchor);weekAnchor.setDate(weekAnchor.getDate()+delta*7);renderWeek();}
+function goToday(){weekAnchor=new Date();renderWeek();}
 async function addLessonFromPanel(){try{const student=document.getElementById('new-lesson-student').value,date=document.getElementById('new-lesson-date').value,rawTime=document.getElementById('new-lesson-time').value,price=Number(document.getElementById('new-lesson-price').value),time=requireValidTime(rawTime);if(rawTime&&!time)return;if(!student||!date){showError(new Error('Выберите ученика и дату'));return;}await db('/lessons',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student,date,time,price,status:'pending'})});await loadData();renderMain();renderWeek();document.getElementById('new-lesson-date').value='';document.getElementById('new-lesson-time').value='';}catch(e){showError(e);}}
-function openEditLesson(id){const l=lessons.find(x=>String(x.id)===String(id));if(!l)return;fillStudentSelects();document.getElementById('edit-id').value=l.id;document.getElementById('edit-student').value=l.student;document.getElementById('edit-date').value=l.date;document.getElementById('edit-time').value=displayTime(l.time||'');document.getElementById('edit-price').value=String(Number(l.price));document.getElementById('edit-status').innerHTML=Object.entries(statusLabels).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');document.getElementById('edit-status').value=l.status;document.getElementById('lesson-modal').classList.remove('hidden');document.getElementById('lesson-modal').classList.add('flex');}function closeLessonModal(){document.getElementById('lesson-modal').classList.add('hidden');document.getElementById('lesson-modal').classList.remove('flex');}async function saveEditedLesson(){try{const id=document.getElementById('edit-id').value,rawTime=document.getElementById('edit-time').value,time=requireValidTime(rawTime);if(rawTime&&!time)return;await db('/lessons?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:document.getElementById('edit-student').value,date:document.getElementById('edit-date').value,time,price:Number(document.getElementById('edit-price').value),status:document.getElementById('edit-status').value})});closeLessonModal();await loadData();renderMain();renderWeek();}catch(e){showError(e);}}async function deleteLesson(id){if(!confirm('Удалить занятие?'))return;try{await db('/lessons?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers});await loadData();renderMain();renderWeek();}catch(e){showError(e);}}async function deleteLessonFromModal(){await deleteLesson(document.getElementById('edit-id').value);closeLessonModal();}
+function openEditLesson(id){const l=lessons.find(x=>String(x.id)===String(id));if(!l)return;fillStudentSelects();document.getElementById('edit-id').value=l.id;document.getElementById('edit-student').value=l.student;document.getElementById('edit-date').value=l.date;document.getElementById('edit-time').value=displayTime(l.time||'');document.getElementById('edit-price').value=String(Number(l.price));document.getElementById('edit-status').innerHTML=Object.entries(statusLabels).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');document.getElementById('edit-status').value=l.status;document.getElementById('lesson-modal').classList.remove('hidden');document.getElementById('lesson-modal').classList.add('flex');}
+function closeLessonModal(){document.getElementById('lesson-modal').classList.add('hidden');document.getElementById('lesson-modal').classList.remove('flex');}
+async function saveEditedLesson(){try{const id=document.getElementById('edit-id').value,rawTime=document.getElementById('edit-time').value,time=requireValidTime(rawTime);if(rawTime&&!time)return;await db('/lessons?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:document.getElementById('edit-student').value,date:document.getElementById('edit-date').value,time,price:Number(document.getElementById('edit-price').value),status:document.getElementById('edit-status').value})});closeLessonModal();await loadData();renderMain();renderWeek();}catch(e){showError(e);}}
+async function deleteLesson(id){if(!confirm('Удалить занятие?'))return;try{await db('/lessons?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers});await loadData();renderMain();renderWeek();}catch(e){showError(e);}}
+async function deleteLessonFromModal(){await deleteLesson(document.getElementById('edit-id').value);closeLessonModal();}
 function studentStats(s){const ls=lessons.filter(l=>l.student===s.name),income=payments.filter(p=>p.student===s.name).reduce((a,p)=>a+Number(p.amount||0),0),expenses=ls.filter(l=>charge.has(l.status)).reduce((a,l)=>a+Number(l.price||0),0);return{ls,income,expenses,bal:income-expenses};}
 function publicLink(s){return location.origin+location.pathname+'?student='+encodeURIComponent(s.id);}
 function toggleStudentMenu(id){document.querySelectorAll('[data-student-menu]').forEach(el=>{if(el.id!=='student-menu-'+id)el.classList.add('hidden');});const m=document.getElementById('student-menu-'+id);if(m){m.classList.toggle('hidden');}}
@@ -111,303 +120,18 @@ function renderSingleStudentCard(s, isArchived){
 async function addStudent(){try{const name=document.getElementById('new-student-name').value.trim(),pin=document.getElementById('new-student-pin').value.trim();if(!name||!pin){showError(new Error('Введите имя и PIN-код'));return;}await db('/students',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({name,pin,price:40,archived:false})});await loadData();renderStudents();document.getElementById('new-student-name').value='';document.getElementById('new-student-pin').value='';}catch(e){showError(e);}}
 function openStudentEdit(id){const s=students.find(x=>String(x.id)===String(id));if(!s)return;document.getElementById('edit-student-id').value=s.id;document.getElementById('edit-student-name').value=s.name;document.getElementById('edit-student-pin').value=s.pin||'';document.getElementById('student-edit-modal').classList.remove('hidden');document.getElementById('student-edit-modal').classList.add('flex');}
 function closeStudentEdit(){document.getElementById('student-edit-modal').classList.add('hidden');document.getElementById('student-edit-modal').classList.remove('flex');}
-async function saveStudentEdit(){try{const id=document.getElementById('edit-student-id').value,s=students.find(x=>String(x.id)===String(id)),newName=document.getElementById('edit-student-name').value.trim(),newPin=document.getElementById('edit-student-pin').value.trim();if(!s||!newName||!newPin){showError(new Error('Введите имя и PIN-код'));return;}const oldName=s.name;if(newName!==oldName){await db('/lessons?student=eq.'+encodeURIComponent(oldName),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:newName})});await db('/payments?student=eq.'+encodeURIComponent(oldName),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:newName})});}await db('/students?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({name:newName,pin:newPin})});closeStudentEdit();await loadData();renderStudents();}catch(e){showError(e);}}
-async function deleteStudent(id){const s=students.find(x=>String(x.id)===String(id));if(!s)return;if(!confirm('Удалить ученика? Его занятия и платежи останутся в системе.'))return;try{await db('/students?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers});await loadData();renderStudents();}catch(e){showError(e);}}
-
-async function toggleArchiveStudent(id, archive){
-  try{
-    await db('/students?id=eq.'+encodeURIComponent(id),{
-      method:'PATCH',
-      headers:{...headers,Prefer:'return=minimal'},
-      body:JSON.stringify({archived: archive})
-    });
-    await loadData();
-    renderStudents();
-  }catch(e){showError(e);}
-}
-
-async function copyStudentLink(id){const s=students.find(x=>String(x.id)===String(id));if(!s)return;const url=publicLink(s);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(url);}else{const ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.left='-9999px';ta.style.top='0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();if(!ok)throw new Error('copy failed');}alert('Ссылка скопирована в буфер обмена!');}catch(e){prompt('Скопируйте ссылку:',url);}}
-function toggleFinanceSection(id){const el=document.getElementById(id);const icon=document.getElementById(id+'-icon');if(!el)return;const open=!el.classList.contains('hidden');el.classList.toggle('hidden',open);if(icon)icon.textContent=open?'＋':'−';}
-function renderFinance(){fillStudentSelects();const activeStudents=students.filter(s=>!s.archived);const c=document.getElementById('finance-balances');c.innerHTML=activeStudents.map(s=>{const{income,expenses,bal}=studentStats(s);const ps=payments.filter(p=>p.student===s.name).sort((a,b)=>String(b.date).localeCompare(String(a.date)));const ds=lessons.filter(l=>l.student===s.name&&charge.has(l.status)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));const pid='finance-payments-'+esc(s.id),did='finance-expenses-'+esc(s.id);return `<div class="p-4 bg-slate-50 rounded-2xl border border-slate-100"><h4 class="font-bold text-base text-indigo-900">${esc(s.name)}</h4><div class="mt-4"><button type="button" onclick="toggleFinanceSection('${pid}')" class="w-full flex justify-between items-center text-left group"><span class="text-sm font-semibold text-emerald-700">Поступления</span><span class="flex items-center gap-2"><span class="text-sm font-bold text-emerald-700">${money(income)}</span><span id="${pid}-icon" class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">＋</span></span></button><div id="${pid}" class="hidden mt-2 space-y-1 max-h-36 overflow-y-auto pr-1">${ps.map(p=>`<div class="flex justify-between gap-3 text-xs py-1.5 border-b border-slate-200 last:border-0"><span class="text-slate-500">${esc(p.date)}</span><span class="font-semibold text-slate-700">+${money(p.amount)}</span></div>`).join('')||'<div class="text-xs text-slate-400 py-1">Поступлений пока нет</div>'}</div></div><div class="mt-4 pt-3 border-t border-slate-200"><button type="button" onclick="toggleFinanceSection('${did}')" class="w-full flex justify-between items-center text-left group"><span class="text-sm font-semibold text-red-700">Списания за занятия</span><span class="flex items-center gap-2"><span class="text-sm font-bold text-red-700">${money(expenses)}</span><span id="${did}-icon" class="w-6 h-6 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold">＋</span></span></button><div id="${did}" class="hidden mt-2 space-y-1 max-h-36 overflow-y-auto pr-1">${ds.map(l=>`<div class="flex justify-between gap-3 text-xs py-1.5 border-b border-slate-200 last:border-0"><span class="text-slate-500">${esc(l.date)}</span><span class="font-semibold text-slate-700">-${money(l.price)}</span></div>`).join('')||'<div class="text-xs text-slate-400 py-1">Списаний пока нет</div>'}</div></div><div class="mt-4 pt-3 border-t border-slate-300 flex justify-between items-center"><span class="text-sm font-bold text-slate-600">Баланс</span><span class="text-xl font-bold ${bal>=0?'text-emerald-600':'text-red-600'}">${money(bal)}</span></div></div>`}).join('')||'<div class="text-slate-400">Учеников пока нет</div>';}
-async function addPayment(){try{const student=document.getElementById('payment-student').value,amount=Number(document.getElementById('payment-amount').value),date=document.getElementById('payment-date').value;if(!student||!Number.isFinite(amount)||amount<=0||!date){showError(new Error('Выберите ученика, укажите сумму и дату'));return;}await db('/payments',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student,amount,date})});document.getElementById('payment-amount').value='';await loadData();renderFinance();}catch(e){showError(e);}}
-async function loginTeacher(){try{const{error}=await supabaseClient.auth.signInWithPassword({email:document.getElementById('teacher-email-input').value,password:document.getElementById('teacher-password-input').value});if(error)throw error;sessionStorage.setItem('auth_teacher','1');document.getElementById('teacher-login-modal').classList.add('hidden');await loadData();switchTab('calendar');}catch(e){document.getElementById('teacher-login-error').textContent=e.message||'Ошибка входа';}}
-async function teacherLogout(){try{await supabaseClient.auth.signOut();}catch(e){}sessionStorage.removeItem('auth_teacher');location.reload();}
-let publicStudent=null;
-async function initPublicStudent(){const id=new URLSearchParams(location.search).get('student');if(!id)return false;document.getElementById('student-public-view').classList.remove('hidden');try{const data=await db('/students?id=eq.'+encodeURIComponent(id)+'&select=*');publicStudent=data&&data[0];if(!publicStudent){document.getElementById('student-public-name').textContent='Ученик не найден';return true;}document.getElementById('student-public-name').textContent='Ученик: '+publicStudent.name;document.getElementById('student-public-pin').focus();}catch(e){document.getElementById('student-public-error').textContent=e.message||'Ошибка загрузки';}return true;}
-async function openStudentCabinet(){if(!publicStudent)return;const pin=document.getElementById('student-public-pin').value.trim();if(pin!==String(publicStudent.pin||'')){document.getElementById('student-public-error').textContent='Неверный PIN';return;}try{const ls=await db('/lessons?student=eq.'+encodeURIComponent(publicStudent.name)+'&select=*');const ps=await db('/payments?student=eq.'+encodeURIComponent(publicStudent.name)+'&select=*');const paid=(ps||[]).reduce((a,p)=>a+Number(p.amount||0),0),spent=(ls||[]).filter(l=>charge.has(l.status)).reduce((a,l)=>a+Number(l.price||0),0);document.getElementById('public-student-title').textContent=publicStudent.name;document.getElementById('public-paid').textContent=money(paid);document.getElementById('public-spent').textContent=money(spent);document.getElementById('public-balance').textContent=money(paid-spent);document.getElementById('public-lessons').innerHTML=[...(ls||[])].sort((a,b)=>(String(b.date)+String(b.time||'')).localeCompare(String(a.date)+String(a.time||''))).map(l=>`<div class="flex justify-between py-2 border-b border-slate-100 last:border-0"><span>${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span>${money(l.price)} · ${statusLabels[l.status]}</span></div>`).join('')||'<span class="text-slate-400">Занятий пока нет</span>';document.getElementById('public-payments').innerHTML=[...(ps||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(p=>`<div class="flex justify-between py-2 border-b border-slate-100 last:border-0"><span>${esc(p.date)}</span><b>${money(p.amount)}</b></div>`).join('')||'<span class="text-slate-400">Платежей пока нет</span>';document.getElementById('student-public-login').classList.add('hidden');document.getElementById('student-public-content').classList.remove('hidden');}catch(e){document.getElementById('student-public-error').textContent=e.message||'Ошибка загрузки';}}
-async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
-document.addEventListener('DOMContentLoaded',boot);
+async function saveStudentEdit(){try{const id=document.getElementById('edit-student-id').value,s=students.find(x=>String(x.id)===String(id)),newName=document.getElementById('edit-student-name').value.trim(),newPin=document.getElementById('edit-student-pin').value.trim();if(!s||!newName||!newPin){showError(new Error('Введите имя и PIN-код'));return;}const oldName=s.name;if(newName!==oldName){await db('/lessons?student=eq.'+encodeURIComponent(oldName),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:newName})});await db('/payments?student=eq.'+encodeURIComponent(oldName),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:newName})});}await db('/students?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({name:newName,pin:newPin})});closeStudentEdit();await loadData();renderStudents();renderMain();renderWeek();}catch(e){showError(e);}}
+async function toggleArchiveStudent(id,archive){try{await db('/students?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({archived:archive})});await loadData();renderStudents();}catch(e){showError(e);}}
+async function deleteStudent(id){if(!confirm('Удалить ученика? Все его занятия и платежи тоже удалятся!'))return;try{const s=students.find(x=>String(x.id)===String(id));if(s){await db('/lessons?student=eq.'+encodeURIComponent(s.name),{method:'DELETE',headers});await db('/payments?student=eq.'+encodeURIComponent(s.name),{method:'DELETE',headers});}await db('/students?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers});await loadData();renderStudents();renderMain();renderWeek();}catch(e){showError(e);}}
+function copyStudentLink(id){navigator.clipboard.writeText(publicLink({id})).then(()=>alert('Ссылка скопирована в буфер обмена!'));}
+function renderFinance(){const container=document.getElementById('finance-balances');container.innerHTML=students.filter(s=>!s.archived).map(s=>{const{ls,income,expenses,bal}=studentStats(s);return `<div class="rounded-2xl bg-slate-50 p-4"><div class="flex justify-between items-center mb-2"><h3 class="font-bold">${esc(s.name)}</h3><span class="font-bold ${bal>=0?'text-indigo-700':'text-red-600'}">${money(bal)}</span></div><div class="text-xs text-slate-500 flex justify-between"><span>Внесено: ${money(income)}</span><span>Списано: ${money(expenses)}</span></div></div>`}).join('')||'<div class="text-slate-400">Нет активных учеников</div>';fillStudentSelects();const d=new Date().toISOString().split('T')[0];const dateEl=document.getElementById('payment-date');if(dateEl&&!dateEl.value)dateEl.value=d;}
+async function addPayment(){try{const student=document.getElementById('payment-student').value,amount=Number(document.getElementById('payment-amount').value),date=document.getElementById('payment-date').value;if(!student||!amount||!date){showError(new Error('Заполните все поля платежа'));return;}await db('/payments',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student,amount,date})});await loadData();renderFinance();document.getElementById('payment-amount').value='';alert('Платеж успешно добавлен!');}catch(e){showError(e);}}
+async function openStudentCabinet(){const id=new URLSearchParams(location.search).get('student'),pin=document.getElementById('student-public-pin').value.trim();if(!pin){document.getElementById('student-public-error').textContent='Введите PIN';return; }const s=students.find(x=>String(x.id)===String(id));if(!s||s.pin!==pin){document.getElementById('student-public-error').textContent='Неверный PIN';return;}document.getElementById('student-public-login').classList.add('hidden');document.getElementById('student-public-content').classList.remove('hidden');document.getElementById('public-student-title').textContent=s.name;const{ls,income,expenses,bal}=studentStats(s);document.getElementById('public-paid').textContent=money(income);document.getElementById('public-spent').textContent=money(expenses);document.getElementById('public-balance').textContent=money(bal);document.getElementById('public-lessons').innerHTML=ls.map(l=>`<div class="flex justify-between items-center py-2 border-b border-slate-100 text-sm"><span>${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span><b>${money(l.price)}</b> · ${statusLabels[l.status]}</span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>';document.getElementById('public-payments').innerHTML=payments.filter(p=>p.student===s.name).map(p=>`<div class="flex justify-between items-center py-2 border-b border-slate-100 text-sm"><span>${esc(p.date)}</span><b class="text-emerald-700">${money(p.amount)}</b></div>`).join('')||'<span class="text-slate-400 text-sm">Платежей нет</span>';}
+async function initPublicView(){const id=new URLSearchParams(location.search).get('student');if(!id)return false;document.getElementById('student-public-view').classList.remove('hidden');try{await loadData();const s=students.find(x=>String(x.id)===String(id));if(!s){document.getElementById('student-public-name').textContent='Ученик не найден';document.getElementById('student-public-pin').classList.add('hidden');return true;}document.getElementById('student-public-name').textContent='Ученик: '+s.name;if(!s.pin){openStudentCabinetWithoutPin(s);}}catch(e){showError(e);}return true;}
+function openStudentCabinetWithoutPin(s){document.getElementById('student-public-pin').value=s.pin||'';openStudentCabinet();}
+async function loginTeacher(){const p=document.getElementById('teacher-password-input').value;if(p!=='123456'){document.getElementById('teacher-login-error').textContent='Неверный пароль';return;}localStorage.setItem('tutor_auth','1');document.getElementById('teacher-login-modal').classList.add('hidden');document.getElementById('teacher-app').classList.remove('hidden');await loadData();renderMain();renderWeek();}
+function teacherLogout(){localStorage.removeItem('tutor_auth');location.reload();}
+(async()=>{if(await initPublicView())return;if(localStorage.getItem('tutor_auth')==='1'){document.getElementById('teacher-app').classList.remove('hidden');await loadData();renderMain();renderWeek();}else{document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}})();
 </script>
-
-<script id="clean-fixes-v2">
-(function(){
-  'use strict';
-
-  function localISO(d){
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  }
-
-  function bindCalendarClicks(){
-    const cal=document.getElementById('week-calendar');
-    if(!cal || cal.dataset.cleanClicks==='2') return;
-    cal.dataset.cleanClicks='2';
-
-    cal.addEventListener('click',function(e){
-      if(e.target.closest('.week-lesson')) return;
-      const day=e.target.closest('.week-day');
-      if(!day || !cal.contains(day)) return;
-
-      const days=[...cal.children];
-      const index=days.indexOf(day);
-      if(index<0 || typeof startOfWeek!=='function') return;
-
-      const d=startOfWeek(new Date(weekAnchor));
-      d.setDate(d.getDate()+index);
-      openNewLessonModal(localISO(d));
-    });
-  }
-
-  function ensureRecurringUI(){
-    const modal=document.querySelector('#lesson-modal .app-card');
-    const status=document.getElementById('edit-status');
-    if(!modal || !status) return null;
-
-    let box=document.getElementById('recurring-options');
-    if(box) return box;
-
-    box=document.createElement('div');
-    box.id='recurring-options';
-    box.className='hidden rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 space-y-3';
-    box.innerHTML=
-      '<label class="flex items-center gap-2 text-sm font-semibold cursor-pointer">'+
-        '<input id="lesson-recurring" type="checkbox" class="w-4 h-4">'+
-        '<span>Повторять занятие регулярно</span>'+
-      '</label>'+
-      '<div id="recurring-fields" class="hidden space-y-3">'+
-        '<label class="text-sm font-semibold block">Как часто'+
-          '<select id="recurring-frequency" class="soft-input mt-1 w-full rounded-xl px-3 py-2">'+
-            '<option value="1">Каждую неделю</option>'+
-            '<option value="2">Раз в 2 недели</option>'+
-            '<option value="3">Раз в 3 недели</option>'+
-            '<option value="4">Раз в 4 недели</option>'+
-          '</select>'+
-        '</label>'+
-        '<div>'+
-          '<div class="text-xs font-semibold text-slate-500 mb-2">По каким дням</div>'+
-          '<div class="grid grid-cols-7 gap-1">'+
-            [['1','Пн'],['2','Вт'],['3','Ср'],['4','Чт'],['5','Пт'],['6','Сб'],['0','Вс']]
-              .map(x=>'<label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="'+x[0]+'">'+x[1]+'</label>')
-              .join('')+
-          '</div>'+
-        '</div>'+
-        '<div class="text-[11px] text-slate-400">Занятия будут создаваться автоматически на год вперед.</div>'+
-      '</div>';
-
-    status.parentElement.insertAdjacentElement('afterend',box);
-
-    document.getElementById('lesson-recurring').addEventListener('change',function(){
-      document.getElementById('recurring-fields').classList.toggle('hidden',!this.checked);
-    });
-    return box;
-  }
-
-  function resetRecurring(date){
-    const box=ensureRecurringUI();
-    if(!box) return;
-    box.classList.remove('hidden');
-
-    const cb=document.getElementById('lesson-recurring');
-    const fields=document.getElementById('recurring-fields');
-    const freq=document.getElementById('recurring-frequency');
-
-    if(cb) cb.checked=false;
-    if(fields) fields.classList.add('hidden');
-    if(freq) freq.value='1';
-    document.querySelectorAll('.rec-day').forEach(x=>x.checked=false);
-
-    if(date){
-      const d=new Date(date+'T12:00:00');
-      const day=document.querySelector('.rec-day[value="'+d.getDay()+'"]');
-      if(day) day.checked=true;
-    }
-  }
-
-  window.openNewLessonModal=function(date){
-    ensureRecurringUI();
-    fillStudentSelects();
-
-    document.getElementById('edit-id').value='';
-    document.getElementById('edit-student').value='';
-    document.getElementById('edit-date').value=date||'';
-    document.getElementById('edit-time').value='';
-    document.getElementById('edit-price').value='40';
-    document.getElementById('edit-status').innerHTML=Object.entries(statusLabels)
-      .map(([k,v])=>'<option value="'+k+'">'+v+'</option>').join('');
-    document.getElementById('edit-status').value='pending';
-    document.getElementById('lesson-modal-title').textContent='Добавить занятие';
-    document.getElementById('lesson-save-btn').textContent='Добавить';
-
-    const futureBtn=document.getElementById('delete-future-from-modal-btn');
-    if(futureBtn) futureBtn.classList.add('hidden');
-
-    resetRecurring(date);
-
-    const modal=document.getElementById('lesson-modal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  };
-
-  const baseOpenEdit=window.openEditLesson;
-  window.openEditLesson=function(id){
-    ensureRecurringUI();
-    baseOpenEdit(id);
-    const box=document.getElementById('recurring-options');
-    if(box) box.classList.add('hidden');
-    const cb=document.getElementById('lesson-recurring');
-    const fields=document.getElementById('recurring-fields');
-    if(cb) cb.checked=false;
-    if(fields) fields.classList.add('hidden');
-
-    const futureBtn=document.getElementById('delete-future-from-modal-btn');
-    if(futureBtn) futureBtn.classList.remove('hidden');
-  };
-
-  const baseSave=window.saveEditedLesson;
-  window.saveEditedLesson=async function(){
-    const id=document.getElementById('edit-id').value;
-
-    if(id) return baseSave();
-
-    const student=document.getElementById('edit-student').value;
-    const date=document.getElementById('edit-date').value;
-    const rawTime=document.getElementById('edit-time').value;
-    const time=requireValidTime(rawTime);
-    const price=Number(document.getElementById('edit-price').value||0);
-    const status=document.getElementById('edit-status').value||'pending';
-
-    if(rawTime && !time) return;
-    if(!student || !date){
-      showError(new Error('Выберите ученика и дату'));
-      return;
-    }
-    if(!time){
-      showError(new Error('Укажите время занятия'));
-      return;
-    }
-
-    const recurring=document.getElementById('lesson-recurring')?.checked;
-    let dates=[date];
-
-    if(recurring){
-      const selected=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
-      const freq=Number(document.getElementById('recurring-frequency')?.value||1);
-
-      if(!selected.length){
-        showError(new Error('Выберите хотя бы один день недели'));
-        return;
-      }
-
-      const start=new Date(date+'T12:00:00');
-      const last=new Date(start);
-      last.setFullYear(last.getFullYear() + 1);
-
-      const monday=function(d){
-        const x=new Date(d);
-        const day=x.getDay();
-        x.setDate(x.getDate()+(day===0?-6:1-day));
-        x.setHours(12,0,0,0);
-        return x;
-      };
-
-      const firstMonday=monday(start);
-      dates=[];
-
-      for(let d=new Date(start);d<=last;d.setDate(d.getDate()+1)){
-        const weeks=Math.round((monday(d)-firstMonday)/604800000);
-        if(weeks%freq===0 && selected.includes(d.getDay())){
-          dates.push(localISO(d));
-        }
-      }
-    }
-
-    try{
-      await db('/lessons',{
-        method:'POST',
-        headers:{'Prefer':'return=minimal'},
-        body:JSON.stringify(dates.map(d=>({student,date:d,time,price,status})))
-      });
-      await loadData();
-      renderMain();
-      renderWeek();
-      if(typeof renderFinance==='function') renderFinance();
-      closeLessonModal();
-    }catch(e){
-      showError(e);
-    }
-  };
-
-  window.deleteFutureFromModal=async function(){
-    const id=document.getElementById('edit-id').value;
-    const l=(lessons||[]).find(x=>String(x.id)===String(id));
-    if(!l) return;
-
-    if(!confirm('Удалить это занятие и все последующие запланированные занятия ученика «'+l.student+'» начиная с '+l.date+'?')) return;
-
-    try{
-      await db('/lessons?student=eq.'+encodeURIComponent(l.student)+'&date=gte.'+l.date+'&status=eq.pending',{
-        method:'DELETE',
-        headers:{'Prefer':'return=minimal'}
-      });
-      closeLessonModal();
-      await loadData();
-      renderMain();
-      renderWeek();
-      if(typeof renderStudents==='function') renderStudents();
-      if(typeof renderFinance==='function') renderFinance();
-    }catch(e){
-      showError(e);
-    }
-  };
-
-  function addStyles(){
-    if(document.getElementById('clean-fixes-style')) return;
-    const st=document.createElement('style');
-    st.id='clean-fixes-style';
-    st.textContent=
-      '.schedule-scroll-v3{max-height:1010px;overflow-y:auto;padding-right:4px}'+
-      '.schedule-scroll-v3 thead{position:sticky;top:0;z-index:3;background:#fff}'+
-      '.schedule-scroll-v3 table{min-width:900px}';
-    document.head.appendChild(st);
-    const wrap=document.getElementById('schedule-scroll-wrap');
-    if(wrap) wrap.classList.add('schedule-scroll-v3');
-  }
-
-  function init(){
-    ensureRecurringUI();
-    bindCalendarClicks();
-    addStyles();
-  }
-
-  document.addEventListener('DOMContentLoaded',function(){
-    init();
-    setTimeout(init,300);
-  });
-})();
-</script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
