@@ -482,5 +482,79 @@ if(typeof _oldSaveLessonV2==='function'){
 const _oldSwitchTabV2=window.switchTab;
 window.switchTab=function(t){if(typeof _oldSwitchTabV2==='function')_oldSwitchTabV2(t);if(t==='calendar')setTimeout(refreshMainLessonsV2,100);};
 </script>
+<script id="final-crm-fix-v1">
+(function(){
+  // The previous patches created several competing navigation/render functions.
+  // This final layer owns the teacher navigation and never calls the legacy calendar renderer.
+  function safeEl(id){ return document.getElementById(id); }
+  function hideStudentUi(){
+    const sv=safeEl('student-view'); if(sv)sv.classList.add('hidden');
+    const pm=safeEl('student-pin-modal'); if(pm)pm.classList.add('hidden');
+  }
+  function fmtDate(d){return d?new Date(d+'T00:00:00').toLocaleDateString('ru-RU'):'';}
+  function renderMain(){
+    const root=safeEl('tab-calendar');
+    if(!root || !Array.isArray(lessons))return;
+    const past=lessons.filter(l=>['conducted','cancelled_charge'].includes(String(l.status||'').toLowerCase())).sort((a,b)=>((b.date||'')+' '+(b.time||'')).localeCompare((a.date||'')+' '+(a.time||'')));
+    const planned=lessons.filter(l=>String(l.status||'').toLowerCase()==='pending').sort((a,b)=>((a.date||'')+' '+(a.time||'')).localeCompare((b.date||'')+' '+(b.time||'')));
+    const row=l=>`<button onclick="openLessonModal(${Number(l.id)})" class="w-full text-left flex items-center justify-between gap-3 p-4 border rounded-xl hover:bg-slate-50"><div><div class="font-semibold">${esc(l.student||'')}</div><div class="text-sm text-slate-500">${fmtDate(l.date)}${l.time?' · '+esc(l.time):''}</div></div><div class="text-right"><div class="font-semibold">${money(l.price)}</div><span class="inline-block mt-1 text-xs px-2 py-1 rounded-full border ${statusClasses[l.status]||''}">${esc(statusLabels[l.status]||l.status||'')}</span></div></button>`;
+    root.innerHTML=`<div class="space-y-5"><div class="grid grid-cols-1 md:grid-cols-4 gap-3"><div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Баланс учеников</p><p class="text-2xl font-bold mt-1">${money(students.reduce((a,s)=>a+balance(s.name),0))}</p></div><div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Проведено занятий</p><p class="text-2xl font-bold mt-1">${past.filter(l=>l.status==='conducted').length}</p></div><div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Получено платежей</p><p class="text-2xl font-bold mt-1">${money(payments.reduce((a,p)=>a+Number(p.amount||0),0))}</p></div><div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">К списанию</p><p class="text-2xl font-bold mt-1">${money(past.reduce((a,l)=>a+Number(l.price||0),0))}</p></div></div><div class="bg-white border rounded-2xl shadow-sm p-5"><div class="flex justify-between items-center mb-4"><div><h2 class="text-xl font-bold">Прошедшие занятия</h2><p class="text-sm text-slate-500">Проведенные и отмененные со списанием</p></div><button onclick="openLessonModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-semibold">＋ Новое занятие</button></div><div class="space-y-2">${past.length?past.map(row).join(''):'<div class="py-8 text-center text-slate-400">Прошедших занятий пока нет</div>'}</div></div><div class="bg-white border rounded-2xl shadow-sm p-5"><h3 class="font-bold mb-3">Запланированные занятия <span class="text-xs text-slate-400">(${planned.length})</span></h3><div class="space-y-2">${planned.length?planned.map(row).join(''):'<div class="text-sm text-slate-400">Нет запланированных занятий</div>'}</div></div></div>`;
+  }
+  function teacherTab(t){
+    hideStudentUi();
+    const tv=safeEl('teacher-view'); if(tv)tv.classList.remove('hidden');
+    ['calendar','students','finance'].forEach(x=>{const el=safeEl('tab-'+x);if(el)el.classList.toggle('hidden',x!==t);const n=safeEl('nav-'+x);if(n)n.className=x===t?'px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white':'px-4 py-2 rounded-xl text-sm font-semibold bg-slate-100 text-slate-600';});
+    const nav=safeEl('nav-calendar'); if(nav)nav.textContent='Занятия';
+    if(t==='calendar')renderMain();
+    if(t==='students' && typeof renderStudents==='function')renderStudents();
+    if(t==='finance' && typeof renderFinance==='function')renderFinance();
+  }
+  window.switchTab=teacherTab;
+  window.renderCalendar=renderMain;
+  window.showError=function(e){const b=safeEl('error-box');console.error(e);if(!b)return;b.textContent='Ошибка: '+(e&&e.message?e.message:String(e||'Неизвестная ошибка'));b.classList.remove('hidden');setTimeout(()=>{if(b)b.classList.add('hidden')},6000);};
+
+  // Student public page: ?student=<name>. It is independent of the teacher workspace.
+  function renderPublicStudent(name){
+    const s=getStudent(name); if(!s)return false;
+    const tv=safeEl('teacher-view');if(tv)tv.classList.add('hidden');
+    const sv=safeEl('student-view');
+    if(!sv)return false;
+    sv.classList.remove('hidden');
+    const past=lessons.filter(l=>l.student===name&&l.status!=='pending').sort((a,b)=>((b.date||'')+' '+(b.time||'')).localeCompare((a.date||'')+' '+(a.time||'')));
+    const planned=lessons.filter(l=>l.student===name&&l.status==='pending').sort((a,b)=>((a.date||'')+' '+(a.time||'')).localeCompare((b.date||'')+' '+(b.time||'')));
+    const ps=payments.filter(p=>p.student===name).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    const expense=lessons.filter(l=>l.student===name&&charged(l)).reduce((a,l)=>a+Number(l.price||0),0);
+    const income=ps.reduce((a,p)=>a+Number(p.amount||0),0);
+    const row=l=>`<div class="py-3 border-b flex justify-between gap-3"><div><b>${fmtDate(l.date)}${l.time?' · '+esc(l.time):''}</b><div class="text-sm text-slate-500">${esc(statusLabels[l.status]||l.status)}</div></div><b>${money(l.price)}</b></div>`;
+    safeEl('student-title').textContent=s.name;
+    safeEl('student-summary').innerHTML=`<div class="grid grid-cols-1 md:grid-cols-3 gap-3"><div class="bg-white border rounded-2xl p-5"><div class="text-xs text-slate-500">Баланс</div><div class="text-3xl font-bold">${money(income-expense)}</div></div><div class="bg-white border rounded-2xl p-5"><div class="text-xs text-slate-500">Приходы</div><div class="text-2xl font-bold text-emerald-700">${money(income)}</div></div><div class="bg-white border rounded-2xl p-5"><div class="text-xs text-slate-500">Списания</div><div class="text-2xl font-bold text-red-600">${money(expense)}</div></div></div><div class="bg-white border rounded-2xl p-5 mt-4"><h3 class="font-bold mb-2">Запланировано (${planned.length})</h3>${planned.length?planned.map(row).join(''):'<p class="text-slate-400">Нет запланированных занятий</p>'}</div>`;
+    safeEl('student-payments').innerHTML=ps.length?ps.map(p=>`<div class="py-3 border-b flex justify-between"><span>${fmtDate(p.date)}<small class="block text-slate-400">${esc(p.note||'')}</small></span><b class="text-emerald-700">+${money(p.amount)}</b></div>`).join(''):'<p class="text-slate-400">Платежей пока нет</p>';
+    safeEl('student-lessons').innerHTML=past.length?past.map(row).join(''):'<p class="text-slate-400">Занятий пока нет</p>';
+    return true;
+  }
+  window.studentLogout=function(){sessionStorage.removeItem('auth_student');history.replaceState({},'',location.pathname);location.reload();};
+  window.openStudentCabinetLink=function(name){
+    const url=location.origin+location.pathname+'?student='+encodeURIComponent(name);
+    if(navigator.clipboard)navigator.clipboard.writeText(url).then(()=>alert('Ссылка ученику скопирована')).catch(()=>prompt('Скопируйте ссылку:',url));
+    else prompt('Скопируйте ссылку:',url);
+  };
+
+  async function boot(){
+    const q=new URLSearchParams(location.search).get('student');
+    if(q){
+      try{await loadData();if(renderPublicStudent(q))return;}catch(e){window.showError(e);return;}
+    }
+    sessionStorage.removeItem('auth_student');
+    hideStudentUi();
+    const tv=safeEl('teacher-view');if(tv && !tv.classList.contains('hidden'))teacherTab('calendar');
+  }
+  // Prevent legacy callbacks from invoking the old calendar renderer.
+  const legacySave=window.saveLesson;
+  if(typeof legacySave==='function')window.saveLesson=async function(){const r=await legacySave.apply(this,arguments);setTimeout(renderMain,50);return r;};
+  document.addEventListener('DOMContentLoaded',boot);
+  setTimeout(()=>{if(document.readyState!=='loading')boot();},50);
+})();
+</script>
+
 </body>
 </html>
