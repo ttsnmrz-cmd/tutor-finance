@@ -9,7 +9,7 @@
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4 font-sans">
 
-    <div id="app" class="max-w-md w-full">
+    <div id="app" class="max-w-4xl w-full">
         <!-- Контент рендерится динамически -->
     </div>
 
@@ -21,6 +21,19 @@
 
         let currentUser = JSON.parse(sessionStorage.getItem('auth_user')) || null;
         let students = [], lessons = [], payments = [];
+        let activeTab = 'students'; // 'students', 'lessons', 'schedule'
+
+        // Проверяем, не открыт ли сайт по ссылке ученика
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentParam = urlParams.get('student');
+
+        async function init() {
+            if (studentParam) {
+                await renderStudentPortal(studentParam);
+                return;
+            }
+            await loadData();
+        }
 
         async function loadData() {
             try {
@@ -42,6 +55,7 @@
             const app = document.getElementById('app');
             
             if (!currentUser) {
+                app.className = "max-w-md w-full";
                 app.innerHTML = `
                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
                         <div class="text-center mb-6">
@@ -71,29 +85,182 @@
                 return;
             }
 
-            if (currentUser.role === 'tutor') {
-                app.innerHTML = `
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
-                        <div class="flex justify-between items-center mb-8">
-                            <div>
-                                <h1 class="text-xl font-bold text-slate-800">Кабинет преподавателя</h1>
-                                <p class="text-slate-400 text-sm">Добро пожаловать, ${currentUser.name}</p>
-                            </div>
-                            <button onclick="logout()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition cursor-pointer">Выйти</button>
+            app.className = "max-w-4xl w-full";
+            app.innerHTML = `
+                <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 mb-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div>
+                            <h1 class="text-xl font-bold text-slate-800">Кабинет преподавателя</h1>
+                            <p class="text-slate-400 text-sm">Добро пожаловать, ${currentUser.name}</p>
                         </div>
-                        <div class="space-y-4">
-                            <p class="text-slate-600">Панель управления активна. База данных подключена.</p>
-                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                <span class="text-xs text-slate-400 uppercase tracking-wider">Статистика</span>
-                                <div class="grid grid-cols-2 gap-4 mt-2">
-                                    <div>Учеников в базе: <b>${students.length}</b></div>
-                                    <div>Всего занятий: <b>${lessons.length}</b></div>
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="loadData()" class="px-3 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-200 transition cursor-pointer">Обновить</button>
+                            <button onclick="logout()" class="px-3 py-2 bg-rose-50 text-rose-600 rounded-xl text-sm font-medium hover:bg-rose-100 transition cursor-pointer">Выйти</button>
                         </div>
                     </div>
-                `;
+
+                    <!-- Навигация по вкладкам -->
+                    <div class="flex gap-2 border-b border-slate-100 pb-4 mb-6">
+                        <button onclick="switchTab('students')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${activeTab === 'students' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Ученики (${students.length})</button>
+                        <button onclick="switchTab('lessons')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${activeTab === 'lessons' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Занятия (${lessons.length})</button>
+                    </div>
+
+                    <!-- Содержимое вкладок -->
+                    <div id="tab-content">
+                        ${activeTab === 'students' ? renderStudentsTab() : renderLessonsTab()}
+                    </div>
+                </div>
+            `;
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            render();
+        }
+
+        function renderStudentsTab() {
+            return `
+                <div class="space-y-6">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <h3 class="font-semibold text-slate-700 mb-3 text-sm">Добавить нового ученика</h3>
+                        <form onsubmit="addStudent(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <input type="text" id="newName" placeholder="Имя ученика" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <input type="text" id="newSubject" placeholder="Предмет" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <button type="submit" class="py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition text-sm cursor-pointer">Добавить</button>
+                        </form>
+                    </div>
+
+                    <div class="divide-y divide-slate-100">
+                        ${students.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Учеников пока нет</p>' : students.map(s => `
+                            py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div>
+                                    <h4 class="font-semibold text-slate-800">${s.name}</h4>
+                                    <p class="text-xs text-slate-400">Предмет: ${s.subject || 'Не указан'} | Баланс: <span class="${(s.balance || 0) < 0 ? 'text-rose-500 font-bold' : 'text-emerald-600 font-bold'}">${s.balance || 0} руб.</span></p>
+                                </div>
+                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <button onclick="copyStudentLink('${s.id}')" class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-200 transition cursor-pointer">Скопировать ссылку</button>
+                                    <button onclick="deleteStudent('${s.id}')" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-xs font-medium hover:bg-rose-100 transition cursor-pointer">Удалить</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLessonsTab() {
+            return `
+                <div class="space-y-6">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <h3 class="font-semibold text-slate-700 mb-3 text-sm">Отметить прошедшее занятие</h3>
+                        <form onsubmit="addLesson(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <select id="lessonStudentId" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                                <option value="">Выберите ученика</option>
+                                ${students.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                            </select>
+                            <input type="date" id="lessonDate" required value="${new Date().toISOString().split('T')[0]}" class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <input type="number" id="lessonPrice" placeholder="Стоимость (руб)" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <button type="submit" class="py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition text-sm cursor-pointer">Добавить</button>
+                        </form>
+                    </div>
+
+                    <div class="divide-y divide-slate-100">
+                        ${lessons.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Занятий пока нет</p>' : lessons.map(l => {
+                            const student = students.find(s => s.id == l.student_id);
+                            return `
+                                <div class="py-3 flex justify-between items-center text-sm">
+                                    <div>
+                                        <span class="font-semibold text-slate-800">${student ? student.name : 'Ученик удален'}</span>
+                                        <span class="text-slate-400 text-xs ml-2">${l.date}</span>
+                                    </div>
+                                    <div class="font-medium text-slate-700">${l.price} руб.</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function addStudent(e) {
+            e.preventDefault();
+            const name = document.getElementById('newName').value.trim();
+            const subject = document.getElementById('newSubject').value.trim();
+            
+            const { error } = await supabaseClient.from('students').insert([{ name, subject, balance: 0 }]);
+            if (error) {
+                alert("Ошибка при добавлении ученика");
+                console.error(error);
+            } else {
+                await loadData();
             }
+        }
+
+        async function deleteStudent(id) {
+            if (!confirm("Удалить ученика?")) return;
+            await supabaseClient.from('students').delete().eq('id', id);
+            await loadData();
+        }
+
+        async function addLesson(e) {
+            e.preventDefault();
+            const student_id = document.getElementById('lessonStudentId').value;
+            const date = document.getElementById('lessonDate').value;
+            const price = parseFloat(document.getElementById('lessonPrice').value);
+
+            const { error } = await supabaseClient.from('lessons').insert([{ student_id, date, price }]);
+            if (error) {
+                alert("Ошибка при добавлении занятия");
+            } else {
+                // Обновляем баланс ученика (уменьшаем на стоимость урока)
+                const student = students.find(s => s.id == student_id);
+                if (student) {
+                    const newBalance = (student.balance || 0) - price;
+                    await supabaseClient.from('students').update({ balance: newBalance }).eq('id', student_id);
+                }
+                await loadData();
+            }
+        }
+
+        function copyStudentLink(studentId) {
+            const url = `${window.location.origin}${window.location.pathname}?student=${studentId}`;
+            navigator.clipboard.writeText(url);
+            alert("Персональная ссылка ученика скопирована в буфер обмена!");
+        }
+
+        async function renderStudentPortal(studentId) {
+            const app = document.getElementById('app');
+            app.className = "max-w-md w-full";
+            
+            const { data, error } = await supabaseClient.from('students').select('*').eq('id', studentId).single();
+            if (error || !data) {
+                app.innerHTML = `<div class="bg-white p-8 rounded-3xl text-center shadow-sm"><h2 class="text-xl font-bold text-slate-800">Ученик не найден</h2><p class="text-slate-400 text-sm mt-2">Проверьте правильность ссылки.</p></div>`;
+                return;
+            }
+
+            const studentLessons = lessons.filter(l => l.student_id == studentId);
+
+            app.innerHTML = `
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="text-center mb-6">
+                        <h1 class="text-xl font-bold text-slate-800">Кабинет ученика</h1>
+                        <p class="text-indigo-600 font-semibold mt-1">${data.name}</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center mb-6">
+                        <span class="text-xs text-slate-400 uppercase tracking-wider">Ваш баланс</span>
+                        <div class="text-2xl font-bold ${(data.balance || 0) < 0 ? 'text-rose-500' : 'text-emerald-600'} mt-1">${data.balance || 0} руб.</div>
+                    </div>
+                    <h3 class="font-semibold text-slate-700 text-sm mb-3">История занятий</h3>
+                    <div class="space-y-2 max-h-60 overflow-y-auto">
+                        ${studentLessons.length === 0 ? '<p class="text-slate-400 text-xs text-center py-4">Занятий пока нет</p>' : studentLessons.map(l => `
+                            py-2 px-3 bg-slate-50 rounded-xl flex justify-between items-center text-sm">
+                                <span class="text-slate-600">${l.date}</span>
+                                <span class="font-medium text-slate-800">-${l.price} руб.</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         async function handleLogin(event) {
@@ -113,7 +280,7 @@
                 if (data && data.length > 0) {
                     currentUser = { role: 'tutor', name: data[0].name || 'Преподаватель' };
                     sessionStorage.setItem('auth_user', JSON.stringify(currentUser));
-                    render();
+                    await loadData();
                 } else {
                     alert("Неверный email или пароль!");
                 }
@@ -129,22 +296,7 @@
             render(); 
         }
 
-        loadData();
+        init();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
