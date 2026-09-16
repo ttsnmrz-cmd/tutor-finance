@@ -1,0 +1,38 @@
+name: Hide lessons block from Students tab
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/hide-student-lessons-block.yml'
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '<script id="hide-student-lessons-block-v1">'
+          if marker not in s:
+              patch = '''\n<script id="hide-student-lessons-block-v1">\n(function(){\n  function hideLessonsBlock(){\n    const el=document.getElementById('tab-lessons');\n    if(el) el.classList.add('hidden');\n  }\n  hideLessonsBlock();\n  document.addEventListener('DOMContentLoaded',hideLessonsBlock);\n  setTimeout(hideLessonsBlock,100);\n  setTimeout(hideLessonsBlock,500);\n  setTimeout(hideLessonsBlock,1000);\n})();\n</script>\n'''
+              s=s.replace('</body>', patch+'\n</body>')
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          if git diff --cached --quiet; then
+            echo 'No changes needed'
+            exit 0
+          fi
+          git commit -m 'Hide duplicate lessons block from Students tab'
+          git push
