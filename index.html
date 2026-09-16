@@ -26,7 +26,16 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 <div id="student-edit-modal" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="app-card rounded-3xl p-6 w-full max-w-md space-y-4"><div class="flex justify-between items-center"><div><h2 class="text-xl font-bold">Редактировать ученика</h2><p class="text-sm text-slate-500">Имя и PIN можно изменить в любой момент</p></div><button type="button" onclick="closeStudentEdit()" class="text-2xl text-slate-400">×</button></div><input type="hidden" id="edit-student-id"><label class="text-sm font-semibold block">Имя<input id="edit-student-name" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><label class="text-sm font-semibold block">PIN<input id="edit-student-pin" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeStudentEdit()" class="px-4 py-2 rounded-xl bg-slate-100 font-semibold">Отмена</button><button type="button" onclick="saveStudentEdit()" class="primary-btn px-5 py-2 rounded-xl text-white font-semibold">Сохранить</button></div></div></div>
 <div id="lesson-modal" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-50 items-center justify-center p-4"><div class="app-card rounded-3xl p-6 w-full max-w-md space-y-3 max-h-[90vh] overflow-y-auto"><div class="flex justify-between"><h2 id="lesson-modal-title" class="text-xl font-bold">Редактировать занятие</h2><button type="button" onclick="closeLessonModal()" class="text-2xl text-slate-400">×</button></div><input type="hidden" id="edit-id"><label class="text-sm font-semibold">Ученик<select id="edit-student" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label><div class="grid grid-cols-2 gap-3"><label class="text-sm font-semibold block">Дата<input id="edit-date" type="date" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><label class="text-sm font-semibold block">Время<input id="edit-time" type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="15.00" onblur="formatTimeField(this)" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label></div><label class="text-sm font-semibold block">Стоимость<select id="edit-price" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="40">40 BYN</option><option value="20">20 BYN</option><option value="0">0 BYN</option></select></label><label class="text-sm font-semibold block">Статус<select id="edit-status" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label>
 <div id="recurring-options" class="hidden rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 space-y-3"><label class="flex items-center gap-2 text-sm font-semibold cursor-pointer"><input id="lesson-recurring" type="checkbox" class="w-4 h-4"><span>Повторять занятие</span></label><div id="recurring-fields" class="hidden space-y-3"><label class="text-sm font-semibold block">Как часто<select id="recurring-frequency" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="1">Каждую неделю</option><option value="2">Раз в 2 недели</option><option value="3">Раз в 3 недели</option><option value="4">Раз в 4 недели</option></select></label><div><div class="text-xs font-semibold text-slate-500 mb-2">По каким дням</div><div class="grid grid-cols-7 gap-1"><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="1">Пн</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="2">Вт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="3">Ср</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="4">Чт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="5">Пт</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="6">Сб</label><label class="flex flex-col items-center gap-1 text-[11px] text-slate-600"><input type="checkbox" class="rec-day" value="0">Вс</label></div></div></div></div>
-<div class="flex justify-between pt-2"><button type="button" onclick="deleteLessonFromModal()" class="px-4 py-2 rounded-xl bg-red-50 text-red-600 font-semibold">Удалить</button><button id="lesson-save-btn" type="button" onclick="saveEditedLesson()" class="primary-btn px-5 py-2 rounded-xl text-white font-semibold">Сохранить</button></div></div></div>
+<div class="flex justify-between items-center pt-2">
+  <div class="relative" id="lesson-delete-dropdown-wrap">
+    <button type="button" onclick="toggleLessonDeleteMenu()" class="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-semibold flex items-center gap-1">Удалить ▾</button>
+    <div id="lesson-delete-menu" class="hidden absolute left-0 bottom-11 z-50 w-60 rounded-2xl border border-slate-200 bg-white shadow-xl p-2 space-y-1">
+      <button type="button" onclick="deleteLessonFromModal()" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">Удалить это занятие</button>
+      <button type="button" onclick="deleteThisAndNextLessons()" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">Удалить это и следующее занятие</button>
+    </div>
+  </div>
+  <button id="lesson-save-btn" type="button" onclick="saveEditedLesson()" class="primary-btn px-5 py-2 rounded-xl text-white font-semibold">Сохранить</button>
+</div></div></div>
 <main id="teacher-view"><section id="tab-calendar" class="space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div><h2 class="text-lg font-bold">Неделя</h2><p id="week-range" class="text-xs text-slate-400 mt-0.5"></p></div><div class="flex gap-2"><button type="button" onclick="changeWeek(-1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">←</button><button type="button" onclick="goToday()" class="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold">Сегодня</button><button type="button" onclick="changeWeek(1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">→</button></div></div><div class="overflow-x-auto"><div id="week-calendar" class="week-grid"></div></div></div>
 <div class="app-card rounded-3xl p-5"><div class="flex justify-between items-center mb-4"><div><h2 class="text-lg font-bold">Расписание</h2><p class="text-xs text-slate-400 mt-0.5">Все занятия и их текущие статусы</p></div><button type="button" onclick="loadData().then(()=>{renderMain();renderWeek()})" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm">Обновить</button></div><div class="overflow-x-auto schedule-scroll-v3" id="schedule-scroll-wrap"><table class="w-full text-sm"><thead><tr class="text-left border-b text-slate-400"><th class="p-3">Дата занятия</th><th class="p-3">Время</th><th class="p-3">Имя ученика</th><th class="p-3">Стоимость</th><th class="p-3">Статус</th><th class="p-3 text-right">Действие</th></tr></thead><tbody id="main-lessons"></tbody></table></div></div></section>
 <section id="tab-students" class="hidden space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">👤</span><h2 class="font-bold">Новый ученик</h2></div><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><input id="new-student-name" class="soft-input rounded-xl px-3 py-2" placeholder="Имя"><input id="new-student-pin" class="soft-input rounded-xl px-3 py-2" placeholder="PIN"><button type="button" onclick="addStudent()" class="primary-btn text-white rounded-xl font-semibold">Добавить</button></div></div><div id="students-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div></section>
@@ -97,6 +106,18 @@ document.addEventListener('change', e => {
   }
 });
 
+function toggleLessonDeleteMenu(){
+  const menu = document.getElementById('lesson-delete-menu');
+  if(menu) menu.classList.toggle('hidden');
+}
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('#lesson-delete-dropdown-wrap')) {
+    const m = document.getElementById('lesson-delete-menu');
+    if(m) m.classList.add('hidden');
+  }
+});
+
 function openNewLessonModal(date){
   fillStudentSelects();
   document.getElementById('edit-id').value='';
@@ -108,6 +129,8 @@ function openNewLessonModal(date){
   document.getElementById('edit-status').value='pending';
   document.getElementById('lesson-modal-title').textContent='Добавить занятие';
   document.getElementById('lesson-save-btn').textContent='Добавить';
+  const delWrap = document.getElementById('lesson-delete-dropdown-wrap');
+  if(delWrap) delWrap.classList.add('hidden');
   resetRecurring(date);
   const modal=document.getElementById('lesson-modal');
   modal.classList.remove('hidden');
@@ -129,6 +152,10 @@ function openEditLesson(id){
   document.getElementById('lesson-save-btn').textContent='Сохранить';
   const box=document.getElementById('recurring-options');
   if(box) box.classList.add('hidden');
+  const delWrap = document.getElementById('lesson-delete-dropdown-wrap');
+  if(delWrap) delWrap.classList.remove('hidden');
+  const menu = document.getElementById('lesson-delete-menu');
+  if(menu) menu.classList.add('hidden');
   const modal=document.getElementById('lesson-modal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -187,6 +214,22 @@ async function saveEditedLesson(){
 async function deleteLesson(id){if(!confirm('Удалить занятие?'))return;try{await db('/lessons?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers});await loadData();renderMain();renderWeek();}catch(e){showError(e);}}
 async function deleteLessonFromModal(){await deleteLesson(document.getElementById('edit-id').value);closeLessonModal();}
 
+async function deleteThisAndNextLessons(){
+  const id=document.getElementById('edit-id').value;
+  const current=lessons.find(x=>String(x.id)===String(id));
+  if(!current)return;
+  if(!confirm(`Удалить это занятие и все последующие занятия ученика «${current.student}» от выбранной даты и позже?`)) return;
+  try{
+    await db(`/lessons?student=eq.${encodeURIComponent(current.student)}&date=gte.${current.date}`,{method:'DELETE',headers:{...headers,Prefer:'return=minimal'}});
+    closeLessonModal();
+    await loadData();
+    renderMain();
+    renderWeek();
+    if(typeof renderStudents==='function') renderStudents();
+    if(typeof renderFinance==='function') renderFinance();
+  }catch(e){showError(e);}
+}
+
 function studentStats(s){const ls=lessons.filter(l=>l.student===s.name),income=payments.filter(p=>p.student===s.name).reduce((a,p)=>a+Number(p.amount||0),0),expenses=ls.filter(l=>charge.has(l.status)).reduce((a,l)=>a+Number(l.price||0),0);return{ls,income,expenses,bal:income-expenses};}
 function publicLink(s){return location.origin+location.pathname+'?student='+encodeURIComponent(s.id);}
 
@@ -242,20 +285,5 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
 document.addEventListener('DOMContentLoaded',boot);
 </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
