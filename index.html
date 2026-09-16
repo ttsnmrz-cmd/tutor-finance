@@ -288,15 +288,17 @@ async function saveEditedLesson(){
     
     const student=document.getElementById('edit-student').value;
     const date=document.getElementById('edit-date').value;
-    const price=Number(document.getElementById('edit-price').value);
+    const price=Number(document.getElementById('edit-price').value) || 0;
     const status=document.getElementById('edit-status').value;
+    const duration = 60; // фиксированная длительность, чтобы база не ругалась на int4/bigint
+
     if(!student||!date){showError(new Error('Выберите ученика и дату'));return;}
 
     if(id){
       await db('/lessons?id=eq.'+encodeURIComponent(id),{
         method:'PATCH',
         headers:{...headers,Prefer:'return=minimal'},
-        body:JSON.stringify({student,date,time,price,status})
+        body:JSON.stringify({student,date,time,price,status,duration})
       });
     }else{
       const isRecurring=document.getElementById('edit-recurring')?.checked;
@@ -307,7 +309,7 @@ async function saveEditedLesson(){
           await db('/lessons',{
             method:'POST',
             headers:{...headers,Prefer:'return=minimal'},
-            body:JSON.stringify({student,date:dateStr,time,price,status:'pending'})
+            body:JSON.stringify({student,date:dateStr,time,price,status:'pending',duration})
           });
           currDate.setDate(currDate.getDate()+7);
         }
@@ -315,7 +317,7 @@ async function saveEditedLesson(){
         await db('/lessons',{
           method:'POST',
           headers:{...headers,Prefer:'return=minimal'},
-          body:JSON.stringify({student,date,time,price,status})
+          body:JSON.stringify({student,date,time,price,status,duration})
         });
       }
     }
