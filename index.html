@@ -202,7 +202,7 @@
 
     <script>
         let students = JSON.parse(localStorage.getItem('tut_students_v2')) || [
-            { name: "Алексей", pin: "1234" },
+            { name: "Алекс", pin: "1234" },
             { name: "Мария", pin: "5678" }
         ];
         let lessons = JSON.parse(localStorage.getItem('tut_lessons')) || [];
@@ -234,7 +234,7 @@
                 s.name.trim().toLowerCase() === decoded || 
                 transliterate(s.name).trim().toLowerCase() === decoded
             );
-            targetStudent = found ? found.name : decodeURIComponent(rawTargetStudent).trim();
+            targetStudent = found ? found.name : decoded;
         }
         
         let authenticatedStudent = sessionStorage.getItem('auth_student');
@@ -394,11 +394,15 @@
 
         function verifyStudentPin() {
             const enteredPin = document.getElementById('student-pin-input').value.trim();
-            const studentObj = students.find(s => s.name.trim().toLowerCase() === targetStudent.trim().toLowerCase());
+            const studentObj = students.find(s => 
+                s.name.trim().toLowerCase() === targetStudent.trim().toLowerCase() ||
+                transliterate(s.name).trim().toLowerCase() === targetStudent.trim().toLowerCase()
+            );
             
             if(studentObj && studentObj.pin === enteredPin) {
                 sessionStorage.setItem('auth_student', studentObj.name);
                 authenticatedStudent = studentObj.name;
+                targetStudent = studentObj.name;
                 document.getElementById('pin-modal').classList.add('hidden');
                 render();
             } else {
@@ -424,7 +428,10 @@
             });
 
             if (targetStudent) {
-                const matchedStudent = students.find(s => s.name.trim().toLowerCase() === targetStudent.trim().toLowerCase());
+                const matchedStudent = students.find(s => 
+                    s.name.trim().toLowerCase() === targetStudent.trim().toLowerCase() ||
+                    transliterate(s.name).trim().toLowerCase() === targetStudent.trim().toLowerCase()
+                );
                 const exactTargetName = matchedStudent ? matchedStudent.name : targetStudent;
 
                 if (authenticatedStudent && authenticatedStudent.trim().toLowerCase() === exactTargetName.trim().toLowerCase()) {
@@ -546,7 +553,7 @@
                                     <option value="pending" ${l.status === 'pending' ? 'selected' : ''}>⏳ Запланировано</option>
                                     <option value="conducted" ${l.status === 'conducted' ? 'selected' : ''}>✅ Проведено (списать)</option>
                                     <option value="rescheduled" ${l.status === 'rescheduled' ? 'selected' : ''}>🔄 Перенесено (не списывать)</option>
-                                    <option value="cancelled_charge" ${l.status === 'cancelled_charge' ? 'selected' : ''}>❌ Отменено (списать)</option>
+                                    <option value="cancelled_charge" ${l.status === 'cancelled_charge' ? 'selected' : ''}>❌ Отменено (списано)</option>
                                     <option value="cancelled_free" ${l.status === 'cancelled_free' ? 'selected' : ''}>🚫 Отменено (бесплатно)</option>
                                 </select>
                             </td>
