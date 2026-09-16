@@ -84,9 +84,10 @@
 
                 // Сортировка и ограничение до 5 ближайших занятий
                 const todayStr = new Date().toISOString().split('T')[0];
+               // Берем последние 5 занятий за весь период (например, отсортированные по дате в обратном порядке)
                 const studentLessons = lessons
-                    .filter(l => l.student === name && l.date >= todayStr)
-                    .sort((a, b) => a.date.localeCompare(b.date))
+                    .filter(l => l.student === name)
+                    .sort((a, b) => b.date.localeCompare(a.date)) // сначала самые новые
                     .slice(0, 5);
 
                 app.innerHTML = `
