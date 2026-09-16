@@ -98,14 +98,14 @@
                         </div>
                     </div>
 
-                    <!-- Навигация по трем вкладкам -->
+                    <!-- Навигация -->
                     <div class="flex gap-2 border-b border-slate-100 pb-4 mb-6 overflow-x-auto">
                         <button onclick="switchTab('students')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'students' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Ученики (${students.length})</button>
                         <button onclick="switchTab('lessons')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'lessons' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Занятия (${lessons.length})</button>
                         <button onclick="switchTab('finance')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'finance' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Финансы (${payments.length})</button>
                     </div>
 
-                    <!-- Содержимое вкладок -->
+                    <!-- Содержимое -->
                     <div id="tab-content">
                         ${activeTab === 'students' ? renderStudentsTab() : activeTab === 'lessons' ? renderLessonsTab() : renderFinanceTab()}
                     </div>
@@ -125,7 +125,7 @@
                         <h3 class="font-semibold text-slate-700 mb-3 text-sm">Добавить нового ученика</h3>
                         <form onsubmit="addStudent(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <input type="text" id="newName" placeholder="Имя ученика" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
-                            <input type="text" id="newSubject" placeholder="Предмет" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <input type="text" id="newSubject" placeholder="Предмет / Примечание" class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
                             <button type="submit" class="py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition text-sm cursor-pointer">Добавить</button>
                         </form>
                     </div>
@@ -135,11 +135,11 @@
                             <div class="py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
                                     <h4 class="font-semibold text-slate-800">${s.name}</h4>
-                                    <p class="text-xs text-slate-400">Предмет: ${s.subject || 'Не указан'} | Баланс: <span class="${(s.balance || 0) < 0 ? 'text-rose-500 font-bold' : 'text-emerald-600 font-bold'}">${s.balance || 0} руб.</span></p>
+                                    <p class="text-xs text-slate-400">Инфо: ${s.subject || 'Нет'} | Баланс: <span class="${(s.balance || 0) < 0 ? 'text-rose-500 font-bold' : 'text-emerald-600 font-bold'}">${s.balance || 0} руб.</span></p>
                                 </div>
                                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                                    <button onclick="copyStudentLink('${s.id}')" class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-200 transition cursor-pointer">Ссылка</button>
-                                    <button onclick="deleteStudent('${s.id}')" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-xs font-medium hover:bg-rose-100 transition cursor-pointer">Удалить</button>
+                                    <button onclick="copyStudentLink('${s.name}')" class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-200 transition cursor-pointer">Ссылка</button>
+                                    <button onclick="deleteStudent('${s.name}')" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-xs font-medium hover:bg-rose-100 transition cursor-pointer">Удалить</button>
                                 </div>
                             </div>
                         `).join('')}
@@ -152,31 +152,31 @@
             return `
                 <div class="space-y-6">
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <h3 class="font-semibold text-slate-700 mb-3 text-sm">Отметить прошедшее занятие</h3>
+                        <h3 class="font-semibold text-slate-700 mb-3 text-sm">Добавить / Отметить занятие</h3>
                         <form onsubmit="addLesson(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                            <select id="lessonStudentId" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <select id="lessonStudentName" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
                                 <option value="">Выберите ученика</option>
-                                ${students.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                                ${students.map(s => `<option value="${s.name}">${s.name}</option>`).join('')}
                             </select>
                             <input type="date" id="lessonDate" required value="${new Date().toISOString().split('T')[0]}" class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
-                            <input type="number" id="lessonPrice" placeholder="Стоимость (руб)" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <input type="number" id="lessonPrice" placeholder="Стоимость (руб)" required value="40" class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
                             <button type="submit" class="py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition text-sm cursor-pointer">Добавить</button>
                         </form>
                     </div>
 
                     <div class="divide-y divide-slate-100">
-                        ${lessons.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Занятий пока нет</p>' : lessons.map(l => {
-                            const student = students.find(s => s.id == l.student_id);
-                            return `
-                                <div class="py-3 flex justify-between items-center text-sm">
-                                    <div>
-                                        <span class="font-semibold text-slate-800">${student ? student.name : 'Ученик удален'}</span>
-                                        <span class="text-slate-400 text-xs ml-2">${l.date}</span>
-                                    </div>
-                                    <div class="font-medium text-slate-700">-${l.price} руб.</div>
+                        ${lessons.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Занятий пока нет</p>' : lessons.map(l => `
+                            <div class="py-3 flex justify-between items-center text-sm">
+                                <div>
+                                    <span class="font-semibold text-slate-800">${l.student_name || l.student_id}</span>
+                                    <span class="text-slate-400 text-xs ml-2">${l.date}</span>
                                 </div>
-                            `;
-                        }).join('')}
+                                <div class="flex items-center gap-3">
+                                    <span class="font-medium text-slate-700">-${l.price} руб.</span>
+                                    <button onclick="deleteLesson('${l.id}', '${l.student_name || l.student_id}', ${l.price})" class="text-rose-400 hover:text-rose-600 text-xs font-medium cursor-pointer">Удалить</button>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
@@ -188,9 +188,9 @@
                     <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <h3 class="font-semibold text-slate-700 mb-3 text-sm">Внести оплату от ученика</h3>
                         <form onsubmit="addPayment(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                            <select id="paymentStudentId" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
+                            <select id="paymentStudentName" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
                                 <option value="">Выберите ученика</option>
-                                ${students.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                                ${students.map(s => `<option value="${s.name}">${s.name}</option>`).join('')}
                             </select>
                             <input type="date" id="paymentDate" required value="${new Date().toISOString().split('T')[0]}" class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
                             <input type="number" id="paymentAmount" placeholder="Сумма (руб)" required class="px-3 py-2 bg-white rounded-xl border border-slate-200 text-sm">
@@ -199,18 +199,15 @@
                     </div>
 
                     <div class="divide-y divide-slate-100">
-                        ${payments.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Платежей пока нет</p>' : payments.map(p => {
-                            const student = students.find(s => s.id == p.student_id);
-                            return `
-                                <div class="py-3 flex justify-between items-center text-sm">
-                                    <div>
-                                        <span class="font-semibold text-slate-800">${student ? student.name : 'Ученик удален'}</span>
-                                        <span class="text-slate-400 text-xs ml-2">${p.date}</span>
-                                    </div>
-                                    <div class="font-bold text-emerald-600">+${p.amount} руб.</div>
+                        ${payments.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Платежей пока нет</p>' : payments.map(p => `
+                            <div class="py-3 flex justify-between items-center text-sm">
+                                <div>
+                                    <span class="font-semibold text-slate-800">${p.student_name || p.student_id}</span>
+                                    <span class="text-slate-400 text-xs ml-2">${p.date}</span>
                                 </div>
-                            `;
-                        }).join('')}
+                                <div class="font-bold text-emerald-600">+${p.amount} руб.</div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
@@ -223,74 +220,96 @@
             
             const { error } = await supabaseClient.from('students').insert([{ name, subject, balance: 0 }]);
             if (error) {
-                alert("Ошибка при добавлении ученика");
+                alert("Ошибка при добавлении ученика (возможно, такое имя уже есть)");
             } else {
                 await loadData();
             }
         }
 
-        async function deleteStudent(id) {
-            if (!confirm("Удалить ученика?")) return;
-            await supabaseClient.from('students').delete().eq('id', id);
+        async function deleteStudent(name) {
+            if (!confirm(`Удалить ученика ${name}?`)) return;
+            await supabaseClient.from('students').delete().eq('name', name);
             await loadData();
         }
 
         async function addLesson(e) {
             e.preventDefault();
-            const student_id = document.getElementById('lessonStudentId').value;
+            const student_name = document.getElementById('lessonStudentName').value;
             const date = document.getElementById('lessonDate').value;
             const price = parseFloat(document.getElementById('lessonPrice').value);
 
-            const { error } = await supabaseClient.from('lessons').insert([{ student_id, date, price }]);
+            // Сохраняем и в student_name, и в student_id для полной совместимости со старыми записями
+            const { error } = await supabaseClient.from('lessons').insert([{ student_name, student_id: student_name, date, price }]);
             if (error) {
                 alert("Ошибка при добавлении занятия");
             } else {
-                const student = students.find(s => s.id == student_id);
+                const student = students.find(s => s.name === student_name);
                 if (student) {
                     const newBalance = (student.balance || 0) - price;
-                    await supabaseClient.from('students').update({ balance: newBalance }).eq('id', student_id);
+                    await supabaseClient.from('students').update({ balance: newBalance }).eq('name', student_name);
                 }
                 await loadData();
             }
+        }
+
+        async function deleteLesson(lessonId, studentName, price) {
+            if (!confirm("Удалить это занятие? Баланс ученика будет пересчитан.")) return;
+            
+            const { error } = await supabaseClient.from('lessons').delete().eq('id', lessonId);
+            if (error) {
+                alert("Ошибка при удалении занятия");
+                return;
+            }
+
+            // Возвращаем деньги на баланс ученика при удалении урока
+            const student = students.find(s => s.name === studentName);
+            if (student) {
+                const newBalance = (student.balance || 0) + price;
+                await supabaseClient.from('students').update({ balance: newBalance }).eq('name', studentName);
+            }
+
+            await loadData();
         }
 
         async function addPayment(e) {
             e.preventDefault();
-            const student_id = document.getElementById('paymentStudentId').value;
+            const student_name = document.getElementById('paymentStudentName').value;
             const date = document.getElementById('paymentDate').value;
             const amount = parseFloat(document.getElementById('paymentAmount').value);
 
-            const { error } = await supabaseClient.from('payments').insert([{ student_id, date, amount }]);
+            const { error } = await supabaseClient.from('payments').insert([{ student_name, student_id: student_name, date, amount }]);
             if (error) {
                 alert("Ошибка при внесении платежа");
             } else {
-                const student = students.find(s => s.id == student_id);
+                const student = students.find(s => s.name === student_name);
                 if (student) {
                     const newBalance = (student.balance || 0) + amount;
-                    await supabaseClient.from('students').update({ balance: newBalance }).eq('id', student_id);
+                    await supabaseClient.from('students').update({ balance: newBalance }).eq('name', student_name);
                 }
                 await loadData();
             }
         }
 
-        function copyStudentLink(studentId) {
-            const url = `${window.location.origin}${window.location.pathname}?student=${studentId}`;
+        function copyStudentLink(studentName) {
+            const url = `${window.location.origin}${window.location.pathname}?student=${encodeURIComponent(studentName)}`;
             navigator.clipboard.writeText(url);
-            alert("Персональная ссылка ученика скопирована в буфер обмена!");
+            alert(`Ссылка для ученика ${studentName} скопирована!`);
         }
 
-        async function renderStudentPortal(studentId) {
+        async function renderStudentPortal(studentName) {
             const app = document.getElementById('app');
             app.className = "max-w-md w-full";
             
-            const { data, error } = await supabaseClient.from('students').select('*').eq('id', studentId).single();
+            const decodedName = decodeURIComponent(studentName);
+            const { data, error } = await supabaseClient.from('students').select('*').eq('name', decodedName).single();
+            
             if (error || !data) {
                 app.innerHTML = `<div class="bg-white p-8 rounded-3xl text-center shadow-sm"><h2 class="text-xl font-bold text-slate-800">Ученик не найден</h2><p class="text-slate-400 text-sm mt-2">Проверьте правильность ссылки.</p></div>`;
                 return;
             }
 
-            const studentLessons = lessons.filter(l => l.student_id == studentId);
-            const studentPayments = payments.filter(p => p.student_id == studentId);
+            const studentLessons = lessons.filter(l => (l.student_name === decodedName || l.student_id === decodedName));
+            const studentPayments = payments.filter(p => (p.student_name === decodedName || p.student_id === decodedName));
 
             app.innerHTML = `
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
@@ -359,20 +378,5 @@
 
         init();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
