@@ -39,4 +39,19 @@ async function addPayment(){try{const student=document.getElementById('payment-s
 async function loginTeacher(){try{const {error}=await supabaseClient.auth.signInWithPassword({email:document.getElementById('teacher-email-input').value,password:document.getElementById('teacher-password-input').value});if(error)throw error;sessionStorage.setItem('auth_teacher','1');document.getElementById('teacher-login-modal').classList.add('hidden');document.getElementById('teacher-view').classList.remove('hidden');await loadData();switchTab('calendar');}catch(e){document.getElementById('teacher-login-error').textContent=e.message||'Ошибка входа';}}async function teacherLogout(){try{await supabaseClient.auth.signOut();}catch(e){}sessionStorage.removeItem('auth_teacher');location.reload();}
 async function boot(){const {data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-view').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}document.addEventListener('DOMContentLoaded',boot);
 </script>
+
+<script id="hide-student-lessons-block-v1">
+(function(){
+  function hideLessonsBlock(){
+    const el=document.getElementById('tab-lessons');
+    if(el) el.classList.add('hidden');
+  }
+  hideLessonsBlock();
+  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
+  setTimeout(hideLessonsBlock,100);
+  setTimeout(hideLessonsBlock,500);
+  setTimeout(hideLessonsBlock,1000);
+})();
+</script>
+
 </body></html>
