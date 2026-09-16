@@ -10,9 +10,11 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 .app-card{background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.20);box-shadow:0 10px 35px rgba(15,23,42,.06);backdrop-filter:blur(10px)}
 .soft-input{border:1px solid #e2e8f0;background:#fff;transition:.18s;outline:none}.soft-input:focus{border-color:#818cf8;box-shadow:0 0 0 4px rgba(99,102,241,.10)}
 .primary-btn{background:linear-gradient(135deg,#6366f1,#4f46e5);box-shadow:0 7px 18px rgba(79,70,229,.20);transition:.18s}.primary-btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(79,70,229,.25)}
-.student-card{transition:.18s;border:1px solid rgba(148,163,184,.20);box-shadow:0 8px 24px rgba(15,23,42,.055)}.student-card:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(15,23,42,.09)}
+.student-card{transition:.18s;border:1px solid rgba(148,163,184,.20);box-shadow:0 8px 24px rgba(15,23,42,.055);overflow:visible !important}.student-card:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(15,23,42,.09)}
 .lesson-scroll{max-height:220px;overflow-y:auto;padding-right:5px}.lesson-scroll::-webkit-scrollbar{width:6px}.lesson-scroll::-webkit-scrollbar-track{background:#f1f5f9;border-radius:99px}.lesson-scroll::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:99px}
-.lesson-rescheduled td{color:#64748b}.lesson-cancelled-free td{color:#94a3b8}.lesson-cancelled-charge td{color:#b91c1c}.lesson-muted{text-decoration:line-through;text-decoration-thickness:1.5px}.lesson-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;margin-right:6px;font-weight:800}.lesson-icon-done{background:#dcfce7;color:#15803d}.lesson-icon-moved{background:#dbeafe;color:#2563eb}.lesson-icon-free{background:#f1f5f9;color:#94a3b8}.lesson-icon-charge{background:#fee2e2;color:#dc2626}
+.lesson-rescheduled td{color:#64748b}.lesson-cancelled-free td{color:#94a3b8}.lesson-cancelled-charge td{color:#b91c1c}.lesson-muted{text-decoration:line-through;text-decoration-thickness:1.5px}
+.lesson-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;margin-right:6px;font-weight:800}
+.lesson-icon-done{background:#dcfce7;color:#15803d}.lesson-icon-moved{background:#dbeafe;color:#2563eb}.lesson-icon-free{background:#f1f5f9;color:#94a3b8}.lesson-icon-charge{background:#fee2e2;color:#dc2626}
 .week-grid{display:grid;grid-template-columns:repeat(7,minmax(145px,1fr));min-width:1015px}.week-day{min-height:190px;cursor:pointer;transition:.12s}.week-day:hover{background:rgba(99,102,241,.03)}.week-lesson{cursor:pointer;transition:.15s}.week-lesson:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(15,23,42,.08)}
 .schedule-scroll-v3{max-height:1010px;overflow-y:auto;padding-right:4px}.schedule-scroll-v3 thead{position:sticky;top:0;z-index:3;background:#fff}.schedule-scroll-v3 table{min-width:900px}
 </style></head>
@@ -88,7 +90,6 @@ function resetRecurring(date){
   }
 }
 
-// Управляем видимостью чекбоксов дней при включении повторения
 document.addEventListener('change', e => {
   if(e.target && e.target.id === 'lesson-recurring'){
     const fields = document.getElementById('recurring-fields');
@@ -159,7 +160,6 @@ async function saveEditedLesson(){
         const freq=Number(document.getElementById('recurring-frequency')?.value||1);
         if(!selected.length){showError(new Error('Выберите хотя бы один день недели'));return;}
 
-        // Генерируем занятия автоматически на 2 месяца (8 недель) вперед без даты окончания
         const start=new Date(date+'T12:00:00');
         const last=new Date(start);
         last.setDate(last.getDate()+60);
@@ -191,8 +191,9 @@ function studentStats(s){const ls=lessons.filter(l=>l.student===s.name),income=p
 function publicLink(s){return location.origin+location.pathname+'?student='+encodeURIComponent(s.id);}
 
 function toggleStudentMenu(id){
-  document.querySelectorAll('[data-student-menu]').forEach(el=>{if(el.id!=='student-menu-'+id)el.classList.add('hidden');});
-  const m=document.getElementById('student-menu-'+id);
+  const menuId = 'student-menu-' + id;
+  document.querySelectorAll('[data-student-menu]').forEach(el=>{if(el.id!==menuId)el.classList.add('hidden');});
+  const m=document.getElementById(menuId);
   if(m)m.classList.toggle('hidden');
 }
 document.addEventListener('click',e=>{if(!e.target.closest('[data-student-actions]'))document.querySelectorAll('[data-student-menu]').forEach(el=>el.classList.add('hidden'));});
@@ -202,7 +203,8 @@ function renderStudents(){
   const c=document.getElementById('students-container');
   c.innerHTML=students.map(s=>{
     const{ls,income,expenses,bal}=studentStats(s),recent=[...ls].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,8);
-    return `<div class="student-card bg-white rounded-3xl p-5 overflow-visible"><div class="flex justify-between items-start gap-3"><div><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">${esc(String(s.name).charAt(0).toUpperCase())}</div><h3 class="text-lg font-bold">${esc(s.name)}</h3></div><p class="text-sm text-slate-500 mt-2">PIN: <span class="font-semibold text-slate-700">${esc(s.pin||'')}</span></p></div><div class="relative" data-student-actions><button type="button" onclick="event.stopPropagation();toggleStudentMenu('${esc(s.id)}')" aria-label="Действия" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-bold leading-none">⋮</button><div id="student-menu-${esc(s.id)}" data-student-menu onclick="event.stopPropagation()" class="hidden absolute right-0 top-11 z-50 w-52 rounded-2xl border border-slate-200 bg-white shadow-xl p-2"><button type="button" onclick="event.stopPropagation();copyStudentLink('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-indigo-50 text-indigo-700 font-semibold text-sm">🔗 Скопировать ссылку</button><button type="button" onclick="event.stopPropagation();openStudentEdit('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold text-sm">Изменить</button><button type="button" onclick="event.stopPropagation();deleteStudent('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">Удалить ученика</button></div></div></div><div class="grid grid-cols-2 gap-2 mt-4 text-sm"><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Проведено</span><br><b>${ls.filter(l=>l.status==='conducted').length}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Приход</span><br><b>${money(income)}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Списано</span><br><b>${money(expenses)}</b></div><div class="rounded-2xl bg-indigo-50 p-3"><span class="text-xs text-indigo-400">Баланс</span><br><b class="text-indigo-700">${money(bal)}</b></div></div><div class="mt-4 pt-3 border-t border-slate-100"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold uppercase tracking-wide text-slate-400">Последние занятия</span><span class="text-xs text-slate-400">${ls.length} всего</span></div><div class="lesson-scroll">${recent.map(l=>`<div class="flex justify-between items-center gap-2 py-2 border-b border-slate-100 last:border-0 text-sm"><span class="text-slate-600">${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span class="text-right"><b class="text-slate-700">${money(l.price)}</b><span class="block text-[11px] text-slate-400">${statusLabels[l.status]}</span></span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>'}</div></div><div class="mt-3 pt-3 border-t border-slate-100"><button type="button" onclick="deleteFutureLessonsForStudent('${esc(s.id)}')" class="w-full text-left text-sm font-semibold text-red-600 hover:text-red-700 py-1">Удалить все будущие занятия</button></div></div>`
+    const sId = String(s.id);
+    return `<div class="student-card bg-white rounded-3xl p-5"><div class="flex justify-between items-start gap-3"><div><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">${esc(String(s.name).charAt(0).toUpperCase())}</div><h3 class="text-lg font-bold">${esc(s.name)}</h3></div><p class="text-sm text-slate-500 mt-2">PIN: <span class="font-semibold text-slate-700">${esc(s.pin||'')}</span></p></div><div class="relative" data-student-actions><button type="button" onclick="event.stopPropagation();toggleStudentMenu('${sId}')" aria-label="Действия" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-bold leading-none">⋮</button><div id="student-menu-${sId}" data-student-menu onclick="event.stopPropagation()" class="hidden absolute right-0 top-11 z-50 w-52 rounded-2xl border border-slate-200 bg-white shadow-xl p-2"><button type="button" onclick="event.stopPropagation();copyStudentLink('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-indigo-50 text-indigo-700 font-semibold text-sm">🔗 Скопировать ссылку</button><button type="button" onclick="event.stopPropagation();openStudentEdit('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold text-sm">Изменить</button><button type="button" onclick="event.stopPropagation();deleteStudent('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">Удалить ученика</button></div></div></div><div class="grid grid-cols-2 gap-2 mt-4 text-sm"><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Проведено</span><br><b>${ls.filter(l=>l.status==='conducted').length}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Приход</span><br><b>${money(income)}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Списано</span><br><b>${money(expenses)}</b></div><div class="rounded-2xl bg-indigo-50 p-3"><span class="text-xs text-indigo-400">Баланс</span><br><b class="text-indigo-700">${money(bal)}</b></div></div><div class="mt-4 pt-3 border-t border-slate-100"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold uppercase tracking-wide text-slate-400">Последние занятия</span><span class="text-xs text-slate-400">${ls.length} всего</span></div><div class="lesson-scroll">${recent.map(l=>`<div class="flex justify-between items-center gap-2 py-2 border-b border-slate-100 last:border-0 text-sm"><span class="text-slate-600">${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span class="text-right"><b class="text-slate-700">${money(l.price)}</b><span class="block text-[11px] text-slate-400">${statusLabels[l.status]}</span></span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>'}</div></div><div class="mt-3 pt-3 border-t border-slate-100"><button type="button" onclick="deleteFutureLessonsForStudent('${sId}')" class="w-full text-left text-sm font-semibold text-red-600 hover:text-red-700 py-1">Удалить все будущие занятия</button></div></div>`
   }).join('')||'<div class="text-slate-400">Учеников пока нет</div>';
 }
 
@@ -240,20 +242,5 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
 document.addEventListener('DOMContentLoaded',boot);
 </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
