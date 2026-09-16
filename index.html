@@ -10,7 +10,9 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 .app-card{background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.20);box-shadow:0 10px 35px rgba(15,23,42,.06);backdrop-filter:blur(10px)}
 .soft-input{border:1px solid #e2e8f0;background:#fff;transition:.18s;outline:none}.soft-input:focus{border-color:#818cf8;box-shadow:0 0 0 4px rgba(99,102,241,.10)}
 .primary-btn{background:linear-gradient(135deg,#6366f1,#4f46e5);box-shadow:0 7px 18px rgba(79,70,229,.20);transition:.18s}.primary-btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(79,70,229,.25)}
-.student-card{transition:.18s;border:1px solid rgba(148,163,184,.20);box-shadow:0 8px 24px rgba(15,23,42,.055);overflow:visible !important}.student-card:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(15,23,42,.09)}
+.student-card{transition:transform .18s, box-shadow .18s, opacity .18s;border:1px solid rgba(148,163,184,.20);box-shadow:0 8px 24px rgba(15,23,42,.055);overflow:visible !important;cursor:grab}
+.student-card:active{cursor:grabbing}
+.student-card.dragging{opacity:0.4;transform:scale(0.98)}
 .lesson-scroll{max-height:220px;overflow-y:auto;padding-right:5px}.lesson-scroll::-webkit-scrollbar{width:6px}.lesson-scroll::-webkit-scrollbar-track{background:#f1f5f9;border-radius:99px}.lesson-scroll::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:99px}
 .lesson-rescheduled td{color:#64748b}.lesson-cancelled-free td{color:#94a3b8}.lesson-cancelled-charge td{color:#b91c1c}.lesson-muted{text-decoration:line-through;text-decoration-thickness:1.5px}
 .lesson-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:8px;margin-right:6px;font-weight:800}
@@ -93,7 +95,20 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 </div></div></div>
 <main id="teacher-view"><section id="tab-calendar" class="space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div><h2 class="text-lg font-bold">Неделя</h2><p id="week-range" class="text-xs text-slate-400 mt-0.5"></p></div><div class="flex gap-2"><button type="button" onclick="changeWeek(-1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">←</button><button type="button" onclick="goToday()" class="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold">Сегодня</button><button type="button" onclick="changeWeek(1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">→</button></div></div><div class="overflow-x-auto"><div id="week-calendar" class="week-grid"></div></div></div>
 <div class="app-card rounded-3xl p-5"><div class="flex justify-between items-center mb-4"><div><h2 class="text-lg font-bold">Расписание</h2><p class="text-xs text-slate-400 mt-0.5">Все занятия и их текущие статусы</p></div><button type="button" onclick="loadData().then(()=>{renderMain();renderWeek()})" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm">Обновить</button></div><div class="overflow-x-auto schedule-scroll-v3" id="schedule-scroll-wrap"><table class="w-full text-sm"><thead><tr class="text-left border-b text-slate-400"><th class="p-3">Дата занятия</th><th class="p-3">Время</th><th class="p-3">Имя ученика</th><th class="p-3">Стоимость</th><th class="p-3">Статус</th><th class="p-3 text-right">Действие</th></tr></thead><tbody id="main-lessons"></tbody></table></div></div></section>
-<section id="tab-students" class="hidden space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">👤</span><h2 class="font-bold">Новый ученик</h2></div><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><input id="new-student-name" class="soft-input rounded-xl px-3 py-2" placeholder="Имя"><input id="new-student-pin" class="soft-input rounded-xl px-3 py-2" placeholder="PIN"><button type="button" onclick="addStudent()" class="primary-btn text-white rounded-xl font-semibold">Добавить</button></div></div><div id="students-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div></section>
+<section id="tab-students" class="hidden space-y-5">
+<div class="app-card rounded-3xl p-5">
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2"><span class="text-xl">👤</span><h2 class="font-bold">Новый ученик</h2></div>
+        <p class="text-xs text-slate-400">💡 Карточки можно перетаскивать мышкой, чтобы менять их местами</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <input id="new-student-name" class="soft-input rounded-xl px-3 py-2" placeholder="Имя">
+        <input id="new-student-pin" class="soft-input rounded-xl px-3 py-2" placeholder="PIN">
+        <button type="button" onclick="addStudent()" class="primary-btn text-white rounded-xl font-semibold">Добавить</button>
+    </div>
+</div>
+<div id="students-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+</section>
 <section id="tab-finance" class="hidden space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">💰</span><h2 class="font-bold">Внести платеж от ученика</h2></div><div class="grid grid-cols-1 md:grid-cols-4 gap-3"><select id="payment-student" class="soft-input rounded-xl px-3 py-2 text-sm"></select><input id="payment-amount" type="number" min="0" step="0.01" class="soft-input rounded-xl px-3 py-2 text-sm" placeholder="Сумма"><input id="payment-date" type="date" class="soft-input rounded-xl px-3 py-2 text-sm"><button type="button" onclick="addPayment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition shadow-sm">Внести оплату</button></div></div><div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">📊</span><h2 class="font-bold">Финансовый баланс учеников</h2></div><div id="finance-balances" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div></section></main><div id="error-box" class="hidden fixed bottom-4 right-4 max-w-md bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl shadow-lg"></div></div></div>
 
 <script>
@@ -109,7 +124,6 @@ async function loadData(){
   [students,lessons,payments]=await Promise.all([db('/students?select=*'),db('/lessons?select=*'),db('/payments?select=*')]);
   students=students||[]; lessons=lessons||[]; payments=payments||[];
   
-  // Автоматический перевод прошедших «Запланированных» в статус «Проведено»
   const now = new Date();
   for(let l of lessons){
     if(l.status === 'pending' && l.date && l.time){
@@ -132,8 +146,6 @@ function lessonVisual(l){if(l.status==='conducted')return {row:'',icon:'✓',ico
 
 function renderMain(){
   fillStudentSelects();
-  
-  // Сортируем ВСЕ занятия строго от старых к новым (хронологически)
   const rows=[...lessons].sort((a,b)=>(String(a.date)+String(a.time||'')).localeCompare(String(b.date)+String(b.time||'')));
   const todayStr = localISO(new Date());
 
@@ -150,7 +162,7 @@ function renderMain(){
 
     return `<tr id="main-row-${index}" ${targetAttr} class="border-b hover:bg-slate-50 transition ${v.row}">
       <td class="p-3 ${textClass}">${esc(l.date)}</td>
-      <td class="p-3 ${textClass}">${esc(displayTime(l.time)||'—')}</td>
+      <td class="p-3 ${textClass}">${esc(displayTime(l.time||'—')}</td>
       <td class="p-3 font-medium ${textClass}">${esc(l.student)}</td>
       <td class="p-3 ${textClass}">${money(l.price)}</td>
       <td class="p-3"><span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold ${statusClass[l.status]||'bg-slate-100'}">${v.icon?`<span class="lesson-icon ${v.iconClass}">${v.icon}</span>`:''}${v.label}</span></td>
@@ -308,14 +320,96 @@ function publicLink(s){return location.origin+location.pathname+'?student='+enco
 function toggleStudentMenu(id){const menuId='student-menu-'+id;document.querySelectorAll('[data-student-menu]').forEach(el=>{if(el.id!==menuId)el.classList.add('hidden');});const m=document.getElementById(menuId);if(m)m.classList.toggle('hidden');}
 document.addEventListener('click',e=>{if(!e.target.closest('[data-student-actions]'))document.querySelectorAll('[data-student-menu]').forEach(el=>el.classList.add('hidden'));});
 
+// Функционал ручной сортировки (Drag and Drop) для карточек учеников
+function getCustomStudentOrder(){
+  try{return JSON.parse(localStorage.getItem('tutor_student_order')||'[]');}catch(e){return [];}
+}
+function saveCustomStudentOrder(order){
+  try{localStorage.setItem('tutor_student_order', JSON.stringify(order));}catch(e){}
+}
+
 function renderStudents(){
   fillStudentSelects();
+  
+  // Сортируем учеников согласно пользовательскому порядку из localStorage
+  const customOrder = getCustomStudentOrder();
+  if(customOrder.length){
+    students.sort((a,b)=>{
+      const ia = customOrder.indexOf(String(a.id));
+      const ib = customOrder.indexOf(String(b.id));
+      if(ia === -1 && ib === -1) return 0;
+      if(ia === -1) return 1;
+      if(ib === -1) return -1;
+      return ia - ib;
+    });
+  }
+
   const c=document.getElementById('students-container');
   c.innerHTML=students.map(s=>{
-    const{ls,income,expenses,bal}=studentStats(s),recent=[...ls].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,8);
+    const{ls,income,expenses,bal}=studentStats(s),recent=[...ls].sort((a,b)=>(String(a.date)+String(a.time||'')).localeCompare(String(b.date)+String(b.time||''))).slice(0,8);
     const sId = String(s.id);
-    return `<div class="student-card bg-white rounded-3xl p-5"><div class="flex justify-between items-start gap-3"><div><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">${esc(String(s.name).charAt(0).toUpperCase())}</div><h3 class="text-lg font-bold">${esc(s.name)}</h3></div><p class="text-sm text-slate-500 mt-2">PIN: <span class="font-semibold text-slate-700">${esc(s.pin||'')}</span></p></div><div class="relative" data-student-actions><button type="button" onclick="event.stopPropagation();toggleStudentMenu('${sId}')" aria-label="Действия" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-bold leading-none">⋮</button><div id="student-menu-${sId}" data-student-menu onclick="event.stopPropagation()" class="hidden absolute right-0 top-11 z-50 w-52 rounded-2xl border border-slate-200 bg-white shadow-xl p-2"><button type="button" onclick="event.stopPropagation();copyStudentLink('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-indigo-50 text-indigo-700 font-semibold text-sm">🔗 Скопировать ссылку</button><button type="button" onclick="event.stopPropagation();openStudentEdit('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold text-sm">Изменить</button><button type="button" onclick="event.stopPropagation();deleteStudent('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">Удалить ученика</button></div></div></div><div class="grid grid-cols-2 gap-2 mt-4 text-sm"><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Проведено</span><br><b>${ls.filter(l=>l.status==='conducted').length}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Приход</span><br><b>${money(income)}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Списано</span><br><b>${money(expenses)}</b></div><div class="rounded-2xl bg-indigo-50 p-3"><span class="text-xs text-indigo-400">Баланс</span><br><b class="text-indigo-700">${money(bal)}</b></div></div><div class="mt-4 pt-3 border-t border-slate-100"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold uppercase tracking-wide text-slate-400">Последние занятия</span><span class="text-xs text-slate-400">${ls.length} всего</span></div><div class="lesson-scroll">${recent.map(l=>`<div class="flex justify-between items-center gap-2 py-2 border-b border-slate-100 last:border-0 text-sm"><span class="text-slate-600">${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span class="text-right"><b class="text-slate-700">${money(l.price)}</b><span class="block text-[11px] text-slate-400">${statusLabels[l.status]}</span></span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>'}</div></div></div>`
+    return `<div draggable="true" ondragstart="onStudentDragStart(event, '${sId}')" ondragover="onStudentDragOver(event)" ondragleave="onStudentDragLeave(event)" ondrop="onStudentDrop(event, '${sId}')" class="student-card bg-white rounded-3xl p-5" data-student-id="${sId}">
+      <div class="flex justify-between items-start gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-300 cursor-grab active:cursor-grabbing select-none text-base" title="Перетащите карточку">⋮⋮</span>
+            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">${esc(String(s.name).charAt(0).toUpperCase())}</div>
+            <h3 class="text-lg font-bold">${esc(s.name)}</h3>
+          </div>
+          <p class="text-sm text-slate-500 mt-2 ml-5">PIN: <span class="font-semibold text-slate-700">${esc(s.pin||'')}</span></p>
+        </div>
+        <div class="relative" data-student-actions>
+          <button type="button" onclick="event.stopPropagation();toggleStudentMenu('${sId}')" aria-label="Действия" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-bold leading-none">⋮</button>
+          <div id="student-menu-${sId}" data-student-menu onclick="event.stopPropagation()" class="hidden absolute right-0 top-11 z-50 w-52 rounded-2xl border border-slate-200 bg-white shadow-xl p-2">
+            <button type="button" onclick="event.stopPropagation();copyStudentLink('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-indigo-50 text-indigo-700 font-semibold text-sm">🔗 Скопировать ссылку</button>
+            <button type="button" onclick="event.stopPropagation();openStudentEdit('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold text-sm">Изменить</button>
+            <button type="button" onclick="event.stopPropagation();deleteStudent('${sId}');toggleStudentMenu('${sId}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">Удалить ученика</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mt-4 text-sm">
+        <div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Проведено</span><br><b>${ls.filter(l=>l.status==='conducted').length}</b></div>
+        <div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Приход</span><br><b>${money(income)}</b></div>
+        <div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Списано</span><br><b>${money(expenses)}</b></div>
+        <div class="rounded-2xl bg-indigo-50 p-3"><span class="text-xs text-indigo-400">Баланс</span><br><b class="text-indigo-700">${money(bal)}</b></div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-slate-100">
+        <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold uppercase tracking-wide text-slate-400">Занятия (от старых к новым)</span><span class="text-xs text-slate-400">${ls.length} всего</span></div>
+        <div class="lesson-scroll">${recent.map(l=>`<div class="flex justify-between items-center gap-2 py-2 border-b border-slate-100 last:border-0 text-sm"><span class="text-slate-600">${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span class="text-right"><b class="text-slate-700">${money(l.price)}</b><span class="block text-[11px] text-slate-400">${statusLabels[l.status]}</span></span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>'}</div>
+      </div>
+    </div>`
   }).join('')||'<div class="text-slate-400">Учеников пока нет</div>';
+}
+
+// Логика Drag and Drop для карточек
+let draggedStudentId = null;
+function onStudentDragStart(e, id){
+  draggedStudentId = id;
+  e.currentTarget.classList.add('dragging');
+}
+function onStudentDragOver(e){
+  e.preventDefault();
+  const card = e.currentTarget.closest('.student-card');
+  if(card) card.style.borderColor = '#6366f1';
+}
+function onStudentDragLeave(e){
+  const card = e.currentTarget.closest('.student-card');
+  if(card) card.style.borderColor = 'rgba(148,163,184,.20)';
+}
+function onStudentDrop(e, targetId){
+  e.preventDefault();
+  document.querySelectorAll('.student-card').forEach(el=>el.style.borderColor = 'rgba(148,163,184,.20)');
+  if(!draggedStudentId || draggedStudentId === targetId) return;
+
+  let order = students.map(s => String(s.id));
+  const fromIdx = order.indexOf(draggedStudentId);
+  const toIdx = order.indexOf(targetId);
+  if(fromIdx !== -1 && toIdx !== -1){
+    order.splice(fromIdx, 1);
+    order.splice(toIdx, 0, draggedStudentId);
+    saveCustomStudentOrder(order);
+    renderStudents();
+  }
 }
 
 async function addStudent(){try{const name=document.getElementById('new-student-name').value.trim(),pin=document.getElementById('new-student-pin').value.trim();if(!name||!pin){showError(new Error('Введите имя и PIN-код'));return;}await db('/students',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({name,pin,price:40})});await loadData();renderStudents();document.getElementById('new-student-name').value='';document.getElementById('new-student-pin').value='';}catch(e){showError(e);}}
@@ -323,20 +417,6 @@ function openStudentEdit(id){const s=students.find(x=>String(x.id)===String(id))
 function closeStudentEdit(){document.getElementById('student-edit-modal').classList.add('hidden');document.getElementById('student-edit-modal').classList.remove('flex');}
 async function saveStudentEdit(){try{const id=document.getElementById('edit-student-id').value,s=students.find(x=>String(x.id)===String(id)),newName=document.getElementById('edit-student-name').value.trim(),newPin=document.getElementById('edit-student-pin').value.trim();if(!s||!newName||!newPin){showError(new Error('Введите имя и PIN-код'));return;}const oldName=s.name;if(newName!==oldName){await db('/lessons?student=eq.'+encodeURIComponent(oldName),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:newName})});await db('/payments?student=eq.'+encodeURIComponent(oldName),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student:newName})});}await db('/students?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({name:newName,pin:newPin})});closeStudentEdit();await loadData();renderStudents();}catch(e){showError(e);}}
 async function deleteStudent(id){const s=students.find(x=>String(x.id)===String(id));if(!s)return;if(!confirm('Удалить ученика? Его занятия и платежи останутся в системе.'))return;try{await db('/students?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers});await loadData();renderStudents();}catch(e){showError(e);}}
-
-async function deleteFutureLessonsForStudent(studentId){
-  const st=students.find(s=>String(s.id)===String(studentId));
-  if(!st)return;
-  const today=localISO(new Date());
-  const count=lessons.filter(l=>String(l.student)===String(st.name)&&l.date>=today&&l.status==='pending').length;
-  if(!count){alert('У этого ученика нет будущих запланированных занятий.');return;}
-  if(!confirm(`Удалить все будущие запланированные занятия ученика «${st.name}»?\n\nБудут удалены ${count} занятий.`)) return;
-  try{
-    await db(`/lessons?student=eq.${encodeURIComponent(st.name)}&date=gte.${today}&status=eq.pending`,{method:'DELETE',headers:{...headers,Prefer:'return=minimal'}});
-    await loadData();renderMain();renderWeek();renderStudents();
-    if(typeof renderFinance==='function') renderFinance();
-  }catch(e){showError(e);}
-}
 
 async function copyStudentLink(id){const s=students.find(x=>String(x.id)===String(id));if(!s)return;const url=publicLink(s);try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(url);}else{const ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');ta.remove();}alert('Ссылка скопирована в буфер обмена!');}catch(e){prompt('Скопируйте ссылку:',url);}}
 function toggleFinanceSection(id){const el=document.getElementById(id);const icon=document.getElementById(id+'-icon');if(!el)return;const open=!el.classList.contains('hidden');el.classList.toggle('hidden',open);if(icon)icon.textContent=open?'＋':'−';}
@@ -461,20 +541,5 @@ async function boot(){
 }
 document.addEventListener('DOMContentLoaded', boot);
 </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
