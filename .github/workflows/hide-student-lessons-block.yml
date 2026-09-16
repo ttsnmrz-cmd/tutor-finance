@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - '.github/workflows/hide-student-lessons-block.yml'
+      - 'index.html'
 
 jobs:
   fix:
