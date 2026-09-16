@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет ученика / Учет занятий</title>
+    <title>Учет занятий и оплат репетитора</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-50 min-h-screen p-6 text-gray-800">
@@ -18,11 +18,12 @@
             </div>
             <div id="nav-tabs" class="flex gap-2">
                 <button onclick="switchTab('schedule')" id="btn-schedule" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition">Календарь</button>
-                <button onclick="switchTab('finance')" id="btn-finance" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition">Финансы и Баланс</button>
+                <button onclick="switchTab('students')" id="btn-students" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition">Ученики</button>
+                <button onclick="switchTab('finance')" id="btn-finance" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition">Финансы</button>
             </div>
         </header>
 
-        <!-- КОНТЕНТ ДЛЯ ПРЕПОДАВАТЕЛЯ (скрывается, если зашел ученик по ссылке) -->
+        <!-- КОНТЕНТ ДЛЯ ПРЕПОДАВАТЕЛЯ -->
         <div id="teacher-view" class="space-y-6">
             
             <!-- ВКЛАДКА 1: КАЛЕНДАРЬ И ЗАНЯТИЯ -->
@@ -30,9 +31,15 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="font-bold text-base mb-4">➕ Добавить занятие</h3>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <input type="text" id="student-name" placeholder="Имя ученика" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <select id="lesson-student-select" class="border border-gray-300 rounded-xl px-3 py-2 text-sm bg-white">
+                            <!-- Заполняется JS из списка учеников -->
+                        </select>
                         <input type="date" id="lesson-date" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
-                        <input type="number" id="lesson-price" value="40" placeholder="Цена за урок (р.)" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <select id="lesson-price-select" class="border border-gray-300 rounded-xl px-3 py-2 text-sm bg-white">
+                            <option value="40">40 р. (стандарт)</option>
+                            <option value="20">20 р. (половина)</option>
+                            <option value="0">0 р. (бесплатно)</option>
+                        </select>
                         <button onclick="addLesson()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 rounded-xl transition">Добавить занятие</button>
                     </div>
                 </div>
@@ -56,12 +63,32 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА 2: ФИНАНСЫ И БАЛАНС -->
+            <!-- ВКЛАДКА 2: УЧЕНИКИ -->
+            <div id="tab-students" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-base mb-4">👤 Добавить нового ученика</h3>
+                    <div class="flex gap-3">
+                        <input type="text" id="new-student-name" placeholder="Имя ученика (например, Алексей)" class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <button onclick="addStudent()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-6 py-2 rounded-xl transition">Добавить</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-base mb-4">📋 Список учеников и ссылки</h3>
+                    <div class="space-y-3" id="students-list-container">
+                        <!-- Заполняется JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВКЛАДКА 3: ФИНАНСЫ И БАЛАНС -->
             <div id="tab-finance" class="space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <h3 class="font-bold text-base mb-4">💰 Внести платеж от ученика</h3>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <input type="text" id="pay-student" placeholder="Имя ученика" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
+                        <select id="pay-student-select" class="border border-gray-300 rounded-xl px-3 py-2 text-sm bg-white">
+                            <!-- Заполняется JS -->
+                        </select>
                         <input type="number" id="pay-amount" placeholder="Сумма (р.)" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
                         <input type="date" id="pay-date" class="border border-gray-300 rounded-xl px-3 py-2 text-sm">
                         <button onclick="addPayment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2 rounded-xl transition">Внести оплату</button>
@@ -74,10 +101,7 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-base">📜 История всех платежей</h3>
-                        <button onclick="generateStudentLinkModal()" class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition">🔗 Ссылка для ученика</button>
-                    </div>
+                    <h3 class="font-bold text-base mb-4">📜 История всех платежей</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead class="bg-gray-50 text-gray-400 uppercase text-xs">
@@ -96,11 +120,9 @@
 
         </div>
 
-        <!-- КОНТЕНТ ДЛЯ УЧЕНИКА (показывается только по ссылке ?student=Имя) -->
+        <!-- КОНТЕНТ ДЛЯ УЧЕНИКА (по ссылке) -->
         <div id="student-view" class="space-y-6 hidden">
-            <div id="student-summary-card" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <!-- Карточка баланса ученика -->
-            </div>
+            <div id="student-summary-card" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100"></div>
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 class="font-bold text-base mb-4">📜 История внесенных вами платежей</h3>
@@ -136,59 +158,58 @@
 
     </div>
 
-    <!-- Модальное окно для копирования ссылки -->
-    <div id="link-modal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden p-4">
-        <div class="bg-white p-6 rounded-2xl max-w-md w-full space-y-4">
-            <h3 class="font-bold text-base">Ссылка для ученика</h3>
-            <p class="text-xs text-gray-500">Скопируйте эту ссылку и отправьте ученику в мессенджер. Он сможет видеть свой баланс и историю платежей.</p>
-            <input type="text" id="modal-link-input" readonly class="w-full border border-gray-300 rounded-xl px-3 py-2 text-xs bg-gray-50 select-all">
-            <div class="flex justify-end gap-2">
-                <button onclick="closeModal()" class="px-4 py-2 bg-gray-100 rounded-xl text-xs font-semibold">Закрыть</button>
-            </div>
-        </div>
-    </div>
-
     <script>
+        // Базовые данные
+        let students = JSON.parse(localStorage.getItem('tut_students')) || ["Алексей", "Мария"];
         let lessons = JSON.parse(localStorage.getItem('tut_lessons')) || [
-            { id: 1, student: "Алексей", date: "2026-03-20", price: 40, status: "conducted" },
-            { id: 2, student: "Алексей", date: "2026-03-22", price: 40, status: "pending" }
+            { id: 1, student: "Алексей", date: "2026-03-20", price: 40, status: "conducted" }
         ];
-
         let payments = JSON.parse(localStorage.getItem('tut_payments')) || [
             { id: 1, student: "Алексей", date: "2026-03-19", amount: 400 }
         ];
 
-        // Проверяем, перешел ли ученик по персональной ссылке (?student=Имя)
         const urlParams = new URLSearchParams(window.location.search);
         const studentMode = urlParams.get('student');
 
         function saveData() {
+            localStorage.setItem('tut_students', JSON.stringify(students));
             localStorage.setItem('tut_lessons', JSON.stringify(lessons));
             localStorage.setItem('tut_payments', JSON.stringify(payments));
             render();
         }
 
         function switchTab(tab) {
-            if(tab === 'schedule') {
-                document.getElementById('tab-schedule').classList.remove('hidden');
-                document.getElementById('tab-finance').classList.add('hidden');
-                document.getElementById('btn-schedule').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition";
-                document.getElementById('btn-finance').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition";
-            } else {
-                document.getElementById('tab-schedule').classList.add('hidden');
-                document.getElementById('tab-finance').classList.remove('hidden');
-                document.getElementById('btn-schedule').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition";
-                document.getElementById('btn-finance').className = "px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition";
-            }
+            ['schedule', 'students', 'finance'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).className = "px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 transition";
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).className = "px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white transition";
         }
 
+        // Управление учениками
+        function addStudent() {
+            const name = document.getElementById('new-student-name').value.trim();
+            if(!name) return alert("Введите имя ученика!");
+            if(students.includes(name)) return alert("Такой ученик уже есть!");
+            students.push(name);
+            document.getElementById('new-student-name').value = '';
+            saveData();
+        }
+
+        function deleteStudent(name) {
+            if(!confirm(`Удалить ученика ${name}?`)) return;
+            students = students.filter(s => s !== name);
+            saveData();
+        }
+
+        // Занятия
         function addLesson() {
-            const student = document.getElementById('student-name').value.trim();
+            const student = document.getElementById('lesson-student-select').value;
             const date = document.getElementById('lesson-date').value;
-            const price = parseFloat(document.getElementById('lesson-price').value) || 40;
-            if(!student || !date) return alert("Заполните имя и дату!");
+            const price = parseFloat(document.getElementById('lesson-price-select').value);
+            if(!student || !date) return alert("Заполните дату!");
             lessons.push({ id: Date.now(), student, date, price, status: 'pending' });
-            document.getElementById('student-name').value = '';
             saveData();
         }
 
@@ -202,13 +223,13 @@
             saveData();
         }
 
+        // Платежи
         function addPayment() {
-            const student = document.getElementById('pay-student').value.trim();
+            const student = document.getElementById('pay-student-select').value;
             const amount = parseFloat(document.getElementById('pay-amount').value);
             const date = document.getElementById('pay-date').value;
-            if(!student || isNaN(amount) || !date) return alert("Заполните все поля платежа!");
+            if(!student || isNaN(amount) || !date) return alert("Заполните сумму и дату!");
             payments.push({ id: Date.now(), student, date, amount });
-            document.getElementById('pay-student').value = '';
             document.getElementById('pay-amount').value = '';
             saveData();
         }
@@ -218,26 +239,29 @@
             saveData();
         }
 
-        // Генерация ссылки для модального окна
-        function generateStudentLinkModal() {
-            const allStudents = [...new Set([...lessons.map(l => l.student), ...payments.map(p => p.student)])];
-            if(allStudents.length === 0) return alert("Сначала добавьте учеников!");
-            // По умолчанию берем первого попавшегося или спрашиваем
-            const student = prompt("Введите имя ученика для создания ссылки:", allStudents[0]);
-            if(!student) return;
-            
+        function getStudentLink(studentName) {
             const baseUrl = window.location.href.split('?')[0];
-            const link = `${baseUrl}?student=${encodeURIComponent(student)}`;
-            
-            document.getElementById('modal-link-input').value = link;
-            document.getElementById('link-modal').classList.remove('hidden');
+            return `${baseUrl}?student=${encodeURIComponent(studentName)}`;
         }
 
-        function closeModal() {
-            document.getElementById('link-modal').classList.add('hidden');
+        function copyStudentLink(studentName) {
+            const link = getStudentLink(studentName);
+            navigator.clipboard.writeText(link);
+            alert(`Ссылка для ученика ${studentName} скопирована в буфер обмена!`);
         }
 
         function render() {
+            // Заполняем выпадающие списки учеников
+            const lSelect = document.getElementById('lesson-student-select');
+            const pSelect = document.getElementById('pay-student-select');
+            lSelect.innerHTML = '';
+            pSelect.innerHTML = '';
+
+            students.forEach(s => {
+                lSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                pSelect.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+
             if (studentMode) {
                 // РЕЖИМ УЧЕНИКА
                 document.getElementById('teacher-view').classList.add('hidden');
@@ -247,7 +271,6 @@
                 document.getElementById('main-title').textContent = `Личный кабинет: ${studentMode}`;
                 document.getElementById('main-subtitle').textContent = `Ваш текущий баланс и история занятий`;
 
-                // Считаем финансы ученика
                 const totalPaid = payments.filter(p => p.student === studentMode).reduce((sum, p) => sum + p.amount, 0);
                 const totalSpent = lessons.filter(l => l.student === studentMode && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
                 const balance = totalPaid - totalSpent;
@@ -269,7 +292,6 @@
                     </div>
                 `;
 
-                // Таблица платежей ученика
                 const spBody = document.getElementById('student-payments-body');
                 spBody.innerHTML = '';
                 const myPayments = payments.filter(p => p.student === studentMode);
@@ -278,7 +300,6 @@
                     spBody.innerHTML += `<tr class="hover:bg-gray-50/50"><td class="p-3">${p.date}</td><td class="p-3 text-emerald-600 font-bold">+${p.amount} р.</td></tr>`;
                 });
 
-                // Таблица занятий ученика
                 const slBody = document.getElementById('student-lessons-body');
                 slBody.innerHTML = '';
                 const myLessons = lessons.filter(l => l.student === studentMode);
@@ -307,7 +328,26 @@
                 document.getElementById('teacher-view').classList.remove('hidden');
                 document.getElementById('student-view').classList.add('hidden');
 
-                // Рендер таблицы занятий
+                // 1. Список учеников во вкладке «Ученики»
+                const stContainer = document.getElementById('students-list-container');
+                stContainer.innerHTML = '';
+                if(students.length === 0) stContainer.innerHTML = `<p class="text-sm text-gray-400 italic">Список учеников пуст.</p>`;
+                students.forEach(s => {
+                    stContainer.innerHTML += `
+                        <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-indigo-900">${s}</span>
+                                <div class="text-xs text-gray-400 truncate max-w-xs mt-0.5">${getStudentLink(s)}</div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="copyStudentLink('${s}')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-semibold transition">🔗 Скопировать ссылку</button>
+                                <button onclick="deleteStudent('${s}')" class="text-red-500 hover:text-red-700 px-2 py-1.5 text-xs font-semibold">Удалить</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // 2. Таблица расписания
                 const lTable = document.getElementById('lessons-table-body');
                 lTable.innerHTML = '';
                 lessons.forEach(l => {
@@ -330,12 +370,11 @@
                     `;
                 });
 
-                // Баланс учеников у преподавателя
-                const allStudents = [...new Set([...lessons.map(l => l.student), ...payments.map(p => p.student)])];
+                // 3. Балансы
                 const balanceContainer = document.getElementById('students-balance-container');
                 balanceContainer.innerHTML = '';
 
-                allStudents.forEach(student => {
+                students.forEach(student => {
                     const totalPaid = payments.filter(p => p.student === student).reduce((sum, p) => sum + p.amount, 0);
                     const totalSpent = lessons.filter(l => l.student === student && (l.status === 'conducted' || l.status === 'cancelled_charge')).reduce((sum, l) => sum + l.price, 0);
                     const balance = totalPaid - totalSpent;
@@ -355,7 +394,7 @@
                     `;
                 });
 
-                // История платежей
+                // 4. История платежей
                 const pTable = document.getElementById('payments-table-body');
                 pTable.innerHTML = '';
                 payments.forEach(p => {
