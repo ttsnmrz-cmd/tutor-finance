@@ -293,7 +293,7 @@ function lessonVisual(l){
 function renderMain(){
   fillStudentSelects();
   const rows=[...lessons].sort((a,b)=>{
-    return String(a.date||'')+String(a.time||'').localeCompare(String(b.date||'')+String(b.time||''));
+    return (String(a.date||'')+String(a.time||'')).localeCompare(String(b.date||'')+String(b.time||''));
   });
   const body=document.getElementById('main-lessons');
   body.innerHTML=rows.length?rows.map(l=>{
@@ -301,7 +301,7 @@ function renderMain(){
     const textClass=v.muted?'lesson-muted':'';
     return `<tr id="lesson-row-${esc(l.id)}" class="border-b hover:bg-slate-50 transition ${v.row}">
       <td class="p-3 ${textClass}">${esc(l.date)}</td>
-      <td class="p-3 ${textClass}">${esc(displayTime(l.time||'—')}</td>
+      <td class="p-3 ${textClass}">${esc(displayTime(l.time))}</td>
       <td class="p-3 font-medium ${textClass}">${esc(l.student)}</td>
       <td class="p-3 ${textClass}">${money(l.price)}</td>
       <td class="p-3"><span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold ${statusClass[l.status]||'bg-slate-100'}">${v.icon?`<span class="lesson-icon ${v.iconClass}">${v.icon}</span>`:''}${v.label}</span></td>
@@ -311,6 +311,19 @@ function renderMain(){
       </td>
     </tr>`;
   }).join(''):`<tr><td colspan="6" class="p-8 text-center text-slate-400">Занятий пока нет</td></tr>`;
+
+  const todayStr = localISO(new Date());
+  let targetRow = rows.find(l => l.date >= todayStr);
+  if (!targetRow && rows.length > 0) targetRow = rows[rows.length - 1];
+  if (targetRow) {
+    setTimeout(() => {
+      const tr = document.getElementById('lesson-row-' + targetRow.id);
+      const scrollWrap = document.getElementById('schedule-scroll-wrap');
+      if (tr && scrollWrap) {
+        scrollWrap.scrollTop = tr.offsetTop - scrollWrap.offsetTop;
+      }
+    }, 50);
+  }
 }
 
 function localISO(d){
@@ -355,7 +368,7 @@ function renderWeek(){
           const tone=l.status==='cancelled_charge'?'border-red-200 bg-red-50':l.status==='cancelled_free'||l.status==='rescheduled'?'border-slate-200 bg-slate-50':'border-indigo-100 bg-white';
           return `<div draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${esc(l.id)}')" onclick="event.stopPropagation();openEditLesson('${esc(l.id)}')" class="week-lesson w-full text-left rounded-xl border ${tone} p-2.5 select-none">
             <div class="flex items-center justify-between gap-2">
-              <span class="font-bold text-sm ${v.muted?'line-through text-slate-400':'text-indigo-700'}">${esc(displayTime(l.time||'—')}</span>
+              <span class="font-bold text-sm ${v.muted?'line-through text-slate-400':'text-indigo-700'}">${esc(displayTime(l.time))}</span>
               <span class="text-xs">${v.icon||''}</span>
             </div>
             <div class="font-semibold text-sm mt-1 ${v.muted?'text-slate-400 line-through':'text-slate-700'}">${esc(l.student)}</div>
@@ -499,11 +512,43 @@ async function deleteThisAndFollowingFromModal(){
   }catch(e){showError(e);}
 }
 
-// Заглушки для функций учеников/финансов, если они требуются в интерфейсе
-function renderStudents(){}
-function renderFinance(){}
-function addStudent(){}
-function addPayment(){}
+// Заглушки или полноценные функции управления учениками и финансами
+async function renderStudents(){
+  fillStudentSelects();
+  const c=document.getElementById('students-container');
+  if(!c)return;
+  c.innerHTML=students.map(s=>{
+    return `<div class="student-card bg-white rounded-3xl p-5"><h3 class="font-bold">${esc(s.name)}</h3><p class="text-sm text-slate-500">PIN: ${esc(s.pin)}</p></div>`;
+  }).join('')||'<div class="text-slate-400">Нет учеников</div>';
+}
+async function renderFinance(){
+  fillStudentSelects();
+  const c=document.getElementById('finance-balances');
+  if(!c)return;
+  c.innerHTML='<div class="text-slate-500">Финансы загружены</div>';
+}
+async function addStudent(){
+  try{
+    const name=document.getElementById('new-student-name').value.trim(),
+          pin=document.getElementById('new-student-pin').value.trim();
+    if(!name||!pin){showError(new Error('Введите имя и PIN'));return;}
+    await db('/students',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({name,pin,price:40})});
+    await loadData(); renderStudents();
+    document.getElementById('new-student-name').value='';
+    document.getElementById('new-student-pin').value='';
+  }catch(e){showError(e);}
+}
+async function addPayment(){
+  try{
+    const student=document.getElementById('payment-student').value,
+          amount=Number(document.getElementById('payment-amount').value),
+          date=document.getElementById('payment-date').value;
+    if(!student||!amount||!date){showError(new Error('Заполните все поля платежа'));return;}
+    await db('/payments',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student,amount,date})});
+    document.getElementById('payment-amount').value='';
+    await loadData(); renderFinance();
+  }catch(e){showError(e);}
+}
 function closeStudentEdit(){}
 function saveStudentEdit(){}
 
@@ -524,35 +569,89 @@ function teacherLogout(){
   location.reload();
 }
 
-// Инициализация при загрузке (чтобы страница не была пустой)
-async function initApp() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const studentId = urlParams.get('student');
+let publicStudent=null;
+async function initPublicStudent(){
+  const id=new URLSearchParams(location.search).get('student');
+  if(!id)return false;
+  document.getElementById('student-public-view').classList.remove('hidden');
+  try{
+    const data=await db('/students?id=eq.'+encodeURIComponent(id)+'&select=*');
+    publicStudent=data&&data[0];
+    if(!publicStudent){document.getElementById('student-public-name').textContent='Ученик не найден';return true;}
+    document.getElementById('student-public-name').textContent='Ученик: '+publicStudent.name;
+    document.getElementById('student-public-pin').focus();
+  }catch(e){document.getElementById('student-public-error').textContent=e.message||'Ошибка загрузки';}
+  return true;
+}
 
-  if (studentId) {
-    document.getElementById('student-public-view').classList.remove('hidden');
+async function openStudentCabinet(){
+  if(!publicStudent)return;
+  const pin=document.getElementById('student-public-pin').value.trim();
+  if(pin!==String(publicStudent.pin||'')){document.getElementById('student-public-error').textContent='Неверный PIN';return;}
+  try{
+    const allLs=await db('/lessons?student=eq.'+encodeURIComponent(publicStudent.name)+'&select=*');
+    const ps=await db('/payments?student=eq.'+encodeURIComponent(publicStudent.name)+'&select=*');
+    
+    const paid=(ps||[]).reduce((a,p)=>a+Number(p.amount||0),0),
+          spent=(allLs||[]).filter(l=>charge.has(l.status)).reduce((a,l)=>a+Number(l.price||0),0);
+    
+    document.getElementById('public-student-title').textContent=publicStudent.name;
+    document.getElementById('public-paid').textContent=money(paid);
+    document.getElementById('public-spent').textContent=money(spent);
+    document.getElementById('public-balance').textContent=money(paid-spent);
+    
+    const todayStr = localISO(new Date());
+    const sortedLessons = [...(allLs||[])].sort((a,b)=>{
+      return (String(a.date||'')+String(a.time||'')).localeCompare(String(b.date||'')+String(b.time||''));
+    });
+    
+    const pastAndToday = sortedLessons.filter(l => l.date <= todayStr);
+    const future = sortedLessons.filter(l => l.date > todayStr).slice(0, 10);
+    const visibleLessons = [...pastAndToday, ...future];
+
+    const lessonsBody = document.getElementById('public-lessons');
+    lessonsBody.innerHTML = visibleLessons.length ? visibleLessons.map(l=>{
+      const v = lessonVisual(l);
+      const textClass = v.muted ? 'lesson-muted' : '';
+      return `<tr id="public-lesson-row-${esc(l.id)}" class="border-b hover:bg-slate-50 transition ${v.row}">
+        <td class="p-3 ${textClass}">${esc(l.date)}</td>
+        <td class="p-3 ${textClass}">${esc(displayTime(l.time))}</td>
+        <td class="p-3 ${textClass}">${money(l.price)}</td>
+        <td class="p-3"><span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold ${statusClass[l.status]||'bg-slate-100'}">${v.icon?`<span class="lesson-icon ${v.iconClass}">${v.icon}</span>`:''}${v.label}</span></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="4" class="p-8 text-center text-slate-400">Занятий пока нет</td></tr>`;
+
+    let targetRow = visibleLessons.find(l => l.date >= todayStr);
+    if (!targetRow && visibleLessons.length > 0) targetRow = visibleLessons[visibleLessons.length - 1];
+    if (targetRow) {
+      setTimeout(() => {
+        const tr = document.getElementById('public-lesson-row-' + targetRow.id);
+        const scrollWrap = document.getElementById('public-schedule-scroll-wrap');
+        if (tr && scrollWrap) {
+          scrollWrap.scrollTop = tr.offsetTop - scrollWrap.offsetTop;
+        }
+      }, 50);
+    }
+
+    document.getElementById('public-payments').innerHTML=[...(ps||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(p=>`<div class="flex justify-between py-2 border-b border-slate-100 last:border-0"><span>${esc(p.date)}</span><b>${money(p.amount)}</b></div>`).join('')||'<span class="text-slate-400">Платежей пока нет</span>';
+    document.getElementById('student-public-login').classList.add('hidden');
+    document.getElementById('student-public-content').classList.remove('hidden');
+  }catch(e){document.getElementById('student-public-error').textContent=e.message||'Ошибка загрузки';}
+}
+
+async function initApp() {
+  if (await initPublicStudent()) return;
+  document.getElementById('teacher-app').classList.remove('hidden');
+  const isTeacherLoggedIn = localStorage.getItem('tutor_logged_in') === 'true';
+  if (isTeacherLoggedIn) {
     try {
       await loadData();
-      const student = students.find(s => String(s.id) === String(studentId));
-      if (student) {
-        document.getElementById('student-public-name').textContent = `Ученик: ${student.name}`;
-      } else {
-        document.getElementById('student-public-login').innerHTML = '<p class="text-red-600">Ученик не найден</p>';
-      }
+      renderMain();
+      renderWeek();
     } catch (e) { showError(e); }
   } else {
-    document.getElementById('teacher-app').classList.remove('hidden');
-    const isTeacherLoggedIn = localStorage.getItem('tutor_logged_in') === 'true';
-    if (isTeacherLoggedIn) {
-      try {
-        await loadData();
-        renderMain();
-        renderWeek();
-      } catch (e) { showError(e); }
-    } else {
-      document.getElementById('teacher-login-modal').classList.remove('hidden');
-      document.getElementById('teacher-login-modal').classList.add('flex');
-    }
+    document.getElementById('teacher-login-modal').classList.remove('hidden');
+    document.getElementById('teacher-login-modal').classList.add('flex');
   }
 }
 
@@ -562,23 +661,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// Запуск приложения
-initApp();
+document.addEventListener('DOMContentLoaded', initApp);
 </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
