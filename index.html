@@ -699,11 +699,11 @@ document.addEventListener('DOMContentLoaded',boot);
     if(el) el.classList.add('hidden');
   }
   hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
+ document.addEventListener('click', e => {
+  if (!e.target.closest('[data-student-menu]') && !e.target.closest('button')) {
+    document.querySelectorAll('[data-student-menu]').forEach(el => el.classList.add('hidden'));
+  }
+});
 </script>
 
 </body>
