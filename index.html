@@ -163,7 +163,6 @@
       }
 
       const start=new Date(date+'T12:00:00');
-      // Ставим конечную дату автоматически ровно через 1 год вперед
       const last=new Date(start);
       last.setFullYear(last.getFullYear() + 1);
 
@@ -272,7 +271,7 @@
 
       const wrap=document.createElement('div');
       wrap.className='mt-3 pt-3 border-t border-slate-100';
-      wrap.innerHTML='<button type="button" data-delete-future class="v-full text-left text-sm font-semibold text-red-600 hover:text-red-700 py-1">Удалить все будущие занятия</button>';
+      wrap.innerHTML='<button type="button" data-delete-future class="w-full text-left text-sm font-semibold text-red-600 hover:text-red-700 py-1">Удалить все будущие занятия</button>';
       wrap.firstElementChild.addEventListener('click',function(e){
         e.stopPropagation();
         deleteFutureLessonsForStudent(id);
@@ -321,7 +320,7 @@
       '.schedule-scroll-v3 table{min-width:900px}';
     document.head.appendChild(st);
     const wrap=document.getElementById('schedule-scroll-wrap');
-    if(wrap) wrap.classList.жadd('schedule-scroll-v3');
+    if(wrap) wrap.classList.add('schedule-scroll-v3');
   }
 
   function init(){
