@@ -1,0 +1,119 @@
+name: Calendar popup patch
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.head_commit.message != '[calendar-popup] Remove top add panel and add day popup'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index.html
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          # Remove the separate top-level "Добавить занятие" panel, keeping the week calendar as the entry point.
+          pattern=r'<div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">✨</span><h2 class="text-lg font-bold">Добавить занятие</h2></div>.*?</div></div>\n<div class="app-card rounded-3xl p-5"><div class="flex flex-wrap justify-between items-center gap-3 mb-4">'
+          ns,n=re.subn(pattern,'<div class="app-card rounded-3xl p-5"><div class="flex flex-wrap justify-between items-center gap-3 mb-4">',s,count=1,flags=re.S)
+          if n != 1:
+              raise SystemExit('Could not remove the top add-lesson panel')
+          s=ns
+
+          # Turn the existing lesson modal into a reusable create/edit modal.
+          s=s.replace('<h2 class="text-xl font-bold">Редактировать занятие</h2><button type="button" onclick="closeLessonModal()"', '<h2 id="lesson-modal-title" class="text-xl font-bold">Редактировать занятие</h2><button type="button" onclick="closeLessonModal()"',1)
+          s=s.replace('<button type="button" onclick="saveEditedLesson()" class="primary-btn px-5 py-2 rounded-xl text-white font-semibold">Сохранить</button>', '<button id="lesson-save-btn" type="button" onclick="saveEditedLesson()" class="primary-btn px-5 py-2 rounded-xl text-white font-semibold">Сохранить</button>',1)
+
+          # Inject a small compatibility layer instead of rewriting the existing calendar renderer.
+          patch=r'''<script id="calendar-day-popup-v1">
+          (function(){
+            function isoFromWeekDay(dayEl,index){
+              const text=(document.getElementById('week-range')?.textContent||'');
+              const m=text.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+              if(!m) return null;
+              const d=new Date(Number(m[3]),Number(m[2])-1,Number(m[1])+index);
+              return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+            }
+            function bindDayClicks(){
+              document.querySelectorAll('#week-calendar .week-day').forEach((day,i)=>{
+                if(day.dataset.popupBound) return;
+                day.dataset.popupBound='1';
+                day.addEventListener('click',function(e){
+                  if(e.target.closest('.week-lesson')) return;
+                  const date=isoFromWeekDay(day,i);
+                  if(date) openNewLessonModal(date);
+                });
+              });
+            }
+            function hideOldPanel(){
+              const cal=document.getElementById('tab-calendar');
+              if(cal){const first=cal.querySelector(':scope > .app-card'); if(first && !first.querySelector('#week-calendar')) first.remove();}
+            }
+            window.openNewLessonModal=function(date){
+              if(typeof fillStudentSelects==='function') fillStudentSelects();
+              document.getElementById('edit-id').value='';
+              document.getElementById('edit-student').value='';
+              document.getElementById('edit-date').value=date||'';
+              document.getElementById('edit-time').value='';
+              document.getElementById('edit-price').value='40';
+              const st=document.getElementById('edit-status');
+              st.innerHTML='<option value="pending">Запланировано</option><option value="conducted">Проведено</option><option value="rescheduled">Перенесено</option><option value="cancelled_charge">Отменено — списать</option><option value="cancelled_free">Отменено — не списывать</option>';
+              st.value='pending';
+              document.getElementById('lesson-modal-title').textContent='Добавить занятие';
+              document.getElementById('lesson-save-btn').textContent='Добавить';
+              document.getElementById('lesson-delete-btn')?.classList.add('hidden');
+              const modal=document.getElementById('lesson-modal');
+              modal.classList.remove('hidden'); modal.classList.add('flex');
+            };
+            const originalSave=window.saveEditedLesson;
+            window.saveEditedLesson=async function(){
+              const id=document.getElementById('edit-id').value;
+              if(id){ return originalSave(); }
+              const student=document.getElementById('edit-student').value;
+              const date=document.getElementById('edit-date').value;
+              const timeRaw=document.getElementById('edit-time').value;
+              const time=typeof requireValidTime==='function' ? requireValidTime(timeRaw) : null;
+              const price=Number(document.getElementById('edit-price').value||0);
+              const status=document.getElementById('edit-status').value||'pending';
+              if(!student||!date||!time) return;
+              try{
+                await db('/lessons',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({student,date,time,price,status})});
+                await loadData();
+                renderMain(); renderWeek();
+                if(typeof renderFinance==='function') renderFinance();
+                closeLessonModal();
+              }catch(e){showError(e)}
+            };
+            const originalEdit=window.openEditLesson;
+            window.openEditLesson=function(id){
+              originalEdit(id);
+              const b=document.getElementById('lesson-save-btn'); if(b)b.textContent='Сохранить';
+              const t=document.getElementById('lesson-modal-title'); if(t)t.textContent='Редактировать занятие';
+              document.getElementById('lesson-delete-btn')?.classList.remove('hidden');
+            };
+            function bind(){hideOldPanel();bindDayClicks();}
+            const originalRender=window.renderWeek;
+            if(originalRender){
+              window.renderWeek=function(){const r=originalRender.apply(this,arguments); setTimeout(bind,0); return r;};
+            }
+            document.addEventListener('DOMContentLoaded',()=>{bind();setTimeout(bind,300);setTimeout(bind,1000);});
+            new MutationObserver(bind).observe(document.body,{childList:true,subtree:true});
+          })();
+          </script>
+          '''
+          s=s.replace('</body>',patch+'</body>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit patch and remove workflow
+        run: |
+          rm -f .github/workflows/one-time-calendar-popup.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/one-time-calendar-popup.yml
+          git commit -m '[calendar-popup] Remove top add panel and add day popup'
+          git push
