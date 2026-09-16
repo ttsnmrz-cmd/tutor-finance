@@ -113,13 +113,217 @@ function bind(){hideOldPanel();bindDayClicks();injectRecurringUI();}const origin
 </script>
 <script id="ui-final-v3">
 (function(){
-  function localISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-  function hideEnd(){const e=document.getElementById('recurring-end');if(e){const p=e.closest('label');if(p)p.remove();else e.remove();}}
-  function recurringSavePatch(){const old=window.saveEditedLesson;if(!old||old.__v3)return;async function save(){const id=document.getElementById('edit-id')?.value;if(id)return old();const recurring=document.getElementById('lesson-recurring')?.checked;if(!recurring)return old();const student=document.getElementById('edit-student')?.value,date=document.getElementById('edit-date')?.value,time=requireValidTime(document.getElementById('edit-time')?.value),price=Number(document.getElementById('edit-price')?.value||0),status=document.getElementById('edit-status')?.value||'pending';if(!student||!date||!time)return;const selected=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value)),freq=Number(document.getElementById('recurring-frequency')?.value||1);if(!selected.length){showError(new Error('Выберите хотя бы один день недели'));return;}const start=new Date(date+'T12:00:00'),last=new Date(start);last.setFullYear(last.getFullYear()+1);const monday=d=>{const x=new Date(d),day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));x.setHours(12,0,0,0);return x;},firstMonday=monday(start),dates=[];for(let d=new Date(start);d<=last;d.setDate(d.getDate()+1)){const weeks=Math.round((monday(d)-firstMonday)/604800000);if(weeks%freq===0&&selected.includes(d.getDay()))dates.push(localISO(d));}try{await db('/lessons',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(dates.map(d=>({student,date:d,time,price,status})))});await loadData();renderMain();renderWeek();if(typeof renderFinance==='function')renderFinance();closeLessonModal();}catch(e){showError(e);}}save.__v3=true;window.saveEditedLesson=save;}
-  function schedulePatch(){const body=document.getElementById('main-lessons'),wrap=document.getElementById('schedule-scroll-wrap');if(!body||!wrap)return;wrap.classList.add('schedule-scroll-v3');const rows=[...body.querySelectorAll('tr')].filter(r=>r.querySelector('td'));rows.forEach(r=>{const c=r.querySelector('td');if(c)r.dataset.date=c.textContent.trim();});rows.sort((a,b)=>{const da=a.dataset.date||'',db=b.dataset.date||'';return da.localeCompare(db);});rows.forEach(r=>body.appendChild(r));const today=localISO(new Date()),target=rows.find(r=>(r.dataset.date||'')>=today);if(target)requestAnimationFrame(()=>{wrap.scrollTop=Math.max(0,target.offsetTop-wrap.offsetTop);});}
-  function style(){if(document.getElementById('schedule-v3-style'))return;const s=document.createElement('style');s.id='schedule-v3-style';s.textContent='.schedule-scroll-v3{max-height:1010px;overflow-y:auto;padding-right:4px}.schedule-scroll-v3 thead{position:sticky;top:0;z-index:3;background:#fff}.schedule-scroll-v3 table{min-width:900px}';document.head.appendChild(s);}
-  function run(){hideEnd();recurringSavePatch();style();schedulePatch();}
-  document.addEventListener('DOMContentLoaded',run);new MutationObserver(run).observe(document.body,{childList:true,subtree:true});setTimeout(run,300);setTimeout(run,1000);setTimeout(run,2000);
+  function localISO(d){
+    return d.getFullYear()+'-'+
+      String(d.getMonth()+1).padStart(2,'0')+'-'+
+      String(d.getDate()).padStart(2,'0');
+  }
+
+  function hideEnd(){
+    const e=document.getElementById('recurring-end');
+    if(e){
+      const p=e.closest('label');
+      if(p)p.remove();
+      else e.remove();
+    }
+  }
+
+  function recurringSavePatch(){
+    const old=window.saveEditedLesson;
+    if(!old || old.__v3)return;
+
+    async function save(){
+      const id=document.getElementById('edit-id')?.value;
+
+      if(id)return old();
+
+      const recurring=document.getElementById('lesson-recurring')?.checked;
+
+      if(!recurring)return old();
+
+      const student=document.getElementById('edit-student')?.value;
+      const date=document.getElementById('edit-date')?.value;
+      const time=requireValidTime(
+        document.getElementById('edit-time')?.value
+      );
+      const price=Number(
+        document.getElementById('edit-price')?.value||0
+      );
+      const status=
+        document.getElementById('edit-status')?.value||'pending';
+
+      if(!student || !date || !time)return;
+
+      const selected=[
+        ...document.querySelectorAll('.rec-day:checked')
+      ].map(x=>Number(x.value));
+
+      const freq=Number(
+        document.getElementById('recurring-frequency')?.value||1
+      );
+
+      if(!selected.length){
+        showError(new Error('Выберите хотя бы один день недели'));
+        return;
+      }
+
+      const start=new Date(date+'T12:00:00');
+      const last=new Date(start);
+      last.setFullYear(last.getFullYear()+1);
+
+      const monday=d=>{
+        const x=new Date(d);
+        const day=x.getDay();
+
+        x.setDate(
+          x.getDate()+(day===0?-6:1-day)
+        );
+
+        x.setHours(12,0,0,0);
+
+        return x;
+      };
+
+      const firstMonday=monday(start);
+      const dates=[];
+
+      for(
+        let d=new Date(start);
+        d<=last;
+        d.setDate(d.getDate()+1)
+      ){
+        const weeks=Math.round(
+          (monday(d)-firstMonday)/604800000
+        );
+
+        if(
+          weeks%freq===0 &&
+          selected.includes(d.getDay())
+        ){
+          dates.push(localISO(d));
+        }
+      }
+
+      try{
+        await db('/lessons',{
+          method:'POST',
+          headers:{'Prefer':'return=minimal'},
+          body:JSON.stringify(
+            dates.map(d=>({
+              student,
+              date:d,
+              time,
+              price,
+              status
+            }))
+          )
+        });
+
+        await loadData();
+        renderMain();
+        renderWeek();
+
+        if(typeof renderFinance==='function'){
+          renderFinance();
+        }
+
+        closeLessonModal();
+
+      }catch(e){
+        showError(e);
+      }
+    }
+
+    save.__v3=true;
+    window.saveEditedLesson=save;
+  }
+
+  function style(){
+    if(document.getElementById('schedule-v3-style'))return;
+
+    const s=document.createElement('style');
+
+    s.id='schedule-v3-style';
+
+    s.textContent=
+      '.schedule-scroll-v3{max-height:1010px;overflow-y:auto;padding-right:4px}' +
+      '.schedule-scroll-v3 thead{position:sticky;top:0;z-index:3;background:#fff}' +
+      '.schedule-scroll-v3 table{min-width:900px}';
+
+    document.head.appendChild(s);
+  }
+
+  function schedulePatch(){
+    const body=document.getElementById('main-lessons');
+    const wrap=document.getElementById('schedule-scroll-wrap');
+
+    if(!body || !wrap)return;
+
+    wrap.classList.add('schedule-scroll-v3');
+
+    const rows=[
+      ...body.querySelectorAll('tr')
+    ].filter(r=>r.querySelector('td'));
+
+    rows.forEach(r=>{
+      const c=r.querySelector('td');
+
+      if(c){
+        r.dataset.date=c.textContent.trim();
+      }
+    });
+
+    rows.sort((a,b)=>{
+      const da=a.dataset.date||'';
+      const db=b.dataset.date||'';
+
+      return da.localeCompare(db);
+    });
+
+    /*
+      ВАЖНО:
+      Не используем MutationObserver здесь.
+      Иначе appendChild() снова запускает observer
+      и создаёт бесконечный цикл.
+    */
+
+    const fragment=document.createDocumentFragment();
+
+    rows.forEach(r=>{
+      fragment.appendChild(r);
+    });
+
+    body.appendChild(fragment);
+
+    const today=localISO(new Date());
+
+    const target=rows.find(
+      r=>(r.dataset.date||'')>=today
+    );
+
+    if(target){
+      requestAnimationFrame(()=>{
+        wrap.scrollTop=Math.max(
+          0,
+          target.offsetTop-wrap.offsetTop
+        );
+      });
+    }
+  }
+
+  function run(){
+    hideEnd();
+    recurringSavePatch();
+    style();
+    schedulePatch();
+  }
+
+  document.addEventListener('DOMContentLoaded',run);
+
+  setTimeout(run,300);
+  setTimeout(run,1000);
+  setTimeout(run,2000);
+
 })();
 </script>
 </body></html>
