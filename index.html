@@ -21,9 +21,8 @@
 
         let currentUser = JSON.parse(sessionStorage.getItem('auth_user')) || null;
         let students = [], lessons = [], payments = [];
-        let activeTab = 'students'; // 'students', 'lessons', 'schedule'
+        let activeTab = 'students'; // 'students', 'lessons'
 
-        // Проверяем, не открыт ли сайт по ссылке ученика
         const urlParams = new URLSearchParams(window.location.search);
         const studentParam = urlParams.get('student');
 
@@ -99,13 +98,11 @@
                         </div>
                     </div>
 
-                    <!-- Навигация по вкладкам -->
                     <div class="flex gap-2 border-b border-slate-100 pb-4 mb-6">
                         <button onclick="switchTab('students')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${activeTab === 'students' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Ученики (${students.length})</button>
                         <button onclick="switchTab('lessons')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${activeTab === 'lessons' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Занятия (${lessons.length})</button>
                     </div>
 
-                    <!-- Содержимое вкладок -->
                     <div id="tab-content">
                         ${activeTab === 'students' ? renderStudentsTab() : renderLessonsTab()}
                     </div>
@@ -132,7 +129,7 @@
 
                     <div class="divide-y divide-slate-100">
                         ${students.length === 0 ? '<p class="text-slate-400 text-center py-6 text-sm">Учеников пока нет</p>' : students.map(s => `
-                            py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <div class="py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
                                     <h4 class="font-semibold text-slate-800">${s.name}</h4>
                                     <p class="text-xs text-slate-400">Предмет: ${s.subject || 'Не указан'} | Баланс: <span class="${(s.balance || 0) < 0 ? 'text-rose-500 font-bold' : 'text-emerald-600 font-bold'}">${s.balance || 0} руб.</span></p>
@@ -212,7 +209,6 @@
             if (error) {
                 alert("Ошибка при добавлении занятия");
             } else {
-                // Обновляем баланс ученика (уменьшаем на стоимость урока)
                 const student = students.find(s => s.id == student_id);
                 if (student) {
                     const newBalance = (student.balance || 0) - price;
@@ -253,7 +249,7 @@
                     <h3 class="font-semibold text-slate-700 text-sm mb-3">История занятий</h3>
                     <div class="space-y-2 max-h-60 overflow-y-auto">
                         ${studentLessons.length === 0 ? '<p class="text-slate-400 text-xs text-center py-4">Занятий пока нет</p>' : studentLessons.map(l => `
-                            py-2 px-3 bg-slate-50 rounded-xl flex justify-between items-center text-sm">
+                            <div class="py-2 px-3 bg-slate-50 rounded-xl flex justify-between items-center text-sm">
                                 <span class="text-slate-600">${l.date}</span>
                                 <span class="font-medium text-slate-800">-${l.price} руб.</span>
                             </div>
@@ -298,20 +294,5 @@
 
         init();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
