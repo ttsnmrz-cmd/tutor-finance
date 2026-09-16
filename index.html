@@ -27,6 +27,7 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 <section id="tab-students" class="hidden space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">👤</span><h2 class="font-bold">Новый ученик</h2></div><div class="grid grid-cols-1 md:grid-cols-3 gap-3"><input id="new-student-name" class="soft-input rounded-xl px-3 py-2" placeholder="Имя"><input id="new-student-pin" class="soft-input rounded-xl px-3 py-2" placeholder="PIN"><button type="button" onclick="addStudent()" class="primary-btn text-white rounded-xl font-semibold">Добавить</button></div></div><div id="students-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div><div id="archived-students-section" class="mt-8 hidden"><div class="app-card rounded-3xl p-5"><h2 class="text-lg font-bold mb-3 text-slate-600">📁 Архив учеников</h2><div id="archived-students-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div></div></div></section>
 <section id="tab-finance" class="hidden space-y-5"><div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">💰</span><h2 class="font-bold">Внести платеж от ученика</h2></div><div class="grid grid-cols-1 md:grid-cols-4 gap-3"><select id="payment-student" class="soft-input rounded-xl px-3 py-2 text-sm"></select><input id="payment-amount" type="number" min="0" step="0.01" class="soft-input rounded-xl px-3 py-2 text-sm" placeholder="Сумма"><input id="payment-date" type="date" class="soft-input rounded-xl px-3 py-2 text-sm"><button type="button" onclick="addPayment()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition shadow-sm">Внести оплату</button></div></div><div class="app-card rounded-3xl p-5"><div class="flex items-center gap-2 mb-4"><span class="text-xl">📊</span><h2 class="font-bold">Финансовый баланс учеников</h2></div><div id="finance-balances" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div></section></main><div id="error-box" class="hidden fixed bottom-4 right-4 max-w-md bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl shadow-lg"></div></div></div>
 <script>
+console.log("DEBUG: Скрипт начал выполняться");
 const SUPABASE_URL='https://dmasuczggcxzrxasgoov.supabase.co';const SUPABASE_KEY='sb_publishable_9XV4TmmWv1OHVvbdei2jhA__Bu4FsQG';const API=SUPABASE_URL+'/rest/v1';const headers={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};const {createClient}=supabase;const supabaseClient=createClient(SUPABASE_URL,SUPABASE_KEY);let students=[],lessons=[],payments=[];let weekAnchor=new Date();const statusLabels={pending:'Запланировано',conducted:'Проведено',rescheduled:'Перенесено',cancelled_charge:'Отменено — списать',cancelled_free:'Отменено — не списывать'};const statusClass={pending:'bg-amber-100 text-amber-800',conducted:'bg-emerald-100 text-emerald-800',rescheduled:'bg-blue-100 text-blue-800',cancelled_charge:'bg-red-100 text-red-800',cancelled_free:'bg-slate-100 text-slate-700'};const charge=new Set(['conducted','cancelled_charge']);
 function esc(v){return String(v??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}function money(n){return Number(n||0).toLocaleString('ru-RU',{maximumFractionDigits:2})+' BYN';}function showError(e){console.error(e);const b=document.getElementById('error-box');b.textContent='Ошибка: '+(e.message||e);b.classList.remove('hidden');setTimeout(()=>b.classList.add('hidden'),5000);}
 function normalizeTimeInput(value){const v=String(value||'').trim().replace(':','.');if(!v)return null;const m=v.match(/^(\d{1,2})\.(\d{2})$/);if(!m)return null;const h=Number(m[1]),min=Number(m[2]);if(h<7||h>23||min<0||min>59||min%5!==0||(h===23&&min>0))return null;return String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');}
@@ -39,11 +40,7 @@ function switchTab(t){['calendar','students','finance'].forEach(x=>{document.get
 function fillStudentSelects(){const activeStudents=students.filter(s=>!s.archived);['new-lesson-student','edit-student','payment-student'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=activeStudents.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('');});}
 function lessonVisual(l){if(l.status==='conducted')return {row:'',icon:'✓',iconClass:'lesson-icon-done',muted:false,label:'Проведено'};if(l.status==='rescheduled')return {row:'lesson-rescheduled',icon:'↪',iconClass:'lesson-icon-moved',muted:true,label:'Перенесено'};if(l.status==='cancelled_free')return {row:'lesson-cancelled-free',icon:'×',iconClass:'lesson-icon-free',muted:true,label:'Отменено — не списывать'};if(l.status==='cancelled_charge')return {row:'lesson-cancelled-charge',icon:'×',iconClass:'lesson-icon-charge',muted:true,label:'Отменено — списать'};return {row:'',icon:'',iconClass:'',muted:false,label:'Запланировано'};}
 function renderMain(){fillStudentSelects();const rows=[...lessons].sort((a,b)=>(String(b.date)+String(b.time||'')).localeCompare(String(a.date)+String(a.time||'')));const body=document.getElementById('main-lessons');body.innerHTML=rows.length?rows.map(l=>{const v=lessonVisual(l);const textClass=v.muted?'lesson-muted':'';return `<tr class="border-b hover:bg-slate-50 transition ${v.row}"><td class="p-3 ${textClass}">${esc(l.date)}</td><td class="p-3 ${textClass}">${esc(displayTime(l.time)||'—')}</td><td class="p-3 font-medium ${textClass}">${esc(l.student)}</td><td class="p-3 ${textClass}">${money(l.price)}</td><td class="p-3"><span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold ${statusClass[l.status]||'bg-slate-100'}">${v.icon?`<span class="lesson-icon ${v.iconClass}">${v.icon}</span>`:''}${v.label}</span></td><td class="p-3 text-right"><button type="button" onclick="openEditLesson('${esc(l.id)}')" class="text-indigo-600 hover:text-indigo-800 font-semibold mr-3">Редактировать</button><button type="button" onclick="deleteLesson('${esc(l.id)}')" class="text-red-600 hover:text-red-800 font-semibold">Удалить</button></td></tr>`}).join(''):`<tr><td colspan="6" class="p-8 text-center text-slate-400">Занятий пока нет</td></tr>`;}
-function dateKey(d){
-  return d.getFullYear()+'-'+
-    String(d.getMonth()+1).padStart(2,'0')+'-'+
-    String(d.getDate()).padStart(2,'0');
-}
+function dateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function startOfWeek(d){const x=new Date(d);x.setHours(0,0,0,0);const day=x.getDay();const diff=day===0?-6:1-day;x.setDate(x.getDate()+diff);return x;}
 function formatDay(d){return d.toLocaleDateString('ru-RU',{weekday:'short'}).replace('.','');}
 function formatShortDate(d){return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});}
@@ -61,62 +58,8 @@ function studentStats(s){const ls=lessons.filter(l=>l.student===s.name),income=p
 function publicLink(s){return location.origin+location.pathname+'?student='+encodeURIComponent(s.id);}
 function toggleStudentMenu(id){document.querySelectorAll('[data-student-menu]').forEach(el=>{if(el.id!=='student-menu-'+id)el.classList.add('hidden');});const m=document.getElementById('student-menu-'+id);if(m){m.classList.toggle('hidden');}}
 document.addEventListener('click',e=>{if(!e.target.closest('[data-student-actions]'))document.querySelectorAll('[data-student-menu]').forEach(el=>el.classList.add('hidden'));});
-function renderStudents(){
-  fillStudentSelects();
-  const activeContainer=document.getElementById('students-container');
-  const activeStudents=students.filter(s=>!s.archived);
-  const archivedStudents=students.filter(s=>s.archived);
-
-  activeContainer.innerHTML=activeStudents.map(s=>renderSingleStudentCard(s,false)).join('')||'<div class="text-slate-400">Активных учеников пока нет</div>';
-
-  const archivedSec=document.getElementById('archived-students-section');
-  const archivedContainer=document.getElementById('archived-students-container');
-  if(archivedStudents.length>0){
-    archivedSec.classList.remove('hidden');
-    archivedContainer.innerHTML=archivedStudents.map(s=>renderSingleStudentCard(s,true)).join('');
-  } else {
-    archivedSec.classList.add('hidden');
-    archivedContainer.innerHTML='';
-  }
-}
-
-function renderSingleStudentCard(s, isArchived){
-  const{ls,income,expenses,bal}=studentStats(s),recent=[...ls].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,8);
-  return `<div class="student-card bg-white rounded-3xl p-5 overflow-visible relative">
-    <div class="flex justify-between items-start gap-3">
-      <div>
-        <div class="flex items-center gap-2">
-          <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">${esc(String(s.name).charAt(0).toUpperCase())}</div>
-          <h3 class="text-lg font-bold">${esc(s.name)} ${isArchived?'<span class="text-xs text-slate-400 font-normal">(Архив)</span>':''}</h3>
-        </div>
-        <p class="text-sm text-slate-500 mt-2">PIN: <span class="font-semibold text-slate-700">${esc(s.pin||'')}</span></p>
-      </div>
-      <div class="relative" data-student-actions>
-        <button type="button" onclick="event.stopPropagation();toggleStudentMenu('${esc(s.id)}')" aria-label="Действия" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-bold leading-none">⋮</button>
-        <div id="student-menu-${esc(s.id)}" data-student-menu onclick="event.stopPropagation()" class="hidden absolute right-0 top-11 z-50 w-56 rounded-2xl border border-slate-200 bg-white shadow-xl p-2 space-y-1">
-          <button type="button" onclick="event.stopPropagation();copyStudentLink('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-indigo-50 text-indigo-700 font-semibold text-sm">🔗 Скопировать ссылку</button>
-          <button type="button" onclick="event.stopPropagation();openStudentEdit('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold text-sm">✏️ Изменить</button>
-          ${isArchived ? 
-            `<button type="button" onclick="event.stopPropagation();toggleArchiveStudent('${esc(s.id)}',false);toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-emerald-50 text-emerald-700 font-semibold text-sm">📂 Восстановить</button>` :
-            `<button type="button" onclick="event.stopPropagation();toggleArchiveStudent('${esc(s.id)}',true);toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-amber-50 text-amber-700 font-semibold text-sm">📦 Архивация</button>`
-          }
-          <button type="button" onclick="event.stopPropagation();deleteStudent('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">🗑️ Удалить</button>
-        </div>
-      </div>
-    </div>
-    <div class="grid grid-cols-2 gap-2 mt-4 text-sm">
-      <div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Проведено</span><br><b>${ls.filter(l=>l.status==='conducted').length}</b></div>
-      <div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Приход</span><br><b>${money(income)}</b></div>
-      <div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Списано</span><br><b>${money(expenses)}</b></div>
-      <div class="rounded-2xl bg-indigo-50 p-3"><span class="text-xs text-indigo-400">Баланс</span><br><b class="text-indigo-700">${money(bal)}</b></div>
-    </div>
-    <div class="mt-4 pt-3 border-t border-slate-100">
-      <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold uppercase tracking-wide text-slate-400">Последние занятия</span><span class="text-xs text-slate-400">${ls.length} всего</span></div>
-      <div class="lesson-scroll">${recent.map(l=>`<div class="flex justify-between items-center gap-2 py-2 border-b border-slate-100 last:border-0 text-sm"><span class="text-slate-600">${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span class="text-right"><b class="text-slate-700">${money(l.price)}</b><span class="block text-[11px] text-slate-400">${statusLabels[l.status]}</span></span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>'}</div>
-    </div>
-  </div>`;
-}
-
+function renderStudents(){fillStudentSelects();const activeContainer=document.getElementById('students-container'),activeStudents=students.filter(s=>!s.archived),archivedStudents=students.filter(s=>s.archived);activeContainer.innerHTML=activeStudents.map(s=>renderSingleStudentCard(s,false)).join('')||'<div class="text-slate-400">Активных учеников пока нет</div>';const archivedSec=document.getElementById('archived-students-section'),archivedContainer=document.getElementById('archived-students-container');if(archivedStudents.length>0){archivedSec.classList.remove('hidden');archivedContainer.innerHTML=archivedStudents.map(s=>renderSingleStudentCard(s,true)).join('');}else{archivedSec.classList.add('hidden');archivedContainer.innerHTML='';}}
+function renderSingleStudentCard(s,isArchived){const{ls,income,expenses,bal}=studentStats(s),recent=[...ls].sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,8);return `<div class="student-card bg-white rounded-3xl p-5 overflow-visible relative"><div class="flex justify-between items-start gap-3"><div><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">${esc(String(s.name).charAt(0).toUpperCase())}</div><h3 class="text-lg font-bold">${esc(s.name)} ${isArchived?'<span class="text-xs text-slate-400 font-normal">(Архив)</span>':''}</h3></div><p class="text-sm text-slate-500 mt-2">PIN: <span class="font-semibold text-slate-700">${esc(s.pin||'')}</span></p></div><div class="relative" data-student-actions><button type="button" onclick="event.stopPropagation();toggleStudentMenu('${esc(s.id)}')" aria-label="Действия" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl font-bold leading-none">⋮</button><div id="student-menu-${esc(s.id)}" data-student-menu onclick="event.stopPropagation()" class="hidden absolute right-0 top-11 z-50 w-56 rounded-2xl border border-slate-200 bg-white shadow-xl p-2 space-y-1"><button type="button" onclick="event.stopPropagation();copyStudentLink('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-indigo-50 text-indigo-700 font-semibold text-sm">🔗 Скопировать ссылку</button><button type="button" onclick="event.stopPropagation();openStudentEdit('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 font-semibold text-sm">✏️ Изменить</button>${isArchived?`<button type="button" onclick="event.stopPropagation();toggleArchiveStudent('${esc(s.id)}',false);toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-emerald-50 text-emerald-700 font-semibold text-sm">📂 Восстановить</button>`:`<button type="button" onclick="event.stopPropagation();toggleArchiveStudent('${esc(s.id)}',true);toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-amber-50 text-amber-700 font-semibold text-sm">📦 Архивация</button>`}<button type="button" onclick="event.stopPropagation();deleteStudent('${esc(s.id)}');toggleStudentMenu('${esc(s.id)}')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600 font-semibold text-sm">🗑️ Удалить</button></div></div></div><div class="grid grid-cols-2 gap-2 mt-4 text-sm"><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Проведено</span><br><b>${ls.filter(l=>l.status==='conducted').length}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Приход</span><br><b>${money(income)}</b></div><div class="rounded-2xl bg-slate-50 p-3"><span class="text-xs text-slate-400">Списано</span><br><b>${money(expenses)}</b></div><div class="rounded-2xl bg-indigo-50 p-3"><span class="text-xs text-indigo-400">Баланс</span><br><b class="text-indigo-700">${money(bal)}</b></div></div><div class="mt-4 pt-3 border-t border-slate-100"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold uppercase tracking-wide text-slate-400">Последние занятия</span><span class="text-xs text-slate-400">${ls.length} всего</span></div><div class="lesson-scroll">${recent.map(l=>`<div class="flex justify-between items-center gap-2 py-2 border-b border-slate-100 last:border-0 text-sm"><span class="text-slate-600">${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span class="text-right"><b class="text-slate-700">${money(l.price)}</b><span class="block text-[11px] text-slate-400">${statusLabels[l.status]}</span></span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>'}</div></div></div>`;}
 async function addStudent(){try{const name=document.getElementById('new-student-name').value.trim(),pin=document.getElementById('new-student-pin').value.trim();if(!name||!pin){showError(new Error('Введите имя и PIN-код'));return;}await db('/students',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({name,pin,price:40,archived:false})});await loadData();renderStudents();document.getElementById('new-student-name').value='';document.getElementById('new-student-pin').value='';}catch(e){showError(e);}}
 function openStudentEdit(id){const s=students.find(x=>String(x.id)===String(id));if(!s)return;document.getElementById('edit-student-id').value=s.id;document.getElementById('edit-student-name').value=s.name;document.getElementById('edit-student-pin').value=s.pin||'';document.getElementById('student-edit-modal').classList.remove('hidden');document.getElementById('student-edit-modal').classList.add('flex');}
 function closeStudentEdit(){document.getElementById('student-edit-modal').classList.add('hidden');document.getElementById('student-edit-modal').classList.remove('flex');}
@@ -126,27 +69,36 @@ async function deleteStudent(id){if(!confirm('Удалить ученика? В�
 function copyStudentLink(id){navigator.clipboard.writeText(publicLink({id})).then(()=>alert('Ссылка скопирована в буфер обмена!'));}
 function renderFinance(){const container=document.getElementById('finance-balances');container.innerHTML=students.filter(s=>!s.archived).map(s=>{const{ls,income,expenses,bal}=studentStats(s);return `<div class="rounded-2xl bg-slate-50 p-4"><div class="flex justify-between items-center mb-2"><h3 class="font-bold">${esc(s.name)}</h3><span class="font-bold ${bal>=0?'text-indigo-700':'text-red-600'}">${money(bal)}</span></div><div class="text-xs text-slate-500 flex justify-between"><span>Внесено: ${money(income)}</span><span>Списано: ${money(expenses)}</span></div></div>`}).join('')||'<div class="text-slate-400">Нет активных учеников</div>';fillStudentSelects();const d=new Date().toISOString().split('T')[0];const dateEl=document.getElementById('payment-date');if(dateEl&&!dateEl.value)dateEl.value=d;}
 async function addPayment(){try{const student=document.getElementById('payment-student').value,amount=Number(document.getElementById('payment-amount').value),date=document.getElementById('payment-date').value;if(!student||!amount||!date){showError(new Error('Заполните все поля платежа'));return;}await db('/payments',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student,amount,date})});await loadData();renderFinance();document.getElementById('payment-amount').value='';alert('Платеж успешно добавлен!');}catch(e){showError(e);}}
-async function openStudentCabinet(){const id=new URLSearchParams(location.search).get('student'),pin=document.getElementById('student-public-pin').value.trim();if(!pin){document.getElementById('student-public-error').textContent='Введите PIN';return; }const s=students.find(x=>String(x.id)===String(id));if(!s||s.pin!==pin){document.getElementById('student-public-error').textContent='Неверный PIN';return;}document.getElementById('student-public-login').classList.add('hidden');document.getElementById('student-public-content').classList.remove('hidden');document.getElementById('public-student-title').textContent=s.name;const{ls,income,expenses,bal}=studentStats(s);document.getElementById('public-paid').textContent=money(income);document.getElementById('public-spent').textContent=money(expenses);document.getElementById('public-balance').textContent=money(bal);document.getElementById('public-lessons').innerHTML=ls.map(l=>`<div class="flex justify-between items-center py-2 border-b border-slate-100 text-sm"><span>${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span><b>${money(l.price)}</b> · ${statusLabels[l.status]}</span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>';document.getElementById('public-payments').innerHTML=payments.filter(p=>p.student===s.name).map(p=>`<div class="flex justify-between items-center py-2 border-b border-slate-100 text-sm"><span>${esc(p.date)}</span><b class="text-emerald-700">${money(p.amount)}</b></div>`).join('')||'<span class="text-slate-400 text-sm">Платежей нет</span>';}
+async function openStudentCabinet(){const id=new URLSearchParams(location.search).get('student'),pin=document.getElementById('student-public-pin').value.trim();if(!pin){document.getElementById('student-public-error').textContent='Введите PIN';return;}const s=students.find(x=>String(x.id)===String(id));if(!s||s.pin!==pin){document.getElementById('student-public-error').textContent='Неверный PIN';return;}document.getElementById('student-public-login').classList.add('hidden');document.getElementById('student-public-content').classList.remove('hidden');document.getElementById('public-student-title').textContent=s.name;const{ls,income,expenses,bal}=studentStats(s);document.getElementById('public-paid').textContent=money(income);document.getElementById('public-spent').textContent=money(expenses);document.getElementById('public-balance').textContent=money(bal);document.getElementById('public-lessons').innerHTML=ls.map(l=>`<div class="flex justify-between items-center py-2 border-b border-slate-100 text-sm"><span>${esc(l.date)}${l.time?' · '+esc(displayTime(l.time)):''}</span><span><b>${money(l.price)}</b> · ${statusLabels[l.status]}</span></div>`).join('')||'<span class="text-slate-400 text-sm">Занятий нет</span>';document.getElementById('public-payments').innerHTML=payments.filter(p=>p.student===s.name).map(p=>`<div class="flex justify-between items-center py-2 border-b border-slate-100 text-sm"><span>${esc(p.date)}</span><b class="text-emerald-700">${money(p.amount)}</b></div>`).join('')||'<span class="text-slate-400 text-sm">Платежей нет</span>';}
 async function initPublicView(){const id=new URLSearchParams(location.search).get('student');if(!id)return false;document.getElementById('student-public-view').classList.remove('hidden');try{await loadData();const s=students.find(x=>String(x.id)===String(id));if(!s){document.getElementById('student-public-name').textContent='Ученик не найден';document.getElementById('student-public-pin').classList.add('hidden');return true;}document.getElementById('student-public-name').textContent='Ученик: '+s.name;if(!s.pin){openStudentCabinetWithoutPin(s);}}catch(e){showError(e);}return true;}
 function openStudentCabinetWithoutPin(s){document.getElementById('student-public-pin').value=s.pin||'';openStudentCabinet();}
 async function loginTeacher(){const p=document.getElementById('teacher-password-input').value;if(p!=='123456'){document.getElementById('teacher-login-error').textContent='Неверный пароль';return;}localStorage.setItem('tutor_auth','1');document.getElementById('teacher-login-modal').classList.add('hidden');document.getElementById('teacher-app').classList.remove('hidden');await loadData();renderMain();renderWeek();}
 function teacherLogout(){localStorage.removeItem('tutor_auth');location.reload();}
-(async()=>{if(await initPublicView())return;if(localStorage.getItem('tutor_auth')==='1'){document.getElementById('teacher-app').classList.remove('hidden');await loadData();renderMain();renderWeek();}else{document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}})();
-</script>
 
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
+(async()=>{
+  console.log("DEBUG: Старт инициализации приложения");
+  try {
+    const isPublic = await initPublicView();
+    console.log("DEBUG: Публичный режим?", isPublic);
+    if (!isPublic) {
+      if(localStorage.getItem('tutor_auth')==='1'){
+        console.log("DEBUG: Авторизован как преподаватель");
+        document.getElementById('teacher-app').classList.remove('hidden');
+        await loadData();
+        renderMain();
+        renderWeek();
+      }else{
+        console.log("DEBUG: Требуется вход преподавателя");
+        document.getElementById('teacher-login-modal').classList.add('hidden'); // на всякий случай сбрасываем
+        const modal = document.getElementById('teacher-login-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+  } catch(err) {
+    console.error("DEBUG CRITICAL ERROR:", err);
   }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
 })();
 </script>
-
 </body>
 </html>
