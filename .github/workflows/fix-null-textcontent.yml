@@ -1,0 +1,84 @@
+name: Fix null textContent error
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-null-textcontent.yml'
+  workflow_dispatch:
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch DOM null guards
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '<script id="null-dom-guards-v1">'
+          if marker not in s:
+              patch = r'''<script id="null-dom-guards-v1">
+(function(){
+  // Prevent the legacy calendar tab from throwing when its navigation element
+  // has already been renamed to the new "Занятия" tab.
+  const oldSwitchTabSafe = window.switchTab;
+  if(typeof oldSwitchTabSafe==='function'){
+    window.switchTab=function(t){
+      try{
+        if(t==='calendar' && !document.getElementById('tab-calendar')) t='lessons';
+        return oldSwitchTabSafe.apply(this,arguments);
+      }catch(e){
+        console.error('switchTab error:',e);
+        if(t==='calendar'){
+          try{
+            const lessonsTab=document.getElementById('tab-lessons');
+            if(lessonsTab){
+              ['lessons','students','finance'].forEach(x=>{const el=document.getElementById('tab-'+x);if(el)el.classList.toggle('hidden',x!=='lessons');});
+              lessonsTab.classList.remove('hidden');
+              if(typeof renderLessonsList==='function')renderLessonsList();
+            }
+          }catch(inner){console.error(inner);}
+        }
+      }
+    };
+  }
+
+  // Make the error renderer itself safe: an error message must never create
+  // a second "Cannot set properties of null" error.
+  window.showError=function(e){
+    console.error(e);
+    const b=document.getElementById('error-box');
+    if(!b)return;
+    const msg=e && e.message ? e.message : String(e||'Неизвестная ошибка');
+    b.textContent='Ошибка: '+msg;
+    b.classList.remove('hidden');
+    setTimeout(()=>{if(b)b.classList.add('hidden');},6000);
+  };
+
+  // Keep the new UI visible after the legacy functions run.
+  setTimeout(()=>{
+    try{
+      const oldCal=document.getElementById('tab-calendar');
+      if(oldCal && document.getElementById('tab-lessons')) oldCal.classList.add('hidden');
+    }catch(e){console.error(e);}
+  },50);
+})();
+</script>
+'''
+              s = s.replace('</body>', patch + '</body>')
+              p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit patched index.html
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Guard legacy DOM operations from null elements"
+          git push
