@@ -20,11 +20,44 @@ create index if not exists payments_student_idx on public.payments(student);
 
 -- The current CRM uses the Supabase anon key for its REST requests.
 -- Keep these policies permissive for the current v1 architecture.
-create policy if not exists "payments_all"
-on public.payments
-for all
-to anon, authenticated
-using (true)
-with check (true);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'students' and policyname = 'students_all'
+  ) then
+    create policy "students_all"
+      on public.students
+      for all
+      to anon, authenticated
+      using (true)
+      with check (true);
+  end if;
+
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'lessons' and policyname = 'lessons_all'
+  ) then
+    create policy "lessons_all"
+      on public.lessons
+      for all
+      to anon, authenticated
+      using (true)
+      with check (true);
+  end if;
+
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'payments' and policyname = 'payments_all'
+  ) then
+    create policy "payments_all"
+      on public.payments
+      for all
+      to anon, authenticated
+      using (true)
+      with check (true);
+  end if;
+end
+$$;
 
 NOTIFY pgrst, 'reload schema';
