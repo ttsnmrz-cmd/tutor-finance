@@ -98,14 +98,49 @@
                         </div>
                     </div>
 
-                    <!-- Навигация -->
+                    <!-- Календарь занятий -->
+                    <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 mb-6">
+                        <h3 class="font-semibold text-indigo-900 mb-3 text-sm">📅 Календарь занятий</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+                            ${lessons.length === 0 ? '<p class="text-slate-400 text-xs col-span-full py-2">Занятий в календаре пока нет</p>' : lessons.slice(-6).reverse().map(l => `
+                                <div class="bg-white p-3 rounded-xl border border-indigo-100 shadow-xs flex justify-between items-center">
+                                    <div>
+                                        <p class="font-semibold text-slate-800 text-sm">${l.student_name || l.student_id}</p>
+                                        <p class="text-xs text-slate-400">${l.date} • <span class="text-slate-600 font-medium">-${l.price} руб.</span></p>
+                                    </div>
+                                    <button onclick="deleteLesson('${l.id}', '${l.student_name || l.student_id}', ${l.price})" class="text-rose-400 hover:text-rose-600 text-xs font-medium cursor-pointer p-1">✕</button>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Полный список занятий прямо под календарём -->
+                        <div class="border-t border-indigo-100 pt-3">
+                            <h4 class="font-medium text-indigo-800 text-xs uppercase tracking-wider mb-2">Все проведенные занятия</h4>
+                            <div class="divide-y divide-indigo-100/60 max-h-48 overflow-y-auto">
+                                ${lessons.length === 0 ? '<p class="text-slate-400 text-xs text-center py-2">Список пуст</p>' : lessons.map(l => `
+                                    <div class="py-2 flex justify-between items-center text-sm">
+                                        <div>
+                                            <span class="font-semibold text-slate-800">${l.student_name || l.student_id}</span>
+                                            <span class="text-slate-400 text-xs ml-2">${l.date}</span>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="font-medium text-slate-700">-${l.price} руб.</span>
+                                            <button onclick="deleteLesson('${l.id}', '${l.student_name || l.student_id}', ${l.price})" class="text-rose-400 hover:text-rose-600 text-xs font-medium cursor-pointer">Удалить</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Навигация по вкладкам -->
                     <div class="flex gap-2 border-b border-slate-100 pb-4 mb-6 overflow-x-auto">
                         <button onclick="switchTab('students')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'students' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Ученики (${students.length})</button>
                         <button onclick="switchTab('lessons')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'lessons' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Занятия (${lessons.length})</button>
                         <button onclick="switchTab('finance')" class="px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer whitespace-nowrap ${activeTab === 'finance' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">Финансы (${payments.length})</button>
                     </div>
 
-                    <!-- Содержимое -->
+                    <!-- Содержимое активной вкладки -->
                     <div id="tab-content">
                         ${activeTab === 'students' ? renderStudentsTab() : activeTab === 'lessons' ? renderLessonsTab() : renderFinanceTab()}
                     </div>
@@ -220,7 +255,7 @@
             
             const { error } = await supabaseClient.from('students').insert([{ name, subject, balance: 0 }]);
             if (error) {
-                alert("Ошибка при добавлении ученика (возможно, такое имя уже есть)");
+                alert("Ошибка при добавлении ученика");
             } else {
                 await loadData();
             }
@@ -238,7 +273,6 @@
             const date = document.getElementById('lessonDate').value;
             const price = parseFloat(document.getElementById('lessonPrice').value);
 
-            // Сохраняем и в student_name, и в student_id для полной совместимости со старыми записями
             const { error } = await supabaseClient.from('lessons').insert([{ student_name, student_id: student_name, date, price }]);
             if (error) {
                 alert("Ошибка при добавлении занятия");
@@ -261,7 +295,6 @@
                 return;
             }
 
-            // Возвращаем деньги на баланс ученика при удалении урока
             const student = students.find(s => s.name === studentName);
             if (student) {
                 const newBalance = (student.balance || 0) + price;
@@ -378,20 +411,5 @@
 
         init();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
