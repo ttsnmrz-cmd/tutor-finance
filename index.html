@@ -211,4 +211,19 @@ async function boot(){
 }
 document.addEventListener('DOMContentLoaded',boot);
 </script>
+
+<script id="hide-student-lessons-block-v1">
+(function(){
+  function hideLessonsBlock(){
+    const el=document.getElementById('tab-lessons');
+    if(el) el.classList.add('hidden');
+  }
+  hideLessonsBlock();
+  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
+  setTimeout(hideLessonsBlock,100);
+  setTimeout(hideLessonsBlock,500);
+  setTimeout(hideLessonsBlock,1000);
+})();
+</script>
+
 </body></html>
