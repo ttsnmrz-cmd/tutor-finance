@@ -53,16 +53,12 @@ async function loadData(){
   [students,lessons,payments]=await Promise.all([db('/students?select=*'),db('/lessons?select=*'),db('/payments?select=*')]);
   students=students||[]; lessons=lessons||[]; payments=payments||[];
   
-  // Автоматически переводим прошедшие «Запланированные» занятия в статус «Проведено»
   const now = new Date();
-  let updatedCount = 0;
   for(let l of lessons){
     if(l.status === 'pending' && l.date && l.time){
       const lessonDateTime = new Date(l.date + 'T' + (l.time.length === 5 ? l.time : '12:00') + ':00');
       if(lessonDateTime < now){
         l.status = 'conducted';
-        updatedCount++;
-        // Тихо сохраняем в базу
         db('/lessons?id=eq.'+encodeURIComponent(l.id),{
           method:'PATCH',
           headers:{...headers,Prefer:'return=minimal'},
@@ -255,10 +251,10 @@ async function deleteThisAndNextLessons(){
 }
 
 function studentStats(s){const ls=lessons.filter(l=>l.student===s.name),income=payments.filter(p=>p.student===s.name).reduce((a,p)=>a+Number(p.amount||0),0),expenses=ls.filter(l=>charge.has(l.status)).reduce((a,l)=>a+Number(l.price||0),0);return{ls,income,expenses,bal:income-expenses};}
-function publicLink(s){return location.origin+location.pathname+'?student='+encodeURIComponent(s.id);}
+function publicLink(s){return location.origin+location.pathname+'?student='+(s.id??'');}
 
 function toggleStudentMenu(id){
-  const menuId = 'student-menu-' + id;
+  const menuId = 'student-menu-' + String(id);
   document.querySelectorAll('[data-student-menu]').forEach(el=>{if(el.id!==menuId)el.classList.add('hidden');});
   const m=document.getElementById(menuId);
   if(m)m.classList.toggle('hidden');
@@ -309,20 +305,5 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
 document.addEventListener('DOMContentLoaded',boot);
 </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
