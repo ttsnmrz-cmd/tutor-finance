@@ -17,3 +17,14 @@ create index if not exists lessons_date_idx on public.lessons(date);
 create index if not exists lessons_student_idx on public.lessons(student);
 create index if not exists payments_date_idx on public.payments(date);
 create index if not exists payments_student_idx on public.payments(student);
+
+-- The current CRM uses the Supabase anon key for its REST requests.
+-- Keep these policies permissive for the current v1 architecture.
+create policy if not exists "payments_all"
+on public.payments
+for all
+to anon, authenticated
+using (true)
+with check (true);
+
+NOTIFY pgrst, 'reload schema';
