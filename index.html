@@ -309,5 +309,20 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function boot(){if(await initPublicStudent())return;const{data}=await supabaseClient.auth.getSession();if(data.session||sessionStorage.getItem('auth_teacher')){document.getElementById('teacher-app').classList.remove('hidden');try{await loadData();switchTab('calendar');}catch(e){showError(e);}}else{document.getElementById('teacher-app').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.remove('hidden');document.getElementById('teacher-login-modal').classList.add('flex');}}
 document.addEventListener('DOMContentLoaded',boot);
 </script>
+
+<script id="hide-student-lessons-block-v1">
+(function(){
+  function hideLessonsBlock(){
+    const el=document.getElementById('tab-lessons');
+    if(el) el.classList.add('hidden');
+  }
+  hideLessonsBlock();
+  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
+  setTimeout(hideLessonsBlock,100);
+  setTimeout(hideLessonsBlock,500);
+  setTimeout(hideLessonsBlock,1000);
+})();
+</script>
+
 </body>
 </html>
