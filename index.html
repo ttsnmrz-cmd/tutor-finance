@@ -10,7 +10,7 @@
 <body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4 font-sans">
 
     <div id="app" class="max-w-4xl w-full">
-        <!-- Контент будет рендериться динамически через JS -->
+        <!-- Контент рендерится динамически -->
     </div>
 
     <script>
@@ -82,12 +82,9 @@
                 const totalSpent = lessons.filter(l => l.student === name && charge.has(l.status)).reduce((sum, l) => sum + Number(l.price), 0);
                 const balance = totalPaid - totalSpent;
 
-                // Сортировка и ограничение до 5 ближайших занятий
-                const todayStr = new Date().toISOString().split('T')[0];
-               // Берем последние 5 занятий за весь период (например, отсортированные по дате в обратном порядке)
                 const studentLessons = lessons
                     .filter(l => l.student === name)
-                    .sort((a, b) => b.date.localeCompare(a.date)) // сначала самые новые
+                    .sort((a, b) => b.date.localeCompare(a.date))
                     .slice(0, 5);
 
                 app.innerHTML = `
@@ -117,11 +114,11 @@
                                 <div class="text-xl font-bold text-indigo-700">${balance} BYN</div>
                             </div>
                         </div>
-                        <h3 class="font-bold text-base mb-4 text-slate-800">Ближайшие занятия</h3>
+                        <h3 class="font-bold text-base mb-4 text-slate-800">Последние занятия</h3>
                         <div class="divide-y divide-slate-100">
-                            ${studentLessons.length === 0 ? '<p class="text-slate-400 py-4">Нет запланированных занятий</p>' : 
+                            ${studentLessons.length === 0 ? '<p class="text-slate-400 py-4">Нет занятий</p>' : 
                                 studentLessons.map(l => `
-                                    py-3 flex justify-between items-center text-sm">
+                                    <div class="py-3 flex justify-between items-center text-sm">
                                         <span class="text-slate-700 font-medium">${l.date} · ${l.time || ''}</span>
                                         <div class="flex items-center gap-4">
                                             <span class="font-semibold text-slate-800">${l.price} BYN</span>
@@ -133,7 +130,6 @@
                     </div>
                 `;
             } else {
-                // Преподаватель (упрощенно для примера вывода структуры)
                 app.innerHTML = `
                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
                         <div class="flex justify-between items-center mb-8">
@@ -151,20 +147,5 @@
 
         loadData();
     </script>
-
-<script id="hide-student-lessons-block-v1">
-(function(){
-  function hideLessonsBlock(){
-    const el=document.getElementById('tab-lessons');
-    if(el) el.classList.add('hidden');
-  }
-  hideLessonsBlock();
-  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
-  setTimeout(hideLessonsBlock,100);
-  setTimeout(hideLessonsBlock,500);
-  setTimeout(hideLessonsBlock,1000);
-})();
-</script>
-
 </body>
 </html>
