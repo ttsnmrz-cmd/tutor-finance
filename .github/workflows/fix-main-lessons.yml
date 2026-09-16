@@ -1,0 +1,91 @@
+name: Fix main lessons list
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fix-main-lessons.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch index.html
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '<script id="main-lessons-list-v1">'
+          if marker in s:
+              raise SystemExit('Patch already present')
+          patch = r'''<script id="main-lessons-list-v1">
+          // Main workspace: chronological list of all conducted lessons.
+          function renderMainLessonsList(){
+            const root=document.getElementById('tab-calendar');
+            if(!root)return;
+            const conducted=lessons
+              .filter(l=>String(l.status||'').toLowerCase()==='conducted')
+              .sort((a,b)=>((b.date||'')+' '+(b.time||'')).localeCompare((a.date||'')+' '+(a.time||'')));
+            const planned=lessons
+              .filter(l=>String(l.status||'').toLowerCase()==='pending')
+              .sort((a,b)=>((a.date||'')+' '+(a.time||'')).localeCompare((b.date||'')+' '+(b.time||'')));
+            const fmt=d=>d?new Date(d+'T00:00:00').toLocaleDateString('ru-RU'):'';
+            const row=l=>`<div onclick="openLessonModal(${Number(l.id)})" class="flex items-center justify-between gap-3 p-4 border rounded-xl hover:bg-slate-50 cursor-pointer">
+              <div class="min-w-0"><div class="font-semibold">${esc(l.student||'')}</div><div class="text-sm text-slate-500">${fmt(l.date)}${l.time?' · '+esc(l.time):''}</div>${l.note?`<div class="text-xs text-slate-400 mt-1 truncate">${esc(l.note)}</div>`:''}</div>
+              <div class="text-right shrink-0"><div class="font-semibold">${money(l.price)}</div><span class="inline-block mt-1 text-xs px-2 py-1 rounded-full border ${statusClasses[l.status]||''}">${esc(statusLabels[l.status]||l.status||'')}</span></div>
+            </div>`;
+            root.innerHTML=`<div class="space-y-5">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Баланс учеников</p><p id="stat-balance" class="text-2xl font-bold mt-1">${money(students.reduce((a,s)=>a+balance(s.name),0))}</p></div>
+                <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Проведено занятий</p><p id="stat-lessons" class="text-2xl font-bold mt-1">${conducted.length}</p></div>
+                <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">Получено платежей</p><p id="stat-payments" class="text-2xl font-bold mt-1">${money(payments.reduce((a,p)=>a+Number(p.amount||0),0))}</p></div>
+                <div class="bg-white border rounded-2xl p-4"><p class="text-xs text-slate-500">К списанию</p><p id="stat-deductions" class="text-2xl font-bold mt-1">${money(conducted.reduce((a,l)=>a+Number(l.price||0),0))}</p></div>
+              </div>
+              <div class="bg-white border rounded-2xl shadow-sm p-5">
+                <div class="flex flex-col md:flex-row gap-3 justify-between md:items-center mb-4">
+                  <div><h2 class="text-xl font-bold">Проведенные занятия</h2><p class="text-sm text-slate-500">Все проведенные занятия, от новых к старым</p></div>
+                  <button onclick="openLessonModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-semibold">＋ Новое занятие</button>
+                </div>
+                <div class="space-y-2">${conducted.length?conducted.map(row).join(''):'<div class="py-8 text-center text-slate-400">Проведенных занятий пока нет</div>'}</div>
+              </div>
+              <div class="bg-white border rounded-2xl shadow-sm p-5">
+                <h3 class="font-bold mb-3">Запланированные занятия <span class="text-xs text-slate-400">(${planned.length})</span></h3>
+                <div class="space-y-2">${planned.length?planned.map(row).join(''):'<div class="text-sm text-slate-400">Нет запланированных занятий</div>'}</div>
+              </div>
+            </div>`;
+          }
+
+          const _oldLoadDataForMainLessons=window.loadData;
+          if(typeof _oldLoadDataForMainLessons==='function'){
+            window.loadData=async function(){
+              const result=await _oldLoadDataForMainLessons.apply(this,arguments);
+              try{renderMainLessonsList();}catch(e){console.error(e);}
+              return result;
+            };
+          }
+          const _oldSwitchTabForMainLessons=window.switchTab;
+          window.switchTab=function(t){
+            if(typeof _oldSwitchTabForMainLessons==='function')_oldSwitchTabForMainLessons(t);
+            if(t==='calendar')setTimeout(renderMainLessonsList,0);
+          };
+          document.addEventListener('DOMContentLoaded',()=>setTimeout(renderMainLessonsList,500));
+          setTimeout(renderMainLessonsList,1000);
+          </script>'''
+          s=s.replace('</body>',patch+'\n</body>')
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Show chronological conducted lessons on main screen"
+          git push
