@@ -127,4 +127,19 @@ async function openStudentCabinet(){if(!publicStudent)return;const pin=document.
 async function initApp(){if(await initPublicStudent())return;document.getElementById('teacher-app').classList.remove('hidden');if(localStorage.getItem('tutor_logged_in')==='true'){try{await loadData();renderWeek();renderDay()}catch(e){showError(e)}}else showModal('teacher-login-modal')}
 document.addEventListener('click',e=>{if(!e.target.closest('[id^="menu-"]')&&!e.target.closest('button'))document.querySelectorAll('[id^="menu-"]').forEach(x=>x.classList.add('hidden'))});
 document.addEventListener('DOMContentLoaded',initApp);
-</script></body></html>
+</script>
+<script id="hide-student-lessons-block-v1">
+(function(){
+  function hideLessonsBlock(){
+    const el=document.getElementById('tab-lessons');
+    if(el) el.classList.add('hidden');
+  }
+  hideLessonsBlock();
+  document.addEventListener('DOMContentLoaded',hideLessonsBlock);
+  setTimeout(hideLessonsBlock,100);
+  setTimeout(hideLessonsBlock,500);
+  setTimeout(hideLessonsBlock,1000);
+})();
+</script>
+
+</body></html>
