@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Tutor Finance — CRM репетитора</title>
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tutor Finance">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -16,6 +24,7 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 .week-grid{display:grid;grid-template-columns:repeat(7,minmax(145px,1fr));min-width:1015px}.week-day{min-height:190px;transition:.15s}.week-day.drag-over{background:#e0e7ff!important;border:2px dashed #6366f1}
 .week-lesson{cursor:grab;transition:.15s}.week-lesson:active{cursor:grabbing}.week-lesson:hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(15,23,42,.08)}
 .schedule-scroll-v3{max-height:1010px;overflow-y:auto;padding-right:4px}.schedule-scroll-v3 thead{position:sticky;top:0;z-index:3;background:#fff}
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 </style></head>
 <body class="text-slate-800 min-h-screen">
 
@@ -53,13 +62,13 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
 
 <!-- Панель преподавателя -->
 <div id="teacher-app" class="hidden">
-  <div class="max-w-7xl mx-auto p-4 md:p-6">
+  <div class="max-w-7xl mx-auto p-4 md:p-6 pb-24 md:pb-6">
     <header class="app-card rounded-3xl p-4 md:p-5 flex flex-wrap gap-3 justify-between items-center mb-6">
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-xl shadow-lg shadow-indigo-200">📚</div>
         <div><h1 class="text-2xl font-bold tracking-tight">Tutor Finance</h1><p class="text-sm text-slate-500">CRM для занятий, учеников и оплат</p></div>
       </div>
-      <nav class="flex flex-wrap gap-2">
+      <nav class="hidden md:flex flex-wrap gap-2">
         <button type="button" id="nav-calendar" onclick="switchTab('calendar')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold shadow-sm">Занятия</button>
         <button type="button" id="nav-students" onclick="switchTab('students')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold transition">Ученики</button>
         <button type="button" id="nav-finance" onclick="switchTab('finance')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold transition">Финансы</button>
@@ -197,6 +206,20 @@ body{background:radial-gradient(circle at top left,#eef2ff 0,#f8fafc 35%,#f8fafc
     </main>
     <div id="error-box" class="hidden fixed bottom-4 right-4 max-w-md bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl shadow-lg"></div>
   </div>
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 flex justify-around" style="padding-bottom:env(safe-area-inset-bottom)">
+    <button id="mnav-calendar" onclick="switchTab('calendar')" class="flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-semibold text-indigo-600">
+      <span class="text-lg">📅</span>Занятия
+    </button>
+    <button id="mnav-students" onclick="switchTab('students')" class="flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-semibold text-slate-500">
+      <span class="text-lg">👤</span>Ученики
+    </button>
+    <button id="mnav-finance" onclick="switchTab('finance')" class="flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-semibold text-slate-500">
+      <span class="text-lg">💰</span>Финансы
+    </button>
+    <button onclick="teacherLogout()" class="flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-semibold text-red-500">
+      <span class="text-lg">🚪</span>Выйти
+    </button>
+  </nav>
 </div>
 
 <script>
@@ -268,6 +291,8 @@ function switchTab(t){
   ['calendar','students','finance'].forEach(x=>{
     document.getElementById('tab-'+x).classList.toggle('hidden',x!==t);
     document.getElementById('nav-'+x).className='px-4 py-2 rounded-xl font-semibold transition '+(x===t?'bg-indigo-600 text-white shadow-sm':'bg-slate-100 hover:bg-slate-200');
+    const mn=document.getElementById('mnav-'+x);
+    if(mn)mn.className='flex flex-col items-center gap-0.5 px-3 py-2 text-xs font-semibold transition '+(x===t?'text-indigo-600':'text-slate-500');
   });
   if(t==='calendar'){renderMain();renderWeek();}
   if(t==='students')renderStudents();
@@ -799,6 +824,7 @@ document.addEventListener('click', e => {
 });
 
 document.addEventListener('DOMContentLoaded', initApp);
+if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));}
 </script>
 
 <script id="hide-student-lessons-block-v1">

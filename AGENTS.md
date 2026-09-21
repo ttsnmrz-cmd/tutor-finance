@@ -18,5 +18,13 @@ Serves `index.html` via nginx on host port 3000. The app talks to the remote Sup
 ## Editing
 Edit `index.html` directly. Changes are served immediately from the bind-mounted volume; call `reload_preview` to refresh the browser (no HMR/dev server).
 
+## PWA / Mobile
+The app is installable as a Progressive Web App:
+- `manifest.json` — web app manifest (name, icons, theme color, standalone display)
+- `sw.js` — service worker (cache-first offline support)
+- `icon.svg` — app icon (graduation cap on indigo gradient, maskable)
+- `index.html` `<head>` — PWA meta tags, manifest link, SW registration
+- Mobile bottom navigation bar (`md:hidden`) replaces the desktop header nav on screens < 768px
+
 ## Secrets
 None required — the Supabase publishable key is embedded in the HTML and the database is hosted remotely.

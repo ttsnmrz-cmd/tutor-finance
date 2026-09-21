@@ -1,0 +1,19 @@
+{
+  "name": "Tutor Finance — CRM репетитора",
+  "short_name": "Tutor Finance",
+  "description": "CRM для занятий, учеников и оплат",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
