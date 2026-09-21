@@ -212,6 +212,8 @@ let weekAnchor=new Date();
 const statusLabels={pending:'Запланировано',conducted:'Проведено',rescheduled:'Перенесено',cancelled_charge:'Отменено — списать',cancelled_free:'Отменено — не списывать'};
 const statusClass={pending:'bg-amber-100 text-amber-800',conducted:'bg-emerald-100 text-emerald-800',rescheduled:'bg-blue-100 text-blue-800',cancelled_charge:'bg-red-100 text-red-800',cancelled_free:'bg-slate-100 text-slate-700'};
 const charge=new Set(['conducted','cancelled_charge']);
+const DISPLAY_LESSONS_LIMIT=500;
+const DISPLAY_HISTORY_LIMIT=200;
 
 function esc(v){return String(v??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 function money(n){return Number(n||0).toLocaleString('ru-RU',{maximumFractionDigits:2})+' BYN';}
@@ -255,9 +257,9 @@ async function db(path,opt={}){
 
 async function loadData(){
   [students,lessons,payments]=await Promise.all([
-    db('/students?select=*'),
-    db('/lessons?select=*'),
-    db('/payments?select=*')
+    db('/students?select=id,name,pin,price'),
+    db('/lessons?select=id,student,date,time,price,status,duration'),
+    db('/payments?select=id,student,amount,date')
   ]);
   students=students||[];
   lessons=lessons||[];
@@ -292,9 +294,14 @@ function lessonVisual(l){
 
 function renderMain(){
   fillStudentSelects();
-  const rows=[...lessons].sort((a,b)=>{
+  const allRows=[...lessons].sort((a,b)=>{
     return (String(a.date||'')+String(a.time||'')).localeCompare(String(b.date||'')+String(b.time||''));
   });
+  const todayKey=localISO(new Date());
+  let pivot=allRows.findIndex(l=>l.date>=todayKey);
+  if(pivot<0)pivot=allRows.length;
+  const start=Math.max(0,pivot-Math.floor(DISPLAY_LESSONS_LIMIT/2));
+  const rows=allRows.slice(start,start+DISPLAY_LESSONS_LIMIT);
   const body=document.getElementById('main-lessons');
   body.innerHTML=rows.length?rows.map(l=>{
     const v=lessonVisual(l);
@@ -474,7 +481,7 @@ async function saveEditedLesson(){
         let currDate = new Date(date + 'T00:00:00');
         if(selectedDays.length === 0) selectedDays.push(currDate.getDay());
 
-        for(let i = 0; i < 365; i++){
+        for(let i = 0; i < 90; i++){
           if(selectedDays.includes(currDate.getDay())){
             await db('/lessons',{method:'POST',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({student,date:localISO(currDate),time,price,status:'pending',duration})});
           }
@@ -652,6 +659,8 @@ function renderFinance(){
     const{income,expenses,bal}=studentStats(s);
     const ps=payments.filter(p=>p.student===s.name).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     const ds=lessons.filter(l=>l.student===s.name&&charge.has(l.status)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    const visiblePs=ps.slice(0,DISPLAY_HISTORY_LIMIT);
+    const visibleDs=ds.slice(0,DISPLAY_HISTORY_LIMIT);
     const pid='finance-payments-'+esc(s.id),did='finance-expenses-'+esc(s.id);
     return `<div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
       <h4 class="font-bold text-base text-indigo-900">${esc(s.name)}</h4>
@@ -660,14 +669,14 @@ function renderFinance(){
           <span class="text-sm font-semibold text-emerald-700">Поступления</span>
           <span class="flex items-center gap-2"><span class="text-sm font-bold text-emerald-700">${money(income)}</span><span id="${pid}-icon" class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">＋</span></span>
         </button>
-        <div id="${pid}" class="hidden mt-2 space-y-1 max-h-36 overflow-y-auto pr-1">${ps.map(p=>`<div class="flex justify-between gap-3 text-xs py-1.5 border-b border-slate-200 last:border-0"><span class="text-slate-500">${esc(p.date)}</span><span class="font-semibold text-slate-700">+${money(p.amount)}</span></div>`).join('')||'<div class="text-xs text-slate-400 py-1">Поступлений пока нет</div>'}</div>
+        <div id="${pid}" class="hidden mt-2 space-y-1 max-h-36 overflow-y-auto pr-1">${visiblePs.map(p=>`<div class="flex justify-between gap-3 text-xs py-1.5 border-b border-slate-200 last:border-0"><span class="text-slate-500">${esc(p.date)}</span><span class="font-semibold text-slate-700">+${money(p.amount)}</span></div>`).join('')||'<div class="text-xs text-slate-400 py-1">Поступлений пока нет</div>'}</div>
       </div>
       <div class="mt-4 pt-3 border-t border-slate-200">
         <button type="button" onclick="toggleFinanceSection('${did}')" class="w-full flex justify-between items-center text-left group">
           <span class="text-sm font-semibold text-red-700">Списания за занятия</span>
           <span class="flex items-center gap-2"><span class="text-sm font-bold text-red-700">${money(expenses)}</span><span id="${did}-icon" class="w-6 h-6 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold">＋</span></span>
         </button>
-        <div id="${did}" class="hidden mt-2 space-y-1 max-h-36 overflow-y-auto pr-1">${ds.map(l=>`<div class="flex justify-between gap-3 text-xs py-1.5 border-b border-slate-200 last:border-0"><span class="text-slate-500">${esc(l.date)}</span><span class="font-semibold text-slate-700">-${money(l.price)}</span></div>`).join('')||'<div class="text-xs text-slate-400 py-1">Списаний пока нет</div>'}</div>
+        <div id="${did}" class="hidden mt-2 space-y-1 max-h-36 overflow-y-auto pr-1">${visibleDs.map(l=>`<div class="flex justify-between gap-3 text-xs py-1.5 border-b border-slate-200 last:border-0"><span class="text-slate-500">${esc(l.date)}</span><span class="font-semibold text-slate-700">-${money(l.price)}</span></div>`).join('')||'<div class="text-xs text-slate-400 py-1">Списаний пока нет</div>'}</div>
       </div>
       <div class="mt-4 pt-3 border-t border-slate-300 flex justify-between items-center">
         <span class="text-sm font-bold text-slate-600">Баланс</span>
@@ -742,8 +751,8 @@ async function openStudentCabinet(){
       return (String(a.date||'')+String(a.time||'')).localeCompare(String(b.date||'')+String(b.time||''));
     });
     
-    const pastAndToday = sortedLessons.filter(l => l.date <= todayStr);
-    const future = sortedLessons.filter(l => l.date > todayStr).slice(0, 10);
+    const pastAndToday = sortedLessons.filter(l => l.date <= todayStr).slice(-DISPLAY_HISTORY_LIMIT);
+    const future = sortedLessons.filter(l => l.date > todayStr).slice(0, 20);
     const visibleLessons = [...pastAndToday, ...future];
 
     const lessonsBody = document.getElementById('public-lessons');
