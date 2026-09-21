@@ -6,8 +6,93 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{background:#f4f1eb;-webkit-tap-highlight-color:transparent;color:#171717}.app-card{background:#fff;border:1px solid #dedbd4;box-shadow:0 10px 35px rgba(25,25,25,.045)}.soft-input{border:1px solid #d6d2ca;background:#fff;outline:none}.soft-input:focus{border-color:#171717;box-shadow:0 0 0 2px rgba(23,23,23,.08)}.primary-btn{background:#171717;color:#fff}.primary-btn:hover{background:#333}.day-dot{width:5px;height:5px;border-radius:50%;background:#171717;margin:auto}.day-circle{width:42px;height:42px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}.day-circle.selected{background:#171717;color:#fff}.day-circle.today{box-shadow:0 0 0 1px #171717}.day-circle.selected .day-dot{background:#fff}.balance-green{background:#e7f0e8}.balance-orange{background:#f3eadb}.balance-red{background:#f3e1df}.modal-bg{background:rgba(20,20,20,.42)}.status{font-size:11px;font-weight:600;padding:4px 8px;border-radius:999px;white-space:nowrap}
-header h1,#student-public-view h1{letter-spacing:-.04em}button{transition:all .15s ease}.border{border-color:#dedbd4!important}.rounded-3xl{border-radius:18px!important}.rounded-2xl{border-radius:14px!important}.rounded-xl{border-radius:10px!important}.teacher-detail-list{max-height:230px;overflow-y:auto;padding-right:4px}.teacher-detail-list::-webkit-scrollbar,#public-lessons::-webkit-scrollbar{width:5px}.teacher-detail-list::-webkit-scrollbar-thumb,#public-lessons::-webkit-scrollbar-thumb{background:#c9c5bd;border-radius:99px}@media(max-width:640px){.day-circle{width:38px;height:38px}.status{font-size:10px;padding:3px 6px}.app-card{border-radius:20px}header{align-items:flex-start!important;flex-direction:column!important}header nav{width:100%;display:grid!important;grid-template-columns:1fr 1fr auto}header nav button{padding:.65rem .7rem!important}.fixed.right-6{right:1rem;bottom:1rem}.modal-bg{align-items:flex-end!important}.modal-bg>.app-card{border-radius:24px 24px 0 0;max-height:92vh;overflow:auto}}</style>
+:root{
+  --bg-color:#f7f6f9;
+  --card-bg:#ffffff;
+  --text-color:#2b2343;
+  --text-secondary:#7e7693;
+  --primary-color:#432c7a;
+  --primary-hover:#32205c;
+  --accent-soft:#ede9f6;
+  --border-color:#e6e2ed;
+  --green-bg:#e6f4ea;
+  --green-text:#137333;
+  --red-bg:#fce8e6;
+  --red-text:#c5221f;
+}
+*{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+body{
+  background-color:var(--bg-color)!important;
+  color:var(--text-color)!important;
+}
+.app-card{
+  background:var(--card-bg);
+  border-color:var(--border-color)!important;
+  box-shadow:0 4px 20px rgba(67,44,122,.04);
+}
+.soft-input{
+  border-color:#dcd7e5!important;
+  background:#fff!important;
+  color:var(--text-color)!important;
+}
+.soft-input:focus{
+  border-color:var(--primary-color)!important;
+  box-shadow:0 0 0 2px rgba(67,44,122,.10)!important;
+}
+.primary-btn{
+  background:var(--primary-color)!important;
+  color:#fff!important;
+}
+.primary-btn:hover{background:var(--primary-hover)!important}
+button{transition:all .15s ease}
+header h1,#student-public-view h1{letter-spacing:-.04em}
+.border{border-color:var(--border-color)!important}
+.day-dot{background:var(--primary-color)}
+.day-circle.selected{background:var(--primary-color);color:#fff}
+.day-circle.today{box-shadow:0 0 0 1px var(--primary-color)}
+.day-circle.selected .day-dot{background:#fff}
+.balance-green{background:var(--green-bg)!important;color:var(--green-text)!important}
+.balance-orange{background:#fff4df!important;color:#8a5a00!important}
+.balance-red{background:var(--red-bg)!important;color:var(--red-text)!important}
+.modal-bg{background:rgba(43,35,67,.42)}
+.status{font-size:11px;font-weight:600;padding:4px 8px;border-radius:999px;white-space:nowrap}
+.teacher-detail-list{max-height:230px;overflow-y:auto;padding-right:4px}
+.teacher-detail-list::-webkit-scrollbar,#public-lessons::-webkit-scrollbar{width:5px}
+.teacher-detail-list::-webkit-scrollbar-thumb,#public-lessons::-webkit-scrollbar-thumb{background:#cfc9da;border-radius:99px}
+
+/* Цветовая палитра из референса — без изменения размеров/раскладки */
+.text-slate-800,.text-slate-900,.font-bold,.font-semibold{color:var(--text-color)}
+.text-slate-500,.text-slate-400{color:var(--text-secondary)!important}
+.bg-slate-50{background:#faf9fc!important}
+.bg-slate-100{background:var(--accent-soft)!important;color:var(--primary-color)!important}
+.bg-indigo-50,.bg-violet-50{background:var(--accent-soft)!important;color:var(--primary-color)!important}
+.bg-indigo-600{background:var(--primary-color)!important;color:#fff!important}
+.hover\\:bg-indigo-700:hover{background:var(--primary-hover)!important}
+.text-indigo-700{color:var(--primary-color)!important}
+.bg-emerald-50{background:var(--green-bg)!important;color:var(--green-text)!important}
+.text-emerald-600{color:var(--green-text)!important}
+.bg-red-50{background:var(--red-bg)!important;color:var(--red-text)!important}
+.bg-red-100{background:#f7dddd!important;color:var(--red-text)!important}
+.text-red-600,.text-red-700{color:var(--red-text)!important}
+.bg-amber-100{background:#fff1d8!important;color:#8a5a00!important}
+.bg-emerald-100{background:var(--green-bg)!important;color:var(--green-text)!important}
+.bg-blue-100{background:#e9e5f4!important;color:var(--primary-color)!important}
+.bg-slate-100{background:var(--accent-soft)!important;color:var(--primary-color)!important}
+
+@media(max-width:640px){
+  .day-circle{width:38px;height:38px}
+  .status{font-size:10px;padding:3px 6px}
+  .app-card{border-radius:20px}
+  header{align-items:flex-start!important;flex-direction:column!important}
+  header nav{width:100%;display:grid!important;grid-template-columns:1fr 1fr auto}
+  header nav button{padding:.65rem .7rem!important}
+  .fixed.right-6{right:1rem;bottom:1rem}
+  .modal-bg{align-items:flex-end!important}
+  .modal-bg>.app-card{border-radius:24px 24px 0 0;max-height:92vh;overflow:auto}
+}
+</style>
 </head>
 <body class="text-slate-800 min-h-screen">
 <div id="student-public-view" class="hidden max-w-3xl mx-auto p-4"><div class="app-card rounded-3xl p-5 md:p-6">
