@@ -219,27 +219,34 @@ function openEditLesson(id){
   if(breakdown){
     if(l.group_id){
       const members=studentsForLesson(l);
-
-      const parts=(
-        members.length
-          ?members
-          :students.filter(
-            s=>
-              !s.archived&&
-              String(s.group_id)===String(l.group_id)
-          )
-      ).map(
-        s=>({
-          name:s.name,
-          price:Number(s.price??0)
-        })
+const parts=members.length
+  ?members.map(m=>{
+      const s=students.find(
+        x=>String(x.id)===String(m.student_id)
       );
 
-      const total=parts.reduce(
-        (a,b)=>a+b.price,
-        0
-      );
+      return {
+        name:s?.name||'',
+        price:m.charged===false
+          ?0
+          :Number(m.price??s?.price??0)
+      };
+    })
+  :students
+      .filter(
+        s=>
+          !s.archived&&
+          String(s.group_id)===String(l.group_id)
+      )
+      .map(s=>({
+        name:s.name,
+        price:Number(s.price??0)
+      }));
 
+const total=parts.reduce(
+  (a,b)=>a+b.price,
+  0
+);
       breakdown.textContent=
         parts.length
           ?parts.map(
