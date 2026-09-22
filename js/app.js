@@ -1323,14 +1323,21 @@ async function openStudentCabinet(){
 
 async function initApp(){
 
+  async function initApp(){
+
   if(await initPublicStudent())return;
+
+  document.getElementById(
+    'teacher-app'
+  ).classList.remove('hidden');
 
   const {
     data: { session }
   } = await supabaseClient.auth.getSession();
 
   if(!session){
-    throw new Error('Пользователь не авторизован');
+    showModal('teacher-login-modal');
+    return;
   }
 
   headers = {
@@ -1339,74 +1346,16 @@ async function initApp(){
     'Content-Type': 'application/json'
   };
 
-  document.getElementById(
-    'teacher-app'
-  ).classList.remove('hidden');
+  try{
+    await loadData();
 
-  if(
-    localStorage.getItem(
-      'tutor_logged_in'
-    )==='true'
-  ){
-    try{
-      await loadData();
-      renderWeek();
-      renderDay();
-    }catch(e){
-      showError(e);
-    }
-  }else{
-    showModal(
-      'teacher-login-modal'
-    );
+    renderWeek();
+    renderDay();
+
+  }catch(e){
+    showError(e);
   }
 }
-
-document.addEventListener(
-  'click',
-  e=>{
-    if(
-      !e.target.closest('[id^="menu-"]')&&
-      !e.target.closest('button')
-    ){
-      document
-        .querySelectorAll(
-          '[id^="menu-"]'
-        )
-        .forEach(
-          x=>x.classList.add('hidden')
-        );
-    }
-
-    if(
-      !e.target.closest(
-        '.student-attendance-menu'
-      )&&
-      !e.target.closest('.status')
-    ){
-      document
-        .querySelectorAll(
-          '.student-attendance-menu'
-        )
-        .forEach(
-          x=>x.classList.add('hidden')
-        );
-    }
-
-    if(
-      !e.target.closest(
-        '#lesson-delete-menu'
-      )
-    ){
-      closeLessonDeleteMenu();
-    }
-  }
-);
-
-document.addEventListener(
-  'DOMContentLoaded',
-  initApp
-);
 
 function lessonGroupContext(){
   const id=document.getElementById(
