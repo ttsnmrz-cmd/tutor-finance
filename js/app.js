@@ -1673,4 +1673,5 @@ function closeLessonDeleteMenu(){
     )
     ?.classList.add('hidden');
 }
- 
+
+
