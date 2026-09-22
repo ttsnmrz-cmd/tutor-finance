@@ -1016,29 +1016,70 @@ function closeModal(id){
   e.classList.remove('flex');
 }
 
-function loginTeacher(){
-  if(
+async function loginTeacher(){
+
+  const email =
+    document.getElementById(
+      'teacher-email-input'
+    ).value.trim();
+
+  const password =
     document.getElementById(
       'teacher-password-input'
-    ).value
-  ){
-    localStorage.setItem(
-      'tutor_logged_in',
-      'true'
+    ).value;
+
+  const errorEl =
+    document.getElementById(
+      'teacher-login-error'
     );
+
+  errorEl.textContent = '';
+
+  if(!email || !password){
+    errorEl.textContent =
+      'Введите email и пароль';
+
+    return;
+  }
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if(error){
+      throw error;
+    }
+
+    headers = {
+      apikey: SUPABASE_KEY,
+      Authorization:
+        'Bearer '+data.session.access_token,
+      'Content-Type':
+        'application/json'
+    };
 
     closeModal(
       'teacher-login-modal'
     );
 
-    loadData().then(()=>{
-      renderWeek();
-      renderDay();
-    });
-  }else{
-    document.getElementById(
-      'teacher-login-error'
-    ).textContent='Введите пароль';
+    await loadData();
+
+    renderWeek();
+    renderDay();
+
+  }catch(e){
+
+    console.error(e);
+
+    errorEl.textContent =
+      e.message ||
+      'Не удалось войти';
   }
 }
 
