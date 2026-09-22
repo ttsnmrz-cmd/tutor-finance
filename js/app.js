@@ -349,50 +349,6 @@ function addStudentToCurrentLessonGroup(){
 
   showModal('group-choice-modal');
 }
-
-function priceOptions(value){
-  return String(value??40);
-}
-
-function timeOptions(){
-  document.getElementById('edit-hour').innerHTML=
-    Array.from(
-      {length:17},
-      (_,i)=>{
-        const h=i+7;
-
-        return `<option value="${String(h).padStart(2,'0')}">${String(h).padStart(2,'0')}</option>`;
-      }
-    ).join('');
-
-  document.getElementById('edit-minute').innerHTML=
-    Array.from(
-      {length:12},
-      (_,i)=>{
-        const m=i*5;
-
-        return `<option value="${String(m).padStart(2,'0')}">${String(m).padStart(2,'0')}</option>`;
-      }
-    ).join('');
-}
-
-function setTime(v){
-  let x=String(v||'11:00')
-    .replace('.',':')
-    .split(':');
-
-  document.getElementById('edit-hour').value=
-    String(Number(x[0]||11)).padStart(2,'0');
-
-  document.getElementById('edit-minute').value=
-    String(x[1]||'00').padStart(2,'0');
-}
-
-function getTime(){
-  return document.getElementById('edit-hour').value+
-    ':'+
-    document.getElementById('edit-minute').value;
-}
 function openNewLessonForDate(date){
   fillStudentSelects();
 
