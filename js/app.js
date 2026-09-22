@@ -1322,7 +1322,22 @@ async function openStudentCabinet(){
 }
 
 async function initApp(){
+
   if(await initPublicStudent())return;
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if(!session){
+    throw new Error('Пользователь не авторизован');
+  }
+
+  headers = {
+    apikey: SUPABASE_KEY,
+    Authorization: 'Bearer '+session.access_token,
+    'Content-Type': 'application/json'
+  };
 
   document.getElementById(
     'teacher-app'
