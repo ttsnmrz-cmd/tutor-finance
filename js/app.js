@@ -1086,10 +1086,9 @@ document.getElementById(
   }
 }
 
-function teacherLogout(){
-  localStorage.removeItem(
-    'tutor_logged_in'
-  );
+async function teacherLogout(){
+
+  await supabaseClient.auth.signOut();
 
   location.reload();
 }
