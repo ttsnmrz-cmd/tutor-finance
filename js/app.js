@@ -1063,7 +1063,10 @@ async function loginTeacher(){
       'Content-Type':
         'application/json'
     };
-
+document.getElementById(
+  'teacher-app'
+).classList.remove('hidden');
+    
     closeModal(
       'teacher-login-modal'
     );
@@ -1366,32 +1369,46 @@ async function openStudentCabinet(){
 
   if(await initPublicStudent())return;
 
-  document.getElementById(
-    'teacher-app'
-  ).classList.remove('hidden');
-
-  const {
-    data: { session }
-  } = await supabaseClient.auth.getSession();
-
-  if(!session){
-    showModal('teacher-login-modal');
-    return;
-  }
-
-  headers = {
-    apikey: SUPABASE_KEY,
-    Authorization: 'Bearer '+session.access_token,
-    'Content-Type': 'application/json'
-  };
-
   try{
+
+    const {
+      data: { session },
+      error
+    } = await supabaseClient.auth.getSession();
+
+    if(error){
+      throw error;
+    }
+
+    document.getElementById(
+      'teacher-app'
+    ).classList.remove('hidden');
+
+    if(!session){
+      showModal('teacher-login-modal');
+      return;
+    }
+
+    headers = {
+      apikey: SUPABASE_KEY,
+      Authorization:
+        'Bearer '+session.access_token,
+      'Content-Type':
+        'application/json'
+    };
+
     await loadData();
 
     renderWeek();
     renderDay();
 
   }catch(e){
+
+    console.error(
+      'initApp error:',
+      e
+    );
+
     showError(e);
   }
 }
