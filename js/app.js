@@ -347,10 +347,9 @@ function addStudentToCurrentLessonGroup(){
     )
   );
 
-  showModal('group-choice-modal');
+ showModal('group-choice-modal');
 }
-  return lesson;
-}
+
 async function createOneGroupLesson(
   groupId,
   date,
