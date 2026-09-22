@@ -35,15 +35,20 @@ function lessonPriceTotal(l){
 
     if(members.length){
       return members.reduce(
-        (a,m)=>
-          a+
-          Number(
-            m.price??
-            students.find(
-              s=>String(s.id)===String(m.student_id)
-            )?.price??
-            0
-          ),
+        (a,m)=>{
+          if(m.charged===false){
+            return a;
+          }
+
+          return a+
+            Number(
+              m.price??
+              students.find(
+                s=>String(s.id)===String(m.student_id)
+              )?.price??
+              0
+            );
+        },
         0
       );
     }
