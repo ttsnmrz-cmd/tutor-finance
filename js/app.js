@@ -1321,8 +1321,6 @@ async function openStudentCabinet(){
   }
 }
 
-async function initApp(){
-
   async function initApp(){
 
   if(await initPublicStudent())return;
