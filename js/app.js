@@ -109,3 +109,4 @@ async function addStudentToLesson(studentId){const ctx=lessonGroupContext();if(!
 function toggleLessonDeleteMenu(){document.getElementById('lesson-delete-dropdown')?.classList.toggle('hidden')}
 function closeLessonDeleteMenu(){document.getElementById('lesson-delete-dropdown')?.classList.add('hidden')}
 
+
