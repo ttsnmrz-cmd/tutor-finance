@@ -62,6 +62,230 @@ function lessonPriceTotal(l){
 
   return Number(l.price||0);
 }
+function openNewLessonForDate(date){
+  fillStudentSelects();
+
+  document
+    .getElementById('edit-student')
+    ?.removeEventListener(
+      'change',
+      updateLessonGroupButton
+    );
+
+  document
+    .getElementById('edit-student')
+    ?.addEventListener(
+      'change',
+      updateLessonGroupButton
+    );
+
+  timeOptions();
+
+  document.getElementById('edit-id').value='';
+  document.getElementById('edit-date').value=
+    date||selectedDate;
+  document.getElementById('edit-duration').value='60';
+
+  setTime('11:00');
+
+  document.getElementById('edit-status').innerHTML=
+    Object.entries(statusLabels)
+      .map(
+        ([k,v])=>
+          '<option value="'+k+'">'+v+'</option>'
+      )
+      .join('');
+
+  document.getElementById(
+    'edit-status'
+  ).value='pending';
+
+  const st=students.find(
+    x=>!x.archived
+  );
+
+  document.getElementById(
+    'edit-student'
+  ).value=st?.name||'';
+
+  document.getElementById(
+    'edit-price'
+  ).value='40';
+
+  document.getElementById(
+    'edit-comment'
+  ).value='';
+
+  updateLessonGroupButton();
+
+  document.getElementById(
+    'recurring-box'
+  ).classList.remove('hidden');
+
+  document.getElementById(
+    'edit-recurring'
+  ).checked=false;
+
+  toggleRecurring();
+
+  document
+    .querySelectorAll('.rec-day')
+    .forEach(x=>x.checked=false);
+
+  document.getElementById(
+    'lesson-modal-title'
+  ).textContent='Новое занятие';
+
+  document.getElementById(
+    'lesson-delete-menu'
+  )?.classList.add('hidden');
+
+  document.getElementById(
+    'lesson-delete-dropdown'
+  )?.classList.add('hidden');
+
+  document.getElementById(
+    'lesson-group-members'
+  )?.classList.add('hidden');
+
+  showModal('lesson-modal');
+}
+function openEditLesson(id){
+  const l=lessons.find(
+    x=>String(x.id)===String(id)
+  );
+
+  if(!l)return;
+
+  fillStudentSelects();
+
+  document
+    .getElementById('edit-student')
+    ?.removeEventListener(
+      'change',
+      updateLessonGroupButton
+    );
+
+  document
+    .getElementById('edit-student')
+    ?.addEventListener(
+      'change',
+      updateLessonGroupButton
+    );
+
+  timeOptions();
+
+  document.getElementById('edit-id').value=l.id;
+
+  document.getElementById(
+    'edit-student'
+  ).value=
+    l.group_id
+      ?'group:'+l.group_id
+      :l.student;
+
+  document.getElementById(
+    'edit-date'
+  ).value=l.date;
+
+  document.getElementById(
+    'edit-duration'
+  ).value=String(l.duration||60);
+
+  setTime(l.time||'11:00');
+
+  const priceEl=document.getElementById(
+    'edit-price'
+  );
+
+  priceEl.value=
+    String(
+      l.group_id
+        ?lessonPriceTotal(l)
+        :l.price??40
+    );
+
+  priceEl.disabled=!!l.group_id;
+
+  const breakdown=document.getElementById(
+    'group-price-breakdown'
+  );
+
+  if(breakdown){
+    if(l.group_id){
+      const members=studentsForLesson(l);
+
+      const parts=(
+        members.length
+          ?members
+          :students.filter(
+            s=>
+              !s.archived&&
+              String(s.group_id)===String(l.group_id)
+          )
+      ).map(
+        s=>({
+          name:s.name,
+          price:Number(s.price??0)
+        })
+      );
+
+      const total=parts.reduce(
+        (a,b)=>a+b.price,
+        0
+      );
+
+      breakdown.textContent=
+        parts.length
+          ?parts.map(
+            x=>x.name+' '+x.price
+          ).join(' + ')+' = '+total+' BYN'
+          :'В группе нет учеников';
+
+      breakdown.classList.remove('hidden');
+    }else{
+      breakdown.classList.add('hidden');
+    }
+  }
+
+  document.getElementById(
+    'edit-status'
+  ).innerHTML=
+    Object.entries(statusLabels)
+      .map(
+        ([k,v])=>
+          '<option value="'+k+'">'+v+'</option>'
+      )
+      .join('');
+
+  document.getElementById(
+    'edit-status'
+  ).value=l.status||'pending';
+
+  document.getElementById(
+    'edit-comment'
+  ).value=l.comment||'';
+
+  updateLessonGroupButton();
+
+  document.getElementById(
+    'recurring-box'
+  ).classList.add('hidden');
+
+  document.getElementById(
+    'lesson-delete-menu'
+  )?.classList.remove('hidden');
+
+  document.getElementById(
+    'lesson-delete-dropdown'
+  )?.classList.add('hidden');
+
+  document.getElementById(
+    'lesson-modal-title'
+  ).textContent='Редактировать занятие';
+
+  showModal('lesson-modal');
+}
 function priceOptions(value){
   return String(value??40);
 }
