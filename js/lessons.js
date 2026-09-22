@@ -218,7 +218,8 @@ function openEditLesson(id){
 
   if(breakdown){
     if(l.group_id){
-      const members=studentsForLesson(l);
+      const members=lessonMembersFor(l);
+
 const parts=members.length
   ?members.map(m=>{
       const s=students.find(
