@@ -1085,7 +1085,25 @@ document.getElementById(
       'Не удалось войти';
   }
 }
+async function loginWithGoogle(){
 
+  const { error } =
+    await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+
+  if(error){
+    console.error(error);
+
+    document.getElementById(
+      'teacher-login-error'
+    ).textContent =
+      error.message;
+  }
+}
 async function teacherLogout(){
 
   await supabaseClient.auth.signOut();
