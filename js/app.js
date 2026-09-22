@@ -1091,7 +1091,7 @@ async function loginWithGoogle(){
     await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin
+        redirectTo:   'https://ttsnmrz-cmd.github.io/tutor-finance/'
       }
     });
 
