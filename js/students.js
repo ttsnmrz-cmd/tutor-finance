@@ -240,3 +240,52 @@ async function openStudentEdit(id){
 
   showModal('student-modal');
 }
+async function saveStudent(){
+  try{
+    const id=document.getElementById('student-edit-id').value;
+    const s=students.find(x=>String(x.id)===String(id));
+    const name=document.getElementById('student-edit-name').value.trim();
+    const email=document.getElementById('student-edit-email').value.trim()||null;
+    const telegram=document.getElementById('student-edit-telegram').value.trim()||null;
+    const price=Number(document.getElementById('student-edit-price').value);
+
+    if(!s||!name)return;
+
+    const old=s.name;
+
+    if(old!==name){
+      await db(
+        '/lessons?student=eq.'+encodeURIComponent(old),
+        {
+          method:'PATCH',
+          headers:{...headers,Prefer:'return=minimal'},
+          body:JSON.stringify({student:name})
+        }
+      );
+
+      await db(
+        '/payments?student=eq.'+encodeURIComponent(old),
+        {
+          method:'PATCH',
+          headers:{...headers,Prefer:'return=minimal'},
+          body:JSON.stringify({student:name})
+        }
+      );
+    }
+
+    await db(
+      '/students?id=eq.'+encodeURIComponent(id),
+      {
+        method:'PATCH',
+        headers:{...headers,Prefer:'return=minimal'},
+        body:JSON.stringify({name,price,email,telegram})
+      }
+    );
+
+    closeModal('student-modal');
+    await loadData();
+    renderStudents();
+  }catch(e){
+    showError(e);
+  }
+}
