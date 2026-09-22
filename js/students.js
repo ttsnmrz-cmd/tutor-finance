@@ -1000,6 +1000,17 @@ async function addStudent(){
       );
     }
 
+    const {
+      data: { user },
+      error: userError
+    } = await supabaseClient.auth.getUser();
+
+    if(userError || !user){
+      throw new Error(
+        'Пользователь не авторизован'
+      );
+    }
+
     await db(
       '/students',
       {
@@ -1014,7 +1025,8 @@ async function addStudent(){
           group_id:gid||null,
           archived:false,
           email,
-          telegram
+          telegram,
+          teacher_id:user.id
         })
       }
     );
@@ -1023,6 +1035,7 @@ async function addStudent(){
 
     await loadData();
     renderStudents();
+
   }catch(e){
     showError(e);
   }
