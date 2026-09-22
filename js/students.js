@@ -228,3 +228,15 @@ function studentLessonAttendance(l,s){
       ?'cancelled_free'
       :null;
 }
+async function openStudentEdit(id){
+  const s=students.find(x=>String(x.id)===String(id));
+  if(!s)return;
+
+  document.getElementById('student-edit-id').value=id;
+  document.getElementById('student-edit-name').value=s.name;
+  document.getElementById('student-edit-email').value=s.email||'';
+  document.getElementById('student-edit-telegram').value=s.telegram||'';
+  document.getElementById('student-edit-price').value=String(s.price??40);
+
+  showModal('student-modal');
+}
