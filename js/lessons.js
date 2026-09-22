@@ -265,3 +265,221 @@ async function saveGroupChargeExceptions(l){
     );
   }
 }
+async function saveLesson(){
+  try{
+    const id=document.getElementById('edit-id').value;
+    const student=document.getElementById('edit-student').value;
+    const date=document.getElementById('edit-date').value;
+    const time=getTime();
+
+    const duration=Number(
+      document.getElementById('edit-duration').value
+    );
+
+    const price=Number(
+      document.getElementById('edit-price').value
+    );
+
+    const status=document.getElementById('edit-status').value;
+
+    const comment=
+      document.getElementById('edit-comment').value.trim()||null;
+
+    if(
+      !student||
+      !date||
+      !Number.isFinite(duration)||
+      duration<=0
+    ){
+      return showError(
+        new Error(
+          'Заполните ученика, дату и длительность'
+        )
+      );
+    }
+
+    if(id){
+      const l=lessons.find(
+        x=>String(x.id)===String(id)
+      );
+
+      const groupId=l?.group_id||null;
+
+      if(groupId){
+        await db(
+          '/lessons?id=eq.'+
+          encodeURIComponent(id),
+          {
+            method:'PATCH',
+            headers:{
+              ...headers,
+              Prefer:'return=minimal'
+            },
+            body:JSON.stringify({
+              student:
+                groups.find(
+                  g=>String(g.id)===String(groupId)
+                )?.name||l.student,
+              date,
+              time,
+              price:l.price,
+              status,
+              duration,
+              comment
+            })
+          }
+        );
+
+        await saveGroupChargeExceptions(l);
+      }else{
+        await db(
+          '/lessons?id=eq.'+
+          encodeURIComponent(id),
+          {
+            method:'PATCH',
+            headers:{
+              ...headers,
+              Prefer:'return=minimal'
+            },
+            body:JSON.stringify({
+              student,
+              date,
+              time,
+              price,
+              status,
+              duration,
+              comment
+            })
+          }
+        );
+      }
+    }else{
+      const groupId=
+        student.startsWith('group:')
+          ?student.slice(6)
+          :null;
+
+      const group=groupId
+        ?groups.find(
+          g=>String(g.id)===String(groupId)
+        )
+        :null;
+
+      const targets=group
+        ?students.filter(
+          s=>
+            !s.archived&&
+            String(s.group_id)===String(groupId)
+        )
+        :[];
+
+      if(group&&!targets.length){
+        pendingEmptyGroupLesson={
+          groupId,
+          date,
+          time,
+          duration,
+          status,
+          comment,
+          recurring:
+            document.getElementById(
+              'edit-recurring'
+            ).checked,
+          days:[
+            ...document.querySelectorAll(
+              '.rec-day:checked'
+            )
+          ].map(x=>Number(x.value))
+        };
+
+        closeLessonModal();
+        openEmptyGroupMembersPicker(groupId);
+        return;
+      }
+
+      if(group){
+        if(
+          document.getElementById(
+            'edit-recurring'
+          ).checked
+        ){
+          let days=[
+            ...document.querySelectorAll(
+              '.rec-day:checked'
+            )
+          ].map(x=>Number(x.value));
+
+          if(!days.length){
+            days=[
+              new Date(
+                date+'T00:00:00'
+              ).getDay()
+            ];
+          }
+
+          let cur=new Date(
+            date+'T00:00:00'
+          );
+
+          for(let i=0;i<90;i++){
+            if(days.includes(cur.getDay())){
+              await createOneGroupLesson(
+                groupId,
+                localISO(cur),
+                time,
+                duration,
+                'pending',
+                targets,
+                comment
+              );
+            }
+
+            cur.setDate(
+              cur.getDate()+1
+            );
+          }
+        }else{
+          await createOneGroupLesson(
+            groupId,
+            date,
+            time,
+            duration,
+            status,
+            targets,
+            comment
+          );
+        }
+      }else{
+        await db(
+          '/lessons',
+          {
+            method:'POST',
+            headers:{
+              ...headers,
+              Prefer:'return=minimal'
+            },
+            body:JSON.stringify({
+              student,
+              date,
+              time,
+              price,
+              status,
+              duration,
+              comment
+            })
+          }
+        );
+      }
+    }
+
+    closeLessonModal();
+
+    await loadData();
+
+    renderWeek();
+    renderDay();
+
+  }catch(e){
+    showError(e);
+  }
+}
