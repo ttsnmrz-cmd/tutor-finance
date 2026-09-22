@@ -186,3 +186,82 @@ async function createOneGroupLesson(
 
   return lesson;
 }
+async function renderGroupChargeExceptions(l){
+  const box=document.getElementById(
+    'group-charge-exceptions'
+  );
+
+  const list=document.getElementById(
+    'group-charge-exceptions-list'
+  );
+
+  if(!box||!list)return;
+
+  if(!l||!l.group_id){
+    box.classList.add('hidden');
+    list.innerHTML='';
+    return;
+  }
+
+  const members=lessonMembersFor(l);
+
+  if(!members.length){
+    box.classList.add('hidden');
+    list.innerHTML='';
+    return;
+  }
+
+  box.classList.remove('hidden');
+
+  list.innerHTML=members.map(m=>{
+    const s=students.find(
+      x=>String(x.id)===String(m.student_id)
+    );
+
+    if(!s)return '';
+
+    const checked=m.charged!==false;
+
+    return '<label class="flex items-center justify-between gap-3 py-2 cursor-pointer">'+
+      '<span>'+
+      esc(s.name)+
+      ' <span class="text-xs text-slate-500">'+
+      money(m.price??s.price??0)+
+      '</span></span>'+
+      '<input type="checkbox" class="group-charge-checkbox w-4 h-4" data-member-id="'+
+      esc(m.id)+
+      '" '+
+      (checked?'checked':'')+
+      '>'+
+      '</label>';
+  }).join('');
+}
+
+async function saveGroupChargeExceptions(l){
+  if(!l?.group_id)return;
+
+  const boxes=[
+    ...document.querySelectorAll(
+      '.group-charge-checkbox'
+    )
+  ];
+
+  for(const box of boxes){
+    await db(
+      '/lesson_members?id=eq.'+
+      encodeURIComponent(
+        box.dataset.memberId
+      ),
+      {
+        method:'PATCH',
+        headers:{
+          ...headers,
+          Prefer:'return=minimal'
+        },
+        body:JSON.stringify({
+          charged:box.checked
+        })
+      }
+    );
+  }
+}
