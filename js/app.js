@@ -201,27 +201,6 @@ function lessonPriceTotal(l){
 
   return Number(l.price||0);
 }
-
-function studentGroup(id){
-  const s=students.find(
-    x=>String(x.id)===String(id)
-  );
-
-  return groups.find(
-    g=>String(g.id)===String(s?.group_id)
-  );
-}
-
-function balanceClass(b){
-  return b>50
-    ?'balance-green'
-    :b>0
-      ?'balance-orange'
-      :b<0
-        ?'balance-red'
-        :'bg-slate-50';
-}
-
 function switchTab(t){
   document
     .getElementById('tab-calendar')
