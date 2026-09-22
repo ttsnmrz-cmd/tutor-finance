@@ -213,3 +213,18 @@ async function setStudentAttendance(lessonId,studentId,status){
     showError(e);
   }
 }
+function studentLessonAttendance(l,s){
+  if(l.group_id){
+    const m=lessonMembers.find(
+      x=>String(x.lesson_id)===String(l.id)&&
+      String(x.student_id)===String(s.id)
+    );
+    return m?.attendance_status||null;
+  }
+
+  return l.status==='cancelled_charge'
+    ?'cancelled_charge'
+    :l.status==='cancelled_free'
+      ?'cancelled_free'
+      :null;
+}
