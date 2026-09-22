@@ -105,3 +105,84 @@ function getTime(){
     ':'+
     document.getElementById('edit-minute').value;
 }
+function toggleRecurring(){
+  document.getElementById(
+    'recurring-days'
+  ).classList.toggle(
+    'hidden',
+    !document.getElementById(
+      'edit-recurring'
+    ).checked
+  );
+}
+
+let pendingEmptyGroupLesson=null;
+
+async function createOneGroupLesson(
+  groupId,
+  date,
+  time,
+  duration,
+  status,
+  targets,
+  comment=null
+){
+  const group=groups.find(
+    g=>String(g.id)===String(groupId)
+  );
+
+  const total=targets.reduce(
+    (a,s)=>a+Number(s.price??0),
+    0
+  );
+
+  const data=await db(
+    '/lessons',
+    {
+      method:'POST',
+      headers:{
+        ...headers,
+        Prefer:'return=representation'
+      },
+      body:JSON.stringify({
+        student:group?.name||'',
+        group_id:groupId,
+        date,
+        time,
+        price:total,
+        status,
+        duration,
+        comment
+      })
+    }
+  );
+
+  const lesson=data?.[0];
+
+  if(!lesson){
+    throw new Error(
+      'Не удалось создать групповое занятие'
+    );
+  }
+
+  for(const st of targets){
+    await db(
+      '/lesson_members',
+      {
+        method:'POST',
+        headers:{
+          ...headers,
+          Prefer:'return=minimal'
+        },
+        body:JSON.stringify({
+          lesson_id:lesson.id,
+          student_id:st.id,
+          price:Number(st.price??0),
+          charged:true
+        })
+      }
+    );
+  }
+
+  return lesson;
+}
