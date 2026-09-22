@@ -1,6 +1,14 @@
-const headers={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
-const {createClient}=supabase;
-createClient(SUPABASE_URL,SUPABASE_KEY);
+const { createClient } = supabase;
+
+const supabaseClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let headers = {
+  apikey: SUPABASE_KEY,
+  'Content-Type': 'application/json'
+};
 
 let students=[],lessons=[],payments=[],groups=[],lessonMembers=[],selectedDate=localISO(new Date()),weekAnchor=new Date();
 
