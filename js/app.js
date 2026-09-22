@@ -349,19 +349,6 @@ function addStudentToCurrentLessonGroup(){
 
   showModal('group-choice-modal');
 }
-function toggleRecurring(){
-  document.getElementById(
-    'recurring-days'
-  ).classList.toggle(
-    'hidden',
-    !document.getElementById(
-      'edit-recurring'
-    ).checked
-  );
-}
-
-let pendingEmptyGroupLesson=null;
-
 async function createOneGroupLesson(
   groupId,
   date,
