@@ -1,4 +1,3 @@
-const SUPABASE_URL='https://dmasuczggcxzrxasgoov.supabase.co',SUPABASE_KEY='sb_publishable_nXL_z4-dtwKcGXmMAXgJSg_v1Op_W1q',API=SUPABASE_URL+'/rest/v1';
 const headers={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 const {createClient}=supabase; createClient(SUPABASE_URL,SUPABASE_KEY);
 let students=[],lessons=[],payments=[],groups=[],lessonMembers=[],selectedDate=localISO(new Date()),weekAnchor=new Date();
