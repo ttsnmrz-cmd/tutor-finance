@@ -1275,8 +1275,8 @@ async function openStudentCabinet(){
         .sort((a,b)=>String(b.date).localeCompare(String(a.date)))
         .map(p=>
           '<div class="flex justify-between border-b border-slate-200 py-1">'+
-            '<span>'+esc(p.date)+'</span>'+\
-            '<b class="text-emerald-600">+'+money(p.amount)+'</b>'+\
+            '<span>'+esc(p.date)+'</span>'+
+            '<b class="text-emerald-600">+'+money(p.amount)+'</b>'+
           '</div>'
         ).join('')||
       '<span class="text-slate-400">Пополнений нет</span>';
@@ -1284,17 +1284,17 @@ async function openStudentCabinet(){
     document.getElementById('public-lessons').innerHTML=
       visible.map(l=>
         '<div class="rounded-2xl border border-slate-200 p-3 flex justify-between items-center gap-3">'+
-          '<div>'+\
-            '<div class="font-semibold">'+esc(l.date)+'</div>'+\
-            '<div class="text-xs text-slate-500">'+\
-              esc(displayTime(l.time))+' · '+\
-              (l.duration||60)+' мин · '+\
-              money(l.price)+\
-            '</div>'+\
-          '</div>'+\
-          '<span class="status '+(statusClass[l.status]||'bg-slate-100 text-slate-700')+' whitespace-nowrap">'+\
-            (statusLabels[l.status]||l.status)+\
-          '</span>'+\
+          '<div>'+
+            '<div class="font-semibold">'+esc(l.date)+'</div>'+
+            '<div class="text-xs text-slate-500">'+
+              esc(displayTime(l.time))+' · '+
+              (l.duration||60)+' мин · '+
+              money(l.price)+
+            '</div>'+
+          '</div>'+
+          '<span class="status '+(statusClass[l.status]||'bg-slate-100 text-slate-700')+' whitespace-nowrap">'+
+            (statusLabels[l.status]||l.status)+
+          '</span>'+
         '</div>'
       ).join('')||
       '<span class="text-slate-400">Занятий нет</span>';
