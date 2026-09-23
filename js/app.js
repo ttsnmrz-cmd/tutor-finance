@@ -1112,6 +1112,8 @@ async function teacherLogout(){
 }
 
 let publicStudent=null;
+let publicStudentLessons=[];
+let publicStudentPayments=[];
 
 async function initPublicStudent(){
   const id=new URLSearchParams(
@@ -1125,13 +1127,35 @@ async function initPublicStudent(){
     .classList.remove('hidden');
 
   try{
-    const d=await db(
-      '/students?id=eq.'+
-      encodeURIComponent(id)+
-      '&select=id,name,price,group_id,archived'
+    const response=await fetch(
+      API+'/rpc/get_public_student_cabinet',
+      {
+        method:'POST',
+        headers:{
+          ...headers,
+          Prefer:'return=representation'
+        },
+        body:JSON.stringify({
+          p_student_id:id
+        })
+      }
     );
 
-    publicStudent=d?.[0];
+    const text=await response.text();
+
+    if(!response.ok){
+      throw new Error(
+        text||response.statusText
+      );
+    }
+
+    const data=text.trim()
+      ?JSON.parse(text)
+      :null;
+
+    publicStudent=data?.student||null;
+    publicStudentLessons=data?.lessons||[];
+    publicStudentPayments=data?.payments||[];
 
     if(publicStudent){
       document.getElementById(
@@ -1152,7 +1176,8 @@ async function initPublicStudent(){
   }catch(e){
     document.getElementById(
       'student-public-error'
-    ).textContent=e.message;
+    ).textContent=
+      e.message||'Не удалось открыть кабинет';
   }
 
   return true;
@@ -1162,17 +1187,8 @@ async function openStudentCabinet(){
   if(!publicStudent)return;
 
   try{
-    const ls=await db(
-      '/lessons?student=eq.'+
-      encodeURIComponent(publicStudent.name)+
-      '&select=id,date,time,price,status,duration'
-    );
-
-    const ps=await db(
-      '/payments?student=eq.'+
-      encodeURIComponent(publicStudent.name)+
-      '&select=amount,date'
-    );
+    const ls=publicStudentLessons||[];
+    const ps=publicStudentPayments||[];
 
     const paid=ps.reduce(
       (a,p)=>a+Number(p.amount||0),
@@ -1183,13 +1199,8 @@ async function openStudentCabinet(){
       .filter(l=>charge.has(l.status))
       .sort(
         (a,b)=>
-          (
-            String(b.date)+
-            String(b.time)
-          ).localeCompare(
-            String(a.date)+
-            String(a.time)
-          )
+          (String(b.date)+String(b.time))
+            .localeCompare(String(a.date)+String(a.time))
       );
 
     const spent=charges.reduce(
@@ -1199,186 +1210,104 @@ async function openStudentCabinet(){
 
     const now=new Date();
     const today=localISO(now);
-
     const nowTime=
-      String(now.getHours()).padStart(2,'0')+
-      ':'+
+      String(now.getHours()).padStart(2,'0')+':' +
       String(now.getMinutes()).padStart(2,'0');
 
     const future=ls
       .filter(
-        l=>
-          l.status==='pending'&&
-          (
-            l.date>today||
-            (
-              l.date===today&&
-              String(l.time||'23:59')
-                .slice(0,5)>=nowTime
-            )
+        l=>l.status==='pending'&&(
+          l.date>today||(
+            l.date===today&&
+            String(l.time||'23:59').slice(0,5)>=nowTime
           )
+        )
       )
       .sort(
-        (a,b)=>
-          (
-            String(a.date)+
-            String(a.time)
-          ).localeCompare(
-            String(b.date)+
-            String(b.time)
-          )
+        (a,b)=>(String(a.date)+String(a.time))
+          .localeCompare(String(b.date)+String(b.time))
       );
 
     const upcoming=future.slice(0,5);
-
-    const cutoff=
-      upcoming.length
-        ?upcoming[upcoming.length-1].date
-        :null;
+    const cutoff=upcoming.length
+      ?upcoming[upcoming.length-1].date
+      :null;
 
     const visible=ls
-      .filter(
-        l=>!cutoff||l.date<=cutoff
-      )
+      .filter(l=>!cutoff||l.date<=cutoff)
       .sort(
-        (a,b)=>
-          (
-            String(a.date)+
-            String(a.time)
-          ).localeCompare(
-            String(b.date)+
-            String(b.time)
-          )
+        (a,b)=>(String(a.date)+String(a.time))
+          .localeCompare(String(b.date)+String(b.time))
       );
 
-    document.getElementById(
-      'public-student-title'
-    ).textContent=
+    document.getElementById('public-student-title').textContent=
       publicStudent.name;
-
-    document.getElementById(
-      'public-student-meta'
-    ).textContent=
-      'Стоимость занятия: '+
+    document.getElementById('public-student-meta').textContent=
+      'Стоимость занятия: '+money(publicStudent.price||0);
+    document.getElementById('public-paid').textContent=money(paid);
+    document.getElementById('public-spent').textContent=money(spent);
+    document.getElementById('public-balance').textContent=money(paid-spent);
+    document.getElementById('public-conducted').textContent=
+      ls.filter(l=>l.status==='conducted').length;
+    document.getElementById('public-price').textContent=
       money(publicStudent.price||0);
 
-    document.getElementById(
-      'public-paid'
-    ).textContent=
-      money(paid);
-
-    document.getElementById(
-      'public-spent'
-    ).textContent=
-      money(spent);
-
-    document.getElementById(
-      'public-balance'
-    ).textContent=
-      money(paid-spent);
-
-    document.getElementById(
-      'public-conducted'
-    ).textContent=
-      ls.filter(
-        l=>l.status==='conducted'
-      ).length;
-
-    document.getElementById(
-      'public-price'
-    ).textContent=
-      money(publicStudent.price||0);
-
-    const topups=ps.sort(
-      (a,b)=>
-        String(b.date).localeCompare(
-          String(a.date)
-        )
-    );
-
-    document.getElementById(
-      'public-payments'
-    ).innerHTML=
-      topups.map(
-        p=>
-          `<div class="flex justify-between border-b border-slate-200 py-1">
-            <span>${esc(p.date)}</span>
-            <b class="text-emerald-600">+${money(p.amount)}</b>
-          </div>`
-      ).join('')||
+    document.getElementById('public-payments').innerHTML=
+      ps.slice()
+        .sort((a,b)=>String(b.date).localeCompare(String(a.date)))
+        .map(p=>
+          '<div class="flex justify-between border-b border-slate-200 py-1">'+
+            '<span>'+esc(p.date)+'</span>'+\
+            '<b class="text-emerald-600">+'+money(p.amount)+'</b>'+\
+          '</div>'
+        ).join('')||
       '<span class="text-slate-400">Пополнений нет</span>';
 
-    document.getElementById(
-      'public-lessons'
-    ).innerHTML=
-      visible.map(
-        l=>
-          `<div class="rounded-2xl border border-slate-200 p-3 flex justify-between items-center gap-3">
-            <div>
-              <div class="font-semibold">${esc(l.date)}</div>
-              <div class="text-xs text-slate-500">
-                ${esc(displayTime(l.time))} ·
-                ${l.duration||60} мин ·
-                ${money(l.price)}
-              </div>
-            </div>
-
-            <span class="status ${statusClass[l.status]||'bg-slate-100 text-slate-700'} whitespace-nowrap">
-              ${statusLabels[l.status]||l.status}
-            </span>
-          </div>`
+    document.getElementById('public-lessons').innerHTML=
+      visible.map(l=>
+        '<div class="rounded-2xl border border-slate-200 p-3 flex justify-between items-center gap-3">'+
+          '<div>'+\
+            '<div class="font-semibold">'+esc(l.date)+'</div>'+\
+            '<div class="text-xs text-slate-500">'+\
+              esc(displayTime(l.time))+' · '+\
+              (l.duration||60)+' мин · '+\
+              money(l.price)+\
+            '</div>'+\
+          '</div>'+\
+          '<span class="status '+(statusClass[l.status]||'bg-slate-100 text-slate-700')+' whitespace-nowrap">'+\
+            (statusLabels[l.status]||l.status)+\
+          '</span>'+\
+        '</div>'
       ).join('')||
       '<span class="text-slate-400">Занятий нет</span>';
 
-    document.getElementById(
-      'student-public-login'
-    ).classList.add('hidden');
+    document.getElementById('student-public-login').classList.add('hidden');
+    document.getElementById('student-public-content').classList.remove('hidden');
 
-    document.getElementById(
-      'student-public-content'
-    ).classList.remove('hidden');
-
-    const box=document.getElementById(
-      'public-lessons'
-    );
-
+    const box=document.getElementById('public-lessons');
     const target=
-      visible.find(
-        l=>
-          l.date>today||
-          (
-            l.date===today&&
-            String(l.time||'23:59')
-              .slice(0,5)>=nowTime
-          )
-      )||
-      visible[visible.length-1];
+      visible.find(l=>
+        l.date>today||(
+          l.date===today&&
+          String(l.time||'23:59').slice(0,5)>=nowTime
+        )
+      )||visible[visible.length-1];
 
     if(target){
-      const el=[
-        ...box.children
-      ].find(
-        x=>
-          x.querySelector(
-            '.font-semibold'
-          )?.textContent===target.date
+      const el=[...box.children].find(
+        x=>x.querySelector('.font-semibold')?.textContent===target.date
       );
 
       if(el){
-        box.scrollTop=
-          Math.max(
-            0,
-            el.offsetTop-
-            box.offsetTop-
-            12
-          );
+        box.scrollTop=Math.max(
+          0,
+          el.offsetTop-box.offsetTop-12
+        );
       }
     }
 
   }catch(e){
-    document.getElementById(
-      'student-public-error'
-    ).textContent=e.message;
+    document.getElementById('student-public-error').textContent=e.message;
   }
 }
 
