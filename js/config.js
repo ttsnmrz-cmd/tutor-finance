@@ -27,7 +27,153 @@ function authLoginForm(){
   authClose('teacher-signup-modal');
   authClose('teacher-reset-modal');
   authClose('teacher-password-modal');
-  authOpen('teacher-login-modal');
+  authOpenLoginCard();
+}
+
+function authOpenLoginCard(){
+  const el = document.getElementById('teacher-login-modal');
+  if(!el) return;
+  el.classList.remove('hidden');
+  el.classList.add('flex');
+}
+
+function authAddLanding(){
+  if(document.getElementById('public-landing')) return;
+  if(new URLSearchParams(location.search).get('student')) return;
+
+  document.body.insertAdjacentHTML('afterbegin', `
+    <div id="public-landing" class="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+      <div class="absolute -top-32 -right-24 w-80 h-80 rounded-full bg-indigo-200/40 blur-3xl pointer-events-none"></div>
+      <div class="absolute top-72 -left-32 w-72 h-72 rounded-full bg-violet-200/30 blur-3xl pointer-events-none"></div>
+
+      <header class="relative z-10 max-w-6xl mx-auto px-5 md:px-8 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="ProfoProfit_logo svg.svg" alt="ProfiProfit" class="w-11 h-11 object-contain rounded-xl">
+          <div>
+            <div class="font-bold text-lg leading-tight">ProfiProfit</div>
+            <div class="text-xs text-slate-500">Финансы преподавателя</div>
+          </div>
+        </div>
+        <button type="button" onclick="authFocusLogin()" class="px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-sm font-semibold hover:bg-slate-50 transition">Войти</button>
+      </header>
+
+      <main class="relative z-10 max-w-6xl mx-auto px-5 md:px-8 pt-8 md:pt-16 pb-16">
+        <div class="grid lg:grid-cols-[1.08fr_.92fr] gap-10 lg:gap-16 items-center">
+          <section>
+            <div class="inline-flex items-center gap-2 rounded-full bg-indigo-50 border border-indigo-100 px-3 py-1.5 text-sm font-semibold text-indigo-700 mb-5">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              Всё для работы преподавателя
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-slate-900 leading-[1.05]">
+              Меньше таблиц.<br>
+              <span class="text-indigo-600">Больше времени</span> на учеников.
+            </h1>
+            <p class="mt-6 text-lg md:text-xl text-slate-600 max-w-2xl leading-relaxed">
+              ProfiProfit помогает преподавателям вести занятия, контролировать оплаты и видеть баланс каждого ученика — в одном удобном месте.
+            </p>
+            <div class="mt-8 flex flex-col sm:flex-row gap-3">
+              <button type="button" onclick="authStartSignup()" class="primary-btn px-6 py-3 rounded-xl font-semibold text-base shadow-lg shadow-indigo-200">
+                Начать бесплатно
+              </button>
+              <button type="button" onclick="authFocusLogin()" class="px-6 py-3 rounded-xl font-semibold text-base bg-white border border-slate-200 hover:bg-slate-50 transition">
+                Уже есть аккаунт → Войти
+              </button>
+            </div>
+            <div class="mt-5 text-sm text-slate-500">Email и пароль или быстрый вход через Google.</div>
+          </section>
+
+          <section id="landing-login-anchor" class="relative">
+            <div class="absolute -inset-4 bg-indigo-200/30 blur-2xl rounded-[2rem]"></div>
+            <div class="relative bg-white/90 backdrop-blur rounded-[2rem] border border-white shadow-2xl shadow-slate-300/40 p-2">
+              <div class="rounded-[1.6rem] bg-slate-50 p-5 md:p-6">
+                <div class="mb-4">
+                  <div class="text-xs uppercase tracking-[.18em] text-indigo-500 font-semibold">ProfiProfit</div>
+                  <h2 class="text-2xl font-bold mt-1">Войдите в свой аккаунт</h2>
+                  <p class="text-sm text-slate-500 mt-1">Управляйте занятиями и оплатами без лишних таблиц.</p>
+                </div>
+                <div id="landing-login-placeholder"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="mt-20 md:mt-28">
+          <div class="text-center max-w-2xl mx-auto">
+            <div class="text-sm font-semibold text-indigo-600">Всё в одном месте</div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mt-2">Простая система для ежедневной работы</h2>
+            <p class="text-slate-500 mt-4">Не нужно держать в голове, кто оплатил, какое занятие перенесли и сколько осталось у ученика.</p>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4 mt-8">
+            <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+              <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center text-xl mb-4">📅</div>
+              <h3 class="font-bold text-lg">Занятия</h3>
+              <p class="text-sm text-slate-500 mt-2 leading-relaxed">Календарь, статусы занятий, переносы и отмены — всё видно в одном месте.</p>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+              <div class="w-11 h-11 rounded-2xl bg-emerald-50 flex items-center justify-center text-xl mb-4">💰</div>
+              <h3 class="font-bold text-lg">Оплаты и баланс</h3>
+              <p class="text-sm text-slate-500 mt-2 leading-relaxed">Вносите платежи и сразу видите, сколько занятий оплачено и какой баланс у ученика.</p>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+              <div class="w-11 h-11 rounded-2xl bg-violet-50 flex items-center justify-center text-xl mb-4">👩‍🎓</div>
+              <h3 class="font-bold text-lg">Ученики</h3>
+              <p class="text-sm text-slate-500 mt-2 leading-relaxed">Профили учеников, группы, стоимость занятий и история — всё организовано.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-16 md:mt-20 rounded-[2rem] bg-slate-900 text-white p-8 md:p-12 text-center">
+          <h2 class="text-3xl md:text-4xl font-bold">Готовы перестать считать всё вручную?</h2>
+          <p class="text-slate-300 mt-3 max-w-xl mx-auto">Создайте аккаунт и попробуйте ProfiProfit в своей работе.</p>
+          <button type="button" onclick="authStartSignup()" class="mt-6 px-6 py-3 rounded-xl bg-white text-slate-900 font-semibold hover:bg-slate-100 transition">Начать бесплатно</button>
+        </section>
+      </main>
+
+      <footer class="relative z-10 max-w-6xl mx-auto px-5 md:px-8 py-8 text-sm text-slate-400 flex flex-col sm:flex-row justify-between gap-2">
+        <span>© ProfiProfit</span>
+        <span>Занятия · Ученики · Оплаты</span>
+      </footer>
+    </div>
+  `);
+}
+
+function authPlaceLoginCard(){
+  const login = document.getElementById('teacher-login-modal');
+  const placeholder = document.getElementById('landing-login-placeholder');
+  if(!login || !placeholder || login.dataset.landingPlaced==='true') return;
+
+  login.dataset.landingPlaced='true';
+  login.className='!static !inset-auto !z-auto !bg-transparent !p-0 flex';
+  login.style.cssText='display:flex !important; position:static;';
+  placeholder.appendChild(login);
+
+  const inner=login.firstElementChild;
+  if(inner){
+    inner.classList.remove('w-full','max-w-sm','p-6');
+    inner.classList.add('w-full','p-0','bg-transparent','shadow-none');
+  }
+}
+
+function authShowLanding(){
+  const landing=document.getElementById('public-landing');
+  if(landing) landing.classList.remove('hidden');
+}
+
+function authHideLanding(){
+  const landing=document.getElementById('public-landing');
+  if(landing) landing.classList.add('hidden');
+}
+
+function authFocusLogin(){
+  authShowLanding();
+  document.getElementById('landing-login-anchor')?.scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('teacher-email-input')?.focus();
+}
+
+function authStartSignup(){
+  authShowLanding();
+  document.getElementById('teacher-signup-modal')?.classList.remove('hidden');
+  document.getElementById('teacher-signup-modal')?.classList.add('flex');
 }
 
 function authAddModals(){
@@ -147,16 +293,14 @@ async function teacherSignUp(){
 
       authClose('teacher-signup-modal');
       document.getElementById('teacher-app')?.classList.remove('hidden');
+      authHideLanding();
       await loadData();
       renderWeek();
       renderDay();
       return;
     }
 
-    authSetError(
-      'teacher-signup-message',
-      'Регистрация создана. Проверьте почту и перейдите по ссылке подтверждения.'
-    );
+    authSetError('teacher-signup-message','Регистрация создана. Проверьте почту и перейдите по ссылке подтверждения.');
   }catch(e){
     console.error(e);
     authSetError('teacher-signup-message', e.message || 'Не удалось зарегистрироваться');
@@ -178,10 +322,7 @@ async function sendPasswordReset(){
 
     if(error) throw error;
 
-    authSetError(
-      'teacher-reset-message',
-      'Если такой аккаунт существует, письмо для восстановления отправлено на указанный email.'
-    );
+    authSetError('teacher-reset-message','Если такой аккаунт существует, письмо для восстановления отправлено на указанный email.');
   }catch(e){
     console.error(e);
     authSetError('teacher-reset-message', e.message || 'Не удалось отправить письмо');
@@ -223,21 +364,30 @@ async function updateTeacherPassword(){
 }
 
 function authSetup(){
+  authAddLanding();
   authAddModals();
+  authPlaceLoginCard();
 
   if(typeof supabaseClient === 'undefined') return;
 
-  supabaseClient.auth.onAuthStateChange((event)=>{
+  supabaseClient.auth.onAuthStateChange((event, session)=>{
     if(event === 'PASSWORD_RECOVERY'){
+      authHideLanding();
       authClose('teacher-login-modal');
       authClose('teacher-signup-modal');
       authClose('teacher-reset-modal');
       authOpen('teacher-password-modal');
+      return;
+    }
+
+    if(session && session.user){
+      authHideLanding();
     }
   });
 
   if(location.hash.includes('type=recovery')){
     setTimeout(()=>{
+      authHideLanding();
       authClose('teacher-login-modal');
       authOpen('teacher-password-modal');
     },300);
