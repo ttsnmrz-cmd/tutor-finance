@@ -1116,223 +1116,200 @@ let publicStudentLessons=[];
 let publicStudentPayments=[];
 
 async function initPublicStudent(){
-  const id=new URLSearchParams(
-    location.search
-  ).get('student');
+  const id=new URLSearchParams(location.search).get('student');
 
   if(!id)return false;
 
-  document
-    .getElementById('student-public-view')
-    .classList.remove('hidden');
+  const view=document.getElementById('student-public-view');
+  const login=document.getElementById('student-public-login');
+  const content=document.getElementById('student-public-content');
+  const nameEl=document.getElementById('student-public-name');
+  const errorEl=document.getElementById('student-public-error');
+
+  view.classList.remove('hidden');
+  nameEl.textContent='Загрузка...';
+  errorEl.textContent='';
 
   try{
-    const response=await fetch(
-      API+'/rpc/get_public_student_cabinet',
-      {
-        method:'POST',
-        headers:{
-          ...headers,
-          Prefer:'return=representation'
-        },
-        body:JSON.stringify({
-          p_student_id:id
-        })
-      }
+    // Use the Supabase client directly. This avoids relying on the mutable
+    // REST headers used by the teacher session.
+    const {data,error}=await supabaseClient.rpc(
+      'get_public_student_cabinet',
+      {p_student_id:id}
     );
 
-    const text=await response.text();
+    if(error)throw error;
 
-    if(!response.ok){
-      throw new Error(
-        text||response.statusText
-      );
-    }
+    const raw=data;
+    const result=Array.isArray(raw)?(raw[0]||null):raw;
 
-    const raw=text.trim()
-      ?JSON.parse(text)
-      :null;
-
-    // PostgREST returns a JSON scalar/object for this SQL function.
-    // Be tolerant of a one-row array as well, so a schema/cache mismatch
-    // cannot silently make the public cabinet look empty.
-    const data=Array.isArray(raw)?(raw[0]||null):raw;
-
-    publicStudent=data?.student||null;
-    publicStudentLessons=Array.isArray(data?.lessons)
-      ?data.lessons
+    publicStudent=result?.student||null;
+    publicStudentLessons=Array.isArray(result?.lessons)
+      ?result.lessons
       :[];
-    publicStudentPayments=Array.isArray(data?.payments)
-      ?data.payments
+    publicStudentPayments=Array.isArray(result?.payments)
+      ?result.payments
       :[];
 
-    if(publicStudent){
-      document.getElementById(
-        'student-public-name'
-      ).textContent=
-        'Ученик: '+publicStudent.name;
-
-      document.getElementById(
-        'student-public-error'
-      ).textContent='';
-    }else{
-      document.getElementById(
-        'student-public-name'
-      ).textContent=
-        'Ученик не найден';
-
-      document.getElementById(
-        'student-public-error'
-      ).textContent=
-        'Не удалось найти данные ученика по этой ссылке.';
+    if(!publicStudent){
+      nameEl.textContent='Ученик не найден';
+      errorEl.textContent='Проверьте ссылку ученика.';
+      return true;
     }
 
-    if(!publicStudent)return true;
-
+    nameEl.textContent='Ученик: '+publicStudent.name;
     await openStudentCabinet();
 
   }catch(e){
-    document.getElementById(
-      'student-public-error'
-    ).textContent=
-      e.message||'Не удалось открыть кабинет';
+    console.error('Public cabinet error:',e);
+    nameEl.textContent='Личный кабинет';
+    errorEl.textContent=
+      e?.message||'Не удалось загрузить данные ученика.';
   }
 
   return true;
 }
 
 async function openStudentCabinet(){
-  if(!publicStudent || !publicStudent.name)return;
+  if(!publicStudent)return;
 
-  try{
-    const ls=publicStudentLessons||[];
-    const ps=publicStudentPayments||[];
+  const ls=publicStudentLessons||[];
+  const ps=publicStudentPayments||[];
 
-    const paid=ps.reduce(
-      (a,p)=>a+Number(p.amount||0),
+  const paid=ps.reduce(
+    (sum,p)=>sum+Number(p.amount||0),
+    0
+  );
+
+  const spent=ls
+    .filter(l=>charge.has(l.status))
+    .reduce(
+      (sum,l)=>sum+Number(l.price||0),
       0
     );
 
-    const spent=ls
-      .filter(l=>charge.has(l.status))
-      .reduce(
-        (a,l)=>a+Number(l.price||0),
-        0
-      );
+  const now=new Date();
+  const today=localISO(now);
+  const nowTime=
+    String(now.getHours()).padStart(2,'0')+':' +
+    String(now.getMinutes()).padStart(2,'0');
 
-    const now=new Date();
-    const today=localISO(now);
-    const nowTime=
-      String(now.getHours()).padStart(2,'0')+':' +
-      String(now.getMinutes()).padStart(2,'0');
-
-    const future=ls
-      .filter(
-        l=>l.status==='pending'&&(
-          l.date>today||
-          (
-            l.date===today&&
-            String(l.time||'23:59').slice(0,5)>=nowTime
-          )
-        )
-      )
-      .sort(
-        (a,b)=>
-          (String(a.date)+String(a.time))
-            .localeCompare(String(b.date)+String(b.time))
-      );
-
-    const upcoming=future.slice(0,5);
-    const cutoff=upcoming.length
-      ?upcoming[upcoming.length-1].date
-      :null;
-
-    const visible=ls
-      .filter(l=>!cutoff||l.date<=cutoff)
-      .sort(
-        (a,b)=>
-          (String(a.date)+String(a.time))
-            .localeCompare(String(b.date)+String(b.time))
-      );
-
-    document.getElementById('public-student-title').textContent=
-      publicStudent.name;
-    document.getElementById('public-student-meta').textContent=
-      'Стоимость занятия: '+money(publicStudent.price||0);
-    document.getElementById('public-paid').textContent=money(paid);
-    document.getElementById('public-spent').textContent=money(spent);
-    document.getElementById('public-balance').textContent=
-      money(paid-spent);
-    document.getElementById('public-conducted').textContent=
-      ls.filter(l=>l.status==='conducted').length;
-    document.getElementById('public-price').textContent=
-      money(publicStudent.price||0);
-
-    document.getElementById('public-payments').innerHTML=
-      ps.slice()
-        .sort((a,b)=>String(b.date).localeCompare(String(a.date)))
-        .map(p=>
-          '<div class="flex justify-between border-b border-slate-200 py-1">'+
-            '<span>'+esc(p.date)+'</span>'+
-            '<b class="text-emerald-600">+'+money(p.amount)+'</b>'+
-          '</div>'
-        ).join('')||
-      '<span class="text-slate-400">Пополнений нет</span>';
-
-    document.getElementById('public-lessons').innerHTML=
-      visible.map(l=>
-        '<div class="rounded-2xl border border-slate-200 p-3 flex justify-between items-center gap-3">'+
-          '<div>'+
-            '<div class="font-semibold">'+esc(l.date)+'</div>'+
-            '<div class="text-xs text-slate-500">'+
-              esc(displayTime(l.time))+' · '+
-              (l.duration||60)+' мин · '+
-              money(l.price)+
-            '</div>'+
-          '</div>'+
-          '<span class="status '+
-            (statusClass[l.status]||
-              'bg-slate-100 text-slate-700')+
-            ' whitespace-nowrap">'+
-            (statusLabels[l.status]||l.status)+
-          '</span>'+
-        '</div>'
-      ).join('')||
-      '<span class="text-slate-400">Занятий нет</span>';
-
-    document.getElementById('student-public-login')
-      .classList.add('hidden');
-    document.getElementById('student-public-content')
-      .classList.remove('hidden');
-
-    const box=document.getElementById('public-lessons');
-    const target=
-      visible.find(l=>
+  const future=ls
+    .filter(
+      l=>l.status==='pending'&&(
         l.date>today||
         (
           l.date===today&&
           String(l.time||'23:59').slice(0,5)>=nowTime
         )
-      )||visible[visible.length-1];
+      )
+    )
+    .sort(
+      (a,b)=>
+        (String(a.date)+String(a.time))
+          .localeCompare(String(b.date)+String(b.time))
+    );
 
-    if(target){
-      const el=[...box.children].find(
-        x=>x.querySelector('.font-semibold')?.textContent===target.date
+  const upcoming=future.slice(0,5);
+  const cutoff=upcoming.length
+    ?upcoming[upcoming.length-1].date
+    :null;
+
+  const visible=ls
+    .filter(l=>!cutoff||l.date<=cutoff)
+    .sort(
+      (a,b)=>
+        (String(a.date)+String(a.time))
+          .localeCompare(String(b.date)+String(b.time))
+    );
+
+  document.getElementById('public-student-title').textContent=
+    publicStudent.name;
+  document.getElementById('public-student-meta').textContent=
+    'Стоимость занятия: '+money(publicStudent.price||0);
+  document.getElementById('public-paid').textContent=money(paid);
+  document.getElementById('public-spent').textContent=money(spent);
+  document.getElementById('public-balance').textContent=
+    money(paid-spent);
+  document.getElementById('public-conducted').textContent=
+    ls.filter(l=>l.status==='conducted').length;
+  document.getElementById('public-price').textContent=
+    money(publicStudent.price||0);
+
+  document.getElementById('public-payments').innerHTML=
+    ps
+      .slice()
+      .sort(
+        (a,b)=>
+          String(b.date).localeCompare(String(a.date))
+      )
+      .map(
+        p=>
+          '<div class="flex justify-between border-b border-slate-200 py-1">'+
+            '<span>'+esc(p.date)+'</span>'+
+            '<b class="text-emerald-600">+'+
+              money(p.amount)+
+            '</b>'+
+          '</div>'
+      )
+      .join('')||
+    '<span class="text-slate-400">Пополнений нет</span>';
+
+  document.getElementById('public-lessons').innerHTML=
+    visible
+      .map(
+        l=>
+          '<div class="rounded-2xl border border-slate-200 p-3 flex justify-between items-center gap-3">'+
+            '<div>'+
+              '<div class="font-semibold">'+esc(l.date)+'</div>'+
+              '<div class="text-xs text-slate-500">'+
+                esc(displayTime(l.time))+' · '+
+                (l.duration||60)+' мин · '+
+                money(l.price)+
+              '</div>'+
+            '</div>'+
+            '<span class="status '+
+              (statusClass[l.status]||
+                'bg-slate-100 text-slate-700')+
+              ' whitespace-nowrap">'+
+              (statusLabels[l.status]||l.status)+
+            '</span>'+
+          '</div>'
+      )
+      .join('')||
+    '<span class="text-slate-400">Занятий нет</span>';
+
+  document.getElementById('student-public-login')
+    .classList.add('hidden');
+  document.getElementById('student-public-content')
+    .classList.remove('hidden');
+
+  const box=document.getElementById('public-lessons');
+  const target=
+    visible.find(
+      l=>
+        l.date>today||
+        (
+          l.date===today&&
+          String(l.time||'23:59').slice(0,5)>=nowTime
+        )
+    )||
+    visible[visible.length-1];
+
+  if(target){
+    const el=[...box.children].find(
+      x=>x.querySelector('.font-semibold')?.textContent===target.date
+    );
+
+    if(el){
+      box.scrollTop=Math.max(
+        0,
+        el.offsetTop-box.offsetTop-12
       );
-
-      if(el){
-        box.scrollTop=Math.max(
-          0,
-          el.offsetTop-box.offsetTop-12
-        );
-      }
     }
-
-  }catch(e){
-    document.getElementById('student-public-error').textContent=
-      e.message;
   }
 }
+
   async function initApp(){
 
   if(await initPublicStudent())return;
