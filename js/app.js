@@ -1213,18 +1213,12 @@ async function openStudentCabinet(){
       0
     );
 
-    const charges=ls
+    const spent=ls
       .filter(l=>charge.has(l.status))
-      .sort(
-        (a,b)=>
-          (String(b.date)+String(b.time))
-            .localeCompare(String(a.date)+String(a.time))
+      .reduce(
+        (a,l)=>a+Number(l.price||0),
+        0
       );
-
-    const spent=charges.reduce(
-      (a,l)=>a+Number(l.price||0),
-      0
-    );
 
     const now=new Date();
     const today=localISO(now);
@@ -1235,15 +1229,17 @@ async function openStudentCabinet(){
     const future=ls
       .filter(
         l=>l.status==='pending'&&(
-          l.date>today||(
+          l.date>today||
+          (
             l.date===today&&
             String(l.time||'23:59').slice(0,5)>=nowTime
           )
         )
       )
       .sort(
-        (a,b)=>(String(a.date)+String(a.time))
-          .localeCompare(String(b.date)+String(b.time))
+        (a,b)=>
+          (String(a.date)+String(a.time))
+            .localeCompare(String(b.date)+String(b.time))
       );
 
     const upcoming=future.slice(0,5);
@@ -1254,8 +1250,9 @@ async function openStudentCabinet(){
     const visible=ls
       .filter(l=>!cutoff||l.date<=cutoff)
       .sort(
-        (a,b)=>(String(a.date)+String(a.time))
-          .localeCompare(String(b.date)+String(b.time))
+        (a,b)=>
+          (String(a.date)+String(a.time))
+            .localeCompare(String(b.date)+String(b.time))
       );
 
     document.getElementById('public-student-title').textContent=
@@ -1264,7 +1261,8 @@ async function openStudentCabinet(){
       'Стоимость занятия: '+money(publicStudent.price||0);
     document.getElementById('public-paid').textContent=money(paid);
     document.getElementById('public-spent').textContent=money(spent);
-    document.getElementById('public-balance').textContent=money(paid-spent);
+    document.getElementById('public-balance').textContent=
+      money(paid-spent);
     document.getElementById('public-conducted').textContent=
       ls.filter(l=>l.status==='conducted').length;
     document.getElementById('public-price').textContent=
@@ -1292,20 +1290,26 @@ async function openStudentCabinet(){
               money(l.price)+
             '</div>'+
           '</div>'+
-          '<span class="status '+(statusClass[l.status]||'bg-slate-100 text-slate-700')+' whitespace-nowrap">'+
+          '<span class="status '+
+            (statusClass[l.status]||
+              'bg-slate-100 text-slate-700')+
+            ' whitespace-nowrap">'+
             (statusLabels[l.status]||l.status)+
           '</span>'+
         '</div>'
       ).join('')||
       '<span class="text-slate-400">Занятий нет</span>';
 
-    document.getElementById('student-public-login').classList.add('hidden');
-    document.getElementById('student-public-content').classList.remove('hidden');
+    document.getElementById('student-public-login')
+      .classList.add('hidden');
+    document.getElementById('student-public-content')
+      .classList.remove('hidden');
 
     const box=document.getElementById('public-lessons');
     const target=
       visible.find(l=>
-        l.date>today||(
+        l.date>today||
+        (
           l.date===today&&
           String(l.time||'23:59').slice(0,5)>=nowTime
         )
@@ -1325,10 +1329,10 @@ async function openStudentCabinet(){
     }
 
   }catch(e){
-    document.getElementById('student-public-error').textContent=e.message;
+    document.getElementById('student-public-error').textContent=
+      e.message;
   }
 }
-
   async function initApp(){
 
   if(await initPublicStudent())return;
