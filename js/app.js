@@ -1149,24 +1149,42 @@ async function initPublicStudent(){
       );
     }
 
-    const data=text.trim()
+    const raw=text.trim()
       ?JSON.parse(text)
       :null;
 
+    // PostgREST returns a JSON scalar/object for this SQL function.
+    // Be tolerant of a one-row array as well, so a schema/cache mismatch
+    // cannot silently make the public cabinet look empty.
+    const data=Array.isArray(raw)?(raw[0]||null):raw;
+
     publicStudent=data?.student||null;
-    publicStudentLessons=data?.lessons||[];
-    publicStudentPayments=data?.payments||[];
+    publicStudentLessons=Array.isArray(data?.lessons)
+      ?data.lessons
+      :[];
+    publicStudentPayments=Array.isArray(data?.payments)
+      ?data.payments
+      :[];
 
     if(publicStudent){
       document.getElementById(
         'student-public-name'
       ).textContent=
         'Ученик: '+publicStudent.name;
+
+      document.getElementById(
+        'student-public-error'
+      ).textContent='';
     }else{
       document.getElementById(
         'student-public-name'
       ).textContent=
         'Ученик не найден';
+
+      document.getElementById(
+        'student-public-error'
+      ).textContent=
+        'Не удалось найти данные ученика по этой ссылке.';
     }
 
     if(!publicStudent)return true;
