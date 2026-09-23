@@ -1184,7 +1184,7 @@ async function initPublicStudent(){
 }
 
 async function openStudentCabinet(){
-  if(!publicStudent)return;
+  if(!publicStudent || !publicStudent.name)return;
 
   try{
     const ls=publicStudentLessons||[];
