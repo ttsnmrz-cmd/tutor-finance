@@ -165,26 +165,36 @@ async function loadData(){
   await autoCompletePastLessons();
 }
 
-async function autoCompletePastLessons(){
-  const now=new Date();
-  const today=localISO(now);
+function lessonEndTimestamp(l){
+  if(!l?.date)return null;
 
-  const nowTime=
-    String(now.getHours()).padStart(2,'0')+
-    ':'+
-    String(now.getMinutes()).padStart(2,'0');
+  const rawTime=String(l.time||'23:59').replace('.',':');
+  const [hRaw,mRaw]=rawTime.split(':');
+  const h=Number(hRaw);
+  const m=Number(mRaw);
+
+  if(!Number.isFinite(h)||!Number.isFinite(m))return null;
+
+  const duration=Math.max(
+    1,
+    Number(l.duration)||60
+  );
+
+  const start=new Date(l.date+'T00:00:00');
+  start.setHours(h,m,0,0);
+  start.setMinutes(start.getMinutes()+duration);
+
+  return start.getTime();
+}
+
+async function autoCompletePastLessons(){
+  const now=Date.now();
 
   const due=lessons.filter(
     l=>
       l.status==='pending'&&
-      l.date&&
-      (
-        l.date<today||
-        (
-          l.date===today&&
-          String(l.time||'23:59').slice(0,5)<=nowTime
-        )
-      )
+      lessonEndTimestamp(l)!==null&&
+      lessonEndTimestamp(l)<=now
   );
 
   if(!due.length)return;
