@@ -362,7 +362,8 @@ async function createOneGroupLesson(
   duration,
   status,
   targets,
-  comment=null
+  comment=null,
+  teacherId=null
 ){
   const group=groups.find(
     g=>String(g.id)===String(groupId)
@@ -389,7 +390,8 @@ async function createOneGroupLesson(
         price:total,
         status,
         duration,
-        comment
+        comment,
+        teacher_id:teacherId
       })
     }
   );
@@ -415,7 +417,8 @@ async function createOneGroupLesson(
           lesson_id:lesson.id,
           student_id:st.id,
           price:Number(st.price??0),
-          charged:true
+          charged:true,
+          teacher_id:teacherId
         })
       }
     );
@@ -534,6 +537,17 @@ async function saveLesson(){
         )
       );
     }
+
+    const {data:userData,error:userError}=
+      await supabaseClient.auth.getUser();
+
+    if(userError||!userData?.user?.id){
+      throw new Error(
+        'Сессия преподавателя не найдена. Войдите в аккаунт снова.'
+      );
+    }
+
+    const teacherId=userData.user.id;
 
     if(id){
       const l=lessons.find(
@@ -667,7 +681,8 @@ async function saveLesson(){
                 duration,
                 'pending',
                 targets,
-                comment
+                comment,
+                teacherId
               );
             }
 
@@ -683,7 +698,8 @@ async function saveLesson(){
             duration,
             status,
             targets,
-            comment
+            comment,
+            teacherId
           );
         }
       }else{
@@ -702,7 +718,8 @@ async function saveLesson(){
               price,
               status,
               duration,
-              comment
+              comment,
+              teacher_id:teacherId
             })
           }
         );
