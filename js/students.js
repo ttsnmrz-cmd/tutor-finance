@@ -1182,6 +1182,10 @@ function openStudentPayment(id){
     'student-payment-amount'
   ).value='';
 
+  document.getElementById(
+    'student-payment-date'
+  ).value=localISO(new Date());
+
   showModal('student-payment-modal');
 
   setTimeout(
@@ -1202,6 +1206,10 @@ async function saveStudentPayment(){
       .getElementById('student-payment-amount')
       .value.trim();
 
+    const date=document
+      .getElementById('student-payment-date')
+      .value;
+
     const amount=Number(raw);
 
     const s=students.find(
@@ -1215,7 +1223,8 @@ async function saveStudentPayment(){
       !s||
       raw===''||
       !Number.isFinite(amount)||
-      amount===0
+      amount===0||
+      !date
     ){
       return showError(
         new Error(
@@ -1235,7 +1244,7 @@ async function saveStudentPayment(){
         body:JSON.stringify({
           student:s.name,
           amount,
-          date:localISO(new Date()),
+          date,
           teacher_id:user.id
         })
       }
