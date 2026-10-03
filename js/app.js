@@ -1026,6 +1026,74 @@ function closeModal(id){
   e.classList.remove('flex');
 }
 
+function showAuthMode(mode){
+  const login=document.getElementById('auth-login-form');
+  const register=document.getElementById('auth-register-form');
+  const loginTab=document.getElementById('auth-tab-login');
+  const registerTab=document.getElementById('auth-tab-register');
+  if(!login||!register)return;
+
+  const isLogin=mode==='login';
+  login.classList.toggle('hidden',!isLogin);
+  register.classList.toggle('hidden',isLogin);
+
+  loginTab.classList.toggle('bg-white',isLogin);
+  loginTab.classList.toggle('shadow-sm',isLogin);
+  loginTab.classList.toggle('text-slate-500',!isLogin);
+
+  registerTab.classList.toggle('bg-white',!isLogin);
+  registerTab.classList.toggle('shadow-sm',!isLogin);
+  registerTab.classList.toggle('text-slate-500',isLogin);
+}
+
+async function registerTeacher(){
+  const email=document.getElementById('teacher-register-email').value.trim();
+  const password=document.getElementById('teacher-register-password').value;
+  const password2=document.getElementById('teacher-register-password2').value;
+  const errorEl=document.getElementById('teacher-register-error');
+
+  errorEl.textContent='';
+
+  if(!email||!password||!password2){
+    errorEl.textContent='Заполните все поля';
+    return;
+  }
+
+  if(password!==password2){
+    errorEl.textContent='Пароли не совпадают';
+    return;
+  }
+
+  if(password.length<6){
+    errorEl.textContent='Пароль должен содержать минимум 6 символов';
+    return;
+  }
+
+  try{
+    const {data,error}=await supabaseClient.auth.signUp({
+      email,
+      password,
+      options:{
+        emailRedirectTo:'https://ttsnmrz-cmd.github.io/tutor-finance/'
+      }
+    });
+
+    if(error)throw error;
+
+    if(data.session){
+      location.reload();
+      return;
+    }
+
+    errorEl.className='text-sm text-emerald-600';
+    errorEl.textContent='Аккаунт создан. Проверьте email для подтверждения.';
+  }catch(e){
+    console.error(e);
+    errorEl.className='text-sm text-red-600';
+    errorEl.textContent=e.message||'Не удалось зарегистрироваться';
+  }
+}
+
 async function loginTeacher(){
 
   const email =
@@ -1073,13 +1141,8 @@ async function loginTeacher(){
       'Content-Type':
         'application/json'
     };
-document.getElementById(
-  'teacher-app'
-).classList.remove('hidden');
-    
-    closeModal(
-      'teacher-login-modal'
-    );
+document.getElementById('landing-page')?.classList.add('hidden');
+    document.getElementById('teacher-app')?.classList.remove('hidden');
 
     await loadData();
 
@@ -1326,6 +1389,8 @@ async function openStudentCabinet(){
 
   try{
 
+    document.getElementById('current-year')?.textContent = String(new Date().getFullYear());
+
     const {
       data: { session },
       error
@@ -1335,14 +1400,14 @@ async function openStudentCabinet(){
       throw error;
     }
 
-    document.getElementById(
-      'teacher-app'
-    ).classList.remove('hidden');
-
     if(!session){
-      showModal('teacher-login-modal');
+      document.getElementById('landing-page')?.classList.remove('hidden');
+      document.getElementById('teacher-app')?.classList.add('hidden');
       return;
     }
+
+    document.getElementById('landing-page')?.classList.add('hidden');
+    document.getElementById('teacher-app')?.classList.remove('hidden');
 
     headers = {
       apikey: SUPABASE_KEY,
