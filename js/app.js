@@ -1606,7 +1606,8 @@ async function addStudentToLesson(studentId){
           body:JSON.stringify({
             lesson_id:lesson.id,
             student_id:st.id,
-            price:Number(st.price??0)
+            price:Number(st.price??0),
+            teacher_id:(await supabaseClient.auth.getUser()).data.user?.id
           })
         }
       );
