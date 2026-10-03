@@ -365,6 +365,12 @@ async function createOneGroupLesson(
   comment=null,
   teacherId=null
 ){
+  if(!teacherId){
+    const {data:{user},error:userError}=await supabaseClient.auth.getUser();
+    if(userError||!user)throw new Error('Пользователь не авторизован');
+    teacherId=user.id;
+  }
+
   const group=groups.find(
     g=>String(g.id)===String(groupId)
   );
