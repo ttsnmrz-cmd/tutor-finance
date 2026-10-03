@@ -778,7 +778,7 @@ function renderGroups(){
       );
 
       const total=members.reduce(
-        (a,s)=>a+studentStats(s).bal,
+        (a,s)=>a+Number(s.price??0),
         0
       );
 
@@ -815,10 +815,9 @@ function renderGroups(){
         '<span class="font-semibold">'+
         esc(g.name)+
         '</span>'+
-        '<span class="text-sm font-bold px-2 py-1 rounded-lg '+
-        balanceClass(total)+
-        '">'+
-        money(total)+
+        '<span class="text-sm font-bold px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">'+
+        '<span class="block text-[10px] font-medium text-emerald-600 leading-tight">Ожидаемый платёж за занятие</span>'+
+        '<span>'+money(total)+'</span>'+
         '</span>'+
         '</button>'+
 
