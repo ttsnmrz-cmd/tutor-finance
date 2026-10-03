@@ -1049,6 +1049,9 @@ async function addGroup(){
   if(!name)return;
 
   try{
+    const {data:{user},error:userError}=await supabaseClient.auth.getUser();
+    if(userError||!user)throw new Error('Пользователь не авторизован');
+
     await db(
       '/groups',
       {
@@ -1057,7 +1060,7 @@ async function addGroup(){
           ...headers,
           Prefer:'return=minimal'
         },
-        body:JSON.stringify({name})
+        body:JSON.stringify({name,teacher_id:user.id})
       }
     );
 
@@ -1205,6 +1208,9 @@ async function saveStudentPayment(){
       x=>String(x.id)===String(id)
     );
 
+    const {data:{user},error:userError}=await supabaseClient.auth.getUser();
+    if(userError||!user)throw new Error('Пользователь не авторизован');
+
     if(
       !s||
       raw===''||
@@ -1229,7 +1235,8 @@ async function saveStudentPayment(){
         body:JSON.stringify({
           student:s.name,
           amount,
-          date:localISO(new Date())
+          date:localISO(new Date()),
+          teacher_id:user.id
         })
       }
     );
@@ -1270,6 +1277,9 @@ async function addPayment(){
       );
     }
 
+    const {data:{user},error:userError}=await supabaseClient.auth.getUser();
+    if(userError||!user)throw new Error('Пользователь не авторизован');
+
     await db(
       '/payments',
       {
@@ -1281,7 +1291,8 @@ async function addPayment(){
         body:JSON.stringify({
           student,
           amount,
-          date
+          date,
+          teacher_id:user.id
         })
       }
     );
