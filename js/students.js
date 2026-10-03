@@ -921,7 +921,20 @@ function openAdd(type){
   showAddForm(type||'student');
 }
 
+function setAddTab(type){
+  document.querySelectorAll('.add-tab').forEach(btn=>{
+    btn.classList.remove('bg-indigo-600','text-white','shadow-sm');
+    btn.classList.add('bg-slate-100','text-slate-600');
+  });
+  const active=document.getElementById('add-tab-'+type);
+  if(active){
+    active.classList.remove('bg-slate-100','text-slate-600');
+    active.classList.add('bg-indigo-600','text-white','shadow-sm');
+  }
+}
+
 function showAddForm(type){
+  setAddTab(type);
   const c=document.getElementById('add-form');
 
   if(type==='student'){
