@@ -1402,13 +1402,17 @@ async function openStudentCabinet(){
     }
 
     if(!session){
+      document.getElementById('teacher-app')?.classList.remove('hidden');
       document.getElementById('landing-page')?.classList.remove('hidden');
-      document.getElementById('teacher-app')?.classList.add('hidden');
+      document.getElementById('teacher-header')?.classList.add('hidden');
+      document.getElementById('teacher-main')?.classList.add('hidden');
       return;
     }
 
     document.getElementById('landing-page')?.classList.add('hidden');
     document.getElementById('teacher-app')?.classList.remove('hidden');
+    document.getElementById('teacher-header')?.classList.remove('hidden');
+    document.getElementById('teacher-main')?.classList.remove('hidden');
 
     headers = {
       apikey: SUPABASE_KEY,
