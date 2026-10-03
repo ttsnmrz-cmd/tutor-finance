@@ -1389,7 +1389,8 @@ async function openStudentCabinet(){
 
   try{
 
-    document.getElementById('current-year')?.textContent = String(new Date().getFullYear());
+    const yearEl=document.getElementById('current-year');
+    if(yearEl)yearEl.textContent=String(new Date().getFullYear());
 
     const {
       data: { session },
