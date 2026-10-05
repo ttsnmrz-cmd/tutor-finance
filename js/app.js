@@ -1216,6 +1216,7 @@ document.getElementById('landing-page')?.classList.add('hidden');
 
     renderWeek();
     renderDay();
+    renderStudents();
 
   }catch(e){
 
@@ -1494,6 +1495,7 @@ async function openStudentCabinet(){
 
     renderWeek();
     renderDay();
+    renderStudents();
 
   }catch(e){
 
