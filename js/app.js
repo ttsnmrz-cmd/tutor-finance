@@ -251,7 +251,13 @@ async function loadData(){
     .filter(s=>s.archived)
     .forEach(s=>archived.add(String(s.id)));
 
-  await autoCompletePastLessons();
+  // Auto-completing an old lesson must never prevent the dashboard
+  // from rendering after a page refresh.
+  try{
+    await autoCompletePastLessons();
+  }catch(e){
+    console.warn('Could not auto-complete past lessons:',e);
+  }
 }
 
 function lessonEndTimestamp(l){
@@ -1551,7 +1557,24 @@ async function openStudentCabinet(){
         'application/json'
     };
 
-    await loadData();
+    // Supabase may still be finishing session restoration immediately
+    // after a browser refresh. Give it one short retry instead of leaving
+    // the dashboard empty if the first REST request races that process.
+    let loaded=false;
+    let lastError=null;
+    for(let attempt=0;attempt<2&&!loaded;attempt++){
+      try{
+        await loadData();
+        loaded=true;
+      }catch(e){
+        lastError=e;
+        if(attempt===0){
+          await new Promise(resolve=>setTimeout(resolve,500));
+        }
+      }
+    }
+
+    if(!loaded)throw lastError;
 
     // A page refresh with an existing session goes through initApp(),
     // not loginTeacher(). Render the dashboard on this path too.
