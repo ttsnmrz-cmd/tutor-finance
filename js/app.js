@@ -54,6 +54,17 @@ function money(n){
   })+' BYN';
 }
 
+function togglePasswordVisibility(inputId,button){
+  const input=document.getElementById(inputId);
+  if(!input||!button)return;
+  const show=input.type==='password';
+  input.type=show?'text':'password';
+  button.setAttribute('aria-label',show?'Скрыть пароль':'Показать пароль');
+  button.title=show?'Скрыть пароль':'Показать пароль';
+  button.innerHTML=show
+    ?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a15 15 0 0 1-3.1 3.9M6.2 6.2C3.5 8 2 12 2 12s3.5 7 10 7c1.2 0 2.3-.2 3.3-.6"/></svg>'
+    :'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+}
 function showError(e){
   console.error(e);
   const b=document.getElementById('error-box');
