@@ -1023,6 +1023,20 @@ async function addStudent(){
       );
     }
 
+    // Free plan: up to 10 active students per teacher.
+    const existingStudents=await db(
+      '/students?select=id,archived&teacher_id=eq.'+
+      encodeURIComponent(user.id)
+    );
+    const activeStudentCount=(existingStudents||[]).filter(
+      student=>student.archived!==true
+    ).length;
+    if(activeStudentCount>=10){
+      throw new Error(
+        'В бесплатном тарифе можно добавить до 10 активных учеников. Для большего количества потребуется платный тариф.'
+      );
+    }
+
     await db(
       '/students',
       {
