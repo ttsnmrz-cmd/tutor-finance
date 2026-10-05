@@ -1270,9 +1270,13 @@ document.getElementById('landing-page')?.classList.add('hidden');
 
     await loadData();
 
+    // Populate the dashboard immediately after login instead of leaving
+    // its empty placeholders visible until the user changes tabs.
+    renderDashboard();
     renderWeek();
     renderDay();
     renderStudents();
+    switchTab('dashboard');
 
   }catch(e){
 
