@@ -113,10 +113,23 @@ function showError(e){
 }
 
 async function db(path,opt={}){
+  // Keep the REST API token in sync with Supabase's refreshed auth session.
+  let authHeaders={};
+  try{
+    const {data:{session}}=await supabaseClient.auth.getSession();
+    if(session?.access_token){
+      authHeaders.Authorization='Bearer '+session.access_token;
+      headers.Authorization=authHeaders.Authorization;
+    }
+  }catch(e){
+    console.warn('Could not refresh REST auth headers:',e);
+  }
+
   const r=await fetch(API+path,{
     ...opt,
     headers:{
       ...headers,
+      ...authHeaders,
       ...(opt.headers||{})
     }
   });
