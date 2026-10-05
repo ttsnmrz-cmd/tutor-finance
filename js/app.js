@@ -138,29 +138,48 @@ function showError(e){
   setTimeout(()=>b.classList.add('hidden'),5000);
 }
 
-async function db(path,opt={}){
-  // Keep the REST API token in sync with Supabase's refreshed auth session.
-  let authHeaders={};
+async function setRestAuthToken(session){
+  if(!session?.access_token)return false;
+  headers={
+    ...headers,
+    Authorization:'Bearer '+session.access_token
+  };
+  return true;
+}
+
+async function refreshRestAuthSession(){
+  const {data,error}=await supabaseClient.auth.refreshSession();
+  if(error)throw error;
+  await setRestAuthToken(data?.session);
+  return data?.session||null;
+}
+
+async function db(path,opt={},retryAuth=true){
+  // Keep REST requests aligned with the current Supabase Auth session.
   try{
     const {data:{session}}=await supabaseClient.auth.getSession();
-    if(session?.access_token){
-      authHeaders.Authorization='Bearer '+session.access_token;
-      headers.Authorization=authHeaders.Authorization;
-    }
+    await setRestAuthToken(session);
   }catch(e){
-    console.warn('Could not refresh REST auth headers:',e);
+    console.warn('Could not read Supabase auth session:',e);
   }
 
   const r=await fetch(API+path,{
     ...opt,
     headers:{
       ...headers,
-      ...authHeaders,
       ...(opt.headers||{})
     }
   });
 
   const t=await r.text();
+
+  // A restored browser session can occasionally contain a JWT whose iat
+  // is rejected by PostgREST as being in the future. Refresh the Auth
+  // session once and retry the same request with the new access token.
+  if(!r.ok && retryAuth && r.status===401 && /PGRST303|JWT issued at future/i.test(t)){
+    await refreshRestAuthSession();
+    return db(path,opt,false);
+  }
 
   if(!r.ok)throw new Error(t||r.statusText);
 
@@ -1527,10 +1546,24 @@ async function openStudentCabinet(){
     const yearEl=document.getElementById('current-year');
     if(yearEl)yearEl.textContent=String(new Date().getFullYear());
 
-    const {
+    // On a full page refresh, prefer a freshly refreshed Auth session.
+    // This avoids reusing a restored access token that PostgREST may reject
+    // with PGRST303 ("JWT issued at future").
+    let {
       data: { session },
       error
     } = await supabaseClient.auth.getSession();
+
+    if(!error && session){
+      try{
+        const refreshed=await supabaseClient.auth.refreshSession();
+        if(!refreshed.error && refreshed.data?.session){
+          session=refreshed.data.session;
+        }
+      }catch(refreshError){
+        console.warn('Could not refresh session on page load:',refreshError);
+      }
+    }
 
     if(error){
       throw error;
