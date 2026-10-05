@@ -709,26 +709,28 @@ async function saveLesson(){
           );
         }
       }else{
-        await db(
-          '/lessons',
-          {
-            method:'POST',
-            headers:{
-              ...headers,
-              Prefer:'return=minimal'
-            },
-            body:JSON.stringify({
-              student,
-              date,
-              time,
-              price,
-              status,
-              duration,
-              comment,
-              teacher_id:teacherId
-            })
+        const recurring=document.getElementById('edit-recurring').checked;
+        if(recurring){
+          const days=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
+          const selectedDays=days.length?days:[new Date(date+'T00:00:00').getDay()];
+          const cur=new Date(date+'T00:00:00');
+          for(let i=0;i<90;i++){
+            if(selectedDays.includes(cur.getDay())){
+              await db('/lessons',{
+                method:'POST',
+                headers:{...headers,Prefer:'return=minimal'},
+                body:JSON.stringify({student,date:localISO(cur),time,price,status:'pending',duration,comment,teacher_id:teacherId})
+              });
+            }
+            cur.setDate(cur.getDate()+1);
           }
-        );
+        }else{
+          await db('/lessons',{
+            method:'POST',
+            headers:{...headers,Prefer:'return=minimal'},
+            body:JSON.stringify({student,date,time,price,status,duration,comment,teacher_id:teacherId})
+          });
+        }
       }
     }
 
