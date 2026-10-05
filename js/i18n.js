@@ -59,7 +59,12 @@
       'Пользователь не авторизован':'User is not authenticated','Сессия преподавателя не найдена. Войдите в аккаунт снова.':'Tutor session not found. Please log in again.',
       'Ошибка:':'Error:','Загрузка...':'Loading...','Сумма, BYN':'Amount, BYN','Управление списком':'Manage list',
       'Учеников в группе пока нет':'No students in this group yet','Группы пока нет':'No groups yet','Сначала создайте группу':'Create a group first',
-      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language','Профиль и настройки':'Profile & settings','Профиль':'Profile','Тёмная тема':'Dark theme','Светлая тема':'Light theme'
+      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language','Профиль и настройки':'Profile & settings','Профиль':'Profile','Тёмная тема':'Dark theme','Светлая тема':'Light theme',
+      'Главная':'Dashboard','Низкие балансы':'Low balances','Сводка':'Summary',
+      'Активные ученики':'Active students','Начислено за месяц':'Accrued this month','Заработано за всё время':'Earned all time',
+      'Занятий сегодня':'Lessons today','Получено платежей за месяц':'Payments received this month','Нужно пополнить':'Top up needed',
+      'Низкий баланс':'Low balance','Задолженность':'Debt','Нет учеников с низким балансом':'No students with low balances',
+      'осталось занятий:':'lessons left:','Нет учеников с низким балансом':'No students with low balances'
     },
     ru: {}
   };
@@ -116,6 +121,9 @@
     if (typeof renderWeek === 'function') renderWeek();
     if (typeof renderDay === 'function') renderDay();
     if (typeof renderStudents === 'function' && document.getElementById('students-list')) renderStudents();
+    if (typeof renderDashboard === 'function' && document.getElementById('dashboard-cards')) renderDashboard();
+    if (typeof updateCurrencyLabel === 'function') updateCurrencyLabel();
+    if (typeof applyTheme === 'function') { try { applyTheme(localStorage.getItem('profiprofit-theme') === 'dark' ? 'dark' : 'light'); } catch(e) { applyTheme('light'); } }
   }
   window.getLanguage = () => language;
   window.setLanguage = setLanguage;
