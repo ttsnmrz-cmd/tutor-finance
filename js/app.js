@@ -929,93 +929,108 @@ async function confirmEmptyGroupMembers(){
   }
 }
 
+let lessonDeleteInProgress=false;
+
+function showBlockingLoader(message='Удаляем занятие…'){
+  let overlay=document.getElementById('blocking-operation-overlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='blocking-operation-overlay';
+    overlay.setAttribute('role','status');
+    overlay.setAttribute('aria-live','polite');
+    overlay.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.38);backdrop-filter:blur(2px);padding:20px;';
+    overlay.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;gap:14px;min-width:190px;padding:24px 28px;border-radius:20px;background:white;box-shadow:0 20px 60px rgba(0,0,0,.2);color:#334155;font:600 14px system-ui,sans-serif;"><div style="width:36px;height:36px;border:4px solid #e0e7ff;border-top-color:#4f46e5;border-radius:50%;animation:profi-spin .8s linear infinite;"></div><span id="blocking-operation-message"></span><span style="font-size:12px;font-weight:400;color:#64748b;">Пожалуйста, подождите</span></div>';
+    const style=document.createElement('style');
+    style.id='blocking-operation-spinner-style';
+    style.textContent='@keyframes profi-spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+  }
+  const label=document.getElementById('blocking-operation-message');
+  if(label)label.textContent=message;
+  overlay.style.display='flex';
+  document.querySelectorAll('#delete-one-btn,#delete-follow-btn').forEach(button=>{
+    button.disabled=true;
+    button.style.opacity='.5';
+  });
+}
+
+function hideBlockingLoader(){
+  const overlay=document.getElementById('blocking-operation-overlay');
+  if(overlay)overlay.style.display='none';
+  document.querySelectorAll('#delete-one-btn,#delete-follow-btn').forEach(button=>{
+    button.disabled=false;
+    button.style.opacity='';
+  });
+}
+
 async function deleteLessonFromModal(){
-  const id=document.getElementById(
-    'edit-id'
-  ).value;
-
+  if(lessonDeleteInProgress)return;
+  const id=document.getElementById('edit-id').value;
   if(!id)return;
-
-  await deleteLesson(id);
-
-  closeLessonModal();
+  const deleted=await deleteLesson(id);
+  if(deleted)closeLessonModal();
 }
 
 async function deleteLesson(id){
-  if(!confirm('Удалить это занятие?'))return;
-
+  if(lessonDeleteInProgress)return false;
+  if(!confirm('Удалить это занятие?'))return false;
+  lessonDeleteInProgress=true;
+  showBlockingLoader('Удаляем занятие…');
   try{
     await db(
-      '/lessons?id=eq.'+
-      encodeURIComponent(id),
-      {
-        method:'DELETE',
-        headers
-      }
+      '/lessons?id=eq.'+encodeURIComponent(id),
+      {method:'DELETE',headers}
     );
-
     await loadData();
-
     renderWeek();
     renderDay();
-
+    return true;
   }catch(e){
     showError(e);
+    return false;
+  }finally{
+    lessonDeleteInProgress=false;
+    hideBlockingLoader();
   }
 }
 
 async function deleteThisAndFollowingFromModal(){
-  const id=document.getElementById(
-    'edit-id'
-  ).value;
-
-  const l=lessons.find(
-    x=>String(x.id)===String(id)
-  );
-
+  if(lessonDeleteInProgress)return;
+  const id=document.getElementById('edit-id').value;
+  const l=lessons.find(x=>String(x.id)===String(id));
   if(!l)return;
 
   const isGroup=!!l.group_id;
-
   if(!confirm(
     isGroup
       ?'Удалить это групповое занятие и все следующие занятия этой группы начиная с '+l.date+'?'
       :'Удалить это занятие и все следующие у этого ученика начиная с '+l.date+'?'
   ))return;
 
+  lessonDeleteInProgress=true;
+  showBlockingLoader('Удаляем занятия…');
   try{
     const targets=isGroup
-      ?lessons.filter(
-        x=>
-          String(x.group_id)===String(l.group_id)&&
-          x.date>=l.date
-      )
-      :lessons.filter(
-        x=>
-          x.student===l.student&&
-          x.date>=l.date
-      );
+      ?lessons.filter(x=>String(x.group_id)===String(l.group_id)&&x.date>=l.date)
+      :lessons.filter(x=>x.student===l.student&&x.date>=l.date);
 
     for(const x of targets){
-      await db(
-        '/lessons?id=eq.'+
-        encodeURIComponent(x.id),
-        {
-          method:'DELETE',
-          headers
-        }
-      );
+      await db('/lessons?id=eq.'+encodeURIComponent(x.id),{
+        method:'DELETE',
+        headers
+      });
     }
 
     closeLessonModal();
-
     await loadData();
-
     renderWeek();
     renderDay();
-
   }catch(e){
     showError(e);
+  }finally{
+    lessonDeleteInProgress=false;
+    hideBlockingLoader();
   }
 }
 
