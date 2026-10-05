@@ -196,18 +196,18 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 :root[data-theme="dark"] .password-toggle:hover{background:#30283d;color:#e3c8ff}
 @media(max-width:640px){
  #teacher-header{flex-direction:column!important;align-items:stretch!important;gap:14px!important;padding:16px!important}
- #teacher-header>div:first-child{width:100%;gap:10px!important}
+ #teacher-header>div:first-child{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px!important}
+ #teacher-header>div:first-child>div:first-of-type{min-width:0}
  #teacher-header>div:first-child img{width:48px;height:48px;flex:0 0 48px}
  #teacher-header>div:first-child h1{font-size:1.35rem;line-height:1.5rem}
  #teacher-header>div:first-child p{font-size:.8rem;line-height:1.15rem;white-space:normal}
- #teacher-header .teacher-header-actions{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px}
- #teacher-header .teacher-nav{display:flex!important;gap:6px;flex:1;min-width:0}
- #teacher-header .teacher-nav button{padding:.65rem .8rem!important;font-size:14px;flex:1;min-width:0}
- #teacher-header .profile-menu-wrap{flex:0 0 auto}
- #teacher-header .profile-menu-button{width:42px;height:42px}
- #teacher-header .profile-menu-dropdown{width:min(240px,calc(100vw - 40px))}
- #teacher-header .profile-menu-item,#teacher-header .profile-menu-row{font-size:14px}
+ #teacher-header .teacher-header-actions{width:100%;display:flex;justify-content:flex-start;align-items:stretch;gap:8px}
+ #teacher-header .teacher-nav{display:flex!important;flex-direction:column!important;gap:8px;width:100%;flex:1;min-width:0}
+ #teacher-header .teacher-nav button{width:100%;padding:.7rem .85rem!important;font-size:14px;text-align:left;flex:initial;min-width:0}
+ #teacher-header .profile-menu-wrap{position:absolute;right:16px;top:16px;display:none}
+ #teacher-header .teacher-header-actions .profile-menu-wrap{display:none}
+ #teacher-header .teacher-nav button{white-space:normal}
 }
 @media(max-width:380px){
- #teacher-header .teacher-nav button{padding:.6rem .5rem!important;font-size:12px}
+ #teacher-header .teacher-nav button{padding:.65rem .7rem!important;font-size:13px}
 }
