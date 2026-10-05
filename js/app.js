@@ -1154,6 +1154,8 @@ async function loginTeacher(){
     };
 document.getElementById('landing-page')?.classList.add('hidden');
     document.getElementById('teacher-app')?.classList.remove('hidden');
+    document.getElementById('teacher-header')?.classList.remove('hidden');
+    document.getElementById('teacher-main')?.classList.remove('hidden');
 
     await loadData();
 
