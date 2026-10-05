@@ -57,12 +57,12 @@ function renderWeek(){
   }
 
   document.getElementById('week-range').textContent=
-    days[0].toLocaleDateString('ru-RU',{
+    days[0].toLocaleDateString((getLanguage()==='en'?'en-US':'ru-RU'),{
       day:'2-digit',
       month:'long'
     })+
     ' — '+
-    days[6].toLocaleDateString('ru-RU',{
+    days[6].toLocaleDateString((getLanguage()==='en'?'en-US':'ru-RU'),{
       day:'2-digit',
       month:'long',
       year:'numeric'
@@ -76,7 +76,7 @@ function renderWeek(){
 
     return `<button onclick="selectDay('${key}')" class="flex flex-col items-center py-2">
       <div class="text-xs text-slate-400 mb-1">
-        ${d.toLocaleDateString('ru-RU',{weekday:'short'}).replace('.','')}
+        ${d.toLocaleDateString((getLanguage()==='en'?'en-US':'ru-RU'),{weekday:'short'}).replace('.','')}
       </div>
       <div class="day-circle ${sel?'selected ':''}${isToday?'today':''}">
         <span class="font-bold">${d.getDate()}</span>
@@ -97,7 +97,7 @@ function renderDay(){
   const d=new Date(selectedDate+'T00:00:00');
 
   title.textContent=
-    d.toLocaleDateString('ru-RU',{
+    d.toLocaleDateString((getLanguage()==='en'?'en-US':'ru-RU'),{
       weekday:'long',
       day:'numeric',
       month:'long'
