@@ -58,7 +58,8 @@
       'Стоимость за занятие':'Price per lesson','Убрать':'Remove','Добавить ученика в группу':'Add student to group',
       'Пользователь не авторизован':'User is not authenticated','Сессия преподавателя не найдена. Войдите в аккаунт снова.':'Tutor session not found. Please log in again.',
       'Ошибка:':'Error:','Загрузка...':'Loading...','Сумма, BYN':'Amount, BYN','Управление списком':'Manage list',
-      'Учеников в группе пока нет':'No students in this group yet','Группы пока нет':'No groups yet','Сначала создайте группу':'Create a group first',\n      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language'
+      'Учеников в группе пока нет':'No students in this group yet','Группы пока нет':'No groups yet','Сначала создайте группу':'Create a group first',
+      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language'
     },
     ru: {}
   };
