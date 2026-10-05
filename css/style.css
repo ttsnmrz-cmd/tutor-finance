@@ -196,11 +196,11 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 :root[data-theme="dark"] .password-toggle:hover{background:#30283d;color:#e3c8ff}
 @media(max-width:640px){
  #teacher-header{flex-direction:column!important;align-items:stretch!important;gap:14px!important;padding:16px!important}
- #teacher-header>div:first-child{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px!important}
- #teacher-header>div:first-child>div:first-of-type{min-width:0}
- #teacher-header>div:first-child img{width:48px;height:48px;flex:0 0 48px}
- #teacher-header>div:first-child h1{font-size:1.35rem;line-height:1.5rem}
- #teacher-header>div:first-child p{font-size:.8rem;line-height:1.15rem;white-space:normal}
+ #teacher-header>div:first-child{width:100%;display:flex;align-items:center;justify-content:flex-start;gap:8px!important;padding-right:52px;box-sizing:border-box}
+ #teacher-header>div:first-child img{width:40px;height:40px;flex:0 0 40px;margin:0}
+ #teacher-header>div:first-child>div{min-width:0;flex:1}
+ #teacher-header>div:first-child h1{font-size:1.2rem;line-height:1.35rem;white-space:nowrap}
+ #teacher-header>div:first-child p{font-size:.75rem;line-height:1rem;white-space:normal;margin-top:2px}
  #teacher-header .teacher-header-actions{width:100%;display:flex;justify-content:flex-start;align-items:stretch;gap:8px}
  #teacher-header .teacher-nav{display:flex!important;flex-direction:column!important;gap:8px;width:100%;flex:1;min-width:0}
  #teacher-header .teacher-nav button{width:100%;padding:.7rem .85rem!important;font-size:14px;text-align:left;flex:initial;min-width:0}
