@@ -154,3 +154,50 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 @media(max-width:420px){
   #recurring-days label{min-height:38px;padding:7px 4px;border-radius:10px}
 }
+
+/* Profile settings menu */
+#teacher-header{flex-direction:row!important;align-items:center!important}
+#teacher-header .teacher-header-actions{flex-shrink:0}
+#teacher-header .teacher-nav{margin-right:0!important;padding-top:0!important;width:auto!important;display:flex!important;grid-template-columns:none!important}
+#teacher-header .teacher-nav button{white-space:nowrap}
+.profile-menu-button{color:var(--text-color);border:1px solid var(--border-color);transition:background .15s ease,transform .15s ease}
+.profile-menu-button:hover{background:var(--accent-soft)!important;transform:translateY(-1px)}
+.profile-menu-dropdown{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-color)}
+.profile-menu-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;font-size:14px}
+.profile-menu-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px;border-radius:10px;font-size:14px;font-weight:500;color:var(--text-color)}
+.profile-menu-item:hover{background:var(--accent-soft)}
+.profile-menu-item svg{width:19px;height:19px;flex-shrink:0}
+.profile-menu-divider{height:1px;background:var(--border-color);margin:5px 3px}
+.profile-logout{color:var(--red-text)}
+:root[data-theme="dark"]{
+ color-scheme:dark;--bg-color:#111018;--card-bg:#1d1a27;--text-color:#f2eef8;--text-secondary:#aaa2b7;
+ --primary-color:#a879d4;--primary-hover:#8f5fbd;--accent-soft:#30283d;--border-color:#3c3549;
+ --green-bg:#193529;--green-text:#9de0b6;--red-bg:#3b2228;--red-text:#ffaaa9;
+}
+:root[data-theme="dark"] body{background-color:var(--bg-color)!important;color:var(--text-color)!important}
+:root[data-theme="dark"] .app-card{background:var(--card-bg)!important;color:var(--text-color);box-shadow:0 4px 20px rgba(0,0,0,.18)}
+:root[data-theme="dark"] .text-slate-800,:root[data-theme="dark"] .text-slate-900,:root[data-theme="dark"] .font-bold,:root[data-theme="dark"] .font-semibold{color:var(--text-color)}
+:root[data-theme="dark"] .text-slate-500,:root[data-theme="dark"] .text-slate-400{color:var(--text-secondary)!important}
+:root[data-theme="dark"] .bg-slate-50,:root[data-theme="dark"] .bg-slate-100,:root[data-theme="dark"] .bg-white{background:#292433!important;color:var(--text-color)!important}
+:root[data-theme="dark"] .bg-indigo-50,:root[data-theme="dark"] .bg-violet-50{background:#30263d!important;color:#d9b9f4!important}
+:root[data-theme="dark"] .bg-indigo-600{background:var(--primary-color)!important;color:#17101f!important}
+:root[data-theme="dark"] .text-indigo-700{color:#d9b9f4!important}
+:root[data-theme="dark"] .soft-input{background:#17141e!important;color:var(--text-color)!important;border-color:#4a4158!important}
+:root[data-theme="dark"] input,:root[data-theme="dark"] select,:root[data-theme="dark"] textarea{color-scheme:dark}
+:root[data-theme="dark"] .border,:root[data-theme="dark"] .border-t{border-color:var(--border-color)!important}
+:root[data-theme="dark"] .bg-amber-100{background:#45351f!important;color:#f3d39a!important}
+:root[data-theme="dark"] .bg-emerald-100{background:#193529!important;color:#9de0b6!important}
+:root[data-theme="dark"] .bg-blue-100{background:#202e43!important;color:#a9ccff!important}
+:root[data-theme="dark"] .bg-red-100{background:#3b2228!important;color:#ffaaa9!important}
+:root[data-theme="dark"] .bg-slate-900{background:#09080d!important}
+:root[data-theme="dark"] .modal-bg{background:rgba(0,0,0,.68)}
+:root[data-theme="dark"] #student-sort-menu,:root[data-theme="dark"] #lesson-delete-dropdown{background:var(--card-bg)!important;color:var(--text-color);border-color:var(--border-color)!important}
+:root[data-theme="dark"] .password-toggle{color:#c3b5d3}
+:root[data-theme="dark"] .password-toggle:hover{background:#30283d;color:#e3c8ff}
+@media(max-width:640px){
+ #teacher-header{gap:10px!important}
+ #teacher-header .teacher-header-actions{width:auto;gap:8px}
+ #teacher-header .teacher-nav{display:flex!important;gap:5px}
+ #teacher-header .teacher-nav button{padding:.6rem .65rem!important;font-size:13px}
+ #teacher-header .profile-menu-button{width:40px;height:40px}
+}
