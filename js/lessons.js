@@ -511,7 +511,18 @@ async function saveGroupChargeExceptions(l){
     );
   }
 }
+let lessonSaveInProgress=false;
+
 async function saveLesson(){
+  if(lessonSaveInProgress)return;
+  lessonSaveInProgress=true;
+  const saveButton=document.getElementById('save-lesson-btn');
+  const originalButtonText=saveButton?.textContent||'Сохранить';
+  if(saveButton){
+    saveButton.disabled=true;
+    saveButton.textContent='Сохраняем…';
+    saveButton.classList.add('opacity-60','cursor-not-allowed');
+  }
   try{
     const id=document.getElementById('edit-id').value;
     const student=document.getElementById('edit-student').value;
@@ -743,5 +754,12 @@ async function saveLesson(){
 
   }catch(e){
     showError(e);
+  }finally{
+    lessonSaveInProgress=false;
+    if(saveButton){
+      saveButton.disabled=false;
+      saveButton.textContent=originalButtonText;
+      saveButton.classList.remove('opacity-60','cursor-not-allowed');
+    }
   }
 }
