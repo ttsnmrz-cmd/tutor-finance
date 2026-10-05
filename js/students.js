@@ -1075,8 +1075,12 @@ async function addGroup(){
   if(!name)return;
 
   try{
-    const {data:{user},error:userError}=await supabaseClient.auth.getUser();
-    if(userError||!user)throw new Error('Пользователь не авторизован');
+    const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+    if(sessionError||!session?.user?.id||!session.access_token){
+      throw new Error('Сессия истекла. Войдите в аккаунт снова.');
+    }
+    const user=session.user;
+    headers.Authorization='Bearer '+session.access_token;
 
     await db(
       '/groups',
@@ -1242,8 +1246,12 @@ async function saveStudentPayment(){
       x=>String(x.id)===String(id)
     );
 
-    const {data:{user},error:userError}=await supabaseClient.auth.getUser();
-    if(userError||!user)throw new Error('Пользователь не авторизован');
+    const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+    if(sessionError||!session?.user?.id||!session.access_token){
+      throw new Error('Сессия истекла. Войдите в аккаунт снова.');
+    }
+    const user=session.user;
+    headers.Authorization='Bearer '+session.access_token;
 
     if(
       !s||
@@ -1312,8 +1320,12 @@ async function addPayment(){
       );
     }
 
-    const {data:{user},error:userError}=await supabaseClient.auth.getUser();
-    if(userError||!user)throw new Error('Пользователь не авторизован');
+    const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
+    if(sessionError||!session?.user?.id||!session.access_token){
+      throw new Error('Сессия истекла. Войдите в аккаунт снова.');
+    }
+    const user=session.user;
+    headers.Authorization='Bearer '+session.access_token;
 
     await db(
       '/payments',
