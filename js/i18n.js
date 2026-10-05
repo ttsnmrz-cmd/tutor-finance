@@ -44,7 +44,21 @@
       'Пользователь не авторизован':'User is not authenticated','На этот день занятий нет':'No lessons for this day',
       'Запланировано':'Scheduled','Проведено':'Completed','Перенесено':'Rescheduled','Отменено — списать':'Cancelled — charge','Отменено — не списывать':'Cancelled — no charge',
       'Пробный урок — бесплатно':'Trial lesson — free','Пробный урок — бесплатно':'Trial lesson — free',
-      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language'
+      'Списывать за это занятие':'Charge for this lesson','Например: пробный урок — бесплатно':'For example: free trial lesson',
+      'Редактировать занятие':'Edit lesson','Сохраняем…':'Saving…','Не удалось создать групповое занятие':'Could not create group lesson',
+      'Добавить ученика в занятие':'Add student to lesson','Все ученики группы уже добавлены':'All group students have already been added',
+      'Заполните ученика, дату и длительность':'Enter a student, date and duration','В группе пока нет учеников':'There are no students in this group yet',
+      'Добавить учеников':'Add students','Нет доступных учеников':'No available students','Выберите хотя бы одного ученика':'Select at least one student',
+      'Удалить это занятие?':'Delete this lesson?','Ученик не найден':'Student not found','Проверьте ссылку ученика.':'Check the student link.',
+      'Не удалось загрузить данные ученика.':'Could not load student data.','Стоимость занятия:':'Lesson price:','Пополнений нет':'No top-ups',
+      'Занятий нет':'No lessons','Все занятия':'All lessons','Ссылка для ученика':'Student portal link','Ссылка для ученика скопирована.':'Student link copied.',
+      'Скопируйте ссылку:':'Copy this link:','Вернуть из архива':'Restore from archive','Заархивировать':'Archive',
+      'Удалить ученика':'Delete student','Не посетил, списать оплату':'Absent — charge payment',
+      'Не посетил, не списывать оплату':'Absent — no charge','Ученик не добавлен в это групповое занятие':'Student is not included in this group lesson',
+      'Стоимость за занятие':'Price per lesson','Убрать':'Remove','Добавить ученика в группу':'Add student to group',
+      'Пользователь не авторизован':'User is not authenticated','Сессия преподавателя не найдена. Войдите в аккаунт снова.':'Tutor session not found. Please log in again.',
+      'Ошибка:':'Error:','Загрузка...':'Loading...','Сумма, BYN':'Amount, BYN','Управление списком':'Manage list',
+      'Учеников в группе пока нет':'No students in this group yet','Группы пока нет':'No groups yet','Сначала создайте группу':'Create a group first',\n      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language'
     },
     ru: {}
   };
