@@ -1553,9 +1553,13 @@ async function openStudentCabinet(){
 
     await loadData();
 
+    // A page refresh with an existing session goes through initApp(),
+    // not loginTeacher(). Render the dashboard on this path too.
+    renderDashboard();
     renderWeek();
     renderDay();
     renderStudents();
+    switchTab('dashboard');
 
   }catch(e){
 
