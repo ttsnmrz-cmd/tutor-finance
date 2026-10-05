@@ -212,3 +212,7 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 @media(max-width:380px){
  #teacher-header .teacher-nav button{padding:.65rem .7rem!important;font-size:13px}
 }
+
+/* Dashboard cards */
+#tab-dashboard button.app-card{transition:transform .15s ease,box-shadow .15s ease}
+#tab-dashboard button.app-card:hover{box-shadow:0 8px 24px rgba(67,44,122,.09)}
