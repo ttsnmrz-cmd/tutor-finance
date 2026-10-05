@@ -204,8 +204,9 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
  #teacher-header .teacher-header-actions{width:100%;display:flex;justify-content:flex-start;align-items:stretch;gap:8px}
  #teacher-header .teacher-nav{display:flex!important;flex-direction:column!important;gap:8px;width:100%;flex:1;min-width:0}
  #teacher-header .teacher-nav button{width:100%;padding:.7rem .85rem!important;font-size:14px;text-align:left;flex:initial;min-width:0}
- #teacher-header .profile-menu-wrap{position:absolute;right:16px;top:16px;display:none}
- #teacher-header .teacher-header-actions .profile-menu-wrap{display:none}
+ #teacher-header .teacher-header-actions .profile-menu-wrap{position:absolute;right:16px;top:16px;display:block;z-index:60}
+ #teacher-header .profile-menu-button{width:42px;height:42px}
+ #teacher-header .profile-menu-dropdown{width:min(240px,calc(100vw - 40px))}
  #teacher-header .teacher-nav button{white-space:normal}
 }
 @media(max-width:380px){
