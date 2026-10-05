@@ -59,7 +59,7 @@
       'Пользователь не авторизован':'User is not authenticated','Сессия преподавателя не найдена. Войдите в аккаунт снова.':'Tutor session not found. Please log in again.',
       'Ошибка:':'Error:','Загрузка...':'Loading...','Сумма, BYN':'Amount, BYN','Управление списком':'Manage list',
       'Учеников в группе пока нет':'No students in this group yet','Группы пока нет':'No groups yet','Сначала создайте группу':'Create a group first',
-      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language'
+      'мин ·':'min ·','BYN':'BYN','Выйти':'Log out','Язык':'Language','Профиль и настройки':'Profile & settings','Профиль':'Profile','Тёмная тема':'Dark theme','Светлая тема':'Light theme'
     },
     ru: {}
   };
