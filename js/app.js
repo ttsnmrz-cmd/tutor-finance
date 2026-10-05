@@ -1,5 +1,44 @@
 const { createClient } = supabase;
 
+const THEME_STORAGE_KEY='profiprofit-theme';
+function applyTheme(theme){
+  const dark=theme==='dark';
+  document.documentElement.dataset.theme=dark?'dark':'light';
+  try{localStorage.setItem(THEME_STORAGE_KEY,dark?'dark':'light')}catch(e){}
+  const label=document.getElementById('theme-toggle-label');
+  const icon=document.getElementById('theme-toggle-icon');
+  const lang=typeof getLanguage==='function'?getLanguage():'ru';
+  if(label)label.textContent=dark?(lang==='en'?'Light theme':'Светлая тема'):(lang==='en'?'Dark theme':'Тёмная тема');
+  if(icon)icon.innerHTML=dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>':'<path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/>';
+}
+function toggleDarkMode(){applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark')}
+function toggleProfileMenu(){
+  const menu=document.getElementById('profile-menu');
+  const button=document.getElementById('profile-menu-button');
+  if(!menu||!button)return;
+  const opening=menu.classList.contains('hidden');
+  menu.classList.toggle('hidden',!opening);
+  button.setAttribute('aria-expanded',String(opening));
+}
+document.addEventListener('click',event=>{
+  const wrap=document.querySelector('.profile-menu-wrap');
+  if(wrap&&!wrap.contains(event.target)){
+    document.getElementById('profile-menu')?.classList.add('hidden');
+    document.getElementById('profile-menu-button')?.setAttribute('aria-expanded','false');
+  }
+});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'){
+    document.getElementById('profile-menu')?.classList.add('hidden');
+    document.getElementById('profile-menu-button')?.setAttribute('aria-expanded','false');
+  }
+});
+document.addEventListener('DOMContentLoaded',()=>{
+  let theme='light';
+  try{theme=localStorage.getItem(THEME_STORAGE_KEY)==='dark'?'dark':'light'}catch(e){}
+  applyTheme(theme);
+});
+
 const supabaseClient = createClient(
   SUPABASE_URL,
   SUPABASE_KEY
