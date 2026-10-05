@@ -45,6 +45,12 @@ const supabaseClient = createClient(
   SUPABASE_KEY
 );
 
+supabaseClient.auth.onAuthStateChange((event,session)=>{
+  if(session?.access_token){
+    setRestAuthToken(session).catch(()=>{});
+  }
+});
+
 let headers = {
   apikey: SUPABASE_KEY,
   'Content-Type': 'application/json'
@@ -176,7 +182,7 @@ async function db(path,opt={},retryAuth=true){
   // A restored browser session can occasionally contain a JWT whose iat
   // is rejected by PostgREST as being in the future. Refresh the Auth
   // session once and retry the same request with the new access token.
-  if(!r.ok && retryAuth && r.status===401 && /PGRST303|JWT issued at future/i.test(t)){
+  if(!r.ok && retryAuth && /PGRST303|JWT issued at future/i.test(t)){
     await refreshRestAuthSession();
     return db(path,opt,false);
   }
