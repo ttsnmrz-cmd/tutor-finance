@@ -49,7 +49,7 @@ function esc(v){
 }
 
 function money(n){
-  return Number(n||0).toLocaleString('ru-RU',{
+  return Number(n||0).toLocaleString((typeof getLanguage==='function'&&getLanguage()==='en'?'en-US':'ru-RU'),{
     maximumFractionDigits:2
   })+' BYN';
 }
