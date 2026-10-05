@@ -105,3 +105,52 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 #teacher-header .teacher-nav button{white-space:nowrap}
 .fixed.right-6.bottom-6{line-height:1;align-items:center;justify-content:center}
 @media(max-width:640px){#teacher-header .teacher-nav{margin-right:0!important;padding-top:2.75rem;width:100%;grid-template-columns:1fr 1fr!important}}
+
+
+/* Modern weekday selector for recurring lessons */
+#recurring-days{
+  gap:8px;
+  margin-top:10px;
+}
+#recurring-days label{
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  padding:8px 10px;
+  border:1px solid #e5deed;
+  border-radius:12px;
+  background:#fff;
+  color:#62566f;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+#recurring-days label:hover{
+  border-color:#c8b5df;
+  background:#faf7fd;
+  transform:translateY(-1px);
+}
+#recurring-days label:has(.rec-day:checked){
+  border-color:#4b1b70;
+  background:#4b1b70;
+  color:#fff;
+  box-shadow:0 3px 8px rgba(75,27,112,.16);
+}
+#recurring-days .rec-day{
+  position:absolute;
+  opacity:0;
+  width:1px;
+  height:1px;
+  pointer-events:none;
+}
+#recurring-days label:has(.rec-day:focus-visible){
+  outline:3px solid #c8b5df;
+  outline-offset:2px;
+}
+@media(max-width:420px){
+  #recurring-days label{min-height:38px;padding:7px 4px;border-radius:10px}
+}
