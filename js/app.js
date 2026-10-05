@@ -798,6 +798,7 @@ async function saveLesson(){
 
     renderWeek();
     renderDay();
+    renderStudents();
 
   }catch(e){
     showError(e);
