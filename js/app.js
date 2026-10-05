@@ -281,34 +281,49 @@ async function autoCompletePastLessons(){
   due.forEach(l=>l.status='conducted');
 }
 function switchTab(t){
-  document
-    .getElementById('tab-calendar')
-    .classList.toggle('hidden',t!=='calendar');
-
-  document
-    .getElementById('tab-students')
-    .classList.toggle('hidden',t!=='students');
-
-  document.getElementById('nav-calendar').className=
-    'px-4 py-2 rounded-xl font-semibold '+
-    (t==='calendar'
-      ?'bg-indigo-600 text-white'
-      :'bg-slate-100');
-
-  document.getElementById('nav-students').className=
-    'px-4 py-2 rounded-xl font-semibold '+
-    (t==='students'
-      ?'bg-indigo-600 text-white'
-      :'bg-slate-100');
-
-  if(t==='calendar'){
-    renderWeek();
-    renderDay();
-  }else{
-    renderStudents();
-  }
+  ['dashboard','calendar','students'].forEach(name=>{
+    document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
+    const nav=document.getElementById('nav-'+name);
+    if(nav)nav.className='px-4 py-2 rounded-xl font-semibold '+(t===name?'bg-indigo-600 text-white':'bg-slate-100');
+  });
+  if(t==='dashboard')renderDashboard();
+  if(t==='calendar'){renderWeek();renderDay();}
+  if(t==='students')renderStudents();
 }
 
+function dashboardLessonCharge(l){
+  if(!charge.has(l.status))return 0;
+  if(!l.group_id)return Number(l.price||0);
+  const members=lessonMembersFor(l);
+  if(members.length)return members.reduce((sum,m)=>{if(m.charged===false)return sum;const s=students.find(x=>String(x.id)===String(m.student_id));return sum+Number(m.price??s?.price??0);},0);
+  return lessonPriceTotal(l);
+}
+
+function renderDashboard(){
+  const now=new Date(), today=localISO(now), month=today.slice(0,7);
+  const active=students.filter(s=>!s.archived);
+  const monthLessons=lessons.filter(l=>String(l.date||'').startsWith(month));
+  const earnedMonth=monthLessons.reduce((sum,l)=>sum+dashboardLessonCharge(l),0);
+  const earnedAll=lessons.reduce((sum,l)=>sum+dashboardLessonCharge(l),0);
+  const receivedMonth=payments.filter(p=>String(p.date||'').startsWith(month)).reduce((sum,p)=>sum+Number(p.amount||0),0);
+  const todayCount=lessons.filter(l=>l.date===today).length;
+  const low=active.map(student=>({student,stats:studentStats(student)})).filter(x=>x.stats.bal<=50).sort((a,b)=>a.stats.bal-b.stats.bal);
+  const en=typeof getLanguage==='function'&&getLanguage()==='en';
+  document.getElementById('dashboard-date').textContent=now.toLocaleDateString(en?'en-US':'ru-RU',{month:'long',year:'numeric'});
+  const cards=[
+    {label:en?'Active students':'Активные ученики',value:active.length,icon:'♙',action:"switchTab('students')"},
+    {label:en?'Accrued this month':'Начислено за месяц',value:money(earnedMonth),icon:'₿'},
+    {label:en?'Earned all time':'Заработано за всё время',value:money(earnedAll),icon:'↗'},
+    {label:en?'Lessons today':'Занятий сегодня',value:todayCount,icon:'▦',action:'openTodayCalendar()'},
+    {label:en?'Payments received this month':'Получено платежей за месяц',value:money(receivedMonth),icon:'＋',action:"switchTab('students')"},
+    {label:en?'Low student balances':'Низкие балансы',value:low.length,icon:'!',action:"switchTab('students')"}
+  ];
+  document.getElementById('dashboard-cards').innerHTML=cards.map(c=>'<button '+(c.action?'onclick="'+c.action+'"':'')+' class="app-card rounded-2xl p-4 md:p-5 text-left border min-w-0"><div class="flex items-center justify-between gap-2 mb-3"><span class="text-xs md:text-sm text-slate-500">'+c.label+'</span><span class="text-xl">'+c.icon+'</span></div><div class="text-xl md:text-2xl font-bold break-words">'+c.value+'</div></button>').join('');
+  document.getElementById('dashboard-low-balances').innerHTML=low.length?low.slice(0,5).map(x=>'<button onclick="switchTab(\'students\')" class="w-full flex justify-between gap-3 items-center text-left border-b last:border-0 py-2"><span class="font-medium">'+esc(x.student.name)+'</span><span class="text-sm '+(x.stats.bal<=0?'text-red-600':'text-amber-600')+'">'+money(x.stats.bal)+'</span></button>').join(''):'<p class="text-sm text-slate-500">'+(en?'No low balances':'Нет учеников с низким балансом')+'</p>';
+  document.getElementById('dashboard-summary').innerHTML='<div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Lessons this month':'Занятий в этом месяце')+'</span><strong>'+monthLessons.length+'</strong></div><div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Lessons today':'Занятий сегодня')+'</span><strong>'+todayCount+'</strong></div><div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Active students':'Активных учеников')+'</span><strong>'+active.length+'</strong></div>';
+}
+
+function openTodayCalendar(){selectedDate=localISO(new Date());weekAnchor=weekStart(new Date());switchTab('calendar');}
 function fillStudentSelects(){
   const active=sortedActiveStudents();
 
@@ -812,6 +827,7 @@ async function saveLesson(){
     renderWeek();
     renderDay();
     renderStudents();
+    switchTab('dashboard');
 
   }catch(e){
     showError(e);
