@@ -809,18 +809,21 @@ function renderGroups(){
           '</div>';
 
       return '<div class="border rounded-2xl overflow-hidden">'+
+        '<div class="p-3 flex flex-wrap gap-2 justify-between items-center hover:bg-slate-50">'+
         '<button onclick="toggleGroup(\''+
         esc(g.id)+
-        '\')" class="w-full p-3 flex justify-between items-center hover:bg-slate-50">'+
-        '<span class="font-semibold">'+
+        '\')" class="min-w-0 flex-1 text-left font-semibold">'+
         esc(g.name)+
-        '</span>'+
+        '</button>'+
+        '<div class="flex items-center gap-2">'+
         '<span class="text-sm font-bold px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">'+
         '<span class="block text-[10px] font-medium text-emerald-600 leading-tight">Ожидаемый платёж за занятие</span>'+
         '<span>'+money(total)+'</span>'+
         '</span>'+
-        '</button>'+
-
+        '<button onclick="editGroup(\''+esc(g.id)+'\');event.stopPropagation()" title="Изменить название" aria-label="Изменить название группы" class="px-2 py-2 rounded-lg text-slate-600 hover:bg-indigo-50 hover:text-indigo-700">✎</button>'+
+        '<button onclick="deleteGroup(\''+esc(g.id)+'\');event.stopPropagation()" title="Удалить группу" aria-label="Удалить группу" class="px-2 py-2 rounded-lg text-red-600 hover:bg-red-50">×</button>'+
+        '</div>'+
+        '</div>'+
         '<div id="group-'+
         esc(g.id)+
         '" class="hidden border-t bg-slate-50 p-3">'+
@@ -913,6 +916,33 @@ function toggleGroup(id){
   document
     .getElementById('group-'+id)
     ?.classList.toggle('hidden');
+}
+
+async function editGroup(id){
+  const group=groups.find(g=>String(g.id)===String(id));
+  if(!group)return;
+
+  const name=prompt('Новое название группы:',group.name||'');
+  if(name===null)return;
+
+  const trimmed=name.trim();
+  if(!trimmed){
+    alert('Название группы не может быть пустым.');
+    return;
+  }
+  if(trimmed===group.name)return;
+
+  try{
+    await db('/groups?id=eq.'+encodeURIComponent(id),{
+      method:'PATCH',
+      headers:{...headers,Prefer:'return=minimal'},
+      body:JSON.stringify({name:trimmed})
+    });
+    await loadData();
+    renderStudents();
+  }catch(e){
+    showError(e);
+  }
 }
 
 function openAdd(type){
@@ -1062,6 +1092,46 @@ async function addStudent(){
     await loadData();
     renderStudents();
 
+  }catch(e){
+    showError(e);
+  }
+}
+
+async function deleteGroup(id){
+  const group=groups.find(g=>String(g.id)===String(id));
+  if(!group)return;
+
+  const members=students.filter(s=>String(s.group_id)===String(id));
+  if(!confirm('Удалить группу «'+group.name+'»?\\n\\nУченики останутся в ProfiProfit, но будут отвязаны от группы.'))return;
+
+  try{
+    if(members.length){
+      await db('/students?group_id=eq.'+encodeURIComponent(id),{
+        method:'PATCH',
+        headers:{...headers,Prefer:'return=minimal'},
+        body:JSON.stringify({group_id:null})
+      });
+    }
+
+    try{
+      await db('/groups?id=eq.'+encodeURIComponent(id),{
+        method:'DELETE',
+        headers:{...headers,Prefer:'return=minimal'}
+      });
+    }catch(deleteError){
+      // Restore memberships if deletion is blocked by a database relation.
+      for(const student of members){
+        await db('/students?id=eq.'+encodeURIComponent(student.id),{
+          method:'PATCH',
+          headers:{...headers,Prefer:'return=minimal'},
+          body:JSON.stringify({group_id:id})
+        });
+      }
+      throw deleteError;
+    }
+
+    await loadData();
+    renderStudents();
   }catch(e){
     showError(e);
   }
