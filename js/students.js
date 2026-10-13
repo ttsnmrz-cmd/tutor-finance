@@ -379,7 +379,7 @@ function studentDetail(s){
   const topups=payments
     .filter(p=>p.student===s.name)
     .sort(
-      (a,b)=>String(b.date).localeCompare(String(a.date))
+      (a,b)=>String(a.date).localeCompare(String(b.date))
     );
 
   const lessonsHtml=allLessons.length
