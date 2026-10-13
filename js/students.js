@@ -572,8 +572,9 @@ function toggleStudentDetail(id){
 if(!window.__profiActionMenuOutsideHandler){
   window.__profiActionMenuOutsideHandler=true;
   document.addEventListener('click',event=>{
-    if(event.target.closest('.student-menu-wrap, .group-menu-wrap'))return;
+    if(event.target.closest('.student-menu-wrap, .group-menu-wrap, .student-sort-wrap'))return;
     document.querySelectorAll('[id^="menu-"], [id^="group-menu-"]').forEach(menu=>menu.classList.add('hidden'));
+    document.getElementById('student-sort-menu')?.classList.add('hidden');
     document.querySelectorAll('.group-card').forEach(card=>card.classList.remove('z-40'));
   });
 }
