@@ -808,7 +808,7 @@ function renderGroups(){
           '\')" class="shrink-0 px-3 py-2 rounded-xl bg-purple-50 text-purple-700 text-xs font-semibold hover:bg-purple-100">+ Добавить ученика</button>'+
           '</div>';
 
-      return '<div class="border rounded-2xl overflow-hidden">'+
+      return '<div class="group-card relative border rounded-2xl overflow-visible">'+
         '<div class="p-3 flex flex-wrap gap-2 justify-between items-center hover:bg-slate-50">'+
         '<button onclick="toggleGroup(\''+
         esc(g.id)+
@@ -925,10 +925,15 @@ function toggleGroup(id){
 
 function toggleGroupMenu(id){
   document.querySelectorAll('[id^="group-menu-"]').forEach(menu=>{
-    if(menu.id!=='group-menu-'+id)menu.classList.add('hidden');
+    menu.classList.add('hidden');
+    menu.closest('.group-card')?.classList.remove('z-40');
   });
   document.querySelectorAll('[id^="menu-"]').forEach(menu=>menu.classList.add('hidden'));
-  document.getElementById('group-menu-'+id)?.classList.toggle('hidden');
+  const menu=document.getElementById('group-menu-'+id);
+  if(!menu)return;
+  const isOpening=menu.classList.contains('hidden');
+  menu.classList.toggle('hidden');
+  menu.closest('.group-card')?.classList.toggle('z-40',isOpening);
 }
 
 async function editGroup(id){
