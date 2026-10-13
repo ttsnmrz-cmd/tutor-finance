@@ -1474,7 +1474,7 @@ async function openStudentCabinet(){
       .slice()
       .sort(
         (a,b)=>
-          String(b.date).localeCompare(String(a.date))
+          String(a.date).localeCompare(String(b.date))
       )
       .map(
         p=>
