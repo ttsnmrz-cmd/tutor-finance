@@ -112,8 +112,9 @@ function renderDay(){
         )
     );
 
+  const addLessonLink='<button type="button" onclick="openNewLessonForDate(selectedDate)" class="mt-2 inline-flex items-center gap-1 rounded-lg px-2 py-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50">+ <span>Добавить занятие</span></button>';
   document.getElementById('day-lessons').innerHTML=
-    ls.length
+    (ls.length
       ?ls.map(l=>
         `<button onclick="openEditLesson('${esc(l.id)}')" class="w-full text-left border-b last:border-0 py-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl px-2">
           <div class="w-16 font-bold">
@@ -142,5 +143,5 @@ function renderDay(){
           </span>
         </button>`
       ).join('')
-      :'<div class="py-8 text-center text-slate-400">На этот день занятий нет</div>';
+      :'')+addLessonLink;
 }
