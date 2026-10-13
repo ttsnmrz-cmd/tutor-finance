@@ -154,7 +154,7 @@ function studentRow(s){
         ${money(st.bal)}
       </div>
 
-      <div class="relative">
+      <div class="student-menu-wrap relative">
         <button
           onclick="event.stopPropagation();toggleStudentMenu('${esc(id)}')"
           class="w-9 h-9 rounded-xl bg-slate-100 text-xl"
@@ -568,6 +568,16 @@ function toggleStudentDetail(id){
   }
 }
 
+// Close student/group action menus when clicking anywhere outside them.
+if(!window.__profiActionMenuOutsideHandler){
+  window.__profiActionMenuOutsideHandler=true;
+  document.addEventListener('click',event=>{
+    if(event.target.closest('.student-menu-wrap, .group-menu-wrap'))return;
+    document.querySelectorAll('[id^="menu-"], [id^="group-menu-"]').forEach(menu=>menu.classList.add('hidden'));
+    document.querySelectorAll('.group-card').forEach(card=>card.classList.remove('z-40'));
+  });
+}
+
 function toggleStudentMenu(id){
   document.querySelectorAll('[id^="menu-"]').forEach(x=>{
     if(x.id!=='menu-'+id){
@@ -820,7 +830,7 @@ function renderGroups(){
         '<span class="block text-[10px] font-medium text-emerald-600 leading-tight">Ожидаемый платёж за занятие</span>'+
         '<span>'+money(total)+'</span>'+
         '</span>'+
-        '<div class="relative">'+
+        '<div class="group-menu-wrap relative">'+
         '<button onclick="event.stopPropagation();toggleGroupMenu(\''+esc(g.id)+'\')" class="w-9 h-9 rounded-xl bg-slate-100 text-xl" title="Действия с группой" aria-label="Действия с группой">⋮</button>'+
         '<div id="group-menu-'+esc(g.id)+'" class="hidden absolute right-0 top-10 z-30 bg-white border rounded-2xl shadow-xl p-2 w-48">'+
         '<button onclick="editGroup(\''+esc(g.id)+'\')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100">Изменить название</button>'+
