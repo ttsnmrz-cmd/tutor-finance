@@ -810,7 +810,7 @@ function renderGroups(){
 
       return '<div class="border rounded-2xl overflow-hidden">'+
         '<div class="p-3 flex flex-wrap gap-2 justify-between items-center hover:bg-slate-50">'+
-        '<button onclick="toggleGroup(\\''+
+        '<button onclick="toggleGroup(\''+
         esc(g.id)+
         '\\')" class="min-w-0 flex-1 text-left font-semibold">'+
         esc(g.name)+
@@ -821,11 +821,10 @@ function renderGroups(){
         '<span>'+money(total)+'</span>'+
         '</span>'+
         '<div class="relative">'+
-        '<button onclick="event.stopPropagation();toggleGroupMenu(\\''+esc(g.id)+'\\')" class="w-9 h-9 rounded-xl bg-slate-100 text-xl" title="Действия с группой" aria-label="Действия с группой">⋮</button>'+
+        '<button onclick="event.stopPropagation();toggleGroupMenu(\''+esc(g.id)+'\\')" class="w-9 h-9 rounded-xl bg-slate-100 text-xl" title="Действия с группой" aria-label="Действия с группой">⋮</button>'+
         '<div id="group-menu-'+esc(g.id)+'" class="hidden absolute right-0 top-10 z-30 bg-white border rounded-2xl shadow-xl p-2 w-48">'+
-        '<button onclick="editGroup(\\''+esc(g.id)+'\\')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100">Изменить название</button>'+
-        '<button onclick="deleteGroup(\\''+esc(g.id)+'\\')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600">Удалить группу</button>'+
-        '</div>'+
+        '<button onclick="editGroup(\''+esc(g.id)+'\\')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100">Изменить название</button>'+
+        '<button onclick="deleteGroup(\''+esc(g.id)+'\\')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600">Удалить группу</button>'+
         '</div>'+
         '</div>'+
         '</div>'+
