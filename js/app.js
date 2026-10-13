@@ -1921,3 +1921,15 @@ if(document.readyState === 'loading'){
   initApp();
 }
 
+
+function openHelp(){
+  document.getElementById('profile-menu')?.classList.add('hidden');
+  document.getElementById('profile-menu-button')?.setAttribute('aria-expanded','false');
+  const modal=document.getElementById('help-modal');
+  if(modal){modal.classList.remove('hidden');modal.classList.add('flex');}
+}
+function closeHelp(){
+  const modal=document.getElementById('help-modal');
+  if(modal){modal.classList.add('hidden');modal.classList.remove('flex');}
+}
+document.addEventListener('keydown',event=>{if(event.key==='Escape')closeHelp()});
