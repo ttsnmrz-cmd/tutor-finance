@@ -216,3 +216,24 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 /* Dashboard cards */
 #tab-dashboard button.app-card{transition:transform .15s ease,box-shadow .15s ease}
 #tab-dashboard button.app-card:hover{box-shadow:0 8px 24px rgba(67,44,122,.09)}
+
+
+/* Keep student and group names readable on hover in both themes. */
+#students-list .cursor-pointer:hover,
+#groups-list .group-card > div:first-child:hover{
+  background:var(--accent-soft)!important;
+  color:var(--text-color)!important;
+}
+#students-list .cursor-pointer:hover .font-semibold,
+#groups-list .group-card > div:first-child:hover button{
+  color:var(--text-color)!important;
+}
+:root[data-theme="dark"] #students-list .cursor-pointer:hover,
+:root[data-theme="dark"] #groups-list .group-card > div:first-child:hover{
+  background:#30283d!important;
+  color:#f2eef8!important;
+}
+:root[data-theme="dark"] #students-list .cursor-pointer:hover .font-semibold,
+:root[data-theme="dark"] #groups-list .group-card > div:first-child:hover button{
+  color:#f2eef8!important;
+}
