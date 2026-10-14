@@ -1181,20 +1181,38 @@ function closeModal(id){
 
 const TURNSTILE_SITE_KEY='0x4AAAAAAFWyPC9oBP3FKPXq';
 let turnstileWidgetId=null;
+let turnstileWidgetContainerId='';
 let turnstileRegisterToken='';
 function onTurnstileLoad(){
   renderTurnstileWidget();
 }
 function renderTurnstileWidget(){
-  const container=document.getElementById('turnstile-register-container');
+  if(!window.turnstile)return;
+  const loginForm=document.getElementById('auth-login-form');
   const registerForm=document.getElementById('auth-register-form');
-  if(!container||!registerForm||registerForm.classList.contains('hidden')||!window.turnstile||turnstileWidgetId!==null)return;
+  const isRegister=registerForm&&!registerForm.classList.contains('hidden');
+  const containerId=isRegister?'turnstile-register-container':'turnstile-login-container';
+  const container=document.getElementById(containerId);
+  if(!container||(!isRegister&&(!loginForm||loginForm.classList.contains('hidden'))))return;
+  if(turnstileWidgetId!==null&&turnstileWidgetContainerId===containerId)return;
+  if(turnstileWidgetId!==null){
+    try{window.turnstile.remove(turnstileWidgetId)}catch(e){}
+    turnstileWidgetId=null;
+    turnstileRegisterToken='';
+  }
+  turnstileWidgetContainerId=containerId;
   turnstileWidgetId=window.turnstile.render(container,{
     sitekey:TURNSTILE_SITE_KEY,
     callback:token=>{turnstileRegisterToken=token;},
     'expired-callback':()=>{turnstileRegisterToken='';},
     'error-callback':()=>{turnstileRegisterToken='';}
   });
+}
+function resetTurnstileWidget(){
+  turnstileRegisterToken='';
+  if(window.turnstile&&turnstileWidgetId!==null){
+    try{window.turnstile.reset(turnstileWidgetId)}catch(e){}
+  }
 }
 function showAuthMode(mode){
   const login=document.getElementById('auth-login-form');
@@ -1214,7 +1232,7 @@ function showAuthMode(mode){
   registerTab.classList.toggle('bg-white',!isLogin);
   registerTab.classList.toggle('shadow-sm',!isLogin);
   registerTab.classList.toggle('text-slate-500',isLogin);
-  if(!isLogin)renderTurnstileWidget();
+  renderTurnstileWidget();
 }
 
 async function registerTeacher(){
@@ -1258,8 +1276,7 @@ async function registerTeacher(){
 
     if(error)throw error;
 
-    turnstileRegisterToken='';
-    if(window.turnstile&&turnstileWidgetId!==null)window.turnstile.reset(turnstileWidgetId);
+    resetTurnstileWidget();
 
     // Supabase may return a successful-looking response for an existing
     // confirmed email to avoid exposing account existence through an error.
@@ -1278,8 +1295,7 @@ async function registerTeacher(){
     errorEl.textContent='Аккаунт создан. Проверьте email для подтверждения.';
   }catch(e){
     console.error(e);
-    turnstileRegisterToken='';
-    if(window.turnstile&&turnstileWidgetId!==null)window.turnstile.reset(turnstileWidgetId);
+    resetTurnstileWidget();
     errorEl.className='text-sm text-red-600';
     errorEl.textContent=e.message||'Не удалось зарегистрироваться';
   }
@@ -1311,6 +1327,12 @@ async function loginTeacher(){
     return;
   }
 
+  if(!turnstileRegisterToken){
+    renderTurnstileWidget();
+    errorEl.textContent='Подтвердите проверку Cloudflare и дождитесь её завершения.';
+    return;
+  }
+
   try{
 
     const {
@@ -1318,8 +1340,11 @@ async function loginTeacher(){
       error
     } = await supabaseClient.auth.signInWithPassword({
       email,
-      password
+      password,
+      options:{captchaToken:turnstileRegisterToken}
     });
+
+    resetTurnstileWidget();
 
     if(error){
       throw error;
