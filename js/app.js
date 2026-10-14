@@ -1187,7 +1187,8 @@ function onTurnstileLoad(){
 }
 function renderTurnstileWidget(){
   const container=document.getElementById('turnstile-register-container');
-  if(!container||!window.turnstile||turnstileWidgetId!==null)return;
+  const registerForm=document.getElementById('auth-register-form');
+  if(!container||!registerForm||registerForm.classList.contains('hidden')||!window.turnstile||turnstileWidgetId!==null)return;
   turnstileWidgetId=window.turnstile.render(container,{
     sitekey:TURNSTILE_SITE_KEY,
     callback:token=>{turnstileRegisterToken=token;},
@@ -1239,13 +1240,19 @@ async function registerTeacher(){
     return;
   }
 
+  if(!turnstileRegisterToken){
+    renderTurnstileWidget();
+    errorEl.textContent='Подтвердите проверку Cloudflare и дождитесь её завершения.';
+    return;
+  }
+
   try{
     const {data,error}=await supabaseClient.auth.signUp({
       email,
       password,
       options:{
         emailRedirectTo:'https://ttsnmrz-cmd.github.io/tutor-finance/',
-        ...(turnstileRegisterToken?{captchaToken:turnstileRegisterToken}:{})
+        captchaToken:turnstileRegisterToken
       }
     });
 
@@ -1263,6 +1270,8 @@ async function registerTeacher(){
     errorEl.textContent='Аккаунт создан. Проверьте email для подтверждения.';
   }catch(e){
     console.error(e);
+    turnstileRegisterToken='';
+    if(window.turnstile&&turnstileWidgetId!==null)window.turnstile.reset(turnstileWidgetId);
     errorEl.className='text-sm text-red-600';
     errorEl.textContent=e.message||'Не удалось зарегистрироваться';
   }
