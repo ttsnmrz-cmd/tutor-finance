@@ -74,6 +74,7 @@
       <input id="teacher-register-email" type="email" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Email" autocomplete="email">
       <div class="password-field"><input id="teacher-register-password" type="password" class="soft-input w-full rounded-xl px-3 py-2 pr-12" placeholder="Пароль" autocomplete="new-password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('teacher-register-password',this)" aria-label="Показать пароль" title="Показать пароль"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
       <div class="password-field"><input id="teacher-register-password2" type="password" class="soft-input w-full rounded-xl px-3 py-2 pr-12" placeholder="Повторите пароль" autocomplete="new-password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('teacher-register-password2',this)" aria-label="Показать пароль" title="Показать пароль"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <div id="turnstile-register-container" class="flex justify-center min-h-[0px]"></div>
       <button onclick="registerTeacher()" class="primary-btn w-full rounded-xl py-2 font-semibold">Зарегистрироваться</button>
       <p id="teacher-register-error" class="text-sm text-red-600"></p>
     </div>
@@ -155,8 +156,9 @@
 <button onclick="openAdd()" class="fixed right-6 bottom-6 w-14 h-14 rounded-full bg-indigo-600 text-white text-3xl shadow-xl inline-flex items-center justify-center leading-none">+</button></section>
 </main><div id="error-box" class="hidden fixed bottom-4 left-4 bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl shadow-lg"></div>
 </div></div>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit" async defer></script>
 <script src="js/config.js?v=20261005-2"></script>
-<script src="js/app.js?v=20261013-2"></script>
+<script src="js/app.js?v=20261014-1"></script>
 <script src="js/students.js?v=20261013-6"></script>
 <script src="js/lessons.js?v=20261005-2"></script>
 <script src="js/calendar.js?v=20261013-1"></script>
