@@ -1261,6 +1261,14 @@ async function registerTeacher(){
     turnstileRegisterToken='';
     if(window.turnstile&&turnstileWidgetId!==null)window.turnstile.reset(turnstileWidgetId);
 
+    // Supabase may return a successful-looking response for an existing
+    // confirmed email to avoid exposing account existence through an error.
+    if(data.user && Array.isArray(data.user.identities) && data.user.identities.length===0){
+      errorEl.className='text-sm text-red-600';
+      errorEl.textContent='Аккаунт с такой почтой уже зарегистрирован. Войдите или восстановите пароль.';
+      return;
+    }
+
     if(data.session){
       location.reload();
       return;
