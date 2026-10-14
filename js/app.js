@@ -1179,6 +1179,22 @@ function closeModal(id){
   e.classList.remove('flex');
 }
 
+const TURNSTILE_SITE_KEY='0x4AAAAAAFWyPC9oBP3FKPXq';
+let turnstileWidgetId=null;
+let turnstileRegisterToken='';
+function onTurnstileLoad(){
+  renderTurnstileWidget();
+}
+function renderTurnstileWidget(){
+  const container=document.getElementById('turnstile-register-container');
+  if(!container||!window.turnstile||turnstileWidgetId!==null)return;
+  turnstileWidgetId=window.turnstile.render(container,{
+    sitekey:TURNSTILE_SITE_KEY,
+    callback:token=>{turnstileRegisterToken=token;},
+    'expired-callback':()=>{turnstileRegisterToken='';},
+    'error-callback':()=>{turnstileRegisterToken='';}
+  });
+}
 function showAuthMode(mode){
   const login=document.getElementById('auth-login-form');
   const register=document.getElementById('auth-register-form');
@@ -1197,6 +1213,7 @@ function showAuthMode(mode){
   registerTab.classList.toggle('bg-white',!isLogin);
   registerTab.classList.toggle('shadow-sm',!isLogin);
   registerTab.classList.toggle('text-slate-500',isLogin);
+  if(!isLogin)renderTurnstileWidget();
 }
 
 async function registerTeacher(){
@@ -1227,11 +1244,15 @@ async function registerTeacher(){
       email,
       password,
       options:{
-        emailRedirectTo:'https://ttsnmrz-cmd.github.io/tutor-finance/'
+        emailRedirectTo:'https://ttsnmrz-cmd.github.io/tutor-finance/',
+        ...(turnstileRegisterToken?{captchaToken:turnstileRegisterToken}:{})
       }
     });
 
     if(error)throw error;
+
+    turnstileRegisterToken='';
+    if(window.turnstile&&turnstileWidgetId!==null)window.turnstile.reset(turnstileWidgetId);
 
     if(data.session){
       location.reload();
