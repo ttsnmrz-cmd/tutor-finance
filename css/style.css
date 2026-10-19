@@ -250,3 +250,10 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 :root[data-theme="dark"] #student-public-view .student-price-card .student-summary-label{color:#d0c1e0!important}
 :root[data-theme="dark"] #student-public-view .student-secondary-text{color:#c3b8d1!important}
 :root[data-theme="dark"] #student-public-view .text-emerald-600{color:#9de0b6!important}
+
+/* Student cabinet contrast fixes */
+#student-public-view .student-theme-panel{background:#f3eef7!important;color:#30213f!important}
+#student-public-view .student-theme-panel .text-slate-500{color:#6f617e!important}
+:root[data-theme="dark"] #student-public-view .student-theme-panel{background:#292433!important;color:#f2eef8!important}
+:root[data-theme="dark"] #student-public-view .student-theme-panel .text-slate-500{color:#c3b8d1!important}
+:root[data-theme="dark"] #student-public-view .text-emerald-600{color:#9de0b6!important}
