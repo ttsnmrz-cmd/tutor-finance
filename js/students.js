@@ -605,6 +605,24 @@ async function openStudentEdit(id){
   document.getElementById('student-edit-price').value=
     String(s.price??40);
 
+  document.getElementById('student-notify-1h').checked=s.telegram_notify_1h!==false;
+  document.getElementById('student-notify-10m').checked=s.telegram_notify_10m!==false;
+  document.getElementById('student-notify-changes').checked=s.telegram_notify_changes===true;
+  document.getElementById('student-notify-payments').checked=s.telegram_notify_payments===true;
+
+  const connected=!!s.telegram_chat_id;
+  const status=document.getElementById('student-telegram-status');
+  if(status){
+    status.textContent=connected?'Telegram подключён':'Telegram не подключён';
+    status.className='text-sm font-semibold '+(connected?'text-emerald-600':'text-amber-600');
+  }
+
+  const linkButton=document.getElementById('student-telegram-link-button');
+  if(linkButton){
+    linkButton.disabled=!s.telegram_link_token;
+    linkButton.classList.toggle('opacity-50',!s.telegram_link_token);
+  }
+
   showModal('student-modal');
 }
 
@@ -633,6 +651,11 @@ async function saveStudent(){
       Number(
         document.getElementById('student-edit-price').value
       );
+
+    const telegram_notify_1h=document.getElementById('student-notify-1h').checked;
+    const telegram_notify_10m=document.getElementById('student-notify-10m').checked;
+    const telegram_notify_changes=document.getElementById('student-notify-changes').checked;
+    const telegram_notify_payments=document.getElementById('student-notify-payments').checked;
 
     if(!s||!name)return;
 
@@ -683,7 +706,11 @@ async function saveStudent(){
           name,
           price,
           email,
-          telegram
+          telegram,
+          telegram_notify_1h,
+          telegram_notify_10m,
+          telegram_notify_changes,
+          telegram_notify_payments
         })
       }
     );
@@ -697,6 +724,25 @@ async function saveStudent(){
     showError(e);
   }
 }
+
+async function copyTelegramStudentLink(id){
+  const s=students.find(x=>String(x.id)===String(id));
+  if(!s)return;
+
+  if(!s.telegram_link_token){
+    alert('Для ученика ещё не создан код подключения Telegram.');
+    return;
+  }
+
+  const url='https://t.me/ProfiProfitMonitorBot?start='+encodeURIComponent(s.telegram_link_token);
+  try{
+    await navigator.clipboard.writeText(url);
+    alert('Персональная ссылка на подключение Telegram скопирована. Отправь её ученику.');
+  }catch(e){
+    prompt('Скопируй персональную ссылку на Telegram:',url);
+  }
+}
+
 async function copyStudentLink(id){
   const url=new URL(location.href);
   url.search='';
