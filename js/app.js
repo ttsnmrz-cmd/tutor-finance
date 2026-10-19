@@ -477,6 +477,7 @@ function renderDashboard(){
     window.teacherProfile?.name ||
     window.currentUser?.user_metadata?.full_name ||
     window.currentUser?.user_metadata?.name ||
+    window.currentUser?.email?.split('@')[0] ||
     ''
   ).trim();
   const greetingHour=Number(new Intl.DateTimeFormat('en-GB',{
@@ -1823,6 +1824,8 @@ async function openStudentCabinet(){
       document.getElementById('teacher-main')?.classList.add('hidden');
       return;
     }
+
+    window.currentUser=session.user;
 
     document.getElementById('landing-page')?.classList.add('hidden');
     document.getElementById('teacher-app')?.classList.remove('hidden');
