@@ -39,7 +39,7 @@ After that, sign out and sign in again. The **Админ** tab should appear for
 Deploy `supabase/functions/notify-platform-registrations/index.ts` using the Supabase CLI linked to the correct project:
 
 ```bash
-supabase functions deploy notify-platform-registrations
+supabase functions deploy notify-platform-registrations --no-verify-jwt
 supabase secrets set TELEGRAM_BOT_TOKEN=YOUR_BOT_TOKEN TELEGRAM_ADMIN_CHAT_ID=YOUR_CHAT_ID SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
 ```
 
@@ -47,7 +47,7 @@ Use your real values locally in the terminal, not in this repository. The servic
 
 ## 5. Schedule the function
 
-Configure a Supabase Cron job to invoke `notify-platform-registrations` every minute. The scheduled request must include this header:
+Configure a Supabase Cron job to invoke `notify-platform-registrations` every minute. The function is deployed with JWT verification disabled because it validates the exact service-role secret itself. The scheduled request must include this header:
 
 ```
 Authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY>
