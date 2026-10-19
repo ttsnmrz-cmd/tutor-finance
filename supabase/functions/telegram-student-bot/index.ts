@@ -31,39 +31,41 @@ async function sendMessage(chatId: number, text: string) {
 
 const welcome = `Привет! 👋 Добро пожаловать в ProfiProfit!
 
-Я буду помогать тебе не пропустить важное:
-🔔 Напоминать о предстоящих занятиях:
-• за 1 час до начала;
-• за 10 минут до начала.
+Я очень рада, что ты решил улучшить свой английский и выбрал меня в качестве своего преподавателя! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь твоих целей.
 
-📅 Сообщать об изменениях в расписании:
-• если занятие перенесено;
-• если занятие отменено.
+Чтобы тебе было удобнее организовывать занятия, я подготовила для тебя личную страницу в ProfiProfit. Там ты сможешь:
+📅 Смотреть расписание и историю занятий.
+💰 Отслеживать баланс, оплаты и списания за уроки.
+🔔 Получать напоминания о предстоящих занятиях — за 1 час и за 10 минут до начала.
+📢 Узнавать об изменениях в расписании, например о переносах и отменах занятий.
 
-💳 Присылать уведомления об оплате.
+Я отправлю тебе ссылку на твою личную страницу отдельно.
 
-Чтобы подключить уведомления, открой персональную ссылку, которую тебе отправил преподаватель, и нажми Start.
+А ещё ты можешь подключить уведомления в Telegram, чтобы ничего не пропустить. Для этого открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.
 
-Если не получается подключиться или нужна помощь, напиши преподавателю: <a href="https://t.me/tiana_wow">@tiana_wow</a>. Поможем! 😊
+Если возникнут вопросы или что-то не получится, смело пиши мне: <a href="https://t.me/tiana_wow">@tiana_wow</a>. Я помогу! 😊
+
+До встречи на занятиях! 🚀
 
 ———
 
 Hi! 👋 Welcome to ProfiProfit!
 
-I'll help you stay up to date with your lessons:
-🔔 Reminders about upcoming lessons:
-• 1 hour before they start;
-• 10 minutes before they start.
+I'm really happy that you've decided to improve your English and chosen me as your teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you achieve your goals.
 
-📅 Updates about schedule changes:
-• when a lesson is rescheduled;
-• when a lesson is cancelled.
+To make managing your lessons easier, I've prepared your personal page on ProfiProfit. There, you can:
+📅 View your lesson schedule and lesson history.
+💰 Keep track of your balance, payments, and lesson charges.
+🔔 Get reminders about upcoming lessons — 1 hour and 10 minutes before they start.
+📢 Stay informed about schedule changes, such as rescheduled or cancelled lessons.
 
-💳 Payment notifications.
+I'll send you the link to your personal page separately.
 
-To enable notifications, open the personal link sent by your teacher and press Start.
+You can also enable Telegram notifications so you don't miss anything. Just open the personal bot link I'll send you and press Start.
 
-If you have trouble connecting or need help, message your teacher: <a href="https://t.me/tiana_wow">@tiana_wow</a>. We'll help! 😊`;
+If you have any questions or need help, feel free to message me: <a href="https://t.me/tiana_wow">@tiana_wow</a>. I'll be happy to help! 😊
+
+See you in class! 🚀`;
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
