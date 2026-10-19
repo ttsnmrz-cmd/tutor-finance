@@ -341,7 +341,10 @@ function switchTab(t){
   ['dashboard','calendar','students','admin'].forEach(name=>{
     document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
     const nav=document.getElementById('nav-'+name);
-    if(nav)nav.className='px-4 py-2 rounded-xl font-semibold '+(t===name?'bg-indigo-600 text-white':'bg-slate-100');
+    if(nav){
+      nav.className='px-4 py-2 rounded-xl font-semibold '+(t===name?'bg-indigo-600 text-white':'bg-slate-100');
+      if(name==='admin'&&!platformAdmin)nav.classList.add('hidden');
+    }
   });
   if(t==='admin')loadPlatformAdminDashboard();
 }
