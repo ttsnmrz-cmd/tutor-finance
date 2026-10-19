@@ -189,15 +189,16 @@ function openEditLesson(id){
       ?'group:'+l.group_id
       :l.student;
 
+  const displayDateTime=lessonDateTimeInTimezone(l,getTeacherTimezone());
   document.getElementById(
     'edit-date'
-  ).value=l.date;
+  ).value=displayDateTime.date;
 
   document.getElementById(
     'edit-duration'
   ).value=String(l.duration||60);
 
-  setTime(l.time||'11:00');
+  setTime(displayDateTime.time||'11:00');
 
   const priceEl=document.getElementById(
     'edit-price'
