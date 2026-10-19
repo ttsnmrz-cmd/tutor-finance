@@ -462,6 +462,28 @@ function dashboardLessonCharge(l){
   return lessonPriceTotal(l);
 }
 
+function dashboardStudentStats(student){
+  const groupLessonIds=new Set(
+    lessonMembersForStudent(student.id).map(m=>String(m.lesson_id))
+  );
+  const studentLessons=lessons.filter(l=>
+    l.student===student.name||groupLessonIds.has(String(l.id))
+  );
+  const income=payments.filter(p=>p.student===student.name)
+    .reduce((sum,p)=>sum+Number(p.amount||0),0);
+  const expenses=studentLessons.filter(l=>charge.has(l.status))
+    .reduce((sum,l)=>{
+      if(!l.group_id)return sum+Number(l.price||0);
+      const member=lessonMembersFor(l).find(m=>String(m.student_id)===String(student.id));
+      return sum+(member&&member.charged!==false?Number(member.price??student.price??0):0);
+    },0);
+  return {ls:studentLessons,income,expenses,bal:income-expenses};
+}
+
+function lessonMembersForStudent(studentId){
+  return lessonMembers.filter(m=>String(m.student_id)===String(studentId));
+}
+
 function renderDashboard(){
   const now=new Date(), today=localISO(now), month=today.slice(0,7);
   const active=students.filter(s=>!s.archived);
@@ -470,7 +492,7 @@ function renderDashboard(){
   const earnedAll=lessons.reduce((sum,l)=>sum+dashboardLessonCharge(l),0);
   const receivedMonth=payments.filter(p=>String(p.date||'').startsWith(month)).reduce((sum,p)=>sum+Number(p.amount||0),0);
   const todayCount=lessons.filter(l=>l.date===today).length;
-  const low=active.map(student=>{const stats=studentStats(student);const price=Number(student.price||0);const remaining=price>0?Math.floor((stats.bal+1e-9)/price):Infinity;return {student,stats,price,remaining,status:stats.bal<0?'debt':remaining<=1?'topup':remaining===2?'low':'ok'};}).filter(x=>x.status!=='ok').sort((a,b)=>a.stats.bal-b.stats.bal);
+  const low=active.map(student=>{const stats=dashboardStudentStats(student);const price=Number(student.price||0);const remaining=price>0?Math.floor((stats.bal+1e-9)/price):Infinity;return {student,stats,price,remaining,status:stats.bal<0?'debt':remaining<=1?'topup':remaining===2?'low':'ok'};}).filter(x=>x.status!=='ok').sort((a,b)=>a.stats.bal-b.stats.bal);
   const en=typeof getLanguage==='function'&&getLanguage()==='en';
   let userName=String(
     window.currentTeacherName ||
