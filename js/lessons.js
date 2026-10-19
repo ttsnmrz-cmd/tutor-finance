@@ -393,6 +393,7 @@ async function createOneGroupLesson(
         group_id:groupId,
         date,
         time,
+        timezone:getTeacherTimezone(),
         price:total,
         status,
         duration,
