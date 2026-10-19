@@ -310,7 +310,7 @@ function lessonPriceTotal(l){
 async function loadData(){
   [students,lessons,payments,groups,lessonMembers]=await Promise.all([
     db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments,timezone'),
-    db('/lessons?select=id,student,date,time,price,status,duration,group_id,comment'),
+    db('/lessons?select=id,student,date,time,timezone,price,status,duration,group_id,comment'),
     db('/payments?select=id,student,amount,date'),
     db('/groups?select=id,name'),
     db('/lesson_members?select=id,lesson_id,student_id,price,charged,attendance_status')
@@ -588,6 +588,7 @@ async function createOneGroupLesson(
         group_id:groupId,
         date,
         time,
+        timezone:getTeacherTimezone(),
         price:total,
         status,
         duration,
@@ -781,6 +782,7 @@ async function saveLesson(){
                 )?.name||l.student,
               date,
               time,
+              timezone:getTeacherTimezone(),
               price:l.price,
               status,
               duration,
@@ -804,6 +806,7 @@ async function saveLesson(){
               student,
               date,
               time,
+              timezone:getTeacherTimezone(),
               price,
               status,
               duration,
@@ -921,6 +924,7 @@ async function saveLesson(){
               student,
               date,
               time,
+              timezone:getTeacherTimezone(),
               price,
               status,
               duration,
