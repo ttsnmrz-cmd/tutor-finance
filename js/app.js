@@ -472,7 +472,7 @@ function renderDashboard(){
   const todayCount=lessons.filter(l=>l.date===today).length;
   const low=active.map(student=>{const stats=studentStats(student);const price=Number(student.price||0);const remaining=price>0?Math.floor((stats.bal+1e-9)/price):Infinity;return {student,stats,price,remaining,status:stats.bal<0?'debt':remaining<=1?'topup':remaining===2?'low':'ok'};}).filter(x=>x.status!=='ok').sort((a,b)=>a.stats.bal-b.stats.bal);
   const en=typeof getLanguage==='function'&&getLanguage()==='en';
-  const userName=String(
+  let userName=String(
     window.currentTeacherName ||
     window.teacherProfile?.name ||
     window.currentUser?.user_metadata?.full_name ||
@@ -480,6 +480,10 @@ function renderDashboard(){
     window.currentUser?.email?.split('@')[0] ||
     ''
   ).trim();
+  const duplicateName=userName.match(/^(.+?)\\s*\\(\\s*([^)]+)\\s*\\)$/);
+  if(duplicateName&&duplicateName[1].trim().toLocaleLowerCase()===duplicateName[2].trim().toLocaleLowerCase()){
+    userName=duplicateName[1].trim();
+  }
   const greetingHour=Number(new Intl.DateTimeFormat('en-GB',{
     timeZone:getTeacherTimezone(),hour:'2-digit',hourCycle:'h23'
   }).format(now));
