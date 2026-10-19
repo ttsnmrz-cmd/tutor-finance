@@ -604,6 +604,8 @@ async function openStudentEdit(id){
   document.getElementById('student-edit-telegram').value=s.telegram||'';
   document.getElementById('student-edit-price').value=
     String(s.price??40);
+  const timezoneSelect=document.getElementById('student-edit-timezone');
+  if(timezoneSelect)timezoneSelect.value=s.timezone||'Europe/Minsk';
 
   document.getElementById('student-notify-1h').checked=s.telegram_notify_1h!==false;
   document.getElementById('student-notify-10m').checked=s.telegram_notify_10m!==false;
@@ -651,6 +653,7 @@ async function saveStudent(){
       Number(
         document.getElementById('student-edit-price').value
       );
+    const timezone=document.getElementById('student-edit-timezone')?.value||'Europe/Minsk';
 
     const telegram_notify_1h=document.getElementById('student-notify-1h').checked;
     const telegram_notify_10m=document.getElementById('student-notify-10m').checked;
@@ -710,7 +713,8 @@ async function saveStudent(){
           telegram_notify_1h,
           telegram_notify_10m,
           telegram_notify_changes,
-          telegram_notify_payments
+          telegram_notify_payments,
+          timezone
         })
       }
     );
