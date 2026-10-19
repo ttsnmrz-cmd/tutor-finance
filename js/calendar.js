@@ -1,5 +1,5 @@
 function weekStart(d){
-  const x=new Date(d);
+  const x=dateAtLocalNoon(localISO(d));
   x.setHours(0,0,0,0);
 
   const day=x.getDay();
@@ -25,8 +25,8 @@ function changeWeek(n){
 }
 
 function goToday(){
-  weekAnchor=new Date();
-  selectedDate=localISO(new Date());
+  selectedDate=todayISOInTimezone(getTeacherTimezone());
+  weekAnchor=dateAtLocalNoon(selectedDate);
 
   renderWeek();
   renderDay();
@@ -47,7 +47,7 @@ function renderWeek(){
   const c=document.getElementById('week-calendar');
 
   const start=weekStart(weekAnchor);
-  const today=localISO(new Date());
+  const today=todayISOInTimezone(getTeacherTimezone());
   const days=[];
 
   for(let i=0;i<7;i++){
@@ -70,7 +70,7 @@ function renderWeek(){
 
   c.innerHTML=days.map(d=>{
     const key=localISO(d);
-    const has=lessons.some(l=>l.date===key);
+    const has=lessons.some(l=>lessonDateTimeInTimezone(l,getTeacherTimezone()).date===key);
     const sel=key===selectedDate;
     const isToday=key===today;
 
@@ -104,13 +104,9 @@ function renderDay(){
     });
 
   const ls=lessons
+    .map(l=>({...l,...lessonDateTimeInTimezone(l,getTeacherTimezone())}))
     .filter(l=>l.date===selectedDate)
-    .sort(
-      (a,b)=>
-        String(a.time||'').localeCompare(
-          String(b.time||'')
-        )
-    );
+    .sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
 
   const addLessonLink='<button type="button" onclick="openNewLessonForDate(selectedDate)" class="mt-2 inline-flex items-center gap-1 rounded-lg px-2 py-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50">+ <span>Добавить занятие</span></button>';
   document.getElementById('day-lessons').innerHTML=
