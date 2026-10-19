@@ -31,25 +31,39 @@ async function sendMessage(chatId: number, text: string) {
 
 const welcome = `Привет! 👋 Добро пожаловать в ProfiProfit!
 
-Я буду напоминать тебе о предстоящих занятиях:
+Я буду помогать тебе не пропустить важное:
+🔔 Напоминать о предстоящих занятиях:
 • за 1 час до начала;
 • за 10 минут до начала.
 
-Чтобы подключить напоминания, открой персональную ссылку, которую тебе отправил преподаватель, и нажми Start.
+📅 Сообщать об изменениях в расписании:
+• если занятие перенесено;
+• если занятие отменено.
 
-Если не получается подключиться, напиши преподавателю: <a href="https://t.me/tiana_wow">@tiana_wow</a>. Поможем! 😊
+💳 Присылать уведомления об оплате.
+
+Чтобы подключить уведомления, открой персональную ссылку, которую тебе отправил преподаватель, и нажми Start.
+
+Если не получается подключиться или нужна помощь, напиши преподавателю: <a href="https://t.me/tiana_wow">@tiana_wow</a>. Поможем! 😊
 
 ———
 
 Hi! 👋 Welcome to ProfiProfit!
 
-I'll remind you about your upcoming lessons:
+I'll help you stay up to date with your lessons:
+🔔 Reminders about upcoming lessons:
 • 1 hour before they start;
 • 10 minutes before they start.
 
-To enable reminders, open the personal link sent by your teacher and press Start.
+📅 Updates about schedule changes:
+• when a lesson is rescheduled;
+• when a lesson is cancelled.
 
-If you have trouble connecting, message your teacher: <a href="https://t.me/tiana_wow">@tiana_wow</a>. We'll help! 😊`;
+💳 Payment notifications.
+
+To enable notifications, open the personal link sent by your teacher and press Start.
+
+If you have trouble connecting or need help, message your teacher: <a href="https://t.me/tiana_wow">@tiana_wow</a>. We'll help! 😊`;
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
