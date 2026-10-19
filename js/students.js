@@ -513,7 +513,7 @@ function studentDetail(s){
 
     '<button type="button" onclick="openStudentPayment(\''+
     esc(s.id)+
-    '\\')" class="primary-btn inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold shadow-sm hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"><span aria-hidden="true" class="text-base leading-none">＋</span><span>Внести оплату</span></button>'+
+    '\')" class="primary-btn inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold shadow-sm hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"><span aria-hidden="true" class="text-base leading-none">＋</span><span>Внести оплату</span></button>'+
 
     '</div>'+
 
