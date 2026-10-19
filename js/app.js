@@ -1688,10 +1688,10 @@ async function openStudentCabinet(){
   document.getElementById('public-spent').textContent=money(spent);
   document.getElementById('public-balance').textContent=
     money(paid-spent);
-  document.getElementById('public-conducted').textContent=
-    ls.filter(l=>l.status==='conducted').length;
-  document.getElementById('public-price').textContent=
-    money(publicStudent.price||0);
+  const conductedEl=document.getElementById('public-conducted');
+  if(conductedEl){
+    conductedEl.textContent=ls.filter(l=>l.status==='conducted').length;
+  }
 
   document.getElementById('public-payments').innerHTML=
     ps
