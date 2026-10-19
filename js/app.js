@@ -338,14 +338,12 @@ async function autoCompletePastLessons(){
   due.forEach(l=>l.status='conducted');
 }
 function switchTab(t){
-  ['dashboard','calendar','students'].forEach(name=>{
+  ['dashboard','calendar','students','admin'].forEach(name=>{
     document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
     const nav=document.getElementById('nav-'+name);
     if(nav)nav.className='px-4 py-2 rounded-xl font-semibold '+(t===name?'bg-indigo-600 text-white':'bg-slate-100');
   });
-  if(t==='dashboard')renderDashboard();
-  if(t==='calendar'){renderWeek();renderDay();}
-  if(t==='students')renderStudents();
+  if(t==='admin')loadPlatformAdminDashboard();
 }
 
 function dashboardLessonCharge(l){
@@ -1301,6 +1299,54 @@ async function registerTeacher(){
   }
 }
 
+let platformAdmin=false;
+function formatPlatformDate(value){
+  if(!value)return '—';
+  const date=new Date(value);
+  return Number.isNaN(date.getTime())?'—':date.toLocaleString('ru-RU');
+}
+async function initializePlatformMonitoring(){
+  try{ await supabaseClient.rpc('record_teacher_activity'); }
+  catch(e){ console.warn('Could not record teacher activity:',e); }
+  try{
+    const {data,error}=await supabaseClient.rpc('get_platform_admin_dashboard');
+    platformAdmin=!error&&!!data;
+  }catch(e){ platformAdmin=false; }
+  const nav=document.getElementById('nav-admin');
+  if(nav)nav.classList.toggle('hidden',!platformAdmin);
+}
+async function loadPlatformAdminDashboard(){
+  const panel=document.getElementById('platform-admin-content');
+  if(!panel)return;
+  panel.innerHTML='<p class="text-sm text-slate-500">Загружаем данные…</p>';
+  try{
+    const {data,error}=await supabaseClient.rpc('get_platform_admin_dashboard');
+    if(error)throw error;
+    if(!data||!Array.isArray(data.teachers))throw new Error('Нет доступа к админ-панели');
+    const teachers=data.teachers;
+    panel.innerHTML=
+      '<div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-5">'+
+      '<div class="app-card rounded-2xl p-4"><div class="text-sm text-slate-500">Всего учителей</div><div class="text-2xl font-bold mt-1">'+Number(data.total_teachers||0)+'</div></div>'+
+      '<div class="app-card rounded-2xl p-4"><div class="text-sm text-slate-500">Новых за 7 дней</div><div class="text-2xl font-bold mt-1">'+Number(data.new_last_7_days||0)+'</div></div>'+
+      '<div class="app-card rounded-2xl p-4 col-span-2 lg:col-span-1"><div class="text-sm text-slate-500">Активны за 7 дней</div><div class="text-2xl font-bold mt-1">'+Number(data.active_last_7_days||0)+'</div></div></div>'+
+      '<div class="overflow-x-auto app-card rounded-2xl"><table class="w-full text-sm"><thead><tr class="text-left border-b border-slate-200"><th class="p-3">Учитель</th><th class="p-3">Регистрация</th><th class="p-3">Ученики</th><th class="p-3">Занятия</th><th class="p-3">Последнее использование</th></tr></thead><tbody>'+
+      teachers.map(t=>'<tr class="border-b border-slate-100"><td class="p-3 font-medium">'+esc(t.email||t.id)+'</td><td class="p-3 whitespace-nowrap">'+esc(formatPlatformDate(t.registered_at))+'</td><td class="p-3">'+Number(t.students_count||0)+'</td><td class="p-3">'+Number(t.lessons_count||0)+'</td><td class="p-3 whitespace-nowrap">'+esc(formatPlatformDate(t.last_seen_at))+'</td></tr>').join('')+
+      '</tbody></table></div>';
+  }catch(e){
+    const nav=document.getElementById('nav-admin');
+    if(nav)nav.classList.add('hidden');
+    panel.innerHTML='<p class="text-sm text-red-600">Не удалось загрузить админ-панель. Проверь, что миграция 008 применена и твой user ID добавлен в platform_admins.</p>';
+    console.error('Platform admin dashboard error:',e);
+  }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){
+    supabaseClient.auth.getSession().then(({data})=>{
+      if(data?.session)supabaseClient.rpc('record_teacher_activity').then(()=>{}).catch(()=>{});
+    }).catch(()=>{});
+  }
+});
+
 async function loginTeacher(){
 
   const email =
@@ -1363,6 +1409,7 @@ document.getElementById('landing-page')?.classList.add('hidden');
     document.getElementById('teacher-main')?.classList.remove('hidden');
 
     await loadData();
+    await initializePlatformMonitoring();
 
     // Populate the dashboard immediately after login instead of leaving
     // its empty placeholders visible until the user changes tabs.
@@ -1677,6 +1724,7 @@ async function openStudentCabinet(){
     }
 
     if(!loaded)throw lastError;
+    await initializePlatformMonitoring();
 
     // A page refresh with an existing session goes through initApp(),
     // not loginTeacher(). Render the dashboard on this path too.
