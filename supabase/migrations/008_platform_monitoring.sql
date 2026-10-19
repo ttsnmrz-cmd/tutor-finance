@@ -79,9 +79,9 @@ begin
   end if;
 
   select jsonb_build_object(
-    'total_teachers', (select count(*) from auth.users u),
-    'new_last_7_days', (select count(*) from auth.users u where u.created_at >= now() - interval '7 days'),
-    'active_last_7_days', (select count(*) from public.platform_teacher_activity a where a.last_seen_at >= now() - interval '7 days'),
+    'total_teachers', (select count(*) from auth.users u where not exists (select 1 from public.platform_admins a where a.user_id = u.id)),
+    'new_last_7_days', (select count(*) from auth.users u where u.created_at >= now() - interval '7 days' and not exists (select 1 from public.platform_admins a where a.user_id = u.id)),
+    'active_last_7_days', (select count(*) from public.platform_teacher_activity a where a.last_seen_at >= now() - interval '7 days' and not exists (select 1 from public.platform_admins p where p.user_id = a.user_id)),
     'teachers', coalesce((
       select jsonb_agg(jsonb_build_object(
         'id', u.id,
@@ -93,6 +93,7 @@ begin
       ) order by u.created_at desc)
       from auth.users u
       left join public.platform_teacher_activity a on a.user_id = u.id
+      where not exists (select 1 from public.platform_admins p where p.user_id = u.id)
     ), '[]'::jsonb)
   ) into result;
   return result;
