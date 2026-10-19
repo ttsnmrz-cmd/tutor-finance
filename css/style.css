@@ -237,3 +237,16 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 :root[data-theme="dark"] #groups-list .group-card > div:first-child:hover button{
   color:#f2eef8!important;
 }
+
+/* Public student cabinet: keep contrast readable in both themes. */
+#student-public-view .student-summary-card{background:#f3eef7;color:#30213f}
+#student-public-view .student-summary-card .student-summary-label{color:#6f617e}
+#student-public-view .student-price-card{background:#eee7f7;color:#30213f}
+#student-public-view .student-price-card .student-summary-label{color:#6f617e}
+#student-public-view .student-secondary-text{color:#6f617e}
+:root[data-theme="dark"] #student-public-view .student-summary-card{background:#292433!important;color:#f2eef8!important}
+:root[data-theme="dark"] #student-public-view .student-summary-card .student-summary-label{color:#c3b8d1!important}
+:root[data-theme="dark"] #student-public-view .student-price-card{background:#30263d!important;color:#f2eef8!important}
+:root[data-theme="dark"] #student-public-view .student-price-card .student-summary-label{color:#d0c1e0!important}
+:root[data-theme="dark"] #student-public-view .student-secondary-text{color:#c3b8d1!important}
+:root[data-theme="dark"] #student-public-view .text-emerald-600{color:#9de0b6!important}
