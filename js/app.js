@@ -104,21 +104,52 @@ function initCurrency(){
   updateCurrencyLabel();
 }
 const TEACHER_TIMEZONE_KEY='profiprofit-teacher-timezone';
-function getTeacherTimezone(){
-  try{
-    const saved=localStorage.getItem(TEACHER_TIMEZONE_KEY);
-    if(saved && Intl.supportedValuesOf('timeZone').includes(saved))return saved;
-  }catch(e){}
-  return 'Europe/Minsk';
+let teacherTimezone='Europe/Minsk';
+let teacherTimezoneUserId=null;
+function isValidTimezone(timezone){
+  if(typeof timezone!=='string'||!timezone)return false;
+  try{new Intl.DateTimeFormat('en-US',{timeZone:timezone}).format(new Date());return true;}
+  catch(e){return false;}
 }
-function setTeacherTimezone(timezone){
+function getTeacherTimezone(){
+  return isValidTimezone(teacherTimezone)?teacherTimezone:'Europe/Minsk';
+}
+async function loadTeacherTimezone(userId){
+  teacherTimezoneUserId=userId||null;
+  let timezone='Europe/Minsk';
+  if(userId){
+    const rows=await db('/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,timezone');
+    if(Array.isArray(rows)&&rows[0]&&isValidTimezone(rows[0].timezone)){
+      timezone=rows[0].timezone;
+    }
+  }
+  teacherTimezone=timezone;
+  try{localStorage.setItem(TEACHER_TIMEZONE_KEY,timezone);}catch(e){}
+  const select=document.getElementById('teacher-timezone-select');
+  if(select)select.value=timezone;
+}
+async function setTeacherTimezone(timezone){
   try{
-    if(!Intl.supportedValuesOf('timeZone').includes(timezone))throw new Error('Некорректный часовой пояс');
-    localStorage.setItem(TEACHER_TIMEZONE_KEY,timezone);
+    if(!isValidTimezone(timezone))throw new Error('Некорректный часовой пояс');
+    const {data:{user},error}=await supabaseClient.auth.getUser();
+    if(error)throw error;
+    if(!user?.id)throw new Error('Войдите в аккаунт, чтобы сохранить часовой пояс.');
+    const response=await db('/profiles?on_conflict=id',{
+      method:'POST',
+      headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({id:user.id,timezone})
+    });
+    teacherTimezone=timezone;
+    teacherTimezoneUserId=user.id;
+    try{localStorage.setItem(TEACHER_TIMEZONE_KEY,timezone);}catch(e){}
     const select=document.getElementById('teacher-timezone-select');
     if(select)select.value=timezone;
-    alert('Часовой пояс сохранён. Отображение времени занятий будет подключено следующим шагом.');
-  }catch(e){showError(e);}
+    alert('Часовой пояс сохранён в профиле.');
+  }catch(e){
+    showError(e);
+    const select=document.getElementById('teacher-timezone-select');
+    if(select)select.value=getTeacherTimezone();
+  }
 }
 document.addEventListener('DOMContentLoaded',()=>{
   const select=document.getElementById('teacher-timezone-select');
@@ -1729,6 +1760,8 @@ async function openStudentCabinet(){
       'Content-Type':
         'application/json'
     };
+
+    await loadTeacherTimezone(session.user?.id);
 
     // Supabase may still be finishing session restoration immediately
     // after a browser refresh. Give it one short retry instead of leaving
