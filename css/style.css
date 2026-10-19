@@ -257,3 +257,24 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 :root[data-theme="dark"] #student-public-view .student-theme-panel{background:#292433!important;color:#f2eef8!important}
 :root[data-theme="dark"] #student-public-view .student-theme-panel .text-slate-500{color:#c3b8d1!important}
 :root[data-theme="dark"] #student-public-view .text-emerald-600{color:#9de0b6!important}
+
+
+/* Calendar contrast fixes for dark mode, including touch/hover states. */
+:root[data-theme="dark"] #day-lessons > button:hover,
+:root[data-theme="dark"] #day-lessons > button:focus,
+:root[data-theme="dark"] #day-lessons > button:active{
+  background:#30283d!important;
+  color:#f2eef8!important;
+}
+:root[data-theme="dark"] #day-lessons > button .text-slate-500{
+  color:#c3b8d1!important;
+}
+:root[data-theme="dark"] #day-lessons > button[class*="text-indigo-600"]{
+  color:#d9b9f4!important;
+}
+:root[data-theme="dark"] #day-lessons > button[class*="text-indigo-600"]:hover,
+:root[data-theme="dark"] #day-lessons > button[class*="text-indigo-600"]:focus,
+:root[data-theme="dark"] #day-lessons > button[class*="text-indigo-600"]:active{
+  background:#30263d!important;
+  color:#f2eef8!important;
+}
