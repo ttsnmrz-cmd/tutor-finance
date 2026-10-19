@@ -84,6 +84,55 @@ function localISO(d){
     String(d.getDate()).padStart(2,'0');
 }
 
+function datePartsInTimezone(date,timezone){
+  const parts=new Intl.DateTimeFormat('en-CA',{
+    timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'
+  }).formatToParts(date);
+  const result={};
+  parts.forEach(p=>{if(p.type!=='literal')result[p.type]=p.value;});
+  return {date:result.year+'-'+result.month+'-'+result.day};
+}
+function dateTimePartsInTimezone(date,timezone){
+  const parts=new Intl.DateTimeFormat('en-GB',{
+    timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+  }).formatToParts(date);
+  const result={};
+  parts.forEach(p=>{if(p.type!=='literal')result[p.type]=p.value;});
+  return {date:result.year+'-'+result.month+'-'+result.day,time:result.hour+':'+result.minute};
+}
+function zonedDateTimeToTimestamp(date,time,timezone){
+  const dm=String(date||'').match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+  const tm=String(time||'').replace('.',':').match(/^(\\d{1,2}):(\\d{2})/);
+  if(!dm||!tm||!isValidTimezone(timezone))return NaN;
+  const target=Date.UTC(Number(dm[1]),Number(dm[2])-1,Number(dm[3]),Number(tm[1]),Number(tm[2]));
+  let guess=target;
+  for(let i=0;i<4;i++){
+    const parts=dateTimePartsInTimezone(new Date(guess),timezone);
+    const m=parts.date.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+    const t=parts.time.split(':').map(Number);
+    const represented=Date.UTC(Number(m[1]),Number(m[2])-1,Number(m[3]),t[0],t[1]);
+    const correction=target-represented;
+    guess+=correction;
+    if(correction===0)break;
+  }
+  return guess;
+}
+function lessonTimestamp(l){
+  return zonedDateTimeToTimestamp(l?.date,l?.time,l?.timezone||'Europe/Minsk');
+}
+function lessonDateTimeInTimezone(l,timezone){
+  const ts=lessonTimestamp(l);
+  if(!Number.isFinite(ts))return {date:l?.date||'',time:String(l?.time||'11:00').slice(0,5)};
+  return dateTimePartsInTimezone(new Date(ts),timezone);
+}
+function todayISOInTimezone(timezone){
+  return datePartsInTimezone(new Date(),timezone).date;
+}
+function dateAtLocalNoon(date){
+  return new Date(String(date||todayISOInTimezone(getTeacherTimezone()))+'T12:00:00');
+}
+
 function esc(v){
   return String(v??'').replace(/[&<>'\"]/g,c=>({
     '&':'&amp;',
