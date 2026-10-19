@@ -174,6 +174,8 @@ async function loadTeacherTimezone(userId){
   }
   teacherTimezone=timezone;
   try{localStorage.setItem(TEACHER_TIMEZONE_KEY,timezone);}catch(e){}
+  selectedDate=todayISOInTimezone(timezone);
+  weekAnchor=dateAtLocalNoon(selectedDate);
   const select=document.getElementById('teacher-timezone-select');
   if(select)select.value=timezone;
 }
@@ -401,11 +403,9 @@ function lessonEndTimestamp(l){
     Number(l.duration)||60
   );
 
-  const start=new Date(l.date+'T00:00:00');
-  start.setHours(h,m,0,0);
-  start.setMinutes(start.getMinutes()+duration);
-
-  return start.getTime();
+  const start=lessonTimestamp(l);
+  if(!Number.isFinite(start))return null;
+  return start+duration*60000;
 }
 
 async function autoCompletePastLessons(){
@@ -483,7 +483,7 @@ function renderDashboard(){
   lowContainer.innerHTML=low.length?low.slice(0,5).map(x=>{const label=x.status==='debt'?(en?'Debt':'Задолженность'):x.status==='topup'?(en?'Top up needed':'Нужно пополнить'):(en?'Low balance':'Низкий баланс');const color=x.status==='debt'?'text-red-700':x.status==='topup'?'text-orange-600':'text-amber-600';const count=x.status==='debt'?'':(en?' · '+x.remaining+' lessons left':' · осталось занятий: '+x.remaining);return '<button onclick="switchTab(\'students\')" class="w-full flex flex-col gap-1 text-left border-b last:border-0 py-2"><span class="flex justify-between gap-3"><span class="font-medium">'+esc(x.student.name)+'</span><span class="text-sm '+color+'">'+label+'</span></span><span class="flex justify-between gap-3 text-xs text-slate-500"><span>'+money(x.stats.bal)+count+'</span></span></button>';}).join(''):'<p class="text-sm text-slate-500">'+(en?'No low balances':'Нет учеников с низким балансом')+'</p>';
 }
 
-function openTodayCalendar(){selectedDate=localISO(new Date());weekAnchor=weekStart(new Date());switchTab('calendar');}
+function openTodayCalendar(){selectedDate=todayISOInTimezone(getTeacherTimezone());weekAnchor=dateAtLocalNoon(selectedDate);switchTab('calendar');}
 function fillStudentSelects(){
   const active=sortedActiveStudents();
 
