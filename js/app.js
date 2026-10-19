@@ -193,9 +193,13 @@ async function setTeacherTimezone(timezone){
     teacherTimezone=timezone;
     teacherTimezoneUserId=user.id;
     try{localStorage.setItem(TEACHER_TIMEZONE_KEY,timezone);}catch(e){}
+    selectedDate=todayISOInTimezone(timezone);
+    weekAnchor=dateAtLocalNoon(selectedDate);
     const select=document.getElementById('teacher-timezone-select');
     if(select)select.value=timezone;
-    alert('Часовой пояс сохранён в профиле.');
+    if(typeof renderWeek==='function')renderWeek();
+    if(typeof renderDay==='function')renderDay();
+    alert('Часовой пояс сохранён в профиле. Календарь обновлён.');
   }catch(e){
     showError(e);
     const select=document.getElementById('teacher-timezone-select');
