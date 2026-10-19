@@ -102,14 +102,14 @@ function dateTimePartsInTimezone(date,timezone){
   return {date:result.year+'-'+result.month+'-'+result.day,time:result.hour+':'+result.minute};
 }
 function zonedDateTimeToTimestamp(date,time,timezone){
-  const dm=String(date||'').match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
-  const tm=String(time||'').replace('.',':').match(/^(\\d{1,2}):(\\d{2})/);
+  const dm=String(date||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const tm=String(time||'').replace('.',':').match(/^(\d{1,2}):(\d{2})/);
   if(!dm||!tm||!isValidTimezone(timezone))return NaN;
   const target=Date.UTC(Number(dm[1]),Number(dm[2])-1,Number(dm[3]),Number(tm[1]),Number(tm[2]));
   let guess=target;
   for(let i=0;i<4;i++){
     const parts=dateTimePartsInTimezone(new Date(guess),timezone);
-    const m=parts.date.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+    const m=parts.date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     const t=parts.time.split(':').map(Number);
     const represented=Date.UTC(Number(m[1]),Number(m[2])-1,Number(m[3]),t[0],t[1]);
     const correction=target-represented;
