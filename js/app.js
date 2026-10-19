@@ -1624,7 +1624,11 @@ async function initPublicStudent(){
 async function openStudentCabinet(){
   if(!publicStudent)return;
 
-  const ls=publicStudentLessons||[];
+  const studentTimezone=isValidTimezone(publicStudent.timezone)?publicStudent.timezone:'Europe/Minsk';
+  const ls=(publicStudentLessons||[]).map(l=>({
+    ...l,
+    ...lessonDateTimeInTimezone(l,studentTimezone)
+  }));
   const ps=publicStudentPayments||[];
 
   const paid=ps.reduce(
@@ -1639,11 +1643,9 @@ async function openStudentCabinet(){
       0
     );
 
-  const now=new Date();
-  const today=localISO(now);
-  const nowTime=
-    String(now.getHours()).padStart(2,'0')+':' +
-    String(now.getMinutes()).padStart(2,'0');
+  const nowParts=dateTimePartsInTimezone(new Date(),studentTimezone);
+  const today=nowParts.date;
+  const nowTime=nowParts.time;
 
   const future=ls
     .filter(
