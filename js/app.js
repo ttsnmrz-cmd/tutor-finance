@@ -103,6 +103,27 @@ function initCurrency(){
   if(select)select.value=appCurrency;
   updateCurrencyLabel();
 }
+const TEACHER_TIMEZONE_KEY='profiprofit-teacher-timezone';
+function getTeacherTimezone(){
+  try{
+    const saved=localStorage.getItem(TEACHER_TIMEZONE_KEY);
+    if(saved && Intl.supportedValuesOf('timeZone').includes(saved))return saved;
+  }catch(e){}
+  return 'Europe/Minsk';
+}
+function setTeacherTimezone(timezone){
+  try{
+    if(!Intl.supportedValuesOf('timeZone').includes(timezone))throw new Error('Некорректный часовой пояс');
+    localStorage.setItem(TEACHER_TIMEZONE_KEY,timezone);
+    const select=document.getElementById('teacher-timezone-select');
+    if(select)select.value=timezone;
+    alert('Часовой пояс сохранён. Отображение времени занятий будет подключено следующим шагом.');
+  }catch(e){showError(e);}
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const select=document.getElementById('teacher-timezone-select');
+  if(select)select.value=getTeacherTimezone();
+});
 function setCurrency(currency){
   if(!CURRENCY_SYMBOLS[currency])return;
   appCurrency=currency;
@@ -257,7 +278,7 @@ function lessonPriceTotal(l){
 }
 async function loadData(){
   [students,lessons,payments,groups,lessonMembers]=await Promise.all([
-    db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments'),
+    db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments,timezone'),
     db('/lessons?select=id,student,date,time,price,status,duration,group_id,comment'),
     db('/payments?select=id,student,amount,date'),
     db('/groups?select=id,name'),
