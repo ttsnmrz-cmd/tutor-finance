@@ -1,7 +1,8 @@
 // Supabase Edge Function: notify-platform-registrations
-// Deploy with SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, TELEGRAM_BOT_TOKEN,
-// and TELEGRAM_ADMIN_CHAT_ID configured as Edge Function secrets.
-// Schedule this function every minute using Supabase Cron / pg_net.
+// Required Edge Function secrets:
+// TELEGRAM_BOT_TOKEN, TELEGRAM_ADMIN_CHAT_ID, PLATFORM_CRON_SECRET.
+// Supabase provides SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in the runtime.
+// Invoke with: Authorization: Bearer <PLATFORM_CRON_SECRET>
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -11,8 +12,13 @@ const corsHeaders = {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
-  const expected = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const expected = Deno.env.get("PLATFORM_CRON_SECRET");
   const auth = req.headers.get("authorization") || "";
   if (!expected || auth !== `Bearer ${expected}`) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -21,11 +27,11 @@ Deno.serve(async (req) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = expected;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
   const chatId = Deno.env.get("TELEGRAM_ADMIN_CHAT_ID");
-  if (!supabaseUrl || !botToken || !chatId) {
-    return new Response(JSON.stringify({ error: "Missing required function secrets" }), {
+  if (!supabaseUrl || !serviceKey || !botToken || !chatId) {
+    return new Response(JSON.stringify({ error: "Missing required function environment configuration" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
