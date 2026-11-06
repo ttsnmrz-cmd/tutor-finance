@@ -67,7 +67,18 @@ function lessonPriceTotal(l){
 
   return Number(l.price||0);
 }
-function openNewLessonForDate(date){
+let lessonDatePickerMonth=null;
+function lessonDateParts(v){const [y,m,d]=String(v||'').split('-').map(Number);return {y,m,d};}
+function lessonDateISO(y,m,d){return String(y).padStart(4,'0')+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+function lessonDateLocale(){return window.getLanguage?.()==='en'?'en-US':'ru-RU';}
+function setLessonDate(v){const input=document.getElementById('edit-date');if(!input)return;input.value=v||'';const p=lessonDateParts(input.value),label=document.getElementById('lesson-date-label');if(label)label.textContent=p.y&&p.m&&p.d?new Date(p.y,p.m-1,p.d).toLocaleDateString(lessonDateLocale(),{day:'numeric',month:'long',year:'numeric'}):(window.getLanguage?.()==='en'?'Choose a date':'Выберите дату');if(input.value)lessonDatePickerMonth=new Date(p.y,p.m-1,1);renderLessonDatePicker();}
+function toggleLessonDatePicker(){const box=document.getElementById('lesson-date-picker');if(!box)return;if(box.classList.contains('hidden')){const p=lessonDateParts(document.getElementById('edit-date').value);if(!lessonDatePickerMonth)lessonDatePickerMonth=new Date(p.y||new Date().getFullYear(),(p.m||new Date().getMonth()+1)-1,1);renderLessonDatePicker();box.classList.remove('hidden');}else box.classList.add('hidden');}
+function closeLessonDatePicker(){document.getElementById('lesson-date-picker')?.classList.add('hidden');}
+function changeLessonDateMonth(n){if(!lessonDatePickerMonth)lessonDatePickerMonth=new Date();lessonDatePickerMonth.setMonth(lessonDatePickerMonth.getMonth()+n);renderLessonDatePicker();}
+function chooseLessonDate(v){setLessonDate(v);closeLessonDatePicker();}
+function selectLessonDateToday(){const n=new Date();chooseLessonDate(lessonDateISO(n.getFullYear(),n.getMonth()+1,n.getDate()));}
+function renderLessonDatePicker(){const me=document.getElementById('lesson-date-month'),de=document.getElementById('lesson-date-days'),we=document.getElementById('lesson-date-weekdays');if(!me||!de||!we||!lessonDatePickerMonth)return;const lang=lessonDateLocale(),y=lessonDatePickerMonth.getFullYear(),m=lessonDatePickerMonth.getMonth();me.textContent=lessonDatePickerMonth.toLocaleDateString(lang,{month:'long',year:'numeric'});we.innerHTML=(lang==='en-US'?['Mon','Tue','Wed','Thu','Fri','Sat','Sun']:['Пн','Вт','Ср','Чт','Пт','Сб','Вс']).map(x=>'<span>'+x+'</span>').join('');const off=(new Date(y,m,1).getDay()+6)%7,cnt=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate(),sel=document.getElementById('edit-date').value,now=new Date();let out='';for(let i=0;i<42;i++){let d,mm,yy,other=false;if(i<off){d=prev-off+i+1;mm=m===0?12:m;yy=m===0?y-1:y;other=true;}else if(i>=off+cnt){d=i-off-cnt+1;mm=m===11?1:m+2;yy=m===11?y+1:y;other=true;}else{d=i-off+1;mm=m+1;yy=y;}const key=lessonDateISO(yy,mm,d),today=yy===now.getFullYear()&&mm===now.getMonth()+1&&d===now.getDate();out+='<button type="button" class="lesson-date-cell'+(other?' is-outside':'')+(key===sel?' is-selected':'')+(today?' is-today':'')+'" onclick="chooseLessonDate(\''+key+'\')">'+d+'</button>';}de.innerHTML=out;document.getElementById('lesson-date-today').textContent=lang==='en-US'?'Today':'Сегодня';document.getElementById('lesson-date-close').textContent=lang==='en-US'?'Done':'Готово';}
+\nfunction openNewLessonForDate(date){
   fillStudentSelects();
 
   document
@@ -87,8 +98,7 @@ function openNewLessonForDate(date){
   timeOptions();
 
   document.getElementById('edit-id').value='';
-  document.getElementById('edit-date').value=
-    date||selectedDate;
+  setLessonDate(date||selectedDate);
   document.getElementById('edit-duration').value='60';
 
   setTime('11:00');
@@ -190,9 +200,7 @@ function openEditLesson(id){
       :l.student;
 
   const displayDateTime=lessonDateTimeInTimezone(l,getTeacherTimezone());
-  document.getElementById(
-    'edit-date'
-  ).value=displayDateTime.date;
+  setLessonDate(displayDateTime.date);
 
   document.getElementById(
     'edit-duration'
