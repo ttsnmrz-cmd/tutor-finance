@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="ProfoProfit_logo.svg">
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="css/style.css?v=20261020-3">
+<link rel="stylesheet" href="css/style.css?v=20261106-calendar1">
 <style id="student-lesson-controls">.student-lessons-scroll{max-height:294px;overflow-y:auto;scroll-behavior:smooth;padding-right:4px}.student-lessons-scroll::-webkit-scrollbar{width:5px}.student-lessons-scroll::-webkit-scrollbar-thumb{background:#c9c2d2;border-radius:99px}.student-attendance-menu{min-width:250px}</style></head>
 <body class="text-slate-800 min-h-screen">
 <div id="student-public-view" class="hidden max-w-3xl mx-auto p-4">
@@ -119,7 +119,7 @@
 <div id="lesson-modal" class="hidden fixed inset-0 modal-bg z-50 items-center justify-center p-4 overflow-y-auto"><div class="app-card rounded-3xl p-6 w-full max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto space-y-3">
 <div class="flex justify-between"><h2 id="lesson-modal-title" class="text-xl font-bold">Новое занятие</h2><button onclick="closeLessonModal()" class="text-2xl text-slate-400">×</button></div><input type="hidden" id="edit-id">
 <label class="text-sm font-semibold">Ученик / группа<select id="edit-student" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label>
-<div class="grid grid-cols-2 gap-3"><label class="text-sm font-semibold">Дата<input id="edit-date" type="date" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><label class="text-sm font-semibold">Длительность<div class="mt-1 flex items-center gap-2"><input id="edit-duration" type="number" min="1" step="1" value="60" class="soft-input w-full rounded-xl px-3 py-2"><span class="text-sm text-slate-500 shrink-0">минут</span></div></label></div>
+<div class="grid grid-cols-2 gap-3"><label class="text-sm font-semibold">Дата<input id="edit-date" type="date" lang="en-GB" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><label class="text-sm font-semibold">Длительность<div class="mt-1 flex items-center gap-2"><input id="edit-duration" type="number" min="1" step="1" value="60" class="soft-input w-full rounded-xl px-3 py-2"><span class="text-sm text-slate-500 shrink-0">минут</span></div></label></div>
 <div><label class="text-sm font-semibold">Время</label><div class="grid grid-cols-2 gap-2 mt-1"><select id="edit-hour" class="soft-input rounded-xl px-3 py-2"></select><select id="edit-minute" class="soft-input rounded-xl px-3 py-2"></select></div></div>
 <label class="text-sm font-semibold">Стоимость<input id="edit-price" type="number" min="0" step="0.01" value="40" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><div id="group-price-breakdown" class="hidden -mt-2 text-xs text-slate-500"></div><div id="group-charge-exceptions" class="hidden mt-3"><div class="text-sm font-semibold mb-1">Списывать за это занятие</div><div id="group-charge-exceptions-list" class="divide-y"></div></div>
 <label class="text-sm font-semibold">Статус<select id="edit-status" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label><label class="text-sm font-semibold">Комментарий <span class="text-slate-400 font-normal">(необязательно)</span><textarea id="edit-comment" rows="2" class="soft-input mt-1 w-full rounded-xl px-3 py-2 resize-y" placeholder="Например: пробный урок — бесплатно"></textarea></label>
@@ -160,7 +160,7 @@
 </section>
 <section id="tab-calendar" class="hidden">
 <div class="app-card rounded-3xl p-5"><div class="flex justify-between items-center mb-4"><div><h2 class="font-bold text-lg">Календарь</h2><p id="week-range" class="text-xs text-slate-400"></p></div><div class="flex gap-2"><button onclick="changeWeek(-1)" class="px-3 py-2 rounded-xl bg-slate-100">←</button><button onclick="goToday()" class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700 font-semibold">Сегодня</button><button onclick="changeWeek(1)" class="px-3 py-2 rounded-xl bg-slate-100">→</button></div></div><div id="week-calendar" class="grid grid-cols-7 gap-1"></div></div>
-<div class="app-card rounded-3xl p-5 mt-4"><h2 id="selected-day-title" class="font-bold text-lg mb-3"></h2><div id="day-lessons"></div></div>
+<div class="hidden"><h2 id="selected-day-title"></h2><div id="day-lessons"></div></div>
 <button onclick="openNewLessonForDate(selectedDate)" class="fixed right-6 bottom-6 w-14 h-14 rounded-full bg-indigo-600 text-white text-3xl shadow-xl hover:bg-indigo-700 inline-flex items-center justify-center leading-none">+</button>
 </section>
 <section id="tab-students" class="hidden"><div class="app-card rounded-3xl p-5">
