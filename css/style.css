@@ -343,3 +343,18 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
   .calendar-week-grid{grid-template-columns:repeat(7,minmax(210px,1fr));gap:8px}
   .calendar-day-column{min-height:170px}
 }
+
+.lesson-date-picker{position:absolute;z-index:80;top:100%;left:0;margin-top:6px;width:min(330px,calc(100vw - 48px));padding:14px;border:1px solid var(--border-color);border-radius:16px;background:var(--card-bg);color:var(--text-color);box-shadow:0 12px 32px rgba(0,0,0,.2)}
+.lesson-date-picker-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.lesson-date-picker-head strong{text-transform:capitalize;font-size:14px}
+.lesson-date-picker-head button{width:32px;height:32px;border-radius:9px;background:var(--accent-soft);color:var(--text-color);font-size:22px}
+.lesson-date-weekdays,.lesson-date-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.lesson-date-weekdays{margin-bottom:5px;color:var(--text-secondary);font-size:11px;font-weight:600}
+.lesson-date-weekdays span{padding:6px 0}
+.lesson-date-cell{height:36px;border-radius:9px;font-size:13px;color:var(--text-color)}
+.lesson-date-cell:hover{background:var(--accent-soft)}
+.lesson-date-cell.is-outside{opacity:.35}
+.lesson-date-cell.is-today{box-shadow:inset 0 0 0 1px var(--primary-color)}
+.lesson-date-cell.is-selected{background:var(--primary-color);color:#fff;font-weight:700}
+.lesson-date-picker-foot{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-color)}
+.lesson-date-picker-foot button{padding:6px 9px;border-radius:8px;color:var(--primary-color);font-size:13px;font-weight:600}
