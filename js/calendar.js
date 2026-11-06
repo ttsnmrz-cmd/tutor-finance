@@ -68,21 +68,34 @@ function renderWeek(){
       year:'numeric'
     });
 
+  const lang=window.getLanguage?.()==='en'?'en-US':'ru-RU';
+  c.className='calendar-week-grid';
   c.innerHTML=days.map(d=>{
     const key=localISO(d);
-    const has=lessons.some(l=>lessonDateTimeInTimezone(l,getTeacherTimezone()).date===key);
     const sel=key===selectedDate;
     const isToday=key===today;
+    const dayLessons=lessons
+      .map(l=>({...l,...lessonDateTimeInTimezone(l,getTeacherTimezone())}))
+      .filter(l=>l.date===key)
+      .sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
 
-    return `<button onclick="selectDay('${key}')" class="flex flex-col items-center py-2">
-      <div class="text-xs text-slate-400 mb-1">
-        ${d.toLocaleDateString((window.getLanguage?.()==='en'?'en-US':'ru-RU'),{weekday:'short'}).replace('.','')}
+    return `<section class="calendar-day-column ${sel?'is-selected ':''}${isToday?'is-today':''}">
+      <button type="button" onclick="selectDay('${key}')" class="calendar-day-heading">
+        <span class="calendar-weekday">${d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')}</span>
+        <span class="calendar-day-number">${d.getDate()}</span>
+      </button>
+      <div class="calendar-day-events">
+        ${dayLessons.length?dayLessons.map(l=>`
+          <button type="button" onclick="openEditLesson('${esc(l.id)}')" class="calendar-event-card">
+            <span class="calendar-event-time">${esc(displayTime(l.time))}</span>
+            <span class="calendar-event-title ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">${esc(lessonTitle(l))}</span>
+            <span class="calendar-event-meta">${l.duration||60} мин · ${money(lessonPriceTotal(l))}</span>
+            ${l.comment?`<span class="calendar-event-comment">${esc(l.comment)}</span>`:''}
+            <span class="status ${statusClass[l.status]||'bg-slate-100'}">${statusLabels[l.status]||l.status}</span>
+          </button>`).join(''):'<p class="calendar-empty-day">Нет занятий</p>'}
       </div>
-      <div class="day-circle ${sel?'selected ':''}${isToday?'today':''}">
-        <span class="font-bold">${d.getDate()}</span>
-        ${has?'<span class="day-dot"></span>':'<span class="h-[7px]"></span>'}
-      </div>
-    </button>`;
+      <button type="button" onclick="openNewLessonForDate('${key}')" class="calendar-add-day">+ Добавить</button>
+    </section>`;
   }).join('');
 }
 
