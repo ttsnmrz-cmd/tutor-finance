@@ -2185,6 +2185,11 @@ function closeLessonDeleteMenu(){
     )
     ?.classList.add('hidden');
 }
+document.addEventListener('click',event=>{
+  if(!event.target.closest('#lesson-delete-menu'))closeLessonDeleteMenu();
+  if(!event.target.closest('#lesson-save-menu'))closeLessonSaveMenu();
+});
+
 if(document.readyState === 'loading'){
   document.addEventListener(
     'DOMContentLoaded',
