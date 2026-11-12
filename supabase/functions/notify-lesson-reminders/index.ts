@@ -47,6 +47,20 @@ function reminderText(type: "1h" | "10m", timestamp: number, timezone: string): 
   return `Здравствуйте! 👋\nНапоминаю, что сегодня в ${time} состоится наше занятие.\nДо встречи!`;
 }
 
+function teacherReminderText(type: "1h" | "10m", studentNames: string[]): string {
+  const names = [...new Set(studentNames.filter(Boolean))];
+  const subject = names.length === 1
+    ? `занятие с учеником ${names[0]}`
+    : names.length > 1
+      ? `занятие с учениками ${names.join(", ")}`
+      : "занятие";
+  const capitalizedSubject = subject[0].toUpperCase() + subject.slice(1);
+  if (type === "10m") {
+    return `Здравствуйте!\\n${capitalizedSubject} должно начаться через 10 минут.`;
+  }
+  return `Здравствуйте!\\n${capitalizedSubject} запланировано через 1 час.`;
+}
+
 async function sendTelegram(chatId: string | number, text: string) {
   const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
@@ -143,7 +157,7 @@ Deno.serve(async (req) => {
     if (teacherError) {
       errors.push(`teacher-profile:${lesson.id}`);
     } else if (teacherProfile?.telegram_chat_id) {
-      const teacherText = reminderText(type, start, teacherProfile.timezone || timezone);
+      const teacherText = teacherReminderText(type, (recipients ?? []).map((student: any) => student.name));
       if (!deliveryEnabled) {
         dryRun++;
         console.log("DRY RUN teacher reminder", { lesson_id: lesson.id, type, text: teacherText });
