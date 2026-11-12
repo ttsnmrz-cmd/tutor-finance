@@ -1051,7 +1051,7 @@ function showAddForm(type){
 
       <input id="add-student-email" type="email" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Email (необязательно)">
 
-      <input id="add-student-telegram" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Telegram (необязательно)">
+      <input id="add-student-telegram" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Telegram (если хотите, чтобы ученик получал автоматические уведомления)">
 
       <label class="text-sm font-semibold">Группа
         <select id="add-student-group" class="soft-input mt-1 w-full rounded-xl px-3 py-2">
