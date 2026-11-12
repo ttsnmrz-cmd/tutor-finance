@@ -168,7 +168,37 @@ Deno.serve(async (req) => {
 
         const balance = income - expenses;
         const state = classify(balance, price);
-        if (!state) { skipped++; continue; }
+        const stateKey = state ? `${state.type}:${state.remaining}` : "ok";
+
+        // Claim this lesson/student event once. Old lessons are never replayed on
+        // every cron tick, even when the student's current balance is unchanged.
+        const { error: eventError } = await db.from("telegram_balance_processed_events")
+          .insert({ lesson_id: lesson.id, student_id: student.id });
+        if (eventError?.code === "23505") continue;
+        if (eventError) {
+          errors.push(`event-claim:${lesson.id}:${student.id}`);
+          continue;
+        }
+
+        const { data: previousState, error: stateReadError } = await db
+          .from("telegram_student_balance_state")
+          .select("last_state")
+          .eq("student_id", student.id)
+          .eq("teacher_id", lesson.teacher_id)
+          .maybeSingle();
+        if (stateReadError) {
+          await db.from("telegram_balance_processed_events").delete()
+            .eq("lesson_id", lesson.id).eq("student_id", student.id);
+          errors.push(`state-read:${student.id}`);
+          continue;
+        }
+
+        // Same warning state means no repeat. A balance above the threshold
+        // resets the state so a later drop can notify again.
+        if ((previousState?.last_state || "ok") === stateKey) {
+          skipped++;
+          continue;
+        }
 
         const recipients: Array<{ type: "student" | "teacher"; chatId: string | number }> = [];
         if (student.telegram_chat_id) {
@@ -183,9 +213,22 @@ Deno.serve(async (req) => {
         } else if (teacher?.telegram_chat_id) {
           recipients.push({ type: "teacher", chatId: teacher.telegram_chat_id });
         }
-        if (!recipients.length) { skipped++; continue; }
+        if (!state || !recipients.length) {
+          const { error: stateSaveError } = await db.from("telegram_student_balance_state")
+            .upsert({
+              student_id: student.id,
+              teacher_id: lesson.teacher_id,
+              last_state: stateKey,
+              last_balance: balance,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: "student_id,teacher_id" });
+          if (stateSaveError) errors.push(`state-save:${student.id}`);
+          if (!recipients.length) skipped++;
+          continue;
+        }
 
         const message = notificationText(student.name || "Ученик", balance, price, state);
+        let deliveryFailed = false;
         for (const recipient of recipients) {
           if (!deliveryEnabled) {
             dryRun++;
@@ -217,8 +260,24 @@ Deno.serve(async (req) => {
           } catch (error) {
             await db.from("telegram_balance_notifications").delete().eq("id", claim.id);
             errors.push(`send:${lesson.id}:${student.id}:${recipient.type}`);
+            deliveryFailed = true;
             console.error("Balance notification delivery failed", error);
           }
+        }
+
+        if (deliveryFailed) {
+          await db.from("telegram_balance_processed_events").delete()
+            .eq("lesson_id", lesson.id).eq("student_id", student.id);
+        } else {
+          const { error: stateSaveError } = await db.from("telegram_student_balance_state")
+            .upsert({
+              student_id: student.id,
+              teacher_id: lesson.teacher_id,
+              last_state: stateKey,
+              last_balance: balance,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: "student_id,teacher_id" });
+          if (stateSaveError) errors.push(`state-save:${student.id}`);
         }
       }
     }
