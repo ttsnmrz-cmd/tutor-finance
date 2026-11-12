@@ -559,6 +559,8 @@ async function saveLesson(scope='one'){
     saveButton.classList.add('opacity-60','cursor-not-allowed');
   }
   try{
+    const notificationLessonIds=[];
+    let notificationEvent=null;
     const id=document.getElementById('edit-id').value;
     const student=document.getElementById('edit-student').value;
     const date=document.getElementById('edit-date').value;
@@ -607,6 +609,14 @@ async function saveLesson(scope='one'){
       );
 
       const groupId=l?.group_id||null;
+      const originalDate=l?.date;
+      const originalTime=l?.time;
+      const originalStatus=l?.status;
+      const scheduleChanged=!!l&&(String(originalDate)!==String(date)||String(originalTime).slice(0,5)!==String(time).slice(0,5)||String(originalStatus)!==String(status));
+      if(scheduleChanged){
+        notificationEvent=(status==='cancelled_charge'||status==='cancelled_free')?'cancelled':'updated';
+        notificationLessonIds.push(String(id));
+      }
       const repeatEnabled=document.getElementById('edit-recurring')?.checked;
       const selectedRepeatDays=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
       if(repeatEnabled&&!selectedRepeatDays.length){
@@ -630,6 +640,9 @@ async function saveLesson(scope='one'){
         'Изменить это занятие и ещё '+following.length+' последующих занятий? Изменятся время, длительность, стоимость и комментарий. Даты остальных занятий и история посещаемости останутся без изменений.'
       ))return;
 
+      if(scope==='following'&&scheduleChanged){
+        following.forEach(x=>notificationLessonIds.push(String(x.id)));
+      }
       if(groupId){
         await db(
           '/lessons?id=eq.'+
@@ -766,7 +779,7 @@ async function saveLesson(scope='one'){
 
           for(let i=0;i<90;i++){
             if(days.includes(cur.getDay())){
-              await createOneGroupLesson(
+              const createdLesson=await createOneGroupLesson(
                 groupId,
                 localISO(cur),
                 time,
@@ -776,6 +789,7 @@ async function saveLesson(scope='one'){
                 comment,
                 teacherId
               );
+              if(createdLesson?.id)notificationLessonIds.push(String(createdLesson.id));
             }
 
             cur.setDate(
@@ -783,7 +797,7 @@ async function saveLesson(scope='one'){
             );
           }
         }else{
-          await createOneGroupLesson(
+          const createdLesson=await createOneGroupLesson(
             groupId,
             date,
             time,
@@ -793,6 +807,7 @@ async function saveLesson(scope='one'){
             comment,
             teacherId
           );
+          if(createdLesson?.id)notificationLessonIds.push(String(createdLesson.id));
         }
       }else{
         const recurring=document.getElementById('edit-recurring').checked;
@@ -802,25 +817,46 @@ async function saveLesson(scope='one'){
           const cur=new Date(date+'T00:00:00');
           for(let i=0;i<90;i++){
             if(selectedDays.includes(cur.getDay())){
-              await db('/lessons',{
+              const created=await db('/lessons',{
                 method:'POST',
-                headers:{...headers,Prefer:'return=minimal'},
+                headers:{...headers,Prefer:'return=representation'},
                 body:JSON.stringify({student,date:localISO(cur),time,timezone:getTeacherTimezone(),price,status:'pending',duration,comment,teacher_id:teacherId})
               });
+              if(created?.[0]?.id)notificationLessonIds.push(String(created[0].id));
             }
             cur.setDate(cur.getDate()+1);
           }
         }else{
-          await db('/lessons',{
+          const created=await db('/lessons',{
             method:'POST',
-            headers:{...headers,Prefer:'return=minimal'},
+            headers:{...headers,Prefer:'return=representation'},
             body:JSON.stringify({student,date,time,timezone:getTeacherTimezone(),price,status,duration,comment,teacher_id:teacherId})
           });
+          if(created?.[0]?.id)notificationLessonIds.push(String(created[0].id));
         }
       }
     }
 
     closeLessonModal();
+
+    if(notificationLessonIds.length){
+      const ask=notificationEvent==='cancelled'
+        ?'Отправить ученику уведомление об отмене занятия в Telegram?'
+        :notificationEvent==='updated'
+          ?'Расписание изменено. Отправить ученику уведомление в Telegram?'
+          :'Занятие создано. Отправить ученику уведомление в Telegram?';
+      if(confirm(ask)){
+        const event=notificationEvent||'created';
+        const {data,error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+          body:{lesson_ids:notificationLessonIds,event}
+        });
+        if(error)showError(new Error('Не удалось отправить уведомление: '+error.message));
+        else{
+          const sent=(data?.results||[]).reduce((sum,x)=>sum+Number(x.sent||0),0);
+          alert(sent?'Уведомления отправлены: '+sent:'Уведомления не отправлены. Проверьте, подключён ли Telegram у ученика и включены ли уведомления об изменениях.');
+        }
+      }
+    }
 
     await loadData();
 
