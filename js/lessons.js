@@ -646,13 +646,13 @@ async function saveLesson(scope='one'){
 
         await saveGroupChargeExceptions(l);
 
-        for(const future of following){
-          await db('/lessons?id=eq.'+encodeURIComponent(future.id),{
+        await Promise.all(following.map(future=>
+          db('/lessons?id=eq.'+encodeURIComponent(future.id),{
             method:'PATCH',
             headers:{...headers,Prefer:'return=minimal'},
             body:JSON.stringify({time,duration,comment})
-          });
-        }
+          })
+        ));
       }else{
         await db(
           '/lessons?id=eq.'+
@@ -675,13 +675,13 @@ async function saveLesson(scope='one'){
           }
         );
 
-        for(const future of following){
-          await db('/lessons?id=eq.'+encodeURIComponent(future.id),{
+        await Promise.all(following.map(future=>
+          db('/lessons?id=eq.'+encodeURIComponent(future.id),{
             method:'PATCH',
             headers:{...headers,Prefer:'return=minimal'},
             body:JSON.stringify({student,time,price,duration,comment})
-          });
-        }
+          })
+        ));
       }
     }else{
       const groupId=
