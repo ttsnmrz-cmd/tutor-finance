@@ -424,7 +424,7 @@ function lessonPriceTotal(l){
 async function loadData(){
   [students,lessons,payments,groups,lessonMembers]=await Promise.all([
     db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments,timezone'),
-    db('/lessons?select=id,student,student_id,date,time,timezone,price,status,duration,group_id,comment'),
+    db('/lessons?select=id,student,student_id,series_id,date,time,timezone,price,status,duration,group_id,comment'),
     db('/payments?select=id,student,student_id,amount,date'),
     db('/groups?select=id,name'),
     db('/lesson_members?select=id,lesson_id,student_id,price,charged,attendance_status')
@@ -1353,6 +1353,10 @@ async function deleteThisAndFollowingFromModal(){
   const l=lessons.find(x=>String(x.id)===String(id));
   if(!l)return;
 
+  if(!l.series_id){
+    showError(new Error('Это старое занятие не связано с идентификатором серии. Массовое удаление недоступно. Можно удалить только это занятие.'));
+    return;
+  }
   const isGroup=!!l.group_id;
   if(!confirm(
     isGroup
@@ -1360,9 +1364,7 @@ async function deleteThisAndFollowingFromModal(){
       :'Удалить это занятие и все следующие у этого ученика начиная с '+l.date+'?'
   ))return;
 
-  const targets=isGroup
-    ?lessons.filter(x=>String(x.group_id)===String(l.group_id)&&x.date>=l.date)
-    :lessons.filter(x=>!x.group_id&&l.student_id&&String(x.student_id)===String(l.student_id)&&x.date>=l.date);
+  const targets=lessons.filter(x=>String(x.series_id)===String(l.series_id)&&x.date>=l.date);
   const notify=targets.length>0&&confirm('Удалить занятия. Отправить ученикам уведомление об удалении расписания в Telegram?');
 
   lessonDeleteInProgress=true;
@@ -1370,7 +1372,7 @@ async function deleteThisAndFollowingFromModal(){
   try{
     if(notify){
       const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:[String(targets[0].id)],event:'deleted'}
+        body:{lesson_ids:targets.map(x=>String(x.id)),event:'deleted'}
       });
       if(error)showError(new Error('Занятия будут удалены, но уведомление отправить не удалось: '+error.message));
     }
@@ -2088,6 +2090,10 @@ async function removeStudentFromLesson(memberId){
   const ctx=lessonGroupContext();
 
   if(!ctx)return;
+  if(!ctx.anchor.series_id){
+    showError(new Error('Это старое групповое занятие не связано с идентификатором серии. Изменение участников для последующих занятий недоступно. Можно изменить состав только этого занятия.'));
+    // Single-lesson changes remain available; bulk changes are blocked below.
+  }
 
   const m=ctx.attached.find(
     x=>String(x.id)===String(memberId)
@@ -2105,16 +2111,17 @@ async function removeStudentFromLesson(memberId){
   );
 
   if(!scope)return;
+  if(scope==='following'&&!ctx.anchor.series_id){
+    showError(new Error('Это старое групповое занятие не имеет идентификатора серии. Массовое изменение участников недоступно.'));
+    return;
+  }
 
   try{
     const targets=
       scope==='one'
         ?[ctx.anchor]
         :lessons.filter(
-          x=>
-            String(x.group_id)===
-            String(ctx.anchor.group_id)&&
-            x.date>=ctx.anchor.date
+          x=>String(x.series_id)===String(ctx.anchor.series_id)&&x.date>=ctx.anchor.date
         );
 
     for(const lesson of targets){
@@ -2177,6 +2184,10 @@ async function addStudentToLesson(studentId){
   const ctx=lessonGroupContext();
 
   if(!ctx)return;
+  if(!ctx.anchor.series_id){
+    showError(new Error('Это старое групповое занятие не связано с идентификатором серии. Изменение участников для последующих занятий недоступно. Можно изменить состав только этого занятия.'));
+    // Single-lesson changes remain available; bulk changes are blocked below.
+  }
 
   const st=students.find(
     x=>String(x.id)===String(studentId)
@@ -2195,16 +2206,17 @@ async function addStudentToLesson(studentId){
   );
 
   if(!scope)return;
+  if(scope==='following'&&!ctx.anchor.series_id){
+    showError(new Error('Это старое групповое занятие не имеет идентификатора серии. Массовое изменение участников недоступно.'));
+    return;
+  }
 
   try{
     const targets=
       scope==='one'
         ?[ctx.anchor]
         :lessons.filter(
-          x=>
-            String(x.group_id)===
-            String(ctx.anchor.group_id)&&
-            x.date>=ctx.anchor.date
+          x=>String(x.series_id)===String(ctx.anchor.series_id)&&x.date>=ctx.anchor.date
         );
 
     for(const lesson of targets){
