@@ -151,7 +151,7 @@ function openNewLessonForDate(date){
     'lesson-modal-title'
   ).textContent='Новое занятие';
 
-  document.getElementById('save-following-btn')?.classList.add('hidden');
+  closeLessonSaveMenu();
 
   document.getElementById(
     'lesson-delete-menu'
@@ -294,9 +294,12 @@ const total=parts.reduce(
 
   document.getElementById(
     'recurring-box'
-  ).classList.add('hidden');
+  ).classList.remove('hidden');
 
-  document.getElementById('save-following-btn')?.classList.remove('hidden');
+  document.getElementById('edit-recurring').checked=false;
+  document.querySelectorAll('.rec-day').forEach(x=>x.checked=false);
+  toggleRecurring();
+  closeLessonSaveMenu();
 
   document.getElementById(
     'lesson-delete-menu'
@@ -364,6 +367,13 @@ function toggleRecurring(){
       'edit-recurring'
     ).checked
   );
+}
+
+function toggleLessonSaveMenu(){
+  document.getElementById('lesson-save-dropdown')?.classList.toggle('hidden');
+}
+function closeLessonSaveMenu(){
+  document.getElementById('lesson-save-dropdown')?.classList.add('hidden');
 }
 
 let pendingEmptyGroupLesson=null;
@@ -586,14 +596,23 @@ async function saveLesson(scope='one'){
       );
 
       const groupId=l?.group_id||null;
+      const repeatEnabled=document.getElementById('edit-recurring')?.checked;
+      const selectedRepeatDays=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
+      if(repeatEnabled&&!selectedRepeatDays.length){
+        throw new Error('Выбери хотя бы один день недели для повторения.');
+      }
       const following=scope==='following'
-        ?lessons.filter(x=>
-            String(x.id)!==String(id)&&
-            x.date>=l.date&&
-            (groupId
+        ?lessons.filter(x=>{
+            if(String(x.id)===String(id)||x.date<l.date)return false;
+            const sameSeries=groupId
               ?String(x.group_id)===String(groupId)
-              :!x.group_id&&x.student===l.student)
-          )
+              :!x.group_id&&x.student===l.student;
+            if(!sameSeries)return false;
+            if(!repeatEnabled)return true;
+            const parts=String(x.date).split('-').map(Number);
+            const weekday=new Date(parts[0],parts[1]-1,parts[2]).getDay();
+            return selectedRepeatDays.includes(weekday);
+          })
         :[];
 
       if(scope==='following'&&!confirm(
