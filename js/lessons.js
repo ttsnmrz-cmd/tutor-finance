@@ -869,10 +869,7 @@ async function saveLesson(scope='one'){
           body:{lesson_ids:notificationLessonIds,event}
         });
         if(error)showError(new Error('Не удалось отправить уведомление: '+error.message));
-        else{
-          const sent=(data?.results||[]).reduce((sum,x)=>sum+Number(x.sent||0),0);
-          alert(sent?'Уведомления отправлены: '+sent:'Уведомления не отправлены. Проверьте, подключён ли Telegram у ученика и включены ли уведомления об изменениях.');
-        }
+        else showNotificationResult(data);
       }
     }
 
