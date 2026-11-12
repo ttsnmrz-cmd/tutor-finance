@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     let lesson: any;
     let recipients: any[] = [];
     if (isDeleted) {
-      if (!item.id || !/^\\d{4}-\\d{2}-\\d{2}$/.test(item.date) || !item.time || !item.student_ids.length) {
+      if (!item.id || !/^\d{4}-\d{2}-\d{2}$/.test(item.date) || !item.time || !item.student_ids.length) {
         results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "invalid_deleted_snapshot" });
         continue;
       }
@@ -107,10 +107,10 @@ Deno.serve(async (req) => {
 
     const dateTime = formatDate(lesson.date, lesson.time);
     let message = "";
-    if (event === "created") message = `Здравствуйте! 👋\\nВ расписании появилось новое занятие: ${dateTime}.\\nДо встречи!`;
-    else if (event === "cancelled") message = `Здравствуйте!\\nЗанятие ${dateTime} отменяется. О времени следующего занятия сообщу дополнительно.`;
-    else if (event === "deleted") message = `Здравствуйте!\\nЗанятие ${dateTime} удалено из расписания.`;
-    else message = `Здравствуйте! 👋\\nВ расписании изменилось занятие: ${dateTime}.\\nПодробности можно посмотреть в личном кабинете.`;
+    if (event === "created") message = `Здравствуйте! 👋\nВ расписании появилось новое занятие: ${dateTime}.\nДо встречи!`;
+    else if (event === "cancelled") message = `Здравствуйте!\nЗанятие ${dateTime} отменяется. О времени следующего занятия сообщу дополнительно.`;
+    else if (event === "deleted") message = `Здравствуйте!\nЗанятие ${dateTime} удалено из расписания.`;
+    else message = `Здравствуйте! 👋\nВ расписании изменилось занятие: ${dateTime}.\nПодробности можно посмотреть в личном кабинете.`;
 
     let sent = 0;
     let failed = 0;
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
       if (!student.telegram_chat_id || student.telegram_notify_changes === false) { skipped_count++; continue; }
       const cabinet = `https://profiprofit.com/?student=${student.id}`;
       try {
-        await send(student.telegram_chat_id, `${message}\\n\\nЛичный кабинет: ${cabinet}`);
+        await send(student.telegram_chat_id, `${message}\n\nЛичный кабинет: ${cabinet}`);
         sent++;
       } catch (e) {
         failed++;
