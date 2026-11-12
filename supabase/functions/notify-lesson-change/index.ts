@@ -52,56 +52,81 @@ Deno.serve(async (req) => {
   if (authError || !user) return jsonResponse({ error: "Unauthorized" }, 401);
 
   const body = await req.json().catch(() => null);
-  const ids = Array.isArray(body?.lesson_ids) ? [...new Set(body.lesson_ids.map(String))].slice(0, 100) : [];
   const event = body?.event;
-  if (!ids.length || !["created", "updated", "cancelled", "deleted"].includes(event)) {
-    return jsonResponse({ error: "Invalid lesson_ids or event" }, 400);
+  const isDeleted = event === "deleted";
+  const deletedLessons = Array.isArray(body?.deleted_lessons) ? body.deleted_lessons.slice(0, 100) : [];
+  const ids = Array.isArray(body?.lesson_ids) ? [...new Set(body.lesson_ids.map(String))].slice(0, 100) : [];
+  if (!["created", "updated", "cancelled", "deleted"].includes(event) || (isDeleted ? !deletedLessons.length : !ids.length)) {
+    return jsonResponse({ error: "Invalid lesson payload or event" }, 400);
   }
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
   const results = [];
-  for (const id of ids) {
-    const { data: lesson, error } = await db.from("lessons")
-      .select("id,student,student_id,group_id,date,time,timezone,teacher_id,status")
-      .eq("id", id).eq("teacher_id", user.id).maybeSingle();
-    if (error || !lesson) { results.push({ lesson_id: id, sent: 0, skipped: "lesson_not_found" }); continue; }
+  const items = isDeleted
+    ? deletedLessons.map((x: any) => ({ id: String(x?.lesson_id || ""), date: String(x?.date || ""), time: String(x?.time || ""), student_ids: Array.isArray(x?.student_ids) ? [...new Set(x.student_ids.map(String))] : [] }))
+    : ids.map((id: string) => ({ id }));
 
+  for (const item of items) {
+    let lesson: any;
     let recipients: any[] = [];
-    if (lesson.group_id) {
-      const { data: members } = await db.from("lesson_members").select("student_id").eq("lesson_id", lesson.id).eq("teacher_id", user.id);
-      const memberIds = (members || []).map((m: any) => m.student_id);
-      if (memberIds.length) {
-        const { data } = await db.from("students")
-          .select("id,name,telegram_chat_id,telegram_notify_changes,telegram_link_token")
-          .eq("teacher_id", user.id).in("id", memberIds);
-        recipients = data || [];
+    if (isDeleted) {
+      if (!item.id || !/^\\d{4}-\\d{2}-\\d{2}$/.test(item.date) || !item.time || !item.student_ids.length) {
+        results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "invalid_deleted_snapshot" });
+        continue;
       }
-    } else if (lesson.student_id) {
-      const { data } = await db.from("students")
-        .select("id,name,telegram_chat_id,telegram_notify_changes,telegram_link_token")
-        .eq("teacher_id", user.id).eq("id", lesson.student_id);
+      const { data, error } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
+        .eq("teacher_id", user.id).in("id", item.student_ids);
+      if (error) {
+        results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: item.student_ids.length, skipped: "students_lookup_failed" });
+        continue;
+      }
       recipients = data || [];
+      lesson = { id: item.id, date: item.date, time: item.time };
+    } else {
+      const { data, error } = await db.from("lessons").select("id,student,student_id,group_id,date,time,timezone,teacher_id,status")
+        .eq("id", item.id).eq("teacher_id", user.id).maybeSingle();
+      if (error || !data) {
+        results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "lesson_not_found" });
+        continue;
+      }
+      lesson = data;
+      if (lesson.group_id) {
+        const { data: members } = await db.from("lesson_members").select("student_id").eq("lesson_id", lesson.id).eq("teacher_id", user.id);
+        const memberIds = (members || []).map((m: any) => m.student_id);
+        if (memberIds.length) {
+          const { data: students } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
+            .eq("teacher_id", user.id).in("id", memberIds);
+          recipients = students || [];
+        }
+      } else if (lesson.student_id) {
+        const { data: students } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
+          .eq("teacher_id", user.id).eq("id", lesson.student_id);
+        recipients = students || [];
+      }
     }
 
     const dateTime = formatDate(lesson.date, lesson.time);
     let message = "";
-    if (event === "created") message = `Здравствуйте! 👋\nВ расписании появилось новое занятие: ${dateTime}.\nДо встречи!`;
-    else if (event === "cancelled") message = `Здравствуйте!\nЗанятие ${dateTime} отменяется. О времени следующего занятия сообщу дополнительно.`;
-    else if (event === "deleted") message = `Здравствуйте!\nЗанятие ${dateTime} удалено из расписания.`;
-    else message = `Здравствуйте! 👋\nВ расписании изменилось занятие: ${dateTime}.\nПодробности можно посмотреть в личном кабинете.`;
+    if (event === "created") message = `Здравствуйте! 👋\\nВ расписании появилось новое занятие: ${dateTime}.\\nДо встречи!`;
+    else if (event === "cancelled") message = `Здравствуйте!\\nЗанятие ${dateTime} отменяется. О времени следующего занятия сообщу дополнительно.`;
+    else if (event === "deleted") message = `Здравствуйте!\\nЗанятие ${dateTime} удалено из расписания.`;
+    else message = `Здравствуйте! 👋\\nВ расписании изменилось занятие: ${dateTime}.\\nПодробности можно посмотреть в личном кабинете.`;
 
     let sent = 0;
+    let failed = 0;
+    let skipped_count = 0;
     for (const student of recipients) {
-      if (!student.telegram_chat_id || student.telegram_notify_changes === false) continue;
+      if (!student.telegram_chat_id || student.telegram_notify_changes === false) { skipped_count++; continue; }
       const cabinet = `https://profiprofit.com/?student=${student.id}`;
       try {
-        await send(student.telegram_chat_id, `${message}\n\nЛичный кабинет: ${cabinet}`);
+        await send(student.telegram_chat_id, `${message}\\n\\nЛичный кабинет: ${cabinet}`);
         sent++;
       } catch (e) {
+        failed++;
         console.error("Notification failed", lesson.id, student.id, e);
       }
     }
-    results.push({ lesson_id: id, sent, recipients: recipients.length });
+    results.push({ lesson_id: lesson.id, sent, failed, skipped_count, recipients: recipients.length });
   }
   return jsonResponse({ ok: true, results });
 });
