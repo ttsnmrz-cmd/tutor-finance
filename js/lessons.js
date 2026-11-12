@@ -636,6 +636,7 @@ async function saveLesson(scope='one'){
                 )?.name||l.student,
               date,
               time,
+              timezone:getTeacherTimezone(),
               price:l.price,
               status,
               duration,
@@ -650,7 +651,7 @@ async function saveLesson(scope='one'){
           db('/lessons?id=eq.'+encodeURIComponent(future.id),{
             method:'PATCH',
             headers:{...headers,Prefer:'return=minimal'},
-            body:JSON.stringify({time,duration,comment})
+            body:JSON.stringify({time,timezone:getTeacherTimezone(),duration,comment})
           })
         ));
       }else{
@@ -667,6 +668,7 @@ async function saveLesson(scope='one'){
               student,
               date,
               time,
+              timezone:getTeacherTimezone(),
               price,
               status,
               duration,
@@ -792,7 +794,7 @@ async function saveLesson(scope='one'){
               await db('/lessons',{
                 method:'POST',
                 headers:{...headers,Prefer:'return=minimal'},
-                body:JSON.stringify({student,date:localISO(cur),time,price,status:'pending',duration,comment,teacher_id:teacherId})
+                body:JSON.stringify({student,date:localISO(cur),time,timezone:getTeacherTimezone(),price,status:'pending',duration,comment,teacher_id:teacherId})
               });
             }
             cur.setDate(cur.getDate()+1);
@@ -801,7 +803,7 @@ async function saveLesson(scope='one'){
           await db('/lessons',{
             method:'POST',
             headers:{...headers,Prefer:'return=minimal'},
-            body:JSON.stringify({student,date,time,price,status,duration,comment,teacher_id:teacherId})
+            body:JSON.stringify({student,date,time,timezone:getTeacherTimezone(),price,status,duration,comment,teacher_id:teacherId})
           });
         }
       }
