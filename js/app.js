@@ -1243,7 +1243,9 @@ async function confirmEmptyGroupMembers(){
             p.duration,
             'pending',
             targets,
-            p.comment
+            p.comment,
+            null,
+            p.seriesId
           );
         }
 
@@ -1259,7 +1261,9 @@ async function confirmEmptyGroupMembers(){
         p.duration,
         p.status,
         targets,
-        p.comment
+        p.comment,
+        null,
+        null
       );
     }
 
@@ -2090,10 +2094,6 @@ async function removeStudentFromLesson(memberId){
   const ctx=lessonGroupContext();
 
   if(!ctx)return;
-  if(!ctx.anchor.series_id){
-    showError(new Error('Это старое групповое занятие не связано с идентификатором серии. Изменение участников для последующих занятий недоступно. Можно изменить состав только этого занятия.'));
-    // Single-lesson changes remain available; bulk changes are blocked below.
-  }
 
   const m=ctx.attached.find(
     x=>String(x.id)===String(memberId)
@@ -2184,10 +2184,6 @@ async function addStudentToLesson(studentId){
   const ctx=lessonGroupContext();
 
   if(!ctx)return;
-  if(!ctx.anchor.series_id){
-    showError(new Error('Это старое групповое занятие не связано с идентификатором серии. Изменение участников для последующих занятий недоступно. Можно изменить состав только этого занятия.'));
-    // Single-lesson changes remain available; bulk changes are blocked below.
-  }
 
   const st=students.find(
     x=>String(x.id)===String(studentId)
