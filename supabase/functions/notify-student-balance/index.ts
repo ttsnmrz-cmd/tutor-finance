@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
   try {
     const candidates = await fetchAll(
       db.from("lessons")
-        .select("id,student_id,student,date,time,timezone,duration,status,group_id,teacher_id")
+        .select("id,student_id,student,date,time,timezone,duration,status,group_id,teacher_id,price")
         .in("status", ["conducted", "cancelled_charge"])
         .gte("date", from).lte("date", to)
         .order("date", { ascending: true })
