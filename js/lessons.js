@@ -629,7 +629,7 @@ async function saveLesson(scope='one'){
             if(String(x.id)===String(id)||x.date<l.date)return false;
             const sameSeries=groupId
               ?String(x.group_id)===String(groupId)
-              :!x.group_id&&x.student===l.student;
+              :!x.group_id&&!!l.student_id&&String(x.student_id)===String(l.student_id);
             if(!sameSeries)return false;
             if(!repeatEnabled)return true;
             const parts=String(x.date).split('-').map(Number);
