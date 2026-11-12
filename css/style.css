@@ -361,3 +361,15 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 
 #lesson-save-dropdown button:hover,#lesson-delete-dropdown button:hover{background:var(--accent-soft);color:var(--text-color)}
 #lesson-save-dropdown button,#lesson-delete-dropdown button{transition:background-color .15s ease,color .15s ease}
+
+/* Keep teacher pages aligned with the header; scroll the week inside its own viewport. */
+#teacher-app>.max-w-5xl{width:100%;max-width:64rem;min-width:0;box-sizing:border-box}
+#teacher-app #tab-dashboard,#teacher-app #tab-calendar,#teacher-app #tab-students,#teacher-app #tab-admin{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+#teacher-app #tab-calendar>.app-card{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+#teacher-app #week-calendar.calendar-week-grid{display:grid;width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+@media(max-width:900px){
+ #teacher-app #week-calendar.calendar-week-grid{grid-template-columns:repeat(7,minmax(145px,1fr));overflow-x:auto;overscroll-behavior-x:contain}
+}
+@media(max-width:640px){
+ #teacher-app #week-calendar.calendar-week-grid{grid-template-columns:repeat(7,minmax(210px,1fr))}
+}
