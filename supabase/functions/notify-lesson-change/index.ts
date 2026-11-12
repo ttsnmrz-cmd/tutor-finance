@@ -6,14 +6,13 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
 
-function formatDate(date: string, time: string, timezone = "Europe/Minsk") {
-  const [y, m, d] = date.split("-").map(Number);
-  const [hh, mm] = time.split(":").map(Number);
-  const value = new Date(Date.UTC(y, m - 1, d, hh, mm));
-  return new Intl.DateTimeFormat("ru-RU", {
-    timeZone: timezone, day: "numeric", month: "long",
-    hour: "2-digit", minute: "2-digit", hourCycle: "h23"
-  }).format(value);
+function formatDate(date: string, time: string) {
+  // The lesson date and time are already stored in the teacher's local timezone.
+  // Formatting them as UTC and converting again would shift the displayed time.
+  const [year, month, day] = date.split("-").map(Number);
+  const monthName = new Intl.DateTimeFormat("ru-RU", { month: "long" })
+    .format(new Date(Date.UTC(year, month - 1, day, 12)));
+  return `${day} ${monthName} в ${time.slice(0, 5)}`;
 }
 
 async function send(chatId: string | number, text: string) {
@@ -71,7 +70,7 @@ Deno.serve(async (req) => {
       recipients = data?.length === 1 ? data : [];
     }
 
-    const dateTime = formatDate(lesson.date, lesson.time, lesson.timezone || "Europe/Minsk");
+    const dateTime = formatDate(lesson.date, lesson.time);
     let message = "";
     if (event === "created") message = `Здравствуйте! 👋\nВ расписании появилось новое занятие: ${dateTime}.\nДо встречи!`;
     else if (event === "cancelled") message = `Здравствуйте!\nЗанятие ${dateTime} отменяется. О времени следующего занятия сообщу дополнительно.`;
