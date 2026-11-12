@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
 
   const { data: lessons, error: lessonsError } = await db
     .from("lessons")
-    .select("id,student,date,time,timezone,status,group_id,teacher_id")
+    .select("id,student,student_id,date,time,timezone,status,group_id,teacher_id")
     .eq("status", "pending")
     .gte("date", from)
     .lte("date", to);
@@ -138,10 +138,15 @@ Deno.serve(async (req) => {
       if (studentsError) { errors.push(`students:${lesson.id}`); continue; }
       recipients = students ?? [];
     } else {
+      if (!lesson.student_id) {
+        // Ambiguous legacy records are intentionally not matched by name.
+        skipped++;
+        continue;
+      }
       const { data, error } = await db
         .from("students")
         .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived")
-        .eq("name", lesson.student)
+        .eq("id", lesson.student_id)
         .eq("teacher_id", lesson.teacher_id)
         .eq("archived", false);
       if (error) { errors.push(`students:${lesson.id}`); continue; }
