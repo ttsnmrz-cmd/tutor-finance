@@ -200,7 +200,7 @@ function openEditLesson(id){
   document.getElementById('edit-id').value=l.id;
 
   const linkedStudent=l.student_id?students.find(x=>String(x.id)===String(l.student_id)):null;
-  const legacyMatches=students.filter(x=>x.name===l.student&&!x.archived);
+  const legacyMatches=students.filter(x=>x.name===l.student);
   document.getElementById('edit-student').value=
     l.group_id?'group:'+l.group_id:
     linkedStudent?'student:'+linkedStudent.id:
