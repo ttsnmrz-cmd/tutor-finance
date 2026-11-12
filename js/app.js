@@ -1362,7 +1362,7 @@ async function deleteThisAndFollowingFromModal(){
 
   const targets=isGroup
     ?lessons.filter(x=>String(x.group_id)===String(l.group_id)&&x.date>=l.date)
-    :lessons.filter(x=>x.student===l.student&&x.date>=l.date);
+    :lessons.filter(x=>!x.group_id&&l.student_id&&String(x.student_id)===String(l.student_id)&&x.date>=l.date);
   const notify=targets.length>0&&confirm('Удалить занятия. Отправить ученикам уведомление об удалении расписания в Telegram?');
 
   lessonDeleteInProgress=true;
