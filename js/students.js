@@ -765,9 +765,16 @@ async function removeStudent(id){
   const s=students.find(x=>String(x.id)===String(id));
   if(!s)return;
 
+  const unlinkedLessons=lessons.filter(x=>!x.group_id&&!x.student_id&&x.student===s.name).length;
+  const unlinkedPayments=payments.filter(x=>!x.student_id&&x.student===s.name).length;
+  const legacyWarning=unlinkedLessons||unlinkedPayments
+    ?'\n\nЕсть старые записи с таким же именем, но без ID ('+
+      unlinkedLessons+' занятий, '+unlinkedPayments+' платежей). Они останутся без изменений, чтобы случайно не удалить чужие данные.'
+    :'';
   const ok=confirm(
     'Вы уверены, что хотите удалить ученика '+s.name+
-    '? Все прошедшие и будущие занятия, информация об оплатах будет удалена.'
+    '? Связанные по ID индивидуальные занятия и платежи будут удалены.'+
+    legacyWarning
   );
 
   if(!ok)return;
