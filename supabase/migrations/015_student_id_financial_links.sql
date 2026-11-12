@@ -11,7 +11,7 @@ alter table public.payments
 -- Backfill individual lessons only when exactly one student with this name
 -- exists for the same teacher. Group lessons continue to use lesson_members.
 with unique_students as (
-  select teacher_id, name, min(id) as student_id
+  select teacher_id, name, (array_agg(id order by id))[1] as student_id
   from public.students
   where teacher_id is not null
   group by teacher_id, name
@@ -28,7 +28,7 @@ where l.student_id is null
 -- Backfill payments only when exactly one student with this name
 -- exists for the same teacher.
 with unique_students as (
-  select teacher_id, name, min(id) as student_id
+  select teacher_id, name, (array_agg(id order by id))[1] as student_id
   from public.students
   where teacher_id is not null
   group by teacher_id, name

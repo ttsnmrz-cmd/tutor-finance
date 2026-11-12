@@ -56,9 +56,9 @@ function teacherReminderText(type: "1h" | "10m", studentNames: string[]): string
       : "занятие";
   const capitalizedSubject = subject[0].toUpperCase() + subject.slice(1);
   if (type === "10m") {
-    return `Hi!\\n${capitalizedSubject} должно начаться через 10 минут.`;
+    return `Hi!\n${capitalizedSubject} должно начаться через 10 минут.`;
   }
-  return `Hi!\\n${capitalizedSubject} запланировано через 1 час.`;
+  return `Hi!\n${capitalizedSubject} запланировано через 1 час.`;
 }
 
 async function sendTelegram(chatId: string | number, text: string) {
@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
 
   const { data: lessons, error: lessonsError } = await db
     .from("lessons")
-    .select("id,student,date,time,timezone,status,group_id,teacher_id")
+    .select("id,student,student_id,date,time,timezone,status,group_id,teacher_id")
     .eq("status", "pending")
     .gte("date", from)
     .lte("date", to);
@@ -138,14 +138,20 @@ Deno.serve(async (req) => {
       if (studentsError) { errors.push(`students:${lesson.id}`); continue; }
       recipients = students ?? [];
     } else {
-      const { data, error } = await db
-        .from("students")
-        .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived")
-        .eq("name", lesson.student)
-        .eq("teacher_id", lesson.teacher_id)
-        .eq("archived", false);
-      if (error) { errors.push(`students:${lesson.id}`); continue; }
-      recipients = data ?? [];
+      if (!lesson.student_id) {
+        // Ambiguous legacy records are intentionally not matched by name.
+        // Keep the teacher reminder, but do not guess a student recipient.
+        skipped++;
+      } else {
+        const { data, error } = await db
+          .from("students")
+          .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived")
+          .eq("id", lesson.student_id)
+          .eq("teacher_id", lesson.teacher_id)
+          .eq("archived", false);
+        if (error) { errors.push(`students:${lesson.id}`); continue; }
+        recipients = data ?? [];
+      }
     }
 
     // Teacher receives one reminder per lesson, independently of student preferences.

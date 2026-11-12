@@ -6,11 +6,11 @@ function studentStats(s){
   );
 
   const ls=lessons.filter(
-    l=>l.student===s.name||groupLessonIds.has(String(l.id))
+    l=>(!l.group_id&&String(l.student_id||'')===String(s.id))||groupLessonIds.has(String(l.id))
   );
 
   const income=payments
-    .filter(p=>p.student===s.name)
+    .filter(p=>String(p.student_id||'')===String(s.id))
     .reduce((a,p)=>a+Number(p.amount||0),0);
 
   const expenses=ls
@@ -377,7 +377,7 @@ function studentDetail(s){
   );
 
   const topups=payments
-    .filter(p=>p.student===s.name)
+    .filter(p=>String(p.student_id||'')===String(s.id))
     .sort(
       (a,b)=>String(a.date).localeCompare(String(b.date))
     );
@@ -665,35 +665,15 @@ async function saveStudent(){
     const old=s.name;
 
     if(old!==name){
-      await db(
-        '/lessons?student=eq.'+
-        encodeURIComponent(old),
-        {
-          method:'PATCH',
-          headers:{
-            ...headers,
-            Prefer:'return=minimal'
-          },
-          body:JSON.stringify({
-            student:name
-          })
-        }
-      );
-
-      await db(
-        '/payments?student=eq.'+
-        encodeURIComponent(old),
-        {
-          method:'PATCH',
-          headers:{
-            ...headers,
-            Prefer:'return=minimal'
-          },
-          body:JSON.stringify({
-            student:name
-          })
-        }
-      );
+      // Update display snapshots only for records linked to this exact student ID.
+      await db('/lessons?student_id=eq.'+encodeURIComponent(id),{
+        method:'PATCH',headers:{...headers,Prefer:'return=minimal'},
+        body:JSON.stringify({student:name})
+      });
+      await db('/payments?student_id=eq.'+encodeURIComponent(id),{
+        method:'PATCH',headers:{...headers,Prefer:'return=minimal'},
+        body:JSON.stringify({student:name})
+      });
     }
 
     await db(
@@ -785,15 +765,22 @@ async function removeStudent(id){
   const s=students.find(x=>String(x.id)===String(id));
   if(!s)return;
 
+  const unlinkedLessons=lessons.filter(x=>!x.group_id&&!x.student_id&&x.student===s.name).length;
+  const unlinkedPayments=payments.filter(x=>!x.student_id&&x.student===s.name).length;
+  const legacyWarning=unlinkedLessons||unlinkedPayments
+    ?'\n\nЕсть старые записи с таким же именем, но без ID ('+
+      unlinkedLessons+' занятий, '+unlinkedPayments+' платежей). Они останутся без изменений, чтобы случайно не удалить чужие данные.'
+    :'';
   const ok=confirm(
     'Вы уверены, что хотите удалить ученика '+s.name+
-    '? Все прошедшие и будущие занятия, информация об оплатах будет удалена.'
+    '? Связанные по ID индивидуальные занятия и платежи будут удалены.'+
+    legacyWarning
   );
 
   if(!ok)return;
 
   try{
-    for(const l of lessons.filter(x=>x.student===s.name)){
+    for(const l of lessons.filter(x=>!x.group_id&&String(x.student_id||'')===String(s.id))){
       await db(
         '/lessons?id=eq.'+encodeURIComponent(l.id),
         {
@@ -803,7 +790,7 @@ async function removeStudent(id){
       );
     }
 
-    for(const p of payments.filter(x=>x.student===s.name)){
+    for(const p of payments.filter(x=>String(x.student_id||'')===String(s.id))){
       await db(
         '/payments?id=eq.'+encodeURIComponent(p.id),
         {
@@ -1051,7 +1038,7 @@ function showAddForm(type){
 
       <input id="add-student-email" type="email" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Email (необязательно)">
 
-      <input id="add-student-telegram" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Telegram (необязательно)">
+      <input id="add-student-telegram" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Telegram (если хотите, чтобы ученик получал автоматические уведомления)">
 
       <label class="text-sm font-semibold">Группа
         <select id="add-student-group" class="soft-input mt-1 w-full rounded-xl px-3 py-2">
@@ -1426,6 +1413,7 @@ async function saveStudentPayment(){
         },
         body:JSON.stringify({
           student:s.name,
+          student_id:s.id,
           amount,
           date,
           teacher_id:user.id
@@ -1449,9 +1437,8 @@ async function saveStudentPayment(){
 
 async function addPayment(){
   try{
-    const student=document
-      .getElementById('add-payment-student')
-      .value;
+    const studentValue=document.getElementById('add-payment-student').value;
+    const s=students.find(x=>String(x.id)===String(studentValue.replace(/^student:/,'')));
 
     const amount=Number(
       document
@@ -1463,7 +1450,7 @@ async function addPayment(){
       .getElementById('add-payment-date')
       .value;
 
-    if(!student||!amount||!date){
+    if(!s||!amount||!date){
       return showError(
         new Error('Заполните данные платежа')
       );
@@ -1485,7 +1472,8 @@ async function addPayment(){
           Prefer:'return=minimal'
         },
         body:JSON.stringify({
-          student,
+          student:s.name,
+          student_id:s.id,
           amount,
           date,
           teacher_id:user.id

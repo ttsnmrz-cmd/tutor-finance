@@ -424,8 +424,8 @@ function lessonPriceTotal(l){
 async function loadData(){
   [students,lessons,payments,groups,lessonMembers]=await Promise.all([
     db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments,timezone'),
-    db('/lessons?select=id,student,date,time,timezone,price,status,duration,group_id,comment'),
-    db('/payments?select=id,student,amount,date'),
+    db('/lessons?select=id,student,student_id,date,time,timezone,price,status,duration,group_id,comment'),
+    db('/payments?select=id,student,student_id,amount,date'),
     db('/groups?select=id,name'),
     db('/lesson_members?select=id,lesson_id,student_id,price,charged,attendance_status')
   ]);
@@ -526,9 +526,9 @@ function dashboardStudentStats(student){
     lessonMembersForStudent(student.id).map(m=>String(m.lesson_id))
   );
   const studentLessons=lessons.filter(l=>
-    l.student===student.name||groupLessonIds.has(String(l.id))
+    (!l.group_id&&String(l.student_id||'')===String(student.id))||groupLessonIds.has(String(l.id))
   );
-  const income=payments.filter(p=>p.student===student.name)
+  const income=payments.filter(p=>String(p.student_id||'')===String(student.id))
     .reduce((sum,p)=>sum+Number(p.amount||0),0);
   const expenses=studentLessons.filter(l=>charge.has(l.status))
     .reduce((sum,l)=>{
@@ -596,7 +596,7 @@ function fillStudentSelects(){
 
   const studentOptions=active
     .map(s=>
-      `<option value="${esc(s.name)}">${esc(s.name)}</option>`
+      `<option value="student:${esc(s.id)}">${esc(s.name)}</option>`
     )
     .join('');
 
@@ -632,9 +632,8 @@ function updateLessonGroupButton(){
 
   if(!e||!sel)return;
 
-  const s=students.find(
-    x=>x.name===sel.value
-  );
+  const selectedId=sel.value.startsWith('student:')?sel.value.slice(8):'';
+  const s=students.find(x=>String(x.id)===String(selectedId));
 
   const g=studentGroup(s?.id);
 
@@ -868,7 +867,7 @@ async function saveLesson(){
       'edit-id'
     ).value;
 
-    const student=document.getElementById(
+    const studentValue=document.getElementById(
       'edit-student'
     ).value;
 
@@ -900,7 +899,7 @@ async function saveLesson(){
       ).value.trim()||null;
 
     if(
-      !student||
+      !studentValue||
       !date||
       !Number.isFinite(duration)||
       duration<=0
@@ -959,7 +958,8 @@ async function saveLesson(){
               Prefer:'return=minimal'
             },
             body:JSON.stringify({
-              student,
+              student:students.find(s=>String(s.id)===String(studentValue.replace(/^student:/,'')))?.name||l.student,
+              student_id:students.find(s=>String(s.id)===String(studentValue.replace(/^student:/,'')))?.id||l.student_id||null,
               date,
               time,
               timezone:getTeacherTimezone(),
@@ -973,9 +973,12 @@ async function saveLesson(){
       }
     }else{
       const groupId=
-        student.startsWith('group:')
-          ?student.slice(6)
+        studentValue.startsWith('group:')
+          ?studentValue.slice(6)
           :null;
+      const individualStudentId=studentValue.startsWith('student:')?studentValue.slice(8):null;
+      const individualStudent=students.find(s=>String(s.id)===String(individualStudentId));
+      if(!groupId&&!individualStudent)throw new Error('Не удалось определить ученика по ID. Обновите страницу и попробуйте снова.');
 
       const group=groupId
         ?groups.find(
@@ -1077,7 +1080,8 @@ async function saveLesson(){
               Prefer:'return=minimal'
             },
             body:JSON.stringify({
-              student,
+              student:individualStudent.name,
+              student_id:individualStudent.id,
               date,
               time,
               timezone:getTeacherTimezone(),
@@ -1358,7 +1362,7 @@ async function deleteThisAndFollowingFromModal(){
 
   const targets=isGroup
     ?lessons.filter(x=>String(x.group_id)===String(l.group_id)&&x.date>=l.date)
-    :lessons.filter(x=>x.student===l.student&&x.date>=l.date);
+    :lessons.filter(x=>!x.group_id&&l.student_id&&String(x.student_id)===String(l.student_id)&&x.date>=l.date);
   const notify=targets.length>0&&confirm('Удалить занятия. Отправить ученикам уведомление об удалении расписания в Telegram?');
 
   lessonDeleteInProgress=true;
