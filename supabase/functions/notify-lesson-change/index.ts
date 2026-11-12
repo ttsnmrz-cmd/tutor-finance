@@ -77,7 +77,8 @@ Deno.serve(async (req) => {
       const { data, error } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
         .eq("teacher_id", user.id).in("id", item.student_ids);
       if (error) {
-        results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: item.student_ids.length, skipped: "students_lookup_failed" });
+        console.error("Deleted-lesson students lookup failed", item.id, error);
+        results.push({ lesson_id: item.id, sent: 0, failed: 1, skipped_count: 0, error: "students_lookup_failed" });
         continue;
       }
       recipients = data || [];
