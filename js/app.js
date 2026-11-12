@@ -464,7 +464,7 @@ async function autoCompletePastLessons(){
   due.forEach(l=>l.status='conducted');
 }
 function switchTab(t){
-  ['dashboard','calendar','students','admin'].forEach(name=>{
+  ['dashboard','calendar','students','admin','settings'].forEach(name=>{
     document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
     const nav=document.getElementById('nav-'+name);
     if(nav){
