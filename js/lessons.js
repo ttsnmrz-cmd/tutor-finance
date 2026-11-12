@@ -151,6 +151,8 @@ function openNewLessonForDate(date){
     'lesson-modal-title'
   ).textContent='Новое занятие';
 
+  document.getElementById('save-following-btn')?.classList.add('hidden');
+
   document.getElementById(
     'lesson-delete-menu'
   )?.classList.add('hidden');
@@ -293,6 +295,8 @@ const total=parts.reduce(
   document.getElementById(
     'recurring-box'
   ).classList.add('hidden');
+
+  document.getElementById('save-following-btn')?.classList.remove('hidden');
 
   document.getElementById(
     'lesson-delete-menu'
@@ -523,7 +527,7 @@ async function saveGroupChargeExceptions(l){
 }
 let lessonSaveInProgress=false;
 
-async function saveLesson(){
+async function saveLesson(scope='one'){
   if(lessonSaveInProgress)return;
   lessonSaveInProgress=true;
   const saveButton=document.getElementById('save-lesson-btn');
@@ -582,6 +586,19 @@ async function saveLesson(){
       );
 
       const groupId=l?.group_id||null;
+      const following=scope==='following'
+        ?lessons.filter(x=>
+            String(x.id)!==String(id)&&
+            x.date>=l.date&&
+            (groupId
+              ?String(x.group_id)===String(groupId)
+              :!x.group_id&&x.student===l.student)
+          )
+        :[];
+
+      if(scope==='following'&&!confirm(
+        'Изменить это занятие и ещё '+following.length+' последующих занятий? Изменятся время, длительность, стоимость и комментарий. Даты остальных занятий и история посещаемости останутся без изменений.'
+      ))return;
 
       if(groupId){
         await db(
@@ -609,6 +626,14 @@ async function saveLesson(){
         );
 
         await saveGroupChargeExceptions(l);
+
+        for(const future of following){
+          await db('/lessons?id=eq.'+encodeURIComponent(future.id),{
+            method:'PATCH',
+            headers:{...headers,Prefer:'return=minimal'},
+            body:JSON.stringify({time,duration,comment})
+          });
+        }
       }else{
         await db(
           '/lessons?id=eq.'+
@@ -630,6 +655,14 @@ async function saveLesson(){
             })
           }
         );
+
+        for(const future of following){
+          await db('/lessons?id=eq.'+encodeURIComponent(future.id),{
+            method:'PATCH',
+            headers:{...headers,Prefer:'return=minimal'},
+            body:JSON.stringify({student,time,price,duration,comment})
+          });
+        }
       }
     }else{
       const groupId=
