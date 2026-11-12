@@ -1613,6 +1613,45 @@ async function teacherLogout(){
 let publicStudent=null;
 let publicStudentLessons=[];
 let publicStudentPayments=[];
+let publicStudentWeekAnchor=null;
+
+function changePublicStudentWeek(offset){
+  if(!publicStudentWeekAnchor)return;
+  publicStudentWeekAnchor.setDate(publicStudentWeekAnchor.getDate()+offset*7);
+  renderPublicStudentCalendar();
+}
+
+function renderPublicStudentCalendar(lessonRows){
+  const grid=document.getElementById('public-week-calendar');
+  const range=document.getElementById('public-week-range');
+  if(!grid||!range)return;
+  if(!publicStudentWeekAnchor){
+    const tz=isValidTimezone(publicStudent?.timezone)?publicStudent.timezone:'Europe/Minsk';
+    const today=todayISOInTimezone(tz);
+    publicStudentWeekAnchor=dateAtLocalNoon(today);
+  }
+  const start=new Date(publicStudentWeekAnchor);
+  const day=start.getDay();
+  start.setDate(start.getDate()+(day===0?-6:1-day));
+  const lang=window.getLanguage?.()==='en'?'en-US':'ru-RU';
+  const days=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);return d;});
+  range.textContent=days[0].toLocaleDateString(lang,{day:'2-digit',month:'short'})+' — '+days[6].toLocaleDateString(lang,{day:'2-digit',month:'short',year:'numeric'});
+  const today=todayISOInTimezone(isValidTimezone(publicStudent?.timezone)?publicStudent.timezone:'Europe/Minsk');
+  grid.innerHTML=days.map(d=>{
+    const key=localISO(d);
+    const dayLessons=lessonRows.filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
+    return `<section class="calendar-day-column ${key===today?'is-today':''}">
+      <div class="calendar-day-heading"><span class="calendar-weekday">${d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')}</span><span class="calendar-day-number">${d.getDate()}</span></div>
+      <div class="calendar-day-events">${dayLessons.length?dayLessons.map(l=>`<div class="calendar-event-card">
+        <span class="calendar-event-time">${esc(displayTime(l.time))}</span>
+        <span class="calendar-event-title ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">${esc(l.student||'Занятие')}</span>
+        <span class="calendar-event-meta">${l.duration||60} мин</span>
+        <span class="status ${statusClass[l.status]||'bg-slate-100 text-slate-700'}">${statusLabels[l.status]||l.status}</span>
+      </div>`).join(''):'<p class="calendar-empty-day">Нет занятий</p>'}</div>
+    </section>`;
+  }).join('');
+}
+
 
 async function initPublicStudent(){
   const id=new URLSearchParams(location.search).get('student');
@@ -1755,6 +1794,8 @@ async function openStudentCabinet(){
       )
       .join('')||
     '<span class="text-slate-400">Пополнений нет</span>';
+
+  renderPublicStudentCalendar(ls);
 
   document.getElementById('public-lessons').innerHTML=
     visible
