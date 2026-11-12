@@ -2119,17 +2119,13 @@ async function updateGroupLessonPrice(lessonId){
   const members=await db(
     '/lesson_members?lesson_id=eq.'+
     encodeURIComponent(lessonId)+
-    '&select=student_id'
+    '&select=student_id,price'
   );
 
+  // A group lesson total is the sum of the member price snapshots.
+  // Never recalculate old lessons from the students' current profile prices.
   const total=(members||[]).reduce(
-    (sum,m)=>
-      sum+
-      Number(
-        students.find(
-          s=>String(s.id)===String(m.student_id)
-        )?.price??0
-      ),
+    (sum,m)=>sum+Number(m.price??0),
     0
   );
 
