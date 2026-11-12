@@ -119,6 +119,7 @@ Deno.serve(async (req) => {
         .from("students")
         .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived")
         .in("id", ids)
+        .eq("teacher_id", lesson.teacher_id)
         .eq("archived", false);
       if (studentsError) { errors.push(`students:${lesson.id}`); continue; }
       recipients = students ?? [];
@@ -131,6 +132,41 @@ Deno.serve(async (req) => {
         .eq("archived", false);
       if (error) { errors.push(`students:${lesson.id}`); continue; }
       recipients = data ?? [];
+    }
+
+    // Teacher receives one reminder per lesson, independently of student preferences.
+    const { data: teacherProfile, error: teacherError } = await db
+      .from("profiles")
+      .select("telegram_chat_id,timezone")
+      .eq("id", lesson.teacher_id)
+      .maybeSingle();
+    if (teacherError) {
+      errors.push(`teacher-profile:${lesson.id}`);
+    } else if (teacherProfile?.telegram_chat_id) {
+      const teacherText = reminderText(type, start, teacherProfile.timezone || timezone);
+      if (!deliveryEnabled) {
+        dryRun++;
+        console.log("DRY RUN teacher reminder", { lesson_id: lesson.id, type, text: teacherText });
+      } else {
+        const { data: claim, error: claimError } = await db
+          .from("telegram_teacher_lesson_reminders")
+          .upsert({ lesson_id: lesson.id, teacher_id: lesson.teacher_id, reminder_type: type },
+            { onConflict: "lesson_id,reminder_type", ignoreDuplicates: true })
+          .select("id");
+        if (claimError) {
+          errors.push(`teacher-dedupe:${lesson.id}`);
+        } else if (claim?.length) {
+          try {
+            await sendTelegram(teacherProfile.telegram_chat_id, teacherText);
+            sent++;
+          } catch (error) {
+            await db.from("telegram_teacher_lesson_reminders")
+              .delete().eq("lesson_id", lesson.id).eq("reminder_type", type);
+            errors.push(`teacher-send:${lesson.id}`);
+            console.error("Teacher Telegram delivery failed", error);
+          }
+        }
+      }
     }
 
     for (const student of recipients) {
