@@ -1627,7 +1627,7 @@ function renderPublicStudentCalendar(lessonRows){
   const calendarLessons=publicStudentCalendarLessons;
   const grid=document.getElementById('public-week-calendar');
   const range=document.getElementById('public-week-range');
-  if(!grid||!range)return;
+  if(!grid||!range){console.warn('Student calendar elements are missing from the page.');return;}
   if(!publicStudentWeekAnchor){
     const tz=isValidTimezone(publicStudent?.timezone)?publicStudent.timezone:'Europe/Minsk';
     const today=todayISOInTimezone(tz);
@@ -1779,7 +1779,8 @@ async function openStudentCabinet(){
     conductedEl.textContent=ls.filter(l=>l.status==='conducted').length;
   }
 
-  document.getElementById('public-payments').innerHTML=
+  const paymentsEl=document.getElementById('public-payments');
+  if(paymentsEl)paymentsEl.innerHTML=
     ps
       .slice()
       .sort(
