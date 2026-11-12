@@ -612,9 +612,10 @@ async function saveLesson(scope='one'){
       const originalDate=l?.date;
       const originalTime=l?.time;
       const originalStatus=l?.status;
-      const scheduleChanged=!!l&&(String(originalDate)!==String(date)||String(originalTime).slice(0,5)!==String(time).slice(0,5)||String(originalStatus)!==String(status));
+      const isCancellation=status==='cancelled_charge'||status==='cancelled_free';
+      const scheduleChanged=!!l&&(String(originalDate)!==String(date)||String(originalTime).slice(0,5)!==String(time).slice(0,5)||(isCancellation&&originalStatus!==status));
       if(scheduleChanged){
-        notificationEvent=(status==='cancelled_charge'||status==='cancelled_free')?'cancelled':'updated';
+        notificationEvent=isCancellation?'cancelled':'updated';
         notificationLessonIds.push(String(id));
       }
       const repeatEnabled=document.getElementById('edit-recurring')?.checked;
