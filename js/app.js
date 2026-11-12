@@ -1315,9 +1315,17 @@ async function deleteLessonFromModal(){
 async function deleteLesson(id){
   if(lessonDeleteInProgress)return false;
   if(!confirm('Удалить это занятие?'))return false;
+  const lesson=lessons.find(x=>String(x.id)===String(id));
+  const notify=!!lesson&&confirm('Удалить занятие. Отправить ученику уведомление об удалении в Telegram?');
   lessonDeleteInProgress=true;
   showBlockingLoader('Удаляем занятие…');
   try{
+    if(notify){
+      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{lesson_ids:[String(id)],event:'deleted'}
+      });
+      if(error)showError(new Error('Занятие будет удалено, но уведомление отправить не удалось: '+error.message));
+    }
     await db(
       '/lessons?id=eq.'+encodeURIComponent(id),
       {method:'DELETE',headers}
@@ -1348,12 +1356,20 @@ async function deleteThisAndFollowingFromModal(){
       :'Удалить это занятие и все следующие у этого ученика начиная с '+l.date+'?'
   ))return;
 
+  const targets=isGroup
+    ?lessons.filter(x=>String(x.group_id)===String(l.group_id)&&x.date>=l.date)
+    :lessons.filter(x=>x.student===l.student&&x.date>=l.date);
+  const notify=targets.length>0&&confirm('Удалить занятия. Отправить ученикам уведомление об удалении расписания в Telegram?');
+
   lessonDeleteInProgress=true;
   showBlockingLoader('Удаляем занятия…');
   try{
-    const targets=isGroup
-      ?lessons.filter(x=>String(x.group_id)===String(l.group_id)&&x.date>=l.date)
-      :lessons.filter(x=>x.student===l.student&&x.date>=l.date);
+    if(notify){
+      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{lesson_ids:[String(targets[0].id)],event:'deleted'}
+      });
+      if(error)showError(new Error('Занятия будут удалены, но уведомление отправить не удалось: '+error.message));
+    }
 
     for(const x of targets){
       await db('/lessons?id=eq.'+encodeURIComponent(x.id),{
