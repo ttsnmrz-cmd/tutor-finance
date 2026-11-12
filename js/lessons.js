@@ -151,6 +151,11 @@ function openNewLessonForDate(date){
     'lesson-modal-title'
   ).textContent='Новое занятие';
 
+  const saveButton=document.getElementById('save-lesson-btn');
+  if(saveButton){
+    saveButton.onclick=()=>saveLesson('one');
+    saveButton.innerHTML='Сохранить';
+  }
   closeLessonSaveMenu();
 
   document.getElementById(
@@ -299,6 +304,12 @@ const total=parts.reduce(
   document.getElementById('edit-recurring').checked=false;
   document.querySelectorAll('.rec-day').forEach(x=>x.checked=false);
   toggleRecurring();
+
+  const saveButton=document.getElementById('save-lesson-btn');
+  if(saveButton){
+    saveButton.onclick=toggleLessonSaveMenu;
+    saveButton.innerHTML='Сохранить <span class="ml-1">▾</span>';
+  }
   closeLessonSaveMenu();
 
   document.getElementById(
