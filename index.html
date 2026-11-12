@@ -28,6 +28,7 @@
 </div>
 <div class="mb-4"><div class="inline-flex items-center gap-2 rounded-xl student-theme-panel px-3 py-2 text-sm"><span class="text-slate-500">Проведённых занятий</span><b id="public-conducted"></b></div></div>
 <div class="mb-4"><h3 class="font-bold mb-1">Пополнения</h3><div id="public-payments" class="space-y-1 text-sm"></div></div>
+<div class="mb-5"><div class="flex items-center justify-between gap-3 mb-3"><h3 class="font-bold">Календарь занятий</h3><div class="flex items-center gap-2"><button type="button" onclick="changePublicStudentWeek(-1)" class="w-8 h-8 rounded-lg student-theme-panel" aria-label="Предыдущая неделя">‹</button><span id="public-week-range" class="text-xs text-slate-500 text-center min-w-0"></span><button type="button" onclick="changePublicStudentWeek(1)" class="w-8 h-8 rounded-lg student-theme-panel" aria-label="Следующая неделя">›</button></div></div><div id="public-week-calendar" class="calendar-week-grid public-calendar-week-grid"></div></div>
 <div><h3 class="font-bold mb-1">Занятия</h3><p class="text-xs text-slate-400 mb-2">Показаны прошедшие занятия и ближайшие 5 запланированных.</p><div id="public-lessons" class="max-h-[300px] overflow-y-auto pr-1 space-y-2 border-t border-slate-200 pt-2"></div></div></div></div></div>
 
 <div id="teacher-app" class="hidden"><div class="max-w-5xl mx-auto p-4 md:p-6">
