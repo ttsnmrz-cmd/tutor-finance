@@ -42,9 +42,9 @@ function displayTime(timestamp: number, timezone: string): string {
 }
 
 function reminderText(type: "1h" | "10m", timestamp: number, timezone: string): string {
-  if (type === "10m") return "Здравствуйте!\nНаше занятие начнётся через 10 минут. До встречи!";
+  if (type === "10m") return "Hi!\nНаше занятие начнётся через 10 минут. До встречи!";
   const time = displayTime(timestamp, timezone);
-  return `Здравствуйте! 👋\nНапоминаю, что сегодня в ${time} состоится наше занятие.\nДо встречи!`;
+  return `Hi! 👋\nНапоминаю, что сегодня в ${time} состоится наше занятие.\nДо встречи!`;
 }
 
 function teacherReminderText(type: "1h" | "10m", studentNames: string[]): string {
