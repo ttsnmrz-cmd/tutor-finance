@@ -373,3 +373,42 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 @media(max-width:640px){
  #teacher-app #week-calendar.calendar-week-grid{grid-template-columns:repeat(7,minmax(210px,1fr))}
 }
+
+/* Restore the same centered content width as the teacher header. */
+#teacher-app #teacher-main{
+  display:block;
+  width:100%;
+  max-width:64rem;
+  min-width:0;
+  margin-left:auto;
+  margin-right:auto;
+  box-sizing:border-box;
+}
+#teacher-app #teacher-main>section{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+#teacher-app #tab-calendar>.app-card{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+#teacher-app #week-calendar{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+}
+@media(max-width:900px){
+  #teacher-app #week-calendar{
+    display:grid;
+    grid-template-columns:repeat(7,minmax(145px,1fr));
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+  }
+}
