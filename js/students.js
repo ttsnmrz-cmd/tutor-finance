@@ -662,6 +662,12 @@ async function saveStudent(){
 
     if(!s||!name)return;
 
+    const oldPrice=Number(s.price??40);
+    const priceChanged=Number.isFinite(price)&&price!==oldPrice;
+    const updateFuturePrices=priceChanged&&confirm(
+      'Стоимость занятия изменена: '+oldPrice+' → '+price+'.\\n\\nИзменить стоимость уже созданных будущих занятий для этого ученика?\\n\\nНажмите «ОК», чтобы обновить расписание, или «Отмена», чтобы новая цена применялась только к новым занятиям.'
+    );
+
     const old=s.name;
 
     if(old!==name){
@@ -698,6 +704,41 @@ async function saveStudent(){
         })
       }
     );
+
+    if(updateFuturePrices){
+      const today=localISO(new Date());
+      const futureLessons=lessons.filter(l=>String(l.date||'')>=today);
+
+      // Update individual lessons belonging to this student.
+      const individualLessons=futureLessons.filter(l=>
+        !l.group_id&&String(l.student_id)===String(id)
+      );
+      for(const lesson of individualLessons){
+        await db('/lessons?id=eq.'+encodeURIComponent(lesson.id),{
+          method:'PATCH',
+          headers:{...headers,Prefer:'return=minimal'},
+          body:JSON.stringify({price})
+        });
+      }
+
+      // Update only this student's price snapshot in future group lessons,
+      // then recalculate each group total from all member snapshots.
+      const memberRows=lessonMembersForStudent(id);
+      const futureGroupIds=new Set(futureLessons.filter(l=>l.group_id).map(l=>String(l.id)));
+      const futureMemberships=memberRows.filter(m=>futureGroupIds.has(String(m.lesson_id)));
+      const affectedGroupLessonIds=new Set();
+      for(const member of futureMemberships){
+        await db('/lesson_members?id=eq.'+encodeURIComponent(member.id),{
+          method:'PATCH',
+          headers:{...headers,Prefer:'return=minimal'},
+          body:JSON.stringify({price})
+        });
+        affectedGroupLessonIds.add(String(member.lesson_id));
+      }
+      for(const lessonId of affectedGroupLessonIds){
+        await updateGroupLessonPrice(lessonId);
+      }
+    }
 
     closeModal('student-modal');
 
