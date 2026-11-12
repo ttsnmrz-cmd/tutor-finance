@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
   const results = [];
   for (const id of ids) {
     const { data: lesson, error } = await db.from("lessons")
-      .select("id,student,group_id,date,time,timezone,teacher_id,status")
+      .select("id,student,student_id,group_id,date,time,timezone,teacher_id,status")
       .eq("id", id).eq("teacher_id", user.id).maybeSingle();
     if (error || !lesson) { results.push({ lesson_id: id, sent: 0, skipped: "lesson_not_found" }); continue; }
 
@@ -76,12 +76,11 @@ Deno.serve(async (req) => {
           .eq("teacher_id", user.id).in("id", memberIds);
         recipients = data || [];
       }
-    } else {
+    } else if (lesson.student_id) {
       const { data } = await db.from("students")
         .select("id,name,telegram_chat_id,telegram_notify_changes,telegram_link_token")
-        .eq("teacher_id", user.id).eq("name", lesson.student);
-      // Name is the legacy individual-lesson relation. Avoid sending to the wrong person if names are duplicated.
-      recipients = data?.length === 1 ? data : [];
+        .eq("teacher_id", user.id).eq("id", lesson.student_id);
+      recipients = data || [];
     }
 
     const dateTime = formatDate(lesson.date, lesson.time);
