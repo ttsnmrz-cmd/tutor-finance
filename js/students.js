@@ -665,7 +665,7 @@ async function saveStudent(){
     const oldPrice=Number(s.price??40);
     const priceChanged=Number.isFinite(price)&&price!==oldPrice;
     const updateFuturePrices=priceChanged&&confirm(
-      'Стоимость занятия изменена: '+oldPrice+' → '+price+'.\\n\\nИзменить стоимость уже созданных будущих занятий для этого ученика?\\n\\nНажмите «ОК», чтобы обновить расписание, или «Отмена», чтобы новая цена применялась только к новым занятиям.'
+      'Стоимость занятия изменена: '+oldPrice+' → '+price+'.\n\nИзменить стоимость уже созданных будущих занятий для этого ученика?\n\nНажмите «ОК», чтобы обновить расписание, или «Отмена», чтобы новая цена применялась только к новым занятиям.'
     );
 
     const old=s.name;
@@ -1209,7 +1209,7 @@ async function deleteGroup(id){
   if(!group)return;
 
   const members=students.filter(s=>String(s.group_id)===String(id));
-  if(!confirm('Удалить группу «'+group.name+'»?\\n\\nУченики останутся в ProfiProfit, но будут отвязаны от группы.'))return;
+  if(!confirm('Удалить группу «'+group.name+'»?\n\nУченики останутся в ProfiProfit, но будут отвязаны от группы.'))return;
 
   try{
     if(members.length){
