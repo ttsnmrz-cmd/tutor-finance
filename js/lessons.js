@@ -713,7 +713,7 @@ async function saveLesson(scope='one'){
           db('/lessons?id=eq.'+encodeURIComponent(future.id),{
             method:'PATCH',
             headers:{...headers,Prefer:'return=minimal'},
-            body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,time,price,duration,comment})
+            body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,time,timezone:getTeacherTimezone(),price,duration,comment})
           })
         ));
       }
