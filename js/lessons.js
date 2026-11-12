@@ -121,7 +121,7 @@ function openNewLessonForDate(date){
 
   document.getElementById(
     'edit-student'
-  ).value=st?.name||'';
+  ).value=st?'student:'+st.id:'';
 
   document.getElementById(
     'edit-price'
@@ -199,12 +199,13 @@ function openEditLesson(id){
 
   document.getElementById('edit-id').value=l.id;
 
-  document.getElementById(
-    'edit-student'
-  ).value=
-    l.group_id
-      ?'group:'+l.group_id
-      :l.student;
+  const linkedStudent=l.student_id?students.find(x=>String(x.id)===String(l.student_id)):null;
+  const legacyMatches=students.filter(x=>x.name===l.student&&!x.archived);
+  document.getElementById('edit-student').value=
+    l.group_id?'group:'+l.group_id:
+    linkedStudent?'student:'+linkedStudent.id:
+    legacyMatches.length===1?'student:'+legacyMatches[0].id:
+    '';
 
   const displayDateTime=lessonDateTimeInTimezone(l,getTeacherTimezone());
   setLessonDate(displayDateTime.date);
