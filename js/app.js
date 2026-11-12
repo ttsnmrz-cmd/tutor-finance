@@ -167,11 +167,12 @@ async function loadTeacherTimezone(userId){
   teacherTimezoneUserId=userId||null;
   let timezone='Europe/Minsk';
   if(userId){
-    const rows=await db('/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,timezone,telegram_username');
+    const rows=await db('/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,timezone,telegram_username,telegram_chat_id,telegram_link_token,telegram_connected_at');
     if(Array.isArray(rows)&&rows[0]){
       if(isValidTimezone(rows[0].timezone))timezone=rows[0].timezone;
       const telegramInput=document.getElementById('teacher-telegram-username');
       if(telegramInput)telegramInput.value=rows[0].telegram_username||'';
+      renderTeacherTelegramStatus(rows[0]);
     }
   }
   teacherTimezone=timezone;
@@ -181,6 +182,43 @@ async function loadTeacherTimezone(userId){
   const select=document.getElementById('teacher-timezone-select');
   if(select)select.value=timezone;
 }
+
+function renderTeacherTelegramStatus(profile={}){
+  const status=document.getElementById('teacher-telegram-status');
+  const linkBox=document.getElementById('teacher-telegram-link');
+  const connectButton=document.getElementById('teacher-telegram-connect');
+  if(!status)return;
+  const connected=!!profile.telegram_chat_id;
+  status.textContent=connected?'Подключён ✓':'Не подключён';
+  status.className='text-sm font-semibold '+(connected?'text-emerald-600':'text-amber-600');
+  if(linkBox){
+    linkBox.value=profile.telegram_link_token?'https://t.me/ProfiProfitMonitorBot?start=teacher_'+profile.telegram_link_token:'';
+    linkBox.classList.toggle('hidden',!profile.telegram_link_token||connected);
+  }
+  if(connectButton)connectButton.textContent=profile.telegram_link_token&&!connected?'Обновить ссылку подключения':'Создать ссылку подключения';
+}
+async function createTeacherTelegramLink(){
+  try{
+    const {data:{user},error}=await supabaseClient.auth.getUser();
+    if(error)throw error;
+    if(!user?.id)throw new Error('Войдите в аккаунт.');
+    const token=crypto.randomUUID();
+    await db('/profiles?on_conflict=id',{
+      method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({id:user.id,telegram_link_token:token,telegram_chat_id:null,telegram_connected_at:null})
+    });
+    renderTeacherTelegramStatus({telegram_link_token:token});
+    const link=document.getElementById('teacher-telegram-link');
+    if(link){link.classList.remove('hidden');link.select();}
+  }catch(e){showError(e);}
+}
+async function copyTeacherTelegramLink(){
+  const link=document.getElementById('teacher-telegram-link')?.value;
+  if(!link)return;
+  try{await navigator.clipboard.writeText(link);alert('Ссылка скопирована. Открой её в Telegram и нажми Start.');}
+  catch(e){const input=document.getElementById('teacher-telegram-link');input?.select();alert('Ссылка выделена — скопируй её вручную.');}
+}
+
 async function saveTeacherTelegramUsername(){
   try{
     const input=document.getElementById('teacher-telegram-username');
