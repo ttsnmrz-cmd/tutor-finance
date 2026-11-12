@@ -56,9 +56,9 @@ function teacherReminderText(type: "1h" | "10m", studentNames: string[]): string
       : "занятие";
   const capitalizedSubject = subject[0].toUpperCase() + subject.slice(1);
   if (type === "10m") {
-    return `Здравствуйте!\\n${capitalizedSubject} должно начаться через 10 минут.`;
+    return `Hi!\\n${capitalizedSubject} должно начаться через 10 минут.`;
   }
-  return `Здравствуйте!\\n${capitalizedSubject} запланировано через 1 час.`;
+  return `Hi!\\n${capitalizedSubject} запланировано через 1 час.`;
 }
 
 async function sendTelegram(chatId: string | number, text: string) {
