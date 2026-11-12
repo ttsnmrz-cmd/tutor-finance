@@ -85,23 +85,52 @@ Deno.serve(async (req) => {
     } else {
       const { data, error } = await db.from("lessons").select("id,student,student_id,group_id,date,time,timezone,teacher_id,status")
         .eq("id", item.id).eq("teacher_id", user.id).maybeSingle();
-      if (error || !data) {
+      if (error) {
+        console.error("Lesson lookup failed", item.id, error);
+        results.push({ lesson_id: item.id, sent: 0, failed: 1, skipped_count: 0, error: "lesson_lookup_failed" });
+        continue;
+      }
+      if (!data) {
         results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "lesson_not_found" });
         continue;
       }
       lesson = data;
       if (lesson.group_id) {
-        const { data: members } = await db.from("lesson_members").select("student_id").eq("lesson_id", lesson.id).eq("teacher_id", user.id);
-        const memberIds = (members || []).map((m: any) => m.student_id);
-        if (memberIds.length) {
-          const { data: students } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
-            .eq("teacher_id", user.id).in("id", memberIds);
-          recipients = students || [];
+        const { data: members, error: membersError } = await db.from("lesson_members").select("student_id").eq("lesson_id", lesson.id).eq("teacher_id", user.id);
+        if (membersError) {
+          console.error("Lesson members lookup failed", lesson.id, membersError);
+          results.push({ lesson_id: item.id, sent: 0, failed: 1, skipped_count: 0, error: "lesson_members_lookup_failed" });
+          continue;
         }
-      } else if (lesson.student_id) {
-        const { data: students } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
-          .eq("teacher_id", user.id).eq("id", lesson.student_id);
+        const memberIds = [...new Set((members || []).map((m: any) => String(m.student_id)).filter(Boolean))];
+        if (!memberIds.length) {
+          results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "no_lesson_members" });
+          continue;
+        }
+        const { data: students, error: studentsError } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
+          .eq("teacher_id", user.id).in("id", memberIds);
+        if (studentsError) {
+          console.error("Group students lookup failed", lesson.id, studentsError);
+          results.push({ lesson_id: item.id, sent: 0, failed: 1, skipped_count: 0, error: "students_lookup_failed" });
+          continue;
+        }
         recipients = students || [];
+      } else if (lesson.student_id) {
+        const { data: students, error: studentsError } = await db.from("students").select("id,name,telegram_chat_id,telegram_notify_changes")
+          .eq("teacher_id", user.id).eq("id", lesson.student_id);
+        if (studentsError) {
+          console.error("Student lookup failed", lesson.id, studentsError);
+          results.push({ lesson_id: item.id, sent: 0, failed: 1, skipped_count: 0, error: "students_lookup_failed" });
+          continue;
+        }
+        recipients = students || [];
+      } else {
+        results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "lesson_has_no_student" });
+        continue;
+      }
+      if (!recipients.length) {
+        results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "no_students_found" });
+        continue;
       }
     }
 
