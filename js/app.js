@@ -1373,17 +1373,19 @@ async function deleteThisAndFollowingFromModal(){
 
   lessonDeleteInProgress=true;
   showBlockingLoader('Удаляем занятия…');
+  const deletedIds=[];
   try{
     for(const x of targets){
       await db('/lessons?id=eq.'+encodeURIComponent(x.id),{
         method:'DELETE',
         headers
       });
+      deletedIds.push(String(x.id));
     }
 
     if(notify){
       const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:targets.map(x=>String(x.id)),event:'deleted'}
+        body:{lesson_ids:deletedIds,event:'deleted'}
       });
       if(error)showError(new Error('Занятия удалены, но уведомление отправить не удалось: '+error.message));
     }
@@ -1393,7 +1395,29 @@ async function deleteThisAndFollowingFromModal(){
     renderWeek();
     renderDay();
   }catch(e){
-    showError(e);
+    if(deletedIds.length){
+      try{
+        await loadData();
+        renderWeek();
+        renderDay();
+      }catch(refreshError){
+        console.error('Could not refresh lessons after partial deletion:',refreshError);
+      }
+      const deletedDates=targets
+        .filter(x=>deletedIds.includes(String(x.id)))
+        .map(x=>x.date);
+      const remainingDates=targets
+        .filter(x=>!deletedIds.includes(String(x.id)))
+        .map(x=>x.date);
+      showError(new Error(
+        'Удалось удалить '+deletedIds.length+' из '+targets.length+' занятий. '+
+        'Удалены даты: '+deletedDates.join(', ')+'. '+
+        'Не удалены даты: '+remainingDates.join(', ')+'. '+
+        'Telegram-уведомление не отправлялось. Ошибка: '+(e?.message||e)
+      ));
+    }else{
+      showError(e);
+    }
   }finally{
     lessonDeleteInProgress=false;
     hideBlockingLoader();
