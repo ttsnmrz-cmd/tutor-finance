@@ -1325,8 +1325,28 @@ function showNotificationResult(data){
   const sent=results.reduce((n,x)=>n+Number(x.sent||0),0);
   const failed=results.reduce((n,x)=>n+Number(x.failed||0),0);
   const skipped=results.reduce((n,x)=>n+Number(x.skipped_count||0),0);
-  if(failed||skipped||!sent)showError(new Error('Telegram: отправлено '+sent+', не доставлено '+failed+', пропущено '+skipped+'. Проверьте подключение и настройки уведомлений.'));
-  else alert('Telegram-уведомления отправлены: '+sent);
+  const errorLabels={
+    lesson_lookup_failed:'ошибка чтения занятия',
+    lesson_members_lookup_failed:'ошибка чтения участников группы',
+    students_lookup_failed:'ошибка поиска учеников',
+  };
+  const skippedLabels={
+    invalid_deleted_snapshot:'неполные данные удалённого занятия',
+    lesson_not_found:'занятие не найдено',
+    no_lesson_members:'у группового занятия нет участников',
+    no_students_found:'ученики не найдены',
+    lesson_has_no_student:'занятие не связано с учеником',
+  };
+  const errors=[...new Set(results.map(x=>errorLabels[x.error]).filter(Boolean))];
+  const reasons=[...new Set(results.map(x=>skippedLabels[x.skipped]).filter(Boolean))];
+  const details=[];
+  if(errors.length)details.push('Причины ошибок: '+errors.join('; ')+'.');
+  if(reasons.length)details.push('Пропущено: '+reasons.join('; ')+'.');
+  if(failed||skipped||!sent){
+    showError(new Error('Telegram: отправлено '+sent+', ошибки '+failed+', пропущено '+skipped+'. '+(details.join(' ')||'Проверьте подключение и настройки уведомлений.')));
+  }else{
+    alert('Telegram-уведомления отправлены: '+sent);
+  }
 }
 async function deleteLesson(id){
   if(lessonDeleteInProgress)return false;
