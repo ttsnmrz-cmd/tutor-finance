@@ -1328,16 +1328,16 @@ async function deleteLesson(id){
   lessonDeleteInProgress=true;
   showBlockingLoader('Удаляем занятие…');
   try{
-    if(notify){
-      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:[String(id)],event:'deleted'}
-      });
-      if(error)showError(new Error('Занятие будет удалено, но уведомление отправить не удалось: '+error.message));
-    }
     await db(
       '/lessons?id=eq.'+encodeURIComponent(id),
       {method:'DELETE',headers}
     );
+    if(notify){
+      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{lesson_ids:[String(id)],event:'deleted'}
+      });
+      if(error)showError(new Error('Занятие удалено, но уведомление отправить не удалось: '+error.message));
+    }
     await loadData();
     renderWeek();
     renderDay();
@@ -1374,18 +1374,18 @@ async function deleteThisAndFollowingFromModal(){
   lessonDeleteInProgress=true;
   showBlockingLoader('Удаляем занятия…');
   try{
-    if(notify){
-      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:targets.map(x=>String(x.id)),event:'deleted'}
-      });
-      if(error)showError(new Error('Занятия будут удалены, но уведомление отправить не удалось: '+error.message));
-    }
-
     for(const x of targets){
       await db('/lessons?id=eq.'+encodeURIComponent(x.id),{
         method:'DELETE',
         headers
       });
+    }
+
+    if(notify){
+      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{lesson_ids:targets.map(x=>String(x.id)),event:'deleted'}
+      });
+      if(error)showError(new Error('Занятия удалены, но уведомление отправить не удалось: '+error.message));
     }
 
     closeLessonModal();
