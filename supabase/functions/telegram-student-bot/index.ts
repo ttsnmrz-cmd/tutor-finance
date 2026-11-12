@@ -127,6 +127,18 @@ Deno.serve(async (req) => {
     return new Response("ok");
   }
 
-  await sendMessage(chatId, `Готово, ${student.name}! ✅ Telegram подключён. Ты получишь напоминания за 1 час и за 10 минут до занятия.\n\nAll set, ${student.name}! ✅ Telegram is connected. You'll get reminders 1 hour and 10 minutes before each lesson.\n\nЕсли возникнут проблемы, напиши <a href="https://t.me/tiana_wow">@tiana_wow</a>.\nIf you need help, message <a href="https://t.me/tiana_wow">@tiana_wow</a>.`);
+  await sendMessage(chatId, `Готово, ${student.name}! ✅ Telegram подключён.
+
+Здесь будут приходить уведомления о занятиях: напоминания за 1 час и за 10 минут, изменения в расписании, информация о балансе и поступлении оплаты. Набор уведомлений зависит от настроек преподавателя.
+
+Если возникнут проблемы с ботом, напиши сюда: <a href="https://t.me/ProfiProfitMonitorBot">@ProfiProfitMonitorBot</a>.
+
+———
+
+All set, ${student.name}! ✅ Telegram is connected.
+
+You'll receive lesson notifications here: reminders 1 hour and 10 minutes before a lesson, schedule changes, balance updates, and payment confirmations. The notifications depend on your teacher's settings.
+
+If you have any problems with the bot, message us here: <a href="https://t.me/ProfiProfitMonitorBot">@ProfiProfitMonitorBot</a>.`);
   return new Response("ok");
 });
