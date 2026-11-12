@@ -424,7 +424,7 @@ function lessonPriceTotal(l){
 async function loadData(){
   [students,lessons,payments,groups,lessonMembers]=await Promise.all([
     db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments,timezone'),
-    db('/lessons?select=id,student,student_id,date,time,timezone,price,status,duration,group_id,comment'),
+    db('/lessons?select=id,student,student_id,series_id,date,time,timezone,price,status,duration,group_id,comment'),
     db('/payments?select=id,student,student_id,amount,date'),
     db('/groups?select=id,name'),
     db('/lesson_members?select=id,lesson_id,student_id,price,charged,attendance_status')
@@ -1243,7 +1243,9 @@ async function confirmEmptyGroupMembers(){
             p.duration,
             'pending',
             targets,
-            p.comment
+            p.comment,
+            null,
+            p.seriesId
           );
         }
 
@@ -1259,7 +1261,9 @@ async function confirmEmptyGroupMembers(){
         p.duration,
         p.status,
         targets,
-        p.comment
+        p.comment,
+        null,
+        null
       );
     }
 
@@ -1316,6 +1320,34 @@ async function deleteLessonFromModal(){
   if(deleted)closeLessonModal();
 }
 
+function showNotificationResult(data){
+  const results=Array.isArray(data?.results)?data.results:[];
+  const sent=results.reduce((n,x)=>n+Number(x.sent||0),0);
+  const failed=results.reduce((n,x)=>n+Number(x.failed||0),0);
+  const skipped=results.reduce((n,x)=>n+Number(x.skipped_count||0),0);
+  const errorLabels={
+    lesson_lookup_failed:'ошибка чтения занятия',
+    lesson_members_lookup_failed:'ошибка чтения участников группы',
+    students_lookup_failed:'ошибка поиска учеников',
+  };
+  const skippedLabels={
+    invalid_deleted_snapshot:'неполные данные удалённого занятия',
+    lesson_not_found:'занятие не найдено',
+    no_lesson_members:'у группового занятия нет участников',
+    no_students_found:'ученики не найдены',
+    lesson_has_no_student:'занятие не связано с учеником',
+  };
+  const errors=[...new Set(results.map(x=>errorLabels[x.error]).filter(Boolean))];
+  const reasons=[...new Set(results.map(x=>skippedLabels[x.skipped]).filter(Boolean))];
+  const details=[];
+  if(errors.length)details.push('Причины ошибок: '+errors.join('; ')+'.');
+  if(reasons.length)details.push('Пропущено: '+reasons.join('; ')+'.');
+  if(failed||skipped||!sent){
+    showError(new Error('Telegram: отправлено '+sent+', ошибки '+failed+', пропущено '+skipped+'. '+(details.join(' ')||'Проверьте подключение и настройки уведомлений.')));
+  }else{
+    alert('Telegram-уведомления отправлены: '+sent);
+  }
+}
 async function deleteLesson(id){
   if(lessonDeleteInProgress)return false;
   if(!confirm('Удалить это занятие?'))return false;
@@ -1324,16 +1356,18 @@ async function deleteLesson(id){
   lessonDeleteInProgress=true;
   showBlockingLoader('Удаляем занятие…');
   try{
-    if(notify){
-      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:[String(id)],event:'deleted'}
-      });
-      if(error)showError(new Error('Занятие будет удалено, но уведомление отправить не удалось: '+error.message));
-    }
     await db(
       '/lessons?id=eq.'+encodeURIComponent(id),
       {method:'DELETE',headers}
     );
+    if(notify){
+      const studentIds=lesson.group_id?lessonMembersFor(lesson).map(m=>String(m.student_id)):(lesson.student_id?[String(lesson.student_id)]:[]);
+      const {data,error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{event:'deleted',deleted_lessons:[{lesson_id:String(lesson.id),date:lesson.date,time:lesson.time,student_ids:studentIds}]}
+      });
+      if(error)showError(new Error('Занятие удалено, но уведомление отправить не удалось: '+error.message));
+      else showNotificationResult(data);
+    }
     await loadData();
     renderWeek();
     renderDay();
@@ -1353,6 +1387,10 @@ async function deleteThisAndFollowingFromModal(){
   const l=lessons.find(x=>String(x.id)===String(id));
   if(!l)return;
 
+  if(!l.series_id){
+    showError(new Error('Это старое занятие не связано с идентификатором серии. Массовое удаление недоступно. Можно удалить только это занятие.'));
+    return;
+  }
   const isGroup=!!l.group_id;
   if(!confirm(
     isGroup
@@ -1360,26 +1398,31 @@ async function deleteThisAndFollowingFromModal(){
       :'Удалить это занятие и все следующие у этого ученика начиная с '+l.date+'?'
   ))return;
 
-  const targets=isGroup
-    ?lessons.filter(x=>String(x.group_id)===String(l.group_id)&&x.date>=l.date)
-    :lessons.filter(x=>!x.group_id&&l.student_id&&String(x.student_id)===String(l.student_id)&&x.date>=l.date);
+  const targets=lessons.filter(x=>String(x.series_id)===String(l.series_id)&&x.date>=l.date);
   const notify=targets.length>0&&confirm('Удалить занятия. Отправить ученикам уведомление об удалении расписания в Telegram?');
 
   lessonDeleteInProgress=true;
   showBlockingLoader('Удаляем занятия…');
+  const deletedIds=[];
   try{
-    if(notify){
-      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:[String(targets[0].id)],event:'deleted'}
-      });
-      if(error)showError(new Error('Занятия будут удалены, но уведомление отправить не удалось: '+error.message));
-    }
-
     for(const x of targets){
       await db('/lessons?id=eq.'+encodeURIComponent(x.id),{
         method:'DELETE',
         headers
       });
+      deletedIds.push(String(x.id));
+    }
+
+    if(notify){
+      const deletedLessons=targets.filter(x=>deletedIds.includes(String(x.id))).map(x=>({
+        lesson_id:String(x.id),date:x.date,time:x.time,
+        student_ids:x.group_id?lessonMembersFor(x).map(m=>String(m.student_id)):(x.student_id?[String(x.student_id)]:[])
+      }));
+      const {data,error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{event:'deleted',deleted_lessons:deletedLessons}
+      });
+      if(error)showError(new Error('Занятия удалены, но уведомление отправить не удалось: '+error.message));
+      else showNotificationResult(data);
     }
 
     closeLessonModal();
@@ -1387,7 +1430,29 @@ async function deleteThisAndFollowingFromModal(){
     renderWeek();
     renderDay();
   }catch(e){
-    showError(e);
+    if(deletedIds.length){
+      try{
+        await loadData();
+        renderWeek();
+        renderDay();
+      }catch(refreshError){
+        console.error('Could not refresh lessons after partial deletion:',refreshError);
+      }
+      const deletedDates=targets
+        .filter(x=>deletedIds.includes(String(x.id)))
+        .map(x=>x.date);
+      const remainingDates=targets
+        .filter(x=>!deletedIds.includes(String(x.id)))
+        .map(x=>x.date);
+      showError(new Error(
+        'Удалось удалить '+deletedIds.length+' из '+targets.length+' занятий. '+
+        'Удалены даты: '+deletedDates.join(', ')+'. '+
+        'Не удалены даты: '+remainingDates.join(', ')+'. '+
+        'Telegram-уведомление не отправлялось. Ошибка: '+(e?.message||e)
+      ));
+    }else{
+      showError(e);
+    }
   }finally{
     lessonDeleteInProgress=false;
     hideBlockingLoader();
@@ -2054,17 +2119,13 @@ async function updateGroupLessonPrice(lessonId){
   const members=await db(
     '/lesson_members?lesson_id=eq.'+
     encodeURIComponent(lessonId)+
-    '&select=student_id'
+    '&select=student_id,price'
   );
 
+  // A group lesson total is the sum of the member price snapshots.
+  // Never recalculate old lessons from the students' current profile prices.
   const total=(members||[]).reduce(
-    (sum,m)=>
-      sum+
-      Number(
-        students.find(
-          s=>String(s.id)===String(m.student_id)
-        )?.price??0
-      ),
+    (sum,m)=>sum+Number(m.price??0),
     0
   );
 
@@ -2105,16 +2166,17 @@ async function removeStudentFromLesson(memberId){
   );
 
   if(!scope)return;
+  if(scope==='following'&&!ctx.anchor.series_id){
+    showError(new Error('Это старое групповое занятие не имеет идентификатора серии. Массовое изменение участников недоступно.'));
+    return;
+  }
 
   try{
     const targets=
       scope==='one'
         ?[ctx.anchor]
         :lessons.filter(
-          x=>
-            String(x.group_id)===
-            String(ctx.anchor.group_id)&&
-            x.date>=ctx.anchor.date
+          x=>String(x.series_id)===String(ctx.anchor.series_id)&&x.date>=ctx.anchor.date
         );
 
     for(const lesson of targets){
@@ -2195,16 +2257,17 @@ async function addStudentToLesson(studentId){
   );
 
   if(!scope)return;
+  if(scope==='following'&&!ctx.anchor.series_id){
+    showError(new Error('Это старое групповое занятие не имеет идентификатора серии. Массовое изменение участников недоступно.'));
+    return;
+  }
 
   try{
     const targets=
       scope==='one'
         ?[ctx.anchor]
         :lessons.filter(
-          x=>
-            String(x.group_id)===
-            String(ctx.anchor.group_id)&&
-            x.date>=ctx.anchor.date
+          x=>String(x.series_id)===String(ctx.anchor.series_id)&&x.date>=ctx.anchor.date
         );
 
     for(const lesson of targets){

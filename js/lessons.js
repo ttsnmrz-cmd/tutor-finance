@@ -398,7 +398,8 @@ async function createOneGroupLesson(
   status,
   targets,
   comment=null,
-  teacherId=null
+  teacherId=null,
+  seriesId=null
 ){
   if(!teacherId){
     const {data:{user},error:userError}=await supabaseClient.auth.getUser();
@@ -426,6 +427,7 @@ async function createOneGroupLesson(
       body:JSON.stringify({
         student:group?.name||'',
         group_id:groupId,
+        series_id:seriesId,
         date,
         time,
         timezone:getTeacherTimezone(),
@@ -621,16 +623,16 @@ async function saveLesson(scope='one'){
       }
       const repeatEnabled=document.getElementById('edit-recurring')?.checked;
       const selectedRepeatDays=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
+      if(scope==='following'&&!l?.series_id){
+        throw new Error('Это старое занятие не связано с идентификатором серии. Массовое редактирование недоступно. Можно изменить только это занятие.');
+      }
       if(repeatEnabled&&!selectedRepeatDays.length){
         throw new Error('Выбери хотя бы один день недели для повторения.');
       }
       const following=scope==='following'
         ?lessons.filter(x=>{
             if(String(x.id)===String(id)||x.date<l.date)return false;
-            const sameSeries=groupId
-              ?String(x.group_id)===String(groupId)
-              :!x.group_id&&!!l.student_id&&String(x.student_id)===String(l.student_id);
-            if(!sameSeries)return false;
+            if(!l.series_id||String(x.series_id)!==String(l.series_id))return false;
             if(!repeatEnabled)return true;
             const parts=String(x.date).split('-').map(Number);
             const weekday=new Date(parts[0],parts[1]-1,parts[2]).getDay();
@@ -639,7 +641,7 @@ async function saveLesson(scope='one'){
         :[];
 
       if(scope==='following'&&!confirm(
-        'Изменить это занятие и ещё '+following.length+' последующих занятий? Изменятся время, длительность, стоимость и комментарий. Даты остальных занятий и история посещаемости останутся без изменений.'
+        'Изменить это занятие и ещё '+following.length+' последующих занятий? Для этого ученика обновится стоимость, а также изменятся время, длительность и комментарий. Даты остальных занятий и история посещаемости останутся без изменений.'
       ))return;
 
       if(scope==='following'&&scheduleChanged){
@@ -711,7 +713,7 @@ async function saveLesson(scope='one'){
           db('/lessons?id=eq.'+encodeURIComponent(future.id),{
             method:'PATCH',
             headers:{...headers,Prefer:'return=minimal'},
-            body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,time,price,duration,comment})
+            body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,time,timezone:getTeacherTimezone(),price,duration,comment})
           })
         ));
       }
@@ -739,6 +741,8 @@ async function saveLesson(scope='one'){
         :[];
 
       if(group&&!targets.length){
+        const recurring=document.getElementById('edit-recurring').checked;
+        const seriesId=recurring?crypto.randomUUID():null;
         pendingEmptyGroupLesson={
           groupId,
           date,
@@ -746,10 +750,8 @@ async function saveLesson(scope='one'){
           duration,
           status,
           comment,
-          recurring:
-            document.getElementById(
-              'edit-recurring'
-            ).checked,
+          seriesId,
+          recurring,
           days:[
             ...document.querySelectorAll(
               '.rec-day:checked'
@@ -763,11 +765,9 @@ async function saveLesson(scope='one'){
       }
 
       if(group){
-        if(
-          document.getElementById(
-            'edit-recurring'
-          ).checked
-        ){
+        const recurring=document.getElementById('edit-recurring').checked;
+        const seriesId=recurring?crypto.randomUUID():null;
+        if(recurring){
           let days=[
             ...document.querySelectorAll(
               '.rec-day:checked'
@@ -796,7 +796,8 @@ async function saveLesson(scope='one'){
                 'pending',
                 targets,
                 comment,
-                teacherId
+                teacherId,
+                seriesId
               );
               if(createdLesson?.id)notificationLessonIds.push(String(createdLesson.id));
             }
@@ -814,12 +815,14 @@ async function saveLesson(scope='one'){
             status,
             targets,
             comment,
-            teacherId
+            teacherId,
+            null
           );
           if(createdLesson?.id)notificationLessonIds.push(String(createdLesson.id));
         }
       }else{
         const recurring=document.getElementById('edit-recurring').checked;
+        const seriesId=recurring?crypto.randomUUID():null;
         if(recurring){
           const days=[...document.querySelectorAll('.rec-day:checked')].map(x=>Number(x.value));
           const selectedDays=days.length?days:[new Date(date+'T00:00:00').getDay()];
@@ -829,7 +832,7 @@ async function saveLesson(scope='one'){
               const created=await db('/lessons',{
                 method:'POST',
                 headers:{...headers,Prefer:'return=representation'},
-                body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,date:localISO(cur),time,timezone:getTeacherTimezone(),price,status:'pending',duration,comment,teacher_id:teacherId})
+                body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,series_id:seriesId,date:localISO(cur),time,timezone:getTeacherTimezone(),price,status:'pending',duration,comment,teacher_id:teacherId})
               });
               if(created?.[0]?.id)notificationLessonIds.push(String(created[0].id));
             }
@@ -866,10 +869,7 @@ async function saveLesson(scope='one'){
           body:{lesson_ids:notificationLessonIds,event}
         });
         if(error)showError(new Error('Не удалось отправить уведомление: '+error.message));
-        else{
-          const sent=(data?.results||[]).reduce((sum,x)=>sum+Number(x.sent||0),0);
-          alert(sent?'Уведомления отправлены: '+sent:'Уведомления не отправлены. Проверьте, подключён ли Telegram у ученика и включены ли уведомления об изменениях.');
-        }
+        else showNotificationResult(data);
       }
     }
 
