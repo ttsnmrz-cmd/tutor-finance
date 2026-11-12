@@ -163,9 +163,9 @@
     </div>
   </section>
   <section class="app-card rounded-3xl p-5 md:p-6 space-y-4">
-    <div><h3 class="text-lg font-bold">Telegram преподавателя</h3><p class="text-sm text-slate-500 mt-1">В будущем сюда будут приходить личные уведомления ProfiProfit: напоминания о занятиях, изменения расписания, новые занятия, информация об оплатах, низком балансе и задолженности.</p></div>
+    <div><div class="flex items-center justify-between gap-3"><h3 class="text-lg font-bold">Telegram преподавателя</h3><span id="teacher-telegram-status" class="text-sm font-semibold text-amber-600">Проверяем…</span></div><p class="text-sm text-slate-500 mt-1">Подключи Telegram, чтобы ProfiProfit мог отправлять личные уведомления о занятиях и событиях в системе. Само подключение не включает ещё не запущенные типы уведомлений.</p></div>
     <label class="block text-sm font-semibold">Telegram username<div class="flex gap-2 mt-1"><input id="teacher-telegram-username" type="text" placeholder="@username" class="soft-input min-w-0 flex-1 rounded-xl px-3 py-2" autocomplete="off"><button type="button" onclick="saveTeacherTelegramUsername()" class="primary-btn rounded-xl px-4 py-2 font-semibold">Сохранить</button></div></label>
-    <div class="rounded-2xl bg-amber-50 text-amber-900 p-3 text-sm"><b>Важно:</b> одного username недостаточно, чтобы бот мог отправлять сообщения. Для получения уведомлений преподавателю нужно будет открыть бота и нажать Start. Привязка Telegram-аккаунта преподавателя ещё не реализована — сейчас можно сохранить только username.</div>
+    <div class="space-y-2"><button id="teacher-telegram-connect" type="button" onclick="createTeacherTelegramLink()" class="primary-btn rounded-xl px-4 py-2 font-semibold">Создать ссылку подключения</button><div class="flex gap-2"><input id="teacher-telegram-link" readonly class="soft-input hidden min-w-0 flex-1 rounded-xl px-3 py-2 text-xs"><button type="button" onclick="copyTeacherTelegramLink()" class="rounded-xl border px-4 py-2 text-sm font-semibold">Скопировать ссылку</button></div><p class="text-xs text-slate-500">1. Создай ссылку. 2. Открой её в Telegram. 3. Нажми Start. После этого статус изменится на «Подключён».</p></div>
   </section>
   <section class="app-card rounded-3xl p-5 md:p-6 space-y-3">
     <h3 class="text-lg font-bold">Telegram учеников</h3>
