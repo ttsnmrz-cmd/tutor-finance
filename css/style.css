@@ -358,3 +358,6 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 .lesson-date-cell.is-selected{background:var(--primary-color);color:#fff;font-weight:700}
 .lesson-date-picker-foot{display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-color)}
 .lesson-date-picker-foot button{padding:6px 9px;border-radius:8px;color:var(--primary-color);font-size:13px;font-weight:600}
+
+#lesson-save-dropdown button:hover,#lesson-delete-dropdown button:hover{background:var(--accent-soft);color:var(--text-color)}
+#lesson-save-dropdown button,#lesson-delete-dropdown button{transition:background-color .15s ease,color .15s ease}
