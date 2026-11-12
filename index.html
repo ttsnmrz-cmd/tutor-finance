@@ -39,9 +39,7 @@
 <div id="profile-menu" class="hidden profile-menu-dropdown absolute right-0 top-full mt-2 z-50 app-card rounded-2xl p-2 w-56 shadow-xl">
 <div class="px-3 py-2 text-xs text-slate-500 font-semibold" data-profile-heading>Профиль и настройки</div>
 <div class="profile-menu-row"><span>Язык</span><button data-language-toggle type="button" class="px-3 py-1.5 rounded-lg bg-slate-100 font-semibold text-sm" aria-label="Switch language">EN</button></div>
- <div class="profile-menu-row"><label for="teacher-timezone-select">Часовой пояс</label><select id="teacher-timezone-select" onchange="setTeacherTimezone(this.value)" class="px-2 py-1.5 rounded-lg bg-slate-100 font-semibold text-xs"><option value="Europe/Minsk">Минск</option><option value="Europe/Riga">Рига</option><option value="Europe/Warsaw">Варшава</option><option value="Europe/Vilnius">Вильнюс</option><option value="Europe/Berlin">Берлин</option><option value="Europe/London">Лондон</option><option value="America/New_York">Нью-Йорк</option><option value="America/Los_Angeles">Лос-Анджелес</option><option value="UTC">UTC</option></select></div>
- <div class="profile-menu-row"><label for="teacher-telegram-username">Telegram преподавателя</label><div class="flex items-center gap-1"><input id="teacher-telegram-username" type="text" placeholder="@username" class="w-28 min-w-0 px-2 py-1.5 rounded-lg bg-slate-100 text-xs" autocomplete="off"><button type="button" onclick="saveTeacherTelegramUsername()" class="px-2 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold">Сохранить</button></div></div>
- <div class="profile-menu-row"><label for="currency-select" id="currency-label">Валюта</label><select id="currency-select" onchange="setCurrency(this.value)" class="px-2 py-1.5 rounded-lg bg-slate-100 font-semibold text-sm"><option value="BYN">BYN</option><option value="RUB">RUB</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div>
+<button type="button" onclick="switchTab('settings');toggleProfileMenu()" class="profile-menu-item"><span>⚙️</span><span>Настройки</span></button>
 <button id="theme-toggle-button" type="button" onclick="toggleDarkMode()" class="profile-menu-item"><svg id="theme-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg><span id="theme-toggle-label">Тёмная тема</span></button>
 <button type="button" onclick="openHelp()" class="profile-menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg><span>Инструкция</span></button>
 
@@ -154,6 +152,27 @@
 <section id="tab-admin" class="hidden">
   <div class="flex items-center justify-between gap-3 mb-5"><div><h2 class="text-2xl font-bold">Администрирование ProfiProfit</h2><p class="text-sm text-slate-500 mt-1">Регистрации и активность учителей</p></div><button onclick="loadPlatformAdminDashboard()" class="px-3 py-2 rounded-xl bg-slate-100 font-semibold text-sm">Обновить</button></div>
   <div id="platform-admin-content"><p class="text-sm text-slate-500">Загрузка…</p></div>
+</section>
+<section id="tab-settings" class="hidden space-y-5">
+  <div><h2 class="text-2xl font-bold">Настройки</h2><p class="text-sm text-slate-500 mt-1">Настройте ProfiProfit под свой часовой пояс и рабочий процесс.</p></div>
+  <section class="app-card rounded-3xl p-5 md:p-6 space-y-4">
+    <div><h3 class="text-lg font-bold">Основные настройки</h3><p class="text-sm text-slate-500 mt-1">Эти параметры влияют на отображение расписания и сумм.</p></div>
+    <div class="grid md:grid-cols-2 gap-4">
+      <label class="text-sm font-semibold">Часовой пояс преподавателя<select id="teacher-timezone-select" onchange="setTeacherTimezone(this.value)" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="Europe/Minsk">Минск</option><option value="Europe/Riga">Рига</option><option value="Europe/Warsaw">Варшава</option><option value="Europe/Vilnius">Вильнюс</option><option value="Europe/Berlin">Берлин</option><option value="Europe/London">Лондон</option><option value="America/New_York">Нью-Йорк</option><option value="America/Los_Angeles">Лос-Анджелес</option><option value="UTC">UTC</option></select></label>
+      <label class="text-sm font-semibold"><span id="currency-label">Валюта</span><select id="currency-select" onchange="setCurrency(this.value)" class="soft-input mt-1 w-full rounded-xl px-3 py-2"><option value="BYN">BYN</option><option value="RUB">RUB</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="PLN">PLN</option></select><span class="block text-xs text-slate-500 font-normal mt-1">Меняется только обозначение валюты, конвертации сумм нет.</span></label>
+    </div>
+  </section>
+  <section class="app-card rounded-3xl p-5 md:p-6 space-y-4">
+    <div><h3 class="text-lg font-bold">Telegram преподавателя</h3><p class="text-sm text-slate-500 mt-1">В будущем сюда будут приходить личные уведомления ProfiProfit: напоминания о занятиях, изменения расписания, новые занятия, информация об оплатах, низком балансе и задолженности.</p></div>
+    <label class="block text-sm font-semibold">Telegram username<div class="flex gap-2 mt-1"><input id="teacher-telegram-username" type="text" placeholder="@username" class="soft-input min-w-0 flex-1 rounded-xl px-3 py-2" autocomplete="off"><button type="button" onclick="saveTeacherTelegramUsername()" class="primary-btn rounded-xl px-4 py-2 font-semibold">Сохранить</button></div></label>
+    <div class="rounded-2xl bg-amber-50 text-amber-900 p-3 text-sm"><b>Важно:</b> одного username недостаточно, чтобы бот мог отправлять сообщения. Для получения уведомлений преподавателю нужно будет открыть бота и нажать Start. Привязка Telegram-аккаунта преподавателя ещё не реализована — сейчас можно сохранить только username.</div>
+  </section>
+  <section class="app-card rounded-3xl p-5 md:p-6 space-y-3">
+    <h3 class="text-lg font-bold">Telegram учеников</h3>
+    <p class="text-sm text-slate-500">Чтобы ученик получал сообщения, откройте его карточку в разделе «Ученики», скопируйте персональную ссылку для подключения Telegram и отправьте её ученику.</p>
+    <ol class="list-decimal pl-5 text-sm space-y-1"><li>Ученик открывает персональную ссылку.</li><li>Переходит в Telegram-бот ProfiProfit и нажимает <b>Start</b>.</li><li>После подключения в карточке ученика появится статус Telegram. Там же можно выбрать, какие уведомления получать.</li></ol>
+    <a href="https://t.me/ProfiProfitMonitorBot" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-xl border border-indigo-200 text-indigo-700 px-4 py-2 text-sm font-semibold">Открыть Telegram-бота ↗</a>
+  </section>
 </section>
 <section id="tab-dashboard">
 <div class="mb-5"><div class="dashboard-greeting mb-5 rounded-3xl p-5 md:p-6"><p id="dashboard-greeting-kicker" class="text-sm mb-1">Рады видеть тебя в ProfiProfit</p><h1 id="dashboard-greeting-title" class="text-2xl md:text-3xl font-bold">Добрый день!</h1></div><h2 class="text-2xl font-bold">Главная</h2><p id="dashboard-date" class="text-sm text-slate-500 mt-1"></p></div>
