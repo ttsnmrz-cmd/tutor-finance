@@ -563,7 +563,7 @@ async function saveLesson(scope='one'){
     const notificationLessonIds=[];
     let notificationEvent=null;
     const id=document.getElementById('edit-id').value;
-    const student=document.getElementById('edit-student').value;
+    const studentValue=document.getElementById('edit-student').value;
     const date=document.getElementById('edit-date').value;
     const time=getTime();
 
@@ -581,7 +581,7 @@ async function saveLesson(scope='one'){
       document.getElementById('edit-comment').value.trim()||null;
 
     if(
-      !student||
+      !studentValue||
       !date||
       !Number.isFinite(duration)||
       duration<=0
@@ -681,6 +681,9 @@ async function saveLesson(scope='one'){
           })
         ));
       }else{
+        const individualStudentId=studentValue.startsWith('student:')?studentValue.slice(8):'';
+        const individualStudent=students.find(s=>String(s.id)===String(individualStudentId));
+        if(!individualStudent)throw new Error('Не удалось определить ученика по ID. Выберите ученика из списка.');
         await db(
           '/lessons?id=eq.'+
           encodeURIComponent(id),
@@ -691,7 +694,8 @@ async function saveLesson(scope='one'){
               Prefer:'return=minimal'
             },
             body:JSON.stringify({
-              student,
+              student:individualStudent.name,
+              student_id:individualStudent.id,
               date,
               time,
               timezone:getTeacherTimezone(),
@@ -707,15 +711,18 @@ async function saveLesson(scope='one'){
           db('/lessons?id=eq.'+encodeURIComponent(future.id),{
             method:'PATCH',
             headers:{...headers,Prefer:'return=minimal'},
-            body:JSON.stringify({student,time,price,duration,comment})
+            body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,time,price,duration,comment})
           })
         ));
       }
     }else{
       const groupId=
-        student.startsWith('group:')
-          ?student.slice(6)
+        studentValue.startsWith('group:')
+          ?studentValue.slice(6)
           :null;
+      const individualStudentId=studentValue.startsWith('student:')?studentValue.slice(8):'';
+      const individualStudent=students.find(s=>String(s.id)===String(individualStudentId));
+      if(!groupId&&!individualStudent)throw new Error('Не удалось определить ученика по ID. Обновите страницу и попробуйте снова.');
 
       const group=groupId
         ?groups.find(
@@ -822,7 +829,7 @@ async function saveLesson(scope='one'){
               const created=await db('/lessons',{
                 method:'POST',
                 headers:{...headers,Prefer:'return=representation'},
-                body:JSON.stringify({student,date:localISO(cur),time,timezone:getTeacherTimezone(),price,status:'pending',duration,comment,teacher_id:teacherId})
+                body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,date:localISO(cur),time,timezone:getTeacherTimezone(),price,status:'pending',duration,comment,teacher_id:teacherId})
               });
               if(created?.[0]?.id)notificationLessonIds.push(String(created[0].id));
             }
@@ -832,7 +839,7 @@ async function saveLesson(scope='one'){
           const created=await db('/lessons',{
             method:'POST',
             headers:{...headers,Prefer:'return=representation'},
-            body:JSON.stringify({student,date,time,timezone:getTeacherTimezone(),price,status,duration,comment,teacher_id:teacherId})
+            body:JSON.stringify({student:individualStudent.name,student_id:individualStudent.id,date,time,timezone:getTeacherTimezone(),price,status,duration,comment,teacher_id:teacherId})
           });
           if(created?.[0]?.id)notificationLessonIds.push(String(created[0].id));
         }
