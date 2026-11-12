@@ -69,7 +69,7 @@ function formatMoney(value: number) {
 }
 
 function notificationText(studentName: string, balance: number, price: number, state: any) {
-  const money = formatMoney(balance);
+  const money = formatMoney(Math.abs(balance));
   const remaining = state.remaining;
   if (state.type === "debt") {
     return `⚠️ Баланс ученика ${studentName}: задолженность ${money} BYN.\nBalance: ${money} BYN in debt.`;
