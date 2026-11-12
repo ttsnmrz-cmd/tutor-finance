@@ -1614,6 +1614,7 @@ let publicStudent=null;
 let publicStudentLessons=[];
 let publicStudentPayments=[];
 let publicStudentWeekAnchor=null;
+let publicStudentCalendarLessons=[];
 
 function changePublicStudentWeek(offset){
   if(!publicStudentWeekAnchor)return;
@@ -1622,6 +1623,8 @@ function changePublicStudentWeek(offset){
 }
 
 function renderPublicStudentCalendar(lessonRows){
+  if(Array.isArray(lessonRows))publicStudentCalendarLessons=lessonRows;
+  const calendarLessons=publicStudentCalendarLessons;
   const grid=document.getElementById('public-week-calendar');
   const range=document.getElementById('public-week-range');
   if(!grid||!range)return;
@@ -1639,7 +1642,7 @@ function renderPublicStudentCalendar(lessonRows){
   const today=todayISOInTimezone(isValidTimezone(publicStudent?.timezone)?publicStudent.timezone:'Europe/Minsk');
   grid.innerHTML=days.map(d=>{
     const key=localISO(d);
-    const dayLessons=lessonRows.filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
+    const dayLessons=calendarLessons.filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
     return `<section class="calendar-day-column ${key===today?'is-today':''}">
       <div class="calendar-day-heading"><span class="calendar-weekday">${d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')}</span><span class="calendar-day-number">${d.getDate()}</span></div>
       <div class="calendar-day-events">${dayLessons.length?dayLessons.map(l=>`<div class="calendar-event-card">
@@ -1797,59 +1800,14 @@ async function openStudentCabinet(){
 
   renderPublicStudentCalendar(ls);
 
-  document.getElementById('public-lessons').innerHTML=
-    visible
-      .map(
-        l=>
-          '<div class="rounded-2xl border border-slate-200 p-3 flex justify-between items-center gap-3">'+
-            '<div>'+
-              '<div class="font-semibold">'+esc(l.date)+'</div>'+
-              '<div class="text-xs text-slate-500">'+
-                esc(displayTime(l.time))+' · '+
-                (l.duration||60)+' мин · '+
-                money(l.price)+
-              '</div>'+
-            '</div>'+
-            '<span class="status '+
-              (statusClass[l.status]||
-                'bg-slate-100 text-slate-700')+
-              ' whitespace-nowrap">'+
-              (statusLabels[l.status]||l.status)+
-            '</span>'+
-          '</div>'
-      )
-      .join('')||
-    '<span class="text-slate-400">Занятий нет</span>';
+
 
   document.getElementById('student-public-login')
     .classList.add('hidden');
   document.getElementById('student-public-content')
     .classList.remove('hidden');
 
-  const box=document.getElementById('public-lessons');
-  const target=
-    visible.find(
-      l=>
-        l.date>today||
-        (
-          l.date===today&&
-          String(l.time||'23:59').slice(0,5)>=nowTime
-        )
-    )||
-    visible[visible.length-1];
 
-  if(target){
-    const el=[...box.children].find(
-      x=>x.querySelector('.font-semibold')?.textContent===target.date
-    );
-
-    if(el){
-      box.scrollTop=Math.max(
-        0,
-        el.offsetTop-box.offsetTop-12
-      );
-    }
-  }
 }
 
   async function initApp(){
