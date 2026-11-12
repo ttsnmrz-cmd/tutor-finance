@@ -15,6 +15,19 @@ function formatDate(date: string, time: string) {
   return `${day} ${monthName} в ${time.slice(0, 5)}`;
 }
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
 async function send(chatId: string | number, text: string) {
   const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
@@ -26,8 +39,9 @@ async function send(chatId: string | number, text: string) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
-  if (!supabaseUrl || !serviceKey || !botToken) return Response.json({ error: "Server configuration error" }, { status: 500 });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405);
+  if (!supabaseUrl || !serviceKey || !botToken) return jsonResponse({ error: "Server configuration error" }, 500);
 
   const authorization = req.headers.get("Authorization") || "";
   const authClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || "", {
@@ -35,13 +49,13 @@ Deno.serve(async (req) => {
     auth: { persistSession: false }
   });
   const { data: { user }, error: authError } = await authClient.auth.getUser();
-  if (authError || !user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (authError || !user) return jsonResponse({ error: "Unauthorized" }, 401);
 
   const body = await req.json().catch(() => null);
   const ids = Array.isArray(body?.lesson_ids) ? [...new Set(body.lesson_ids.map(String))].slice(0, 100) : [];
   const event = body?.event;
   if (!ids.length || !["created", "updated", "cancelled"].includes(event)) {
-    return Response.json({ error: "Invalid lesson_ids or event" }, { status: 400 });
+    return jsonResponse({ error: "Invalid lesson_ids or event" }, 400);
   }
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
@@ -89,5 +103,5 @@ Deno.serve(async (req) => {
     }
     results.push({ lesson_id: id, sent, recipients: recipients.length });
   }
-  return Response.json({ ok: true, results });
+  return jsonResponse({ ok: true, results });
 });
