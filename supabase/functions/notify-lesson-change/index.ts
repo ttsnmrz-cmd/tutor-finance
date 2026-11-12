@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
   const body = await req.json().catch(() => null);
   const ids = Array.isArray(body?.lesson_ids) ? [...new Set(body.lesson_ids.map(String))].slice(0, 100) : [];
   const event = body?.event;
-  if (!ids.length || !["created", "updated", "cancelled"].includes(event)) {
+  if (!ids.length || !["created", "updated", "cancelled", "deleted"].includes(event)) {
     return jsonResponse({ error: "Invalid lesson_ids or event" }, 400);
   }
 
@@ -88,6 +88,7 @@ Deno.serve(async (req) => {
     let message = "";
     if (event === "created") message = `Здравствуйте! 👋\nВ расписании появилось новое занятие: ${dateTime}.\nДо встречи!`;
     else if (event === "cancelled") message = `Здравствуйте!\nЗанятие ${dateTime} отменяется. О времени следующего занятия сообщу дополнительно.`;
+    else if (event === "deleted") message = `Здравствуйте!\nЗанятие ${dateTime} удалено из расписания.`;
     else message = `Здравствуйте! 👋\nВ расписании изменилось занятие: ${dateTime}.\nПодробности можно посмотреть в личном кабинете.`;
 
     let sent = 0;
