@@ -1320,6 +1320,14 @@ async function deleteLessonFromModal(){
   if(deleted)closeLessonModal();
 }
 
+function showNotificationResult(data){
+  const results=Array.isArray(data?.results)?data.results:[];
+  const sent=results.reduce((n,x)=>n+Number(x.sent||0),0);
+  const failed=results.reduce((n,x)=>n+Number(x.failed||0),0);
+  const skipped=results.reduce((n,x)=>n+Number(x.skipped_count||0),0);
+  if(failed||skipped||!sent)showError(new Error('Telegram: отправлено '+sent+', не доставлено '+failed+', пропущено '+skipped+'. Проверьте подключение и настройки уведомлений.'));
+  else alert('Telegram-уведомления отправлены: '+sent);
+}
 async function deleteLesson(id){
   if(lessonDeleteInProgress)return false;
   if(!confirm('Удалить это занятие?'))return false;
@@ -1333,10 +1341,12 @@ async function deleteLesson(id){
       {method:'DELETE',headers}
     );
     if(notify){
-      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:[String(id)],event:'deleted'}
+      const studentIds=lesson.group_id?lessonMembersFor(lesson).map(m=>String(m.student_id)):(lesson.student_id?[String(lesson.student_id)]:[]);
+      const {data,error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{event:'deleted',deleted_lessons:[{lesson_id:String(lesson.id),date:lesson.date,time:lesson.time,student_ids:studentIds}]}
       });
       if(error)showError(new Error('Занятие удалено, но уведомление отправить не удалось: '+error.message));
+      else showNotificationResult(data);
     }
     await loadData();
     renderWeek();
@@ -1384,10 +1394,15 @@ async function deleteThisAndFollowingFromModal(){
     }
 
     if(notify){
-      const {error}=await supabaseClient.functions.invoke('notify-lesson-change',{
-        body:{lesson_ids:deletedIds,event:'deleted'}
+      const deletedLessons=targets.filter(x=>deletedIds.includes(String(x.id))).map(x=>({
+        lesson_id:String(x.id),date:x.date,time:x.time,
+        student_ids:x.group_id?lessonMembersFor(x).map(m=>String(m.student_id)):(x.student_id?[String(x.student_id)]:[])
+      }));
+      const {data,error}=await supabaseClient.functions.invoke('notify-lesson-change',{
+        body:{event:'deleted',deleted_lessons:deletedLessons}
       });
       if(error)showError(new Error('Занятия удалены, но уведомление отправить не удалось: '+error.message));
+      else showNotificationResult(data);
     }
 
     closeLessonModal();
