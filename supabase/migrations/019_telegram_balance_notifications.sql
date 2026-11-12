@@ -1,6 +1,6 @@
 create table if not exists public.telegram_balance_notifications (
   id uuid primary key default gen_random_uuid(),
-  lesson_id uuid not null references public.lessons(id) on delete cascade,
+  lesson_id bigint not null references public.lessons(id) on delete cascade,
   student_id uuid not null references public.students(id) on delete cascade,
   teacher_id uuid not null,
   recipient_type text not null check (recipient_type in ('student','teacher')),
