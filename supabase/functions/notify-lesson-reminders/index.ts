@@ -140,17 +140,18 @@ Deno.serve(async (req) => {
     } else {
       if (!lesson.student_id) {
         // Ambiguous legacy records are intentionally not matched by name.
+        // Keep the teacher reminder, but do not guess a student recipient.
         skipped++;
-        continue;
+      } else {
+        const { data, error } = await db
+          .from("students")
+          .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived")
+          .eq("id", lesson.student_id)
+          .eq("teacher_id", lesson.teacher_id)
+          .eq("archived", false);
+        if (error) { errors.push(`students:${lesson.id}`); continue; }
+        recipients = data ?? [];
       }
-      const { data, error } = await db
-        .from("students")
-        .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived")
-        .eq("id", lesson.student_id)
-        .eq("teacher_id", lesson.teacher_id)
-        .eq("archived", false);
-      if (error) { errors.push(`students:${lesson.id}`); continue; }
-      recipients = data ?? [];
     }
 
     // Teacher receives one reminder per lesson, independently of student preferences.
