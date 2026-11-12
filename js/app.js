@@ -235,7 +235,7 @@ async function saveTeacherTelegramUsername(){
       body:JSON.stringify({id:user.id,telegram_username:username||null})
     });
     if(input)input.value=username?'@'+username:'';
-    alert('Telegram преподавателя сохранён.');
+    alert('Контакт для учеников сохранён.');
   }catch(e){showError(e);}
 }
 async function setTeacherTimezone(timezone){
