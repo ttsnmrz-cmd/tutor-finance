@@ -958,7 +958,8 @@ async function saveLesson(){
               Prefer:'return=minimal'
             },
             body:JSON.stringify({
-              student:l.student,
+              student:students.find(s=>String(s.id)===String(studentValue.replace(/^student:/,'')))?.name||l.student,
+              student_id:students.find(s=>String(s.id)===String(studentValue.replace(/^student:/,'')))?.id||l.student_id||null,
               date,
               time,
               timezone:getTeacherTimezone(),
