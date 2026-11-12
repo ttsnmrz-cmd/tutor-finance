@@ -838,6 +838,12 @@ async function saveLesson(scope='one'){
       }
     }
 
+    // For a newly created recurring series, notify only about the first lesson.
+    // Sending one Telegram message for every generated occurrence would spam students.
+    if(!id&&document.getElementById('edit-recurring')?.checked&&notificationLessonIds.length>1){
+      notificationLessonIds.splice(1);
+    }
+
     closeLessonModal();
 
     if(notificationLessonIds.length){
