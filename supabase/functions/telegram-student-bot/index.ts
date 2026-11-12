@@ -93,6 +93,18 @@ Deno.serve(async (req) => {
   }
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+  if(payload.startsWith("teacher_")){
+    const token=payload.slice("teacher_".length);
+    const {data:teacher,error:teacherError}=await db.from("profiles").select("id,telegram_chat_id").eq("telegram_link_token",token).maybeSingle();
+    if(teacherError){console.error("Teacher lookup failed",teacherError.message);await sendMessage(chatId,"Не удалось проверить ссылку. Попробуй позже.");return new Response("ok");}
+    if(!teacher){await sendMessage(chatId,"Ссылка подключения недействительна. Создай новую в настройках ProfiProfit.");return new Response("ok");}
+    if(teacher.telegram_chat_id&&Number(teacher.telegram_chat_id)!==Number(chatId)){await sendMessage(chatId,"К Telegram уже подключён другой аккаунт. Создай новую ссылку в настройках ProfiProfit, если нужно сменить аккаунт.");return new Response("ok");}
+    const {error:updateTeacherError}=await db.from("profiles").update({telegram_chat_id:chatId,telegram_connected_at:new Date().toISOString()}).eq("id",teacher.id).eq("telegram_link_token",token);
+    if(updateTeacherError){console.error("Teacher connection update failed",updateTeacherError.message);await sendMessage(chatId,"Не удалось подключить Telegram. Попробуй создать новую ссылку.");return new Response("ok");}
+    await sendMessage(chatId,"Готово! ✅ Telegram преподавателя подключён к ProfiProfit. Здесь будут приходить уведомления, когда соответствующие функции будут включены.");
+    return new Response("ok");
+  }
+
   const { data: student, error } = await db
     .from("students")
     .select("id,name,telegram_chat_id")
