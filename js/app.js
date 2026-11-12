@@ -167,9 +167,11 @@ async function loadTeacherTimezone(userId){
   teacherTimezoneUserId=userId||null;
   let timezone='Europe/Minsk';
   if(userId){
-    const rows=await db('/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,timezone');
-    if(Array.isArray(rows)&&rows[0]&&isValidTimezone(rows[0].timezone)){
-      timezone=rows[0].timezone;
+    const rows=await db('/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,timezone,telegram_username');
+    if(Array.isArray(rows)&&rows[0]){
+      if(isValidTimezone(rows[0].timezone))timezone=rows[0].timezone;
+      const telegramInput=document.getElementById('teacher-telegram-username');
+      if(telegramInput)telegramInput.value=rows[0].telegram_username||'';
     }
   }
   teacherTimezone=timezone;
@@ -178,6 +180,25 @@ async function loadTeacherTimezone(userId){
   weekAnchor=dateAtLocalNoon(selectedDate);
   const select=document.getElementById('teacher-timezone-select');
   if(select)select.value=timezone;
+}
+async function saveTeacherTelegramUsername(){
+  try{
+    const input=document.getElementById('teacher-telegram-username');
+    const username=String(input?.value||'').trim().replace(/^@/,'');
+    if(username&&!/^[A-Za-z0-9_]{5,32}$/.test(username)){
+      throw new Error('Укажи Telegram username: от 5 до 32 символов, латинские буквы, цифры и _.');
+    }
+    const {data:{user},error}=await supabaseClient.auth.getUser();
+    if(error)throw error;
+    if(!user?.id)throw new Error('Войдите в аккаунт, чтобы сохранить Telegram.');
+    await db('/profiles?on_conflict=id',{
+      method:'POST',
+      headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({id:user.id,telegram_username:username||null})
+    });
+    if(input)input.value=username?'@'+username:'';
+    alert('Telegram преподавателя сохранён.');
+  }catch(e){showError(e);}
 }
 async function setTeacherTimezone(timezone){
   try{
