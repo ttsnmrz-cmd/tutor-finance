@@ -280,6 +280,12 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 }
 
 
+#student-public-view .public-calendar-week-grid{grid-template-columns:repeat(7,minmax(105px,1fr));gap:7px;overflow-x:auto;padding-bottom:7px}
+#student-public-view .public-calendar-week-grid .calendar-day-column{min-height:150px;padding:7px}
+#student-public-view .public-calendar-week-grid .calendar-event-card{padding:7px;cursor:default}
+#student-public-view .public-calendar-week-grid .calendar-event-card:hover{transform:none;border-color:var(--border-color)}
+@media(max-width:640px){#student-public-view .public-calendar-week-grid{grid-template-columns:repeat(7,minmax(135px,1fr))}}
+
 /* Weekly calendar: show every lesson directly in its day column. */
 .calendar-week-grid{
   display:grid;
