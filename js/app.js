@@ -525,7 +525,16 @@ async function autoCompletePastLessons(){
 
   due.forEach(l=>l.status='conducted');
 }
-function switchTab(t){
+const TAB_PATHS={dashboard:'/dashboard',calendar:'/calendar',students:'/students',admin:'/admin',settings:'/settings'};
+function getTabFromPath(){
+  const path=location.pathname.replace(/\\/+$/,'')||'/';
+  const entry=Object.entries(TAB_PATHS).find(([,route])=>route===path);
+  return entry?.[0]||'dashboard';
+}
+function switchTab(t,options={}){
+  const allowed=['dashboard','calendar','students','admin','settings'];
+  if(!allowed.includes(t))t='dashboard';
+  if(t==='admin'&&!platformAdmin)t='dashboard';
   ['dashboard','calendar','students','admin','settings'].forEach(name=>{
     document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
     const nav=document.getElementById('nav-'+name);
@@ -534,8 +543,18 @@ function switchTab(t){
       if(name==='admin'&&!platformAdmin)nav.classList.add('hidden');
     }
   });
+  const nextPath=TAB_PATHS[t];
+  if(options.history!==false&&location.pathname!==nextPath){
+    const method=options.replace?'replaceState':'pushState';
+    history[method]({tab:t},'',nextPath+location.search+location.hash);
+  }
   if(t==='admin')loadPlatformAdminDashboard();
 }
+window.addEventListener('popstate',()=>{
+  if(!document.getElementById('teacher-app')?.classList.contains('hidden')){
+    switchTab(getTabFromPath(),{history:false});
+  }
+});
 
 function dashboardLessonCharge(l){
   if(!charge.has(l.status))return 0;
@@ -1140,7 +1159,7 @@ async function saveLesson(){
     renderWeek();
     renderDay();
     renderStudents();
-    switchTab('dashboard');
+    switchTab(getTabFromPath(),{replace:true});
 
   }catch(e){
     showError(e);
@@ -1808,7 +1827,7 @@ document.getElementById('landing-page')?.classList.add('hidden');
     renderWeek();
     renderDay();
     renderStudents();
-    switchTab('dashboard');
+    switchTab(getTabFromPath(),{replace:true});
 
   }catch(e){
 
