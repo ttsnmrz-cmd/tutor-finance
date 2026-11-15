@@ -72,8 +72,6 @@ Deno.serve(async (req) => {
     }
   }
 
-  if (command === "/stop" || command === "/disconnect") {
-
   const parts = text.split(/\s+/, 2);
   const payload = parts.length > 1 ? parts[1] : "";
 
