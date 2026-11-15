@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
       const date = String(item?.date || "");
       const time = String(item?.time || "");
       const studentIds = Array.isArray(item?.student_ids) ? [...new Set(item.student_ids.map(String))] : [];
-      if (!lessonId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date) || !time || !studentIds.length) {
+      if (!lessonId || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !time || !studentIds.length) {
         invalid.push({ lesson_id: lessonId, sent: 0, failed: 0, skipped_count: 1, skipped: "invalid_deleted_snapshot" });
         continue;
       }
@@ -104,11 +104,11 @@ Deno.serve(async (req) => {
       }
       const dates = (lessonsByStudent.get(studentId) || [])
         .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-      const dateLines = dates.map(x => `• ${formatDate(x.date, x.time)}`).join("\\n");
-      const message = `Hello, ${student.name || "there"}!\\nThe following lessons have been removed from your schedule:\\n${dateLines}\\n\\nЗдравствуйте, ${student.name || ""}!\\nСледующие занятия удалены из вашего расписания:\\n${dateLines}`;
+      const dateLines = dates.map(x => `• ${formatDate(x.date, x.time)}`).join("\n");
+      const message = `Hello, ${student.name || "there"}!\nThe following lessons have been removed from your schedule:\n${dateLines}\n\nЗдравствуйте, ${student.name || ""}!\nСледующие занятия удалены из вашего расписания:\n${dateLines}`;
       const cabinet = `https://profiprofit.com/?student=${student.id}`;
       try {
-        await send(student.telegram_chat_id, `${message}\\n\\nPersonal account / Личный кабинет: ${cabinet}`);
+        await send(student.telegram_chat_id, `${message}\n\nPersonal account / Личный кабинет: ${cabinet}`);
         results.push({ student_id: studentId, sent: 1, failed: 0, skipped_count: 0, recipients: 1, lessons: dates.length });
       } catch (e) {
         console.error("Consolidated deletion notification failed", studentId, e);
@@ -121,8 +121,6 @@ Deno.serve(async (req) => {
   const results: any[] = [];
   const items = ids.map((id: string) => ({ id }));
 
-    ? deletedLessons.map((x: any) => ({ id: String(x?.lesson_id || ""), date: String(x?.date || ""), time: String(x?.time || ""), student_ids: Array.isArray(x?.student_ids) ? [...new Set(x.student_ids.map(String))] : [] }))
-    : ids.map((id: string) => ({ id }));
 
   for (const item of items) {
     let lesson: any;
