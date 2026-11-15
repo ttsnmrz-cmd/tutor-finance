@@ -61,8 +61,66 @@ Deno.serve(async (req) => {
   }
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
-  const results = [];
-  const items = isDeleted
+
+  // A recurring-series deletion is one user action: send one consolidated
+  // Telegram message per student, not one message for every removed lesson.
+  if (isDeleted) {
+    const lessonsByStudent = new Map<string, Array<{ date: string; time: string }>>();
+    const invalid: any[] = [];
+    for (const item of deletedLessons) {
+      const lessonId = String(item?.lesson_id || "");
+      const date = String(item?.date || "");
+      const time = String(item?.time || "");
+      const studentIds = Array.isArray(item?.student_ids) ? [...new Set(item.student_ids.map(String))] : [];
+      if (!lessonId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date) || !time || !studentIds.length) {
+        invalid.push({ lesson_id: lessonId, sent: 0, failed: 0, skipped_count: 1, skipped: "invalid_deleted_snapshot" });
+        continue;
+      }
+      for (const studentId of studentIds) {
+        const list = lessonsByStudent.get(studentId) || [];
+        if (!list.some(x => x.date === date && x.time === time)) list.push({ date, time });
+        lessonsByStudent.set(studentId, list);
+      }
+    }
+    const studentIds = [...lessonsByStudent.keys()];
+    if (!studentIds.length) return jsonResponse({ ok: true, results: invalid });
+    const { data: students, error } = await db.from("students")
+      .select("id,name,telegram_chat_id,telegram_notify_changes")
+      .eq("teacher_id", user.id).in("id", studentIds);
+    if (error) {
+      console.error("Deleted-series students lookup failed", error);
+      return jsonResponse({ ok: true, results: [...invalid, { sent: 0, failed: 1, skipped_count: 0, error: "students_lookup_failed" }] });
+    }
+    const results = [...invalid];
+    for (const studentId of studentIds) {
+      const student = (students || []).find((x: any) => String(x.id) === studentId);
+      if (!student) {
+        results.push({ student_id: studentId, sent: 0, failed: 0, skipped_count: 1, skipped: "no_students_found" });
+        continue;
+      }
+      if (!student.telegram_chat_id || student.telegram_notify_changes === false) {
+        results.push({ student_id: studentId, sent: 0, failed: 0, skipped_count: 1, skipped: "notifications_disabled" });
+        continue;
+      }
+      const dates = (lessonsByStudent.get(studentId) || [])
+        .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+      const dateLines = dates.map(x => `• ${formatDate(x.date, x.time)}`).join("\\n");
+      const message = `Hello, ${student.name || "there"}!\\nThe following lessons have been removed from your schedule:\\n${dateLines}\\n\\nЗдравствуйте, ${student.name || ""}!\\nСледующие занятия удалены из вашего расписания:\\n${dateLines}`;
+      const cabinet = `https://profiprofit.com/?student=${student.id}`;
+      try {
+        await send(student.telegram_chat_id, `${message}\\n\\nPersonal account / Личный кабинет: ${cabinet}`);
+        results.push({ student_id: studentId, sent: 1, failed: 0, skipped_count: 0, recipients: 1, lessons: dates.length });
+      } catch (e) {
+        console.error("Consolidated deletion notification failed", studentId, e);
+        results.push({ student_id: studentId, sent: 0, failed: 1, skipped_count: 0, recipients: 1, lessons: dates.length });
+      }
+    }
+    return jsonResponse({ ok: true, results });
+  }
+
+  const results: any[] = [];
+  const items = ids.map((id: string) => ({ id }));
+
     ? deletedLessons.map((x: any) => ({ id: String(x?.lesson_id || ""), date: String(x?.date || ""), time: String(x?.time || ""), student_ids: Array.isArray(x?.student_ids) ? [...new Set(x.student_ids.map(String))] : [] }))
     : ids.map((id: string) => ({ id }));
 
