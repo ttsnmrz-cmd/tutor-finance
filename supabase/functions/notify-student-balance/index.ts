@@ -68,19 +68,19 @@ function formatMoney(value: number) {
   return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
 }
 
-function notificationText(studentName: string, balance: number, price: number, state: any) {
+function notificationText(studentName: string, balance: number, price: number, state: any, studentId: string) {
   const money = formatMoney(Math.abs(balance));
-  const remaining = state.remaining;
+  const remaining = state.remaining;\n  const cabinet = `https://profiprofit.com/?student=${studentId}`;
   if (state.type === "debt") {
-    return `🚩 Outstanding balance: ${studentName} owes ${money} BYN.\\n\\n🚩 Задолженность ученика ${studentName}: ${money} BYN.`;
+    return `🚩 Outstanding balance: ${studentName} owes ${money} BYN.\\nStudent account: ${cabinet}\\n\\n🚩 Задолженность ученика ${studentName}: ${money} BYN.\\nКабинет ученика: ${cabinet}`;
   }
   if (state.type === "empty") {
-    return `⚠️ ${studentName} has run out of lesson funds. Balance: 0 BYN.\\n\\n⚠️ У ученика ${studentName} закончились средства на занятия. Баланс: 0 BYN.`;
+    return `⚠️ ${studentName} has run out of lesson funds. Balance: 0 BYN.\\nStudent account: ${cabinet}\\n\\n⚠️ У ученика ${studentName} закончились средства на занятия. Баланс: 0 BYN.\\nКабинет ученика: ${cabinet}`;
   }
   if (state.type === "less_than_one") {
-    return `⚠️ ${studentName} has ${money} BYN left — less than one lesson (${formatMoney(price)} BYN).\\n\\n⚠️ У ученика ${studentName} осталось ${money} BYN — этого меньше чем на одно занятие стоимостью ${formatMoney(price)} BYN.`;
+    return `⚠️ ${studentName} has ${money} BYN left — less than one lesson (${formatMoney(price)} BYN).\\nStudent account: ${cabinet}\\n\\n⚠️ У ученика ${studentName} осталось ${money} BYN — этого меньше чем на одно занятие стоимостью ${formatMoney(price)} BYN.`;
   }
-  return `🔔 ${studentName} has ${money} BYN left — enough for ${remaining} more lesson(s).\\n\\n🔔 У ученика ${studentName} осталось ${money} BYN — хватит ещё на ${remaining} занятий.`;
+  return `🔔 ${studentName} has ${money} BYN left — enough for ${remaining} more lesson(s).\\nStudent account: ${cabinet}\\n\\n🔔 У ученика ${studentName} осталось ${money} BYN — хватит ещё на ${remaining} занятий.\\nКабинет ученика: ${cabinet}`;
 }
 
 Deno.serve(async (req) => {
@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        const message = notificationText(student.name || "Ученик", balance, price, state);
+        const message = notificationText(student.name || "Ученик", balance, price, state, student.id);
         let deliveryFailed = false;
         for (const recipient of recipients) {
           if (!deliveryEnabled) {
