@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
   const isDeleted = event === "deleted";
   const deletedLessons = Array.isArray(body?.deleted_lessons) ? body.deleted_lessons.slice(0, 100) : [];
   const ids = Array.isArray(body?.lesson_ids) ? [...new Set(body.lesson_ids.map(String))].slice(0, 100) : [];
-  if (!["created", "updated", "cancelled", "deleted"].includes(event) || (isDeleted ? !deletedLessons.length : !ids.length)) {
+  if (!["created", "updated", "rescheduled", "cancelled", "deleted"].includes(event) || (isDeleted ? !deletedLessons.length : !ids.length)) {
     return jsonResponse({ error: "Invalid lesson payload or event" }, 400);
   }
 
@@ -137,10 +137,16 @@ Deno.serve(async (req) => {
 
     const dateTime = formatDate(lesson.date, lesson.time);
     let message = "";
-    if (event === "created") message = `Здравствуйте! 👋\nВ расписании появилось новое занятие: ${dateTime}.\nДо встречи!`;
-    else if (event === "cancelled") message = `Здравствуйте!\nЗанятие ${dateTime} отменяется. О времени следующего занятия сообщу дополнительно.`;
-    else if (event === "deleted") message = `Здравствуйте!\nЗанятие ${dateTime} удалено из расписания.`;
-    else message = `Здравствуйте! 👋\nВ расписании изменилось занятие: ${dateTime}.\nПодробности можно посмотреть в личном кабинете.`;
+    if (event === "created") message = `Hello! 👋\\nA new lesson has been added to your schedule: ${dateTime}.\\nSee you in class! 😊\\n\\nЗдравствуйте! 👋\\nВ расписании появилось новое занятие: ${dateTime}.\\nДо встречи! 😊`;
+    else if (event === "rescheduled") message = `Hello! 👋\\nYour lesson has been rescheduled to ${dateTime}. No lesson fee will be deducted for this change.\\n\\nЗдравствуйте! 👋\\nВаше занятие перенесено на ${dateTime}. Средства за это изменение списываться не будут.`;
+    else if (event === "cancelled") {
+      const charged = lesson.status === "cancelled_charge";
+      const paymentEn = charged ? "The lesson fee will be deducted from your balance." : "No lesson fee will be deducted.";
+      const paymentRu = charged ? "Стоимость занятия будет списана с вашего баланса." : "Средства за занятие списываться не будут.";
+      message = `Hello!\\nYour lesson scheduled for ${dateTime} has been cancelled. ${paymentEn}\\n\\nЗдравствуйте!\\nЗанятие, запланированное на ${dateTime}, отменено. ${paymentRu}`;
+    }
+    else if (event === "deleted") message = `Hello!\\nYour lesson scheduled for ${dateTime} has been removed from the schedule.\\n\\nЗдравствуйте!\\nЗанятие ${dateTime} удалено из расписания.`;
+    else message = `Hello! 👋\\nYour lesson schedule has been updated: ${dateTime}.\\n\\nЗдравствуйте! 👋\\nИнформация о занятии изменена: ${dateTime}.`;
 
     let sent = 0;
     let failed = 0;
