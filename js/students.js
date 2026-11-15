@@ -1504,13 +1504,13 @@ async function addPayment(){
     const user=session.user;
     headers.Authorization='Bearer '+session.access_token;
 
-    await db(
+    const createdPayments=await db(
       '/payments',
       {
         method:'POST',
         headers:{
           ...headers,
-          Prefer:'return=minimal'
+          Prefer:'return=representation'
         },
         body:JSON.stringify({
           student:s.name,
@@ -1521,6 +1521,21 @@ async function addPayment(){
         })
       }
     );
+
+    const createdPayment=Array.isArray(createdPayments)?createdPayments[0]:createdPayments;
+    if(createdPayment?.id){
+      try{
+        const {data,error}=await supabaseClient.functions.invoke('notify-payment',{
+          body:{payment_id:String(createdPayment.id)}
+        });
+        if(error)console.warn('Payment saved, but Telegram notification failed:',error);
+        else if(data?.errors?.length)console.warn('Payment saved, but some Telegram notifications failed:',data.errors);
+      }catch(notificationError){
+        // The payment is already safely saved; a notification failure must not
+        // make the user think the payment itself failed or invite a duplicate.
+        console.warn('Payment saved, but Telegram notification failed:',notificationError);
+      }
+    }
 
     closeModal('add-modal');
 
