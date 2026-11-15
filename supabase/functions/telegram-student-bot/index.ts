@@ -82,15 +82,10 @@ Deno.serve(async (req) => {
   const message = update?.message;
   const chatId = message?.chat?.id;
   const text = typeof message?.text === "string" ? message.text.trim() : "";
-  if (!chatId || !text.startsWith("/start")) return new Response("ok");
+  if (!chatId || (!text.startsWith("/start") && text !== "/stop" && text !== "/disconnect")) return new Response("ok");
 
   const parts = text.split(/\s+/, 2);
   const payload = parts.length > 1 ? parts[1] : "";
-
-  if (!payload) {
-    await sendMessage(chatId, welcome);
-    return new Response("ok");
-  }
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
   if (text === "/stop" || text === "/disconnect") {
@@ -111,6 +106,10 @@ Deno.serve(async (req) => {
       return new Response("ok");
     }
     await sendMessage(chatId, "No linked student account was found. / Подключённый аккаунт ученика не найден.");
+    return new Response("ok");
+  }
+  if (!payload) {
+    await sendMessage(chatId, welcome);
     return new Response("ok");
   }
   if(payload.startsWith("teacher_")){
