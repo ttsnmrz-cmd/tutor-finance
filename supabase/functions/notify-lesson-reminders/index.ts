@@ -185,6 +185,64 @@ Deno.serve(async (req) => {
       }
     }
 
+    // A separate teacher-only warning when a student's balance is negative.
+    // It is sent only in the 10-minute window and has its own deduplication record.
+    if (type === "10m" && teacherProfile?.telegram_chat_id && recipients.length) {
+      for (const student of recipients) {
+        if (!student.id) continue;
+        const [paymentsResult, individualLessonsResult, membershipsResult] = await Promise.all([
+          db.from("payments").select("amount").eq("student_id", student.id).eq("teacher_id", lesson.teacher_id),
+          db.from("lessons").select("id,price").eq("student_id", student.id).eq("teacher_id", lesson.teacher_id).in("status", ["conducted", "cancelled_charge"]),
+          db.from("lesson_members").select("lesson_id,price,charged").eq("student_id", student.id).eq("teacher_id", lesson.teacher_id),
+        ]);
+        if (paymentsResult.error || individualLessonsResult.error || membershipsResult.error) {
+          errors.push(`debt-balance:${lesson.id}:${student.id}`);
+          continue;
+        }
+        const memberships = (membershipsResult.data || []).filter((m: any) => m.charged !== false);
+        const groupIds = [...new Set(memberships.map((m: any) => m.lesson_id))];
+        let groupLessons: any[] = [];
+        if (groupIds.length) {
+          const { data, error } = await db.from("lessons").select("id,status")
+            .in("id", groupIds).eq("teacher_id", lesson.teacher_id)
+            .in("status", ["conducted", "cancelled_charge"]);
+          if (error) { errors.push(`debt-groups:${lesson.id}:${student.id}`); continue; }
+          groupLessons = data || [];
+        }
+        const income = (paymentsResult.data || []).reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0);
+        const individualExpenses = (individualLessonsResult.data || []).reduce((sum: number, l: any) => sum + Number(l.price || 0), 0);
+        const chargedGroupIds = new Set(groupLessons.map((l: any) => String(l.id)));
+        const groupExpenses = memberships.reduce((sum: number, m: any) =>
+          sum + (chargedGroupIds.has(String(m.lesson_id)) ? Number(m.price ?? student.price ?? 0) : 0), 0);
+        const balance = income - individualExpenses - groupExpenses;
+        if (balance >= 0 || !student.telegram_chat_id) continue;
+
+        const { data: claim, error: claimError } = await db.from("telegram_teacher_lesson_debt_reminders")
+          .insert({ lesson_id: lesson.id, student_id: student.id, teacher_id: lesson.teacher_id })
+          .select("id").maybeSingle();
+        if (claimError?.code === "23505") continue;
+        if (claimError || !claim) { errors.push(`debt-dedupe:${lesson.id}:${student.id}`); continue; }
+
+        const money = (value: number) => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
+        const cabinet = `https://profiprofit.com/?student=${student.id}`;
+        const debtText = `🚩 Negative student balance\\n${student.name}: ${money(Math.abs(balance))} BYN debt.\\nUpcoming lesson fee: ${money(Number(lesson.price ?? student.price ?? 0))} BYN.\\nStudent account: ${cabinet}\\n\\n🚩 Отрицательный баланс ученика\\n${student.name}: задолженность ${money(Math.abs(balance))} BYN.\\nСтоимость предстоящего занятия: ${money(Number(lesson.price ?? student.price ?? 0))} BYN.\\nКабинет ученика: ${cabinet}`;
+        if (!deliveryEnabled) {
+          dryRun++;
+          await db.from("telegram_teacher_lesson_debt_reminders").delete().eq("id", claim.id);
+          console.log("DRY RUN teacher debt warning", { lesson_id: lesson.id, student_id: student.id, text: debtText });
+          continue;
+        }
+        try {
+          await sendTelegram(teacherProfile.telegram_chat_id, debtText);
+          sent++;
+        } catch (error) {
+          await db.from("telegram_teacher_lesson_debt_reminders").delete().eq("id", claim.id);
+          errors.push(`debt-send:${lesson.id}:${student.id}`);
+          console.error("Teacher debt warning failed", error);
+        }
+      }
+    }
+
     for (const student of recipients) {
       const enabled = type === "1h" ? student.telegram_notify_1h : student.telegram_notify_10m;
       if (!enabled || !student.telegram_chat_id) { skipped++; continue; }
