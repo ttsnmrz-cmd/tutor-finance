@@ -1387,18 +1387,37 @@ async function deleteThisAndFollowingFromModal(){
   const l=lessons.find(x=>String(x.id)===String(id));
   if(!l)return;
 
-  if(!l.series_id){
-    showError(new Error('Это старое занятие не связано с идентификатором серии. Массовое удаление недоступно. Можно удалить только это занятие.'));
+  const isGroup=!!l.group_id;
+  // Older recurring lessons were created before series_id existed. For those
+  // records, identify the same recurring slot by group/student + time +
+  // duration + timezone, rather than blocking "this and following".
+  const legacy=!l.series_id;
+  if(legacy&&!isGroup&&!l.student_id){
+    showError(new Error('У этого старого занятия нет ни идентификатора серии, ни привязки к ученику. Безопасно определить следующие занятия невозможно.'));
     return;
   }
-  const isGroup=!!l.group_id;
+  const sameSlot=x=>{
+    if(x.date<l.date)return false;
+    if(String(x.time||'').slice(0,5)!==String(l.time||'').slice(0,5))return false;
+    if(Number(x.duration||60)!==Number(l.duration||60))return false;
+    if(String(x.timezone||'Europe/Minsk')!==String(l.timezone||'Europe/Minsk'))return false;
+    if(isGroup)return String(x.group_id||'')===String(l.group_id);
+    return !x.group_id&&String(x.student_id||'')===String(l.student_id);
+  };
+  const targets=legacy
+    ?lessons.filter(sameSlot)
+    :lessons.filter(x=>String(x.series_id)===String(l.series_id)&&x.date>=l.date);
+  if(!targets.some(x=>String(x.id)===String(l.id))){
+    showError(new Error('Не удалось безопасно определить занятия этой серии. Ничего не удалено.'));
+    return;
+  }
   if(!confirm(
-    isGroup
-      ?'Удалить это групповое занятие и все следующие занятия этой группы начиная с '+l.date+'?'
-      :'Удалить это занятие и все следующие у этого ученика начиная с '+l.date+'?'
+    (legacy?'Старое расписание: ':'')+
+    (isGroup
+      ?'удалить это групповое занятие и все следующие занятия этой группы начиная с '+l.date+'?'
+      :'удалить это занятие и все следующие у этого ученика начиная с '+l.date+'?')+
+    (legacy?' Будут выбраны занятия того же ученика/группы, времени, длительности и часового пояса.':'')
   ))return;
-
-  const targets=lessons.filter(x=>String(x.series_id)===String(l.series_id)&&x.date>=l.date);
   const notify=targets.length>0&&confirm('Удалить занятия. Отправить ученикам уведомление об удалении расписания в Telegram?');
 
   lessonDeleteInProgress=true;
