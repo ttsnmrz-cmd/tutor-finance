@@ -29,43 +29,43 @@ async function sendMessage(chatId: number, text: string) {
   }
 }
 
-const welcome = `Привет! 👋 Добро пожаловать в ProfiProfit!
+const welcome = \`Hi! 👋 Welcome to ProfiProfit!
 
-Я очень рада, что ты решил улучшить свой английский и выбрал меня в качестве своего преподавателя! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь твоих целей.
+I'm happy to be your English teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you reach your goals.
 
-Чтобы тебе было удобнее организовывать занятия, я подготовила для тебя личную страницу в ProfiProfit. Там ты сможешь:
-📅 Смотреть расписание и историю занятий.
-💰 Отслеживать баланс, оплаты и списания за уроки.
-🔔 Получать напоминания о предстоящих занятиях — за 1 час и за 10 минут до начала.
-📢 Узнавать об изменениях в расписании, например о переносах и отменах занятий.
+Your personal ProfiProfit page lets you:
+📅 View your lesson schedule and lesson history.
+💰 Track your balance, payments, and lesson charges.
+🔔 Receive reminders 1 hour and 10 minutes before lessons.
+📢 Stay up to date with schedule changes.
 
-Я отправлю тебе ссылку на твою личную страницу отдельно.
+I'll send you your personal account link separately.
 
-А ещё ты можешь подключить уведомления в Telegram, чтобы ничего не пропустить. Для этого открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.
+To receive Telegram notifications, open the personal bot link I'll send you and press Start.
 
-Если возникнут вопросы или что-то не получится, смело пиши мне: <a href="https://t.me/tiana_wow">@tiana_wow</a>. Я помогу! 😊
+If you have any questions or need help, message me: <a href="https://t.me/tiana_wow">@tiana_wow</a>.
 
-До встречи на занятиях! 🚀
+See you in class! 😊
 
 ———
 
-Hi! 👋 Welcome to ProfiProfit!
+Привет! 👋 Добро пожаловать в ProfiProfit!
 
-I'm really happy that you've decided to improve your English and chosen me as your teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you achieve your goals.
+Я рада быть твоим преподавателем английского! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь своих целей.
 
-To make managing your lessons easier, I've prepared your personal page on ProfiProfit. There, you can:
-📅 View your lesson schedule and lesson history.
-💰 Keep track of your balance, payments, and lesson charges.
-🔔 Get reminders about upcoming lessons — 1 hour and 10 minutes before they start.
-📢 Stay informed about schedule changes, such as rescheduled or cancelled lessons.
+В личном кабинете ProfiProfit можно:
+📅 Смотреть расписание и историю занятий.
+💰 Отслеживать баланс, оплаты и списания за уроки.
+🔔 Получать напоминания за 1 час и за 10 минут до начала занятий.
+📢 Узнавать об изменениях в расписании.
 
-I'll send you the link to your personal page separately.
+Ссылку на личный кабинет я отправлю отдельно.
 
-You can also enable Telegram notifications so you don't miss anything. Just open the personal bot link I'll send you and press Start.
+Чтобы получать уведомления в Telegram, открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.
 
-If you have any questions or need help, feel free to message me: <a href="https://t.me/tiana_wow">@tiana_wow</a>. I'll be happy to help! 😊
+Если возникнут вопросы или понадобится помощь, напиши мне: <a href="https://t.me/tiana_wow">@tiana_wow</a>.
 
-See you in class! 🚀`;
+До встречи на занятиях! 😊\`;
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
