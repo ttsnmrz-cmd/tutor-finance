@@ -69,6 +69,7 @@ Deno.serve(async (req) => {
   for (const item of items) {
     let lesson: any;
     let recipients: any[] = [];
+    const memberChargeByStudent = new Map<string, boolean>();
     if (isDeleted) {
       if (!item.id || !/^\d{4}-\d{2}-\d{2}$/.test(item.date) || !item.time || !item.student_ids.length) {
         results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "invalid_deleted_snapshot" });
@@ -97,13 +98,16 @@ Deno.serve(async (req) => {
       }
       lesson = data;
       if (lesson.group_id) {
-        const { data: members, error: membersError } = await db.from("lesson_members").select("student_id").eq("lesson_id", lesson.id).eq("teacher_id", user.id);
+        const { data: members, error: membersError } = await db.from("lesson_members").select("student_id,charged").eq("lesson_id", lesson.id).eq("teacher_id", user.id);
         if (membersError) {
           console.error("Lesson members lookup failed", lesson.id, membersError);
           results.push({ lesson_id: item.id, sent: 0, failed: 1, skipped_count: 0, error: "lesson_members_lookup_failed" });
           continue;
         }
-        const memberIds = [...new Set((members || []).map((m: any) => String(m.student_id)).filter(Boolean))];
+        const memberIds = [...new Set((members || []).map((m: any) => {
+          memberChargeByStudent.set(String(m.student_id), m.charged !== false);
+          return String(m.student_id);
+        }).filter(Boolean))];
         if (!memberIds.length) {
           results.push({ lesson_id: item.id, sent: 0, failed: 0, skipped_count: 1, skipped: "no_lesson_members" });
           continue;
@@ -154,8 +158,17 @@ Deno.serve(async (req) => {
     for (const student of recipients) {
       if (!student.telegram_chat_id || student.telegram_notify_changes === false) { skipped_count++; continue; }
       const cabinet = `https://profiprofit.com/?student=${student.id}`;
+      let studentMessage = message;
+      if (event === "cancelled") {
+        const charged = lesson.group_id
+          ? memberChargeByStudent.get(String(student.id)) !== false
+          : lesson.status === "cancelled_charge";
+        const paymentEn = charged ? "The lesson fee will be deducted from your balance." : "No lesson fee will be deducted.";
+        const paymentRu = charged ? "Стоимость занятия будет списана с вашего баланса." : "Средства за занятие списываться не будут.";
+        studentMessage = `Hello!\\nYour lesson scheduled for ${dateTime} has been cancelled. ${paymentEn}\\n\\nЗдравствуйте!\\nЗанятие, запланированное на ${dateTime}, отменено. ${paymentRu}`;
+      }
       try {
-        await send(student.telegram_chat_id, `${message}\n\nЛичный кабинет: ${cabinet}`);
+        await send(student.telegram_chat_id, `${studentMessage}\\n\\nPersonal account / Личный кабинет: ${cabinet}`);
         sent++;
       } catch (e) {
         failed++;
