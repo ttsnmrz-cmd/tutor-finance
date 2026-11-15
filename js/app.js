@@ -527,7 +527,7 @@ async function autoCompletePastLessons(){
 }
 const TAB_PATHS={dashboard:'/dashboard',calendar:'/calendar',students:'/students',admin:'/admin',settings:'/settings'};
 function getTabFromPath(){
-  const path=location.pathname.replace(/\\/+$/,'')||'/';
+  const path=location.pathname.replace(/\/+$/,'')||'/';
   const entry=Object.entries(TAB_PATHS).find(([,route])=>route===path);
   return entry?.[0]||'dashboard';
 }
