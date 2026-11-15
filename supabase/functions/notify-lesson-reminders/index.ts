@@ -42,9 +42,9 @@ function displayTime(timestamp: number, timezone: string): string {
 }
 
 function reminderText(type: "1h" | "10m", timestamp: number, timezone: string): string {
-  if (type === "10m") return "👋 Our English lesson starts in 10 minutes!\\nSee you online! 😊\\n\\n👋 Через 10 минут встречаемся онлайн на занятии английским!\\nДо встречи! 😊";
+  if (type === "10m") return "👋 Our English lesson starts in 10 minutes!\nSee you online! 😊\n\n👋 Через 10 минут встречаемся онлайн на занятии английским!\nДо встречи! 😊";
   const time = displayTime(timestamp, timezone);
-  return `Hi! 👋\\nJust a friendly reminder that our English lesson is scheduled for today at ${time}.\\nSee you soon! 😊\\n\\nЗдравствуйте! 👋\\nНапоминаю, что сегодня в ${time} состоится наше занятие английским.\\nДо встречи! 😊`;
+  return `Hi! 👋\nJust a friendly reminder that our English lesson is scheduled for today at ${time}.\nSee you soon! 😊\n\nЗдравствуйте! 👋\nНапоминаю, что сегодня в ${time} состоится наше занятие английским.\nДо встречи! 😊`;
 }
 
 function teacherReminderText(type: "1h" | "10m", studentNames: string[]): string {
@@ -52,9 +52,9 @@ function teacherReminderText(type: "1h" | "10m", studentNames: string[]): string
   const name = names.length ? names.join(", ") : "your student";
   const ruName = names.length ? names.join(", ") : "учеником";
   if (type === "10m") {
-    return `⏰ Lesson with ${name} starts in 10 minutes.\\n\\n⏰ Занятие с ${ruName} начнётся через 10 минут.`;
+    return `⏰ Lesson with ${name} starts in 10 minutes.\n\n⏰ Занятие с ${ruName} начнётся через 10 минут.`;
   }
-  return `📅 Lesson with ${name} is scheduled in 1 hour.\\n\\n📅 Занятие с ${ruName} запланировано через 1 час.`;
+  return `📅 Lesson with ${name} is scheduled in 1 hour.\n\n📅 Занятие с ${ruName} запланировано через 1 час.`;
 }
 
 async function sendTelegram(chatId: string | number, text: string) {
