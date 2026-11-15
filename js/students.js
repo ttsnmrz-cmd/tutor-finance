@@ -216,12 +216,14 @@ function studentLessonAttendance(l,s){
 
 function studentLessonStatusText(l,s){
   const a=studentLessonAttendance(l,s);
+  const now=dateTimePartsInTimezone(new Date(),getTeacherTimezone());
+  const lessonDate=String(l.date||'');
+  const lessonTime=String(l.time||'23:59').slice(0,5);
+  const isFuture=lessonDate>now.date||(lessonDate===now.date&&lessonTime>=now.time);
 
-  return a==='cancelled_charge'
-    ?'Не посетил, списать оплату'
-    :a==='cancelled_free'
-      ?'Не посетил, не списывать оплату'
-      :(statusLabels[l.status]||l.status);
+  if(a==='cancelled_charge')return isFuture?'Отменено — списать':'Не посетил, списать оплату';
+  if(a==='cancelled_free')return isFuture?'Отменено — не списывать':'Не посетил, не списывать оплату';
+  return statusLabels[l.status]||l.status;
 }
 
 function studentLessonStatusClass(l,s){
@@ -306,6 +308,8 @@ async function setStudentAttendance(lessonId,studentId,status){
 
     await loadData();
     renderStudents();
+    renderWeek();
+    renderDay();
 
     document
       .getElementById('detail-'+studentId)
