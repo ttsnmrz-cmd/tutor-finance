@@ -93,6 +93,26 @@ Deno.serve(async (req) => {
   }
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+  if (text === "/stop" || text === "/disconnect") {
+    const { data: linkedStudents } = await db.from("students")
+      .select("id,name,teacher_id").eq("telegram_chat_id", chatId);
+    if (linkedStudents?.length) {
+      await db.from("students").update({ telegram_chat_id: null, telegram_connected_at: null })
+        .eq("telegram_chat_id", chatId);
+      for (const student of linkedStudents) {
+        const { data: teacher } = await db.from("profiles").select("telegram_chat_id")
+          .eq("id", student.teacher_id).maybeSingle();
+        if (teacher?.telegram_chat_id) {
+          await sendMessage(Number(teacher.telegram_chat_id),
+            `⚠️ Telegram notifications disconnected\\n${student.name} has disconnected their Telegram account. They will no longer receive lesson reminders or schedule updates via Telegram.\\n\\n⚠️ Ученик отключил Telegram\\n${student.name} отключил(а) Telegram. Ученик больше не будет получать напоминания и уведомления об изменениях расписания.`);
+        }
+      }
+      await sendMessage(chatId, "Telegram notifications have been disconnected. / Уведомления Telegram отключены.");
+      return new Response("ok");
+    }
+    await sendMessage(chatId, "No linked student account was found. / Подключённый аккаунт ученика не найден.");
+    return new Response("ok");
+  }
   if(payload.startsWith("teacher_")){
     const token=payload.slice("teacher_".length);
     const {data:teacher,error:teacherError}=await db.from("profiles").select("id,telegram_chat_id").eq("telegram_link_token",token).maybeSingle();
