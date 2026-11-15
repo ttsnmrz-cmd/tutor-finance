@@ -466,11 +466,12 @@ function studentDetail(s){
 
               '</div>'
 
-            :'<span class="status '+
-              statusCls+
-              '">'+
+            :'<button type="button" onclick="openEditLesson(\''+
+              esc(l.id)+
+              '\')" class="status '+statusCls+
+              ' cursor-pointer hover:opacity-80" title="Редактировать занятие">'+
               esc(statusText)+
-              '</span>'
+              '</button>'
         )+
         '</div></div>';
 
