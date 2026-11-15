@@ -332,6 +332,8 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
   overflow-wrap:anywhere;
 }
 .calendar-event-card:hover{border-color:var(--primary-color);transform:translateY(-1px)}
+.calendar-event-card.is-cancelled > :not(.status){text-decoration:line-through;opacity:.58}
+.calendar-event-card.is-cancelled{background:var(--card-bg);border-style:dashed}
 .calendar-event-time{font-size:12px;font-weight:700;color:var(--primary-color)}
 .calendar-event-title{font-size:12px;font-weight:650;line-height:1.35;color:var(--text-color)}
 .calendar-event-title.is-cancelled{text-decoration:line-through;opacity:.65}
