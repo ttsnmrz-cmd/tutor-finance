@@ -62,8 +62,9 @@ Deno.serve(async (req) => {
         .eq("teacher_chat_id", chatId)
         .eq("support_message_id", message.reply_to_message.message_id).maybeSingle();
       if (ticket && text) {
+        const safeReply = text.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]!));
         await sendMessage(Number(ticket.student_chat_id),
-          `💬 ProfiProfit Support / Поддержка ProfiProfit\\n\\n${text}`);
+          `💬 ProfiProfit Support / Поддержка ProfiProfit\\n\\n${safeReply}`);
         await sendMessage(chatId, "Your reply has been sent. / Ответ отправлен ученику.");
       } else if (ticket) {
         await sendMessage(chatId, "Please send your reply as text. / Отправь ответ текстом.");
