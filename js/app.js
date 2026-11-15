@@ -916,6 +916,9 @@ async function saveLesson(){
         x=>String(x.id)===String(id)
       );
 
+      const previousStatus=l?.status;
+      const statusChanged=!!l&&previousStatus!==status;
+      const shouldOfferChangeNotice=statusChanged&&["rescheduled","cancelled_charge","cancelled_free"].includes(status);
       const groupId=l?.group_id||null;
 
       if(groupId){
@@ -970,6 +973,17 @@ async function saveLesson(){
             })
           }
         );
+      }
+
+      if(shouldOfferChangeNotice){
+        const notify=confirm("Статус занятия изменён. Отправить ученику уведомление в Telegram?");
+        if(notify){
+          const {data,error}=await supabaseClient.functions.invoke("notify-lesson-change",{
+            body:{event:status==="rescheduled"?"rescheduled":"cancelled",lesson_ids:[String(id)]}
+          });
+          if(error)showError(new Error("Занятие изменено, но уведомление отправить не удалось: "+error.message));
+          else showNotificationResult(data);
+        }
       }
     }else{
       const groupId=
