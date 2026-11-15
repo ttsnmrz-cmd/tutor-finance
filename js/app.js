@@ -167,9 +167,13 @@ async function loadTeacherTimezone(userId){
   teacherTimezoneUserId=userId||null;
   let timezone='Europe/Minsk';
   if(userId){
-    const rows=await db('/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,timezone,telegram_username,telegram_chat_id,telegram_link_token,telegram_connected_at');
+    const rows=await db('/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,name,timezone,telegram_username,telegram_chat_id,telegram_link_token,telegram_connected_at');
     if(Array.isArray(rows)&&rows[0]){
       if(isValidTimezone(rows[0].timezone))timezone=rows[0].timezone;
+      window.teacherProfile=rows[0];
+      window.currentTeacherName=String(rows[0].name||'').trim();
+      const nameInput=document.getElementById('teacher-display-name');
+      if(nameInput)nameInput.value=window.currentTeacherName;
       const telegramInput=document.getElementById('teacher-telegram-username');
       if(telegramInput)telegramInput.value=rows[0].telegram_username||'';
       renderTeacherTelegramStatus(rows[0]);
@@ -217,6 +221,26 @@ async function copyTeacherTelegramLink(){
   if(!link)return;
   try{await navigator.clipboard.writeText(link);alert('Ссылка скопирована. Открой её в Telegram и нажми Start.');}
   catch(e){const input=document.getElementById('teacher-telegram-link');input?.select();alert('Ссылка выделена — скопируй её вручную.');}
+}
+
+async function saveTeacherDisplayName(){
+  try{
+    const input=document.getElementById('teacher-display-name');
+    const name=String(input?.value||'').trim();
+    if(name.length>80)throw new Error('Имя должно быть не длиннее 80 символов.');
+    const {data:{user},error}=await supabaseClient.auth.getUser();
+    if(error)throw error;
+    if(!user?.id)throw new Error('Войдите в аккаунт, чтобы сохранить имя.');
+    await db('/profiles?on_conflict=id',{
+      method:'POST',
+      headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({id:user.id,name:name||null})
+    });
+    window.currentTeacherName=name;
+    window.teacherProfile={...(window.teacherProfile||{}),name};
+    if(typeof renderDashboard==='function')renderDashboard();
+    alert('Имя сохранено.');
+  }catch(e){showError(e);}
 }
 
 async function saveTeacherTelegramUsername(){
