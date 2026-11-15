@@ -158,18 +158,18 @@ Deno.serve(async (req) => {
     return new Response("ok");
   }
 
-  await sendMessage(chatId, `Готово, ${student.name}! ✅ Telegram подключён.
+  await sendMessage(chatId, \`All set, \${student.name}! ✅ Telegram is connected.
 
-Здесь будут приходить уведомления о занятиях: напоминания за 1 час и за 10 минут, изменения в расписании, информация о балансе и поступлении оплаты. Набор уведомлений зависит от настроек преподавателя.
+You'll receive lesson reminders, schedule updates, and payment notifications according to your preferences.
 
-Если возникнут проблемы с ботом, напиши сюда: <a href="https://t.me/ProfiProfitMonitorBot">@ProfiProfitMonitorBot</a>.
+Your personal account: <a href="https://profiprofit.com/?student=\${student.id}">Open ProfiProfit</a>
 
 ———
 
-All set, ${student.name}! ✅ Telegram is connected.
+Готово, \${student.name}! ✅ Telegram подключён.
 
-You'll receive lesson notifications here: reminders 1 hour and 10 minutes before a lesson, schedule changes, balance updates, and payment confirmations. The notifications depend on your teacher's settings.
+Здесь будут приходить напоминания о занятиях, изменения расписания и уведомления о пополнении баланса — в соответствии с вашими настройками.
 
-If you have any problems with the bot, message us here: <a href="https://t.me/ProfiProfitMonitorBot">@ProfiProfitMonitorBot</a>.`);
+Личный кабинет: <a href="https://profiprofit.com/?student=\${student.id}">Открыть ProfiProfit</a>\`);
   return new Response("ok");
 });
