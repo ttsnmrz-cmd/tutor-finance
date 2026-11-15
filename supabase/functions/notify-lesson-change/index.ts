@@ -104,8 +104,21 @@ Deno.serve(async (req) => {
       }
       const dates = (lessonsByStudent.get(studentId) || [])
         .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-      const dateLines = dates.map(x => `• ${formatDate(x.date, x.time)}`).join("\n");
-      const message = `Hello, ${student.name || "there"}!\nThe following lessons have been removed from your schedule:\n${dateLines}\n\nЗдравствуйте, ${student.name || ""}!\nСледующие занятия удалены из вашего расписания:\n${dateLines}`;
+      const first = dates[0];
+      const last = dates[dates.length - 1];
+      const uniqueTimes = [...new Set(dates.map(x => x.time.slice(0, 5)))];
+      const weekdayOrder = [1, 2, 3, 4, 5, 6, 0];
+      const weekdays = [...new Set(dates.map(x => new Date(x.date + "T12:00:00Z").getUTCDay()))]
+        .sort((a, b) => weekdayOrder.indexOf(a) - weekdayOrder.indexOf(b));
+      const enDays = weekdays.map(day => new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, 0, 4 + day, 12))));
+      const ruDays = weekdays.map(day => new Intl.DateTimeFormat("ru-RU", { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, 0, 4 + day, 12))));
+      const enDate = (value: string) => new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(value + "T12:00:00Z"));
+      const ruDate = (value: string) => new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(value + "T12:00:00Z"));
+      const timeEn = uniqueTimes.length === 1 ? ` at ${uniqueTimes[0]}` : ` (times: ${uniqueTimes.join(", ")})`;
+      const timeRu = uniqueTimes.length === 1 ? ` в ${uniqueTimes[0]}` : ` (время: ${uniqueTimes.join(", ")})`;
+      const scheduleEn = `${enDays.join("/")}${timeEn}`;
+      const scheduleRu = `${ruDays.join("/")}${timeRu}`;
+      const message = `Hello, ${student.name || "there"}! ${dates.length} lessons have been removed from your schedule: ${scheduleEn}, ${enDate(first.date)}–${enDate(last.date)}.\n\nЗдравствуйте, ${student.name || ""}! Из вашего расписания удалено занятий: ${dates.length}. ${scheduleRu}, ${ruDate(first.date)}–${ruDate(last.date)}.`;
       const cabinet = `https://profiprofit.com/?student=${student.id}`;
       try {
         await send(student.telegram_chat_id, `${message}\n\nPersonal account / Личный кабинет: ${cabinet}`);
