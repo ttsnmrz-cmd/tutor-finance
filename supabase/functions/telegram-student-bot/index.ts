@@ -46,13 +46,13 @@ Deno.serve(async (req) => {
   const message = update?.message;
   const chatId = message?.chat?.id;
   const text = typeof message?.text === "string" ? message.text.trim() : "";
-  if (!chatId || (!text.startsWith("/start") && text !== "/stop" && text !== "/disconnect")) return new Response("ok");
+  if (!chatId || (!text.startsWith("/start") && !/^\\/stop(?:@\\w+)?$/.test(text) && !/^\\/disconnect(?:@\\w+)?$/.test(text))) return new Response("ok");
 
   const parts = text.split(/\s+/, 2);
   const payload = parts.length > 1 ? parts[1] : "";
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
-  if (text === "/stop" || text === "/disconnect") {
+  if (/^\\/stop(?:@\\w+)?$/.test(text) || /^\\/disconnect(?:@\\w+)?$/.test(text)) {
     const { data: linkedStudents } = await db.from("students")
       .select("id,name,teacher_id").eq("telegram_chat_id", chatId);
     if (linkedStudents?.length) {
