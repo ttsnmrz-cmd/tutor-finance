@@ -1159,7 +1159,7 @@ async function saveLesson(){
     renderWeek();
     renderDay();
     renderStudents();
-    switchTab(getTabFromPath(),{replace:true});
+    switchTab('dashboard');
 
   }catch(e){
     showError(e);
@@ -2149,7 +2149,7 @@ async function openStudentCabinet(){
     renderWeek();
     renderDay();
     renderStudents();
-    switchTab('dashboard');
+    switchTab(getTabFromPath(),{replace:true});
 
   }catch(e){
 
