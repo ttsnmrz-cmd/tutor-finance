@@ -180,6 +180,7 @@ Deno.serve(async (req) => {
     return new Response("ok");
   }
 
+  await sendMessage(chatId, welcome);
   await sendMessage(chatId, `Hi, __NAME__! ✅ Your Telegram account is now connected to ProfiProfit.\n\nYou'll receive lesson reminders, schedule updates, and payment notifications based on your notification settings.\n\nYour personal account: <a href="https://profiprofit.com/?student=__ID__">Open your ProfiProfit account</a>\n\n———\n\nПривет, __NAME__! ✅ Ваш Telegram теперь подключён к ProfiProfit.\n\nВы будете получать напоминания о занятиях, уведомления об изменениях расписания и пополнении баланса — в соответствии с выбранными настройками.\n\nЛичный кабинет: <a href="https://profiprofit.com/?student=__ID__">Открыть личный кабинет ProfiProfit</a>`.replaceAll("__NAME__", student.name).replaceAll("__ID__", String(student.id)));
   return new Response("ok");
 });
