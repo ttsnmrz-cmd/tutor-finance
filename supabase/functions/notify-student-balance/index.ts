@@ -72,15 +72,15 @@ function notificationText(studentName: string, balance: number, price: number, s
   const money = formatMoney(Math.abs(balance));
   const remaining = state.remaining;
   if (state.type === "debt") {
-    return `⚠️ Баланс ученика ${studentName}: задолженность ${money} BYN.\nBalance: ${money} BYN in debt.`;
+    return `🚩 Outstanding balance: ${studentName} owes ${money} BYN.\\n\\n🚩 Задолженность ученика ${studentName}: ${money} BYN.`;
   }
   if (state.type === "empty") {
-    return `⚠️ У ученика ${studentName} закончились средства на занятия. Баланс: 0 BYN.\n${studentName} has run out of lesson funds. Balance: 0 BYN.`;
+    return `⚠️ ${studentName} has run out of lesson funds. Balance: 0 BYN.\\n\\n⚠️ У ученика ${studentName} закончились средства на занятия. Баланс: 0 BYN.`;
   }
   if (state.type === "less_than_one") {
-    return `⚠️ У ученика ${studentName} осталось ${money} BYN — этого меньше чем на одно занятие стоимостью ${formatMoney(price)} BYN.\n${studentName} has ${money} BYN left — less than the cost of one lesson (${formatMoney(price)} BYN).`;
+    return `⚠️ ${studentName} has ${money} BYN left — less than one lesson (${formatMoney(price)} BYN).\\n\\n⚠️ У ученика ${studentName} осталось ${money} BYN — этого меньше чем на одно занятие стоимостью ${formatMoney(price)} BYN.`;
   }
-  return `🔔 У ученика ${studentName} осталось ${money} BYN — хватит ещё на ${remaining} ${remaining === 1 ? "занятие" : "занятия"}.\n${studentName} has ${money} BYN left — enough for ${remaining} more lesson(s).`;
+  return `🔔 ${studentName} has ${money} BYN left — enough for ${remaining} more lesson(s).\\n\\n🔔 У ученика ${studentName} осталось ${money} BYN — хватит ещё на ${remaining} занятий.`;
 }
 
 Deno.serve(async (req) => {
