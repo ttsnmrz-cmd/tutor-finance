@@ -29,43 +29,7 @@ async function sendMessage(chatId: number, text: string) {
   }
 }
 
-const welcome = \`Hi! 👋 Welcome to ProfiProfit!
-
-I'm happy to be your English teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you reach your goals.
-
-Your personal ProfiProfit page lets you:
-📅 View your lesson schedule and lesson history.
-💰 Track your balance, payments, and lesson charges.
-🔔 Receive reminders 1 hour and 10 minutes before lessons.
-📢 Stay up to date with schedule changes.
-
-I'll send you your personal account link separately.
-
-To receive Telegram notifications, open the personal bot link I'll send you and press Start.
-
-If you have any questions or need help, message me: <a href="https://t.me/tiana_wow">@tiana_wow</a>.
-
-See you in class! 😊
-
-———
-
-Привет! 👋 Добро пожаловать в ProfiProfit!
-
-Я рада быть твоим преподавателем английского! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь своих целей.
-
-В личном кабинете ProfiProfit можно:
-📅 Смотреть расписание и историю занятий.
-💰 Отслеживать баланс, оплаты и списания за уроки.
-🔔 Получать напоминания за 1 час и за 10 минут до начала занятий.
-📢 Узнавать об изменениях в расписании.
-
-Ссылку на личный кабинет я отправлю отдельно.
-
-Чтобы получать уведомления в Telegram, открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.
-
-Если возникнут вопросы или понадобится помощь, напиши мне: <a href="https://t.me/tiana_wow">@tiana_wow</a>.
-
-До встречи на занятиях! 😊\`;
+const welcome = "Hi! 👋 Welcome to ProfiProfit!\n\nI'm happy to be your English teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you reach your goals.\n\nYour personal ProfiProfit page lets you:\n📅 View your lesson schedule and lesson history.\n💰 Track your balance, payments, and lesson charges.\n🔔 Receive reminders 1 hour and 10 minutes before lessons.\n📢 Stay up to date with schedule changes.\n\nI'll send you your personal account link separately.\n\nTo receive Telegram notifications, open the personal bot link I'll send you and press Start.\n\nIf you have any questions or need help, message me: <a href=\"https://t.me/tiana_wow\">@tiana_wow</a>.\n\nSee you in class! 😊\n\n———\n\nПривет! 👋 Добро пожаловать в ProfiProfit!\n\nЯ рада быть твоим преподавателем английского! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь своих целей.\n\nВ личном кабинете ProfiProfit можно:\n📅 Смотреть расписание и историю занятий.\n💰 Отслеживать баланс, оплаты и списания за уроки.\n🔔 Получать напоминания за 1 час и за 10 минут до начала занятий.\n📢 Узнавать об изменениях в расписании.\n\nСсылку на личный кабинет я отправлю отдельно.\n\nЧтобы получать уведомления в Telegram, открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.\n\nЕсли возникнут вопросы или понадобится помощь, напиши мне: <a href=\"https://t.me/tiana_wow\">@tiana_wow</a>.\n\nДо встречи на занятиях! 😊"
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -154,22 +118,6 @@ Deno.serve(async (req) => {
 
   if (updateError) {
     console.error("Student connection update failed", updateError.message);
-    await sendMessage(chatId, "Не удалось подключить Telegram. Напиши преподавателю: @tiana_wow\n\nCouldn't connect Telegram. Please message your teacher: @tiana_wow");
-    return new Response("ok");
-  }
-
-  await sendMessage(chatId, \`All set, \${student.name}! ✅ Telegram is connected.
-
-You'll receive lesson reminders, schedule updates, and payment notifications according to your preferences.
-
-Your personal account: <a href="https://profiprofit.com/?student=\${student.id}">Open ProfiProfit</a>
-
-———
-
-Готово, \${student.name}! ✅ Telegram подключён.
-
-Здесь будут приходить напоминания о занятиях, изменения расписания и уведомления о пополнении баланса — в соответствии с вашими настройками.
-
-Личный кабинет: <a href="https://profiprofit.com/?student=\${student.id}">Открыть ProfiProfit</a>\`);
+    await sendMessage(chatId, "All set, __NAME__! ✅ Telegram is connected.\n\nYou'll receive lesson reminders, schedule updates, and payment notifications according to your preferences.\n\nYour personal account: <a href=\"https://profiprofit.com/?student=__ID__\">Open ProfiProfit</a>\n\n———\n\nГотово, __NAME__! ✅ Telegram подключён.\n\nЗдесь будут приходить напоминания о занятиях, изменения расписания и уведомления о пополнении баланса — в соответствии с вашими настройками.\n\nЛичный кабинет: <a href=\"https://profiprofit.com/?student=__ID__\">Открыть ProfiProfit</a>".replaceAll("__NAME__", student.name).replaceAll("__ID__", String(student.id)));
   return new Response("ok");
 });
