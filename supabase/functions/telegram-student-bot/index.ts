@@ -10,7 +10,7 @@ const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const headers = { "Content-Type": "application/json" };
 
-async function sendMessage(chatId: number, text: string) {
+async function sendMessage(chatId: number, text: string): Promise<number> {
   if (!botToken) throw new Error("Missing TELEGRAM_BOT_TOKEN");
   const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
@@ -27,9 +27,10 @@ async function sendMessage(chatId: number, text: string) {
     console.error("Telegram sendMessage failed", result);
     throw new Error("Telegram sendMessage failed");
   }
+  return Number(result.result?.message_id);
 }
 
-const welcome = "Hi! 👋 Welcome to ProfiProfit!\n\nI'm happy to be your English teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you reach your goals.\n\nYour personal ProfiProfit page lets you:\n📅 View your lesson schedule and lesson history.\n💰 Track your balance, payments, and lesson charges.\n🔔 Receive reminders 1 hour and 10 minutes before lessons.\n📢 Stay up to date with schedule changes.\n\nI'll send you your personal account link separately.\n\nTo receive Telegram notifications, open the personal bot link I'll send you and press Start.\n\nIf you have any questions or need help, message me: <a href=\"https://t.me/tiana_wow\">@tiana_wow</a>.\n\nSee you in class! 😊\n\n———\n\nПривет! 👋 Добро пожаловать в ProfiProfit!\n\nЯ рада быть твоим преподавателем английского! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь своих целей.\n\nВ личном кабинете ProfiProfit можно:\n📅 Смотреть расписание и историю занятий.\n💰 Отслеживать баланс, оплаты и списания за уроки.\n🔔 Получать напоминания за 1 час и за 10 минут до начала занятий.\n📢 Узнавать об изменениях в расписании.\n\nСсылку на личный кабинет я отправлю отдельно.\n\nЧтобы получать уведомления в Telegram, открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.\n\nЕсли возникнут вопросы или понадобится помощь, напиши мне: <a href=\"https://t.me/tiana_wow\">@tiana_wow</a>.\n\nДо встречи на занятиях! 😊"
+const welcome = "Hi! 👋 Welcome to ProfiProfit!\\n\\nI'm happy to be your English teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you reach your goals.\\n\\nYour personal ProfiProfit page lets you:\\n📅 View your lesson schedule and lesson history.\\n💰 Track your balance, payments, and lesson charges.\\n🔔 Receive reminders 1 hour and 10 minutes before lessons.\\n📢 Stay up to date with schedule changes.\\n\\nI'll send you your personal account link separately.\\n\\nTo receive Telegram notifications, open the personal bot link I'll send you and press Start.\\n\\nFor help with ProfiProfit, just send a message to this bot. Our support team will get back to you! 💬\\n\\nSee you in class! 😊\\n\\n———\\n\\nПривет! 👋 Добро пожаловать в ProfiProfit!\\n\\nЯ рада быть твоим преподавателем английского! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь своих целей.\\n\\nВ личном кабинете ProfiProfit можно:\\n📅 Смотреть расписание и историю занятий.\\n💰 Отслеживать баланс, оплаты и списания за уроки.\\n🔔 Получать напоминания за 1 час и за 10 минут до начала занятий.\\n📢 Узнавать об изменениях в расписании.\\n\\nСсылку на личный кабинет я отправлю отдельно.\\n\\nЧтобы получать уведомления в Telegram, открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.\\n\\nЕсли нужна помощь с ProfiProfit, просто напиши этому боту. Наша служба поддержки ответит тебе! 💬\\n\\nДо встречи на занятиях! 😊"
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -46,13 +47,36 @@ Deno.serve(async (req) => {
   const message = update?.message;
   const chatId = message?.chat?.id;
   const text = typeof message?.text === "string" ? message.text.trim() : "";
+  if (!chatId) return new Response("ok");
+
+  const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
   const command = text.split("@")[0];
-  if (!chatId || (command !== "/start" && command !== "/stop" && command !== "/disconnect")) return new Response("ok");
+
+  // Support replies from the teacher: reply to a support notification in the bot chat.
+  if (message?.reply_to_message?.message_id) {
+    const { data: teacher } = await db.from("profiles").select("id,telegram_chat_id")
+      .eq("telegram_chat_id", chatId).maybeSingle();
+    if (teacher) {
+      const { data: ticket } = await db.from("telegram_support_messages")
+        .select("student_chat_id,student_id").eq("teacher_id", teacher.id)
+        .eq("teacher_chat_id", chatId)
+        .eq("support_message_id", message.reply_to_message.message_id).maybeSingle();
+      if (ticket && text) {
+        await sendMessage(Number(ticket.student_chat_id),
+          `💬 ProfiProfit Support / Поддержка ProfiProfit\\n\\n${text}`);
+        await sendMessage(chatId, "Your reply has been sent. / Ответ отправлен ученику.");
+      } else if (ticket) {
+        await sendMessage(chatId, "Please send your reply as text. / Отправь ответ текстом.");
+      }
+      return new Response("ok");
+    }
+  }
+
+  if (command === "/stop" || command === "/disconnect") {
 
   const parts = text.split(/\s+/, 2);
   const payload = parts.length > 1 ? parts[1] : "";
 
-  const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
   if (command === "/stop" || command === "/disconnect") {
     const { data: linkedStudents } = await db.from("students")
       .select("id,name,teacher_id").eq("telegram_chat_id", chatId);
@@ -73,6 +97,40 @@ Deno.serve(async (req) => {
     await sendMessage(chatId, "No linked student account was found. / Подключённый аккаунт ученика не найден.");
     return new Response("ok");
   }
+  // Messages from linked students are forwarded to their teacher as support requests.
+  if (command !== "/start" && command !== "/stop" && command !== "/disconnect") {
+    const { data: student } = await db.from("students")
+      .select("id,name,teacher_id").eq("telegram_chat_id", chatId).maybeSingle();
+    if (student) {
+      const { data: teacher } = await db.from("profiles").select("id,telegram_chat_id")
+        .eq("id", student.teacher_id).maybeSingle();
+      if (!teacher?.telegram_chat_id) {
+        await sendMessage(chatId, "Support is temporarily unavailable. Please try again later. / Служба поддержки временно недоступна. Попробуй позже.");
+        return new Response("ok");
+      }
+      if (!text) {
+        await sendMessage(chatId, "Please send your question as a text message. / Отправь вопрос текстовым сообщением.");
+        return new Response("ok");
+      }
+      const safeName = student.name.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]!));
+      const safeText = text.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]!));
+      const teacherMessageId = await sendMessage(Number(teacher.telegram_chat_id),
+        `💬 <b>ProfiProfit Support request</b>\\n<b>Student:</b> ${safeName}\\n\\n${safeText}\\n\\n<i>Reply to this message to answer the student.</i>`);
+      const { error: ticketError } = await db.from("telegram_support_messages").insert({
+        teacher_id: teacher.id, student_id: student.id, student_chat_id: chatId,
+        teacher_chat_id: teacher.telegram_chat_id, support_message_id: teacherMessageId
+      });
+      if (ticketError) {
+        console.error("Support message mapping insert failed", ticketError.message);
+        await sendMessage(chatId, "Your message reached support, but reply tracking failed. Please try again later. / Сообщение отправлено, но возникла ошибка ответа. Попробуй позже.");
+        return new Response("ok");
+      }
+      await sendMessage(chatId, "Thanks! Your message has been sent to ProfiProfit support. We'll reply here. / Спасибо! Сообщение отправлено в поддержку ProfiProfit. Ответ придёт сюда.");
+      return new Response("ok");
+    }
+    return new Response("ok");
+  }
+
   if (!payload) {
     await sendMessage(chatId, welcome);
     return new Response("ok");
