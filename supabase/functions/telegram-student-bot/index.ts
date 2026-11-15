@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
           .eq("id", student.teacher_id).maybeSingle();
         if (teacher?.telegram_chat_id) {
           await sendMessage(Number(teacher.telegram_chat_id),
-            `⚠️ Telegram notifications disconnected\\n${student.name} has disconnected their Telegram account. They will no longer receive lesson reminders or schedule updates via Telegram.\\n\\n⚠️ Ученик отключил Telegram\\n${student.name} отключил(а) Telegram. Ученик больше не будет получать напоминания и уведомления об изменениях расписания.`);
+            `⚠️ Telegram notifications disconnected\n${student.name} has disconnected their Telegram account. They will no longer receive lesson reminders or schedule updates via Telegram.\n\n⚠️ Ученик отключил Telegram\n${student.name} отключил(а) Telegram. Ученик больше не будет получать напоминания и уведомления об изменениях расписания.`);
         }
       }
       await sendMessage(chatId, "Telegram notifications have been disconnected. / Уведомления Telegram отключены.");
