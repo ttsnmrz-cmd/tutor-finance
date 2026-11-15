@@ -71,17 +71,17 @@ function formatMoney(value: number) {
 function notificationText(studentName: string, balance: number, price: number, state: any, studentId: string) {
   const money = formatMoney(Math.abs(balance));
   const remaining = state.remaining;
-  const cabinet = \`https://profiprofit.com/?student=\${studentId}\`;
+  const cabinet = "https://profiprofit.com/?student=" + studentId;
   if (state.type === "debt") {
-    return \`🚩 Outstanding balance: \${studentName} owes \${money} BYN.\nStudent account: \${cabinet}\n\n🚩 Задолженность ученика \${studentName}: \${money} BYN.\nКабинет ученика: \${cabinet}\`;
+    return "🚩 Outstanding balance: " + studentName + " owes " + money + " BYN.\\nStudent account: " + cabinet + "\\n\\n🚩 Задолженность ученика " + studentName + ": " + money + " BYN.\\nКабинет ученика: " + cabinet;
   }
   if (state.type === "empty") {
-    return \`⚠️ \${studentName} has run out of lesson funds. Balance: 0 BYN.\nStudent account: \${cabinet}\n\n⚠️ У ученика \${studentName} закончились средства на занятия. Баланс: 0 BYN.\nКабинет ученика: \${cabinet}\`;
+    return "⚠️ " + studentName + " has run out of lesson funds. Balance: 0 BYN.\\nStudent account: " + cabinet + "\\n\\n⚠️ У ученика " + studentName + " закончились средства на занятия. Баланс: 0 BYN.\\nКабинет ученика: " + cabinet;
   }
   if (state.type === "less_than_one") {
-    return \`⚠️ \${studentName} has \${money} BYN left — less than one lesson (\${formatMoney(price)} BYN).\nStudent account: \${cabinet}\n\n⚠️ У ученика \${studentName} осталось \${money} BYN — этого меньше чем на одно занятие стоимостью \${formatMoney(price)} BYN.\nКабинет ученика: \${cabinet}\`;
+    return "⚠️ " + studentName + " has " + money + " BYN left — less than one lesson (" + formatMoney(price) + " BYN).\\nStudent account: " + cabinet + "\\n\\n⚠️ У ученика " + studentName + " осталось " + money + " BYN — этого меньше чем на одно занятие стоимостью " + formatMoney(price) + " BYN.\\nКабинет ученика: " + cabinet;
   }
-  return \`🔔 \${studentName} has \${money} BYN left — enough for \${remaining} more lesson(s).\nStudent account: \${cabinet}\n\n🔔 У ученика \${studentName} осталось \${money} BYN — хватит ещё на \${remaining} занятий.\nКабинет ученика: \${cabinet}\`;
+  return "🔔 " + studentName + " has " + money + " BYN left — enough for " + remaining + " more lesson(s).\\nStudent account: " + cabinet + "\\n\\n🔔 У ученика " + studentName + " осталось " + money + " BYN — хватит ещё на " + remaining + " занятий.\\nКабинет ученика: " + cabinet;
 }
 
 Deno.serve(async (req) => {
