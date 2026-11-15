@@ -976,7 +976,7 @@ async function saveLesson(){
       }
 
       if(shouldOfferChangeNotice){
-        const notify=confirm("Статус занятия изменён. Отправить ученику уведомление в Telegram?");
+        const notify=await askTelegramChangeNotification();
         if(notify){
           const {data,error}=await supabaseClient.functions.invoke("notify-lesson-change",{
             body:{event:status==="rescheduled"?"rescheduled":"cancelled",lesson_ids:[String(id)]}
@@ -1490,6 +1490,40 @@ async function deleteThisAndFollowingFromModal(){
     lessonDeleteInProgress=false;
     hideBlockingLoader();
   }
+}
+
+function askTelegramChangeNotification(){
+  return new Promise(resolve=>{
+    const en=typeof getLanguage==='function'&&getLanguage()==='en';
+    const overlay=document.createElement('div');
+    overlay.className='fixed inset-0 modal-bg z-[100] flex items-center justify-center p-4';
+    const card=document.createElement('div');
+    card.className='app-card rounded-2xl p-5 w-full max-w-sm space-y-4 shadow-2xl';
+    const title=document.createElement('h3');
+    title.className='text-base font-semibold';
+    title.textContent=en?'Schedule updated. Send a Telegram notification to the student?':'Расписание изменено. Отправить ученику уведомление в Telegram?';
+    const actions=document.createElement('div');
+    actions.className='flex gap-3';
+    const send=document.createElement('button');
+    send.type='button';
+    send.className='primary-btn flex-1 rounded-xl px-3 py-2 font-semibold';
+    send.textContent=en?'Send':'Отправить';
+    const skip=document.createElement('button');
+    skip.type='button';
+    skip.className='soft-input flex-1 rounded-xl px-3 py-2 font-semibold';
+    skip.textContent=en?"Don't send":'Не отправлять';
+    const finish=value=>{
+      overlay.remove();
+      resolve(value);
+    };
+    send.addEventListener('click',()=>finish(true));
+    skip.addEventListener('click',()=>finish(false));
+    overlay.addEventListener('click',event=>{if(event.target===overlay)finish(false)});
+    card.append(title,actions);
+    actions.append(send,skip);
+    overlay.append(card);
+    document.body.append(overlay);
+  });
 }
 
 function closeLessonModal(){
