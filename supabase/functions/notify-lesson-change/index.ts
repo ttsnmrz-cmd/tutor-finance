@@ -165,10 +165,10 @@ Deno.serve(async (req) => {
           : lesson.status === "cancelled_charge";
         const paymentEn = charged ? "The lesson fee will be deducted from your balance." : "No lesson fee will be deducted.";
         const paymentRu = charged ? "Стоимость занятия будет списана с вашего баланса." : "Средства за занятие списываться не будут.";
-        studentMessage = `Hello!\\nYour lesson scheduled for ${dateTime} has been cancelled. ${paymentEn}\\n\\nЗдравствуйте!\\nЗанятие, запланированное на ${dateTime}, отменено. ${paymentRu}`;
+        studentMessage = `Hello!\nYour lesson scheduled for ${dateTime} has been cancelled. ${paymentEn}\n\nЗдравствуйте!\nЗанятие, запланированное на ${dateTime}, отменено. ${paymentRu}`;
       }
       try {
-        await send(student.telegram_chat_id, `${studentMessage}\\n\\nPersonal account / Личный кабинет: ${cabinet}`);
+        await send(student.telegram_chat_id, `${studentMessage}\n\nPersonal account / Личный кабинет: ${cabinet}`);
         sent++;
       } catch (e) {
         failed++;
