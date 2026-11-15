@@ -118,6 +118,10 @@ Deno.serve(async (req) => {
 
   if (updateError) {
     console.error("Student connection update failed", updateError.message);
-    await sendMessage(chatId, "All set, __NAME__! ✅ Telegram is connected.\n\nYou'll receive lesson reminders, schedule updates, and payment notifications according to your preferences.\n\nYour personal account: <a href=\"https://profiprofit.com/?student=__ID__\">Open ProfiProfit</a>\n\n———\n\nГотово, __NAME__! ✅ Telegram подключён.\n\nЗдесь будут приходить напоминания о занятиях, изменения расписания и уведомления о пополнении баланса — в соответствии с вашими настройками.\n\nЛичный кабинет: <a href=\"https://profiprofit.com/?student=__ID__\">Открыть ProfiProfit</a>".replaceAll("__NAME__", student.name).replaceAll("__ID__", String(student.id)));
+    await sendMessage(chatId, "Не удалось подключить Telegram. Попробуй создать новую ссылку. / We couldn't connect Telegram. Please create a new link.");
+    return new Response("ok");
+  }
+
+  await sendMessage(chatId, `All set, __NAME__! ✅ Telegram is connected.\n\nYou'll receive lesson reminders, schedule updates, and payment notifications according to your preferences.\n\nYour personal account: <a href="https://profiprofit.com/?student=__ID__">Open ProfiProfit</a>\n\n———\n\nГотово, __NAME__! ✅ Telegram подключён.\n\nЗдесь будут приходить напоминания о занятиях, изменения расписания и уведомления о пополнении баланса — в соответствии с вашими настройками.\n\nЛичный кабинет: <a href="https://profiprofit.com/?student=__ID__">Открыть ProfiProfit</a>`.replaceAll("__NAME__", student.name).replaceAll("__ID__", String(student.id)));
   return new Response("ok");
 });
