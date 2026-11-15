@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
       if (!ids.length) continue;
       const { data: students, error: studentsError } = await db
         .from("students")
-        .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived")
+        .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived,price")
         .in("id", ids)
         .eq("teacher_id", lesson.teacher_id)
         .eq("archived", false);
@@ -215,7 +215,7 @@ Deno.serve(async (req) => {
         const groupExpenses = memberships.reduce((sum: number, m: any) =>
           sum + (chargedGroupIds.has(String(m.lesson_id)) ? Number(m.price ?? student.price ?? 0) : 0), 0);
         const balance = income - individualExpenses - groupExpenses;
-        if (balance >= 0 || !student.telegram_chat_id) continue;
+        if (balance >= 0) continue;
 
         const { data: claim, error: claimError } = await db.from("telegram_teacher_lesson_debt_reminders")
           .insert({ lesson_id: lesson.id, student_id: student.id, teacher_id: lesson.teacher_id })
@@ -225,7 +225,7 @@ Deno.serve(async (req) => {
 
         const money = (value: number) => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
         const cabinet = `https://profiprofit.com/?student=${student.id}`;
-        const debtText = `🚩 Negative student balance\\n${student.name}: ${money(Math.abs(balance))} BYN debt.\\nUpcoming lesson fee: ${money(Number(lesson.price ?? student.price ?? 0))} BYN.\\nStudent account: ${cabinet}\\n\\n🚩 Отрицательный баланс ученика\\n${student.name}: задолженность ${money(Math.abs(balance))} BYN.\\nСтоимость предстоящего занятия: ${money(Number(lesson.price ?? student.price ?? 0))} BYN.\\nКабинет ученика: ${cabinet}`;
+        const debtText = `🚩 Negative student balance\n${student.name}: ${money(Math.abs(balance))} BYN debt.\nUpcoming lesson fee: ${money(Number(lesson.price ?? student.price ?? 0))} BYN.\nStudent account: ${cabinet}\n\n🚩 Отрицательный баланс ученика\n${student.name}: задолженность ${money(Math.abs(balance))} BYN.\nСтоимость предстоящего занятия: ${money(Number(lesson.price ?? student.price ?? 0))} BYN.\nКабинет ученика: ${cabinet}`;
         if (!deliveryEnabled) {
           dryRun++;
           await db.from("telegram_teacher_lesson_debt_reminders").delete().eq("id", claim.id);
