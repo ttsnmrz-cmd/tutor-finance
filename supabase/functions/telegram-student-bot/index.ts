@@ -30,7 +30,7 @@ async function sendMessage(chatId: number, text: string): Promise<number> {
   return Number(result.result?.message_id);
 }
 
-const welcome = "Hi! 👋 Welcome to ProfiProfit!\\n\\nI'm happy to be your English teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you reach your goals.\\n\\nYour personal ProfiProfit page lets you:\\n📅 View your lesson schedule and lesson history.\\n💰 Track your balance, payments, and lesson charges.\\n🔔 Receive reminders 1 hour and 10 minutes before lessons.\\n📢 Stay up to date with schedule changes.\\n\\nI'll send you your personal account link separately.\\n\\nTo receive Telegram notifications, open the personal bot link I'll send you and press Start.\\n\\nFor help with ProfiProfit, just send a message to this bot. Our support team will get back to you! 💬\\n\\nSee you in class! 😊\\n\\n———\\n\\nПривет! 👋 Добро пожаловать в ProfiProfit!\\n\\nЯ рада быть твоим преподавателем английского! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь своих целей.\\n\\nВ личном кабинете ProfiProfit можно:\\n📅 Смотреть расписание и историю занятий.\\n💰 Отслеживать баланс, оплаты и списания за уроки.\\n🔔 Получать напоминания за 1 час и за 10 минут до начала занятий.\\n📢 Узнавать об изменениях в расписании.\\n\\nСсылку на личный кабинет я отправлю отдельно.\\n\\nЧтобы получать уведомления в Telegram, открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.\\n\\nЕсли нужна помощь с ProfiProfit, просто напиши этому боту. Наша служба поддержки ответит тебе! 💬\\n\\nДо встречи на занятиях! 😊"
+const welcome = "Hi! 👋 Welcome to ProfiProfit!\n\nI'm happy to be your English teacher! ❤️ I hope our lessons will be enjoyable, comfortable, and help you reach your goals.\n\nYour personal ProfiProfit page lets you:\n📅 View your lesson schedule and lesson history.\n💰 Track your balance, payments, and lesson charges.\n🔔 Receive reminders 1 hour and 10 minutes before lessons.\n📢 Stay up to date with schedule changes.\n\nI'll send you your personal account link separately.\n\nTo receive Telegram notifications, open the personal bot link I'll send you and press Start.\n\nFor help with ProfiProfit, just send a message to this bot. Our support team will get back to you! 💬\n\nSee you in class! 😊\n\n———\n\nПривет! 👋 Добро пожаловать в ProfiProfit!\n\nЯ рада быть твоим преподавателем английского! ❤️ Надеюсь, наши занятия будут интересными, комфортными и помогут тебе достичь своих целей.\n\nВ личном кабинете ProfiProfit можно:\n📅 Смотреть расписание и историю занятий.\n💰 Отслеживать баланс, оплаты и списания за уроки.\n🔔 Получать напоминания за 1 час и за 10 минут до начала занятий.\n📢 Узнавать об изменениях в расписании.\n\nСсылку на личный кабинет я отправлю отдельно.\n\nЧтобы получать уведомления в Telegram, открой персональную ссылку на бота, которую я тебе отправлю, и нажми Start.\n\nЕсли нужна помощь с ProfiProfit, просто напиши этому боту. Наша служба поддержки ответит тебе! 💬\n\nДо встречи на занятиях! 😊"
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
   if (!chatId) return new Response("ok");
 
   const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
-  const command = text.split("@")[0];
+  const command = text.split(/\s+/, 1)[0].split("@")[0];
 
   // Support replies from the teacher: reply to a support notification in the bot chat.
   if (message?.reply_to_message?.message_id) {
@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
       if (ticket && text) {
         const safeReply = text.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]!));
         await sendMessage(Number(ticket.student_chat_id),
-          `💬 ProfiProfit Support / Поддержка ProfiProfit\\n\\n${safeReply}`);
+          `💬 ProfiProfit Support / Поддержка ProfiProfit\n\n${safeReply}`);
         await sendMessage(chatId, "Your reply has been sent. / Ответ отправлен ученику.");
       } else if (ticket) {
         await sendMessage(chatId, "Please send your reply as text. / Отправь ответ текстом.");
@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
       const safeName = student.name.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]!));
       const safeText = text.replace(/[&<>]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[ch]!));
       const teacherMessageId = await sendMessage(Number(teacher.telegram_chat_id),
-        `💬 <b>ProfiProfit Support request</b>\\n<b>Student:</b> ${safeName}\\n\\n${safeText}\\n\\n<i>Reply to this message to answer the student.</i>`);
+        `💬 <b>ProfiProfit Support request</b>\n<b>Student:</b> ${safeName}\n\n${safeText}\n\n<i>Reply to this message to answer the student.</i>`);
       const { error: ticketError } = await db.from("telegram_support_messages").insert({
         teacher_id: teacher.id, student_id: student.id, student_chat_id: chatId,
         teacher_chat_id: teacher.telegram_chat_id, support_message_id: teacherMessageId
