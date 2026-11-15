@@ -86,7 +86,7 @@ function renderWeek(){
       </button>
       <div class="calendar-day-events">
         ${dayLessons.length?dayLessons.map(l=>`
-          <button type="button" onclick="openEditLesson('${esc(l.id)}')" class="calendar-event-card">
+          <button type="button" onclick="openEditLesson('${esc(l.id)}')" class="calendar-event-card ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">
             <span class="calendar-event-time">${esc(displayTime(l.time))}</span>
             <span class="calendar-event-title ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">${esc(lessonTitle(l))}</span>
             <span class="calendar-event-meta">${l.duration||60} мин · ${money(lessonPriceTotal(l))}</span>
