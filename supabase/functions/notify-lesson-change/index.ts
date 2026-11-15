@@ -137,16 +137,16 @@ Deno.serve(async (req) => {
 
     const dateTime = formatDate(lesson.date, lesson.time);
     let message = "";
-    if (event === "created") message = `Hello! 👋\\nA new lesson has been added to your schedule: ${dateTime}.\\nSee you in class! 😊\\n\\nЗдравствуйте! 👋\\nВ расписании появилось новое занятие: ${dateTime}.\\nДо встречи! 😊`;
-    else if (event === "rescheduled") message = `Hello! 👋\\nYour lesson has been rescheduled to ${dateTime}. No lesson fee will be deducted for this change.\\n\\nЗдравствуйте! 👋\\nВаше занятие перенесено на ${dateTime}. Средства за это изменение списываться не будут.`;
+    if (event === "created") message = `Hello! 👋\nA new lesson has been added to your schedule: ${dateTime}.\nSee you in class! 😊\n\nЗдравствуйте! 👋\nВ расписании появилось новое занятие: ${dateTime}.\nДо встречи! 😊`;
+    else if (event === "rescheduled") message = `Hello! 👋\nYour lesson has been rescheduled to ${dateTime}. No lesson fee will be deducted for this change.\n\nЗдравствуйте! 👋\nВаше занятие перенесено на ${dateTime}. Средства за это изменение списываться не будут.`;
     else if (event === "cancelled") {
       const charged = lesson.status === "cancelled_charge";
       const paymentEn = charged ? "The lesson fee will be deducted from your balance." : "No lesson fee will be deducted.";
       const paymentRu = charged ? "Стоимость занятия будет списана с вашего баланса." : "Средства за занятие списываться не будут.";
-      message = `Hello!\\nYour lesson scheduled for ${dateTime} has been cancelled. ${paymentEn}\\n\\nЗдравствуйте!\\nЗанятие, запланированное на ${dateTime}, отменено. ${paymentRu}`;
+      message = `Hello!\nYour lesson scheduled for ${dateTime} has been cancelled. ${paymentEn}\n\nЗдравствуйте!\nЗанятие, запланированное на ${dateTime}, отменено. ${paymentRu}`;
     }
-    else if (event === "deleted") message = `Hello!\\nYour lesson scheduled for ${dateTime} has been removed from the schedule.\\n\\nЗдравствуйте!\\nЗанятие ${dateTime} удалено из расписания.`;
-    else message = `Hello! 👋\\nYour lesson schedule has been updated: ${dateTime}.\\n\\nЗдравствуйте! 👋\\nИнформация о занятии изменена: ${dateTime}.`;
+    else if (event === "deleted") message = `Hello!\nYour lesson scheduled for ${dateTime} has been removed from the schedule.\n\nЗдравствуйте!\nЗанятие ${dateTime} удалено из расписания.`;
+    else message = `Hello! 👋\nYour lesson schedule has been updated: ${dateTime}.\n\nЗдравствуйте! 👋\nИнформация о занятии изменена: ${dateTime}.`;
 
     let sent = 0;
     let failed = 0;
