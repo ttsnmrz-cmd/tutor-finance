@@ -616,6 +616,7 @@ async function openStudentEdit(id){
   document.getElementById('student-notify-10m').checked=s.telegram_notify_10m!==false;
   document.getElementById('student-notify-changes').checked=s.telegram_notify_changes===true;
   document.getElementById('student-notify-payments').checked=s.telegram_notify_payments===true;
+  document.getElementById('student-notify-balance').checked=s.telegram_notify_balance!==false;
 
   const connected=!!s.telegram_chat_id;
   const status=document.getElementById('student-telegram-status');
@@ -664,6 +665,7 @@ async function saveStudent(){
     const telegram_notify_10m=document.getElementById('student-notify-10m').checked;
     const telegram_notify_changes=document.getElementById('student-notify-changes').checked;
     const telegram_notify_payments=document.getElementById('student-notify-payments').checked;
+    const telegram_notify_balance=document.getElementById('student-notify-balance').checked;
 
     if(!s||!name)return;
 
@@ -705,6 +707,7 @@ async function saveStudent(){
           telegram_notify_10m,
           telegram_notify_changes,
           telegram_notify_payments,
+          telegram_notify_balance,
           timezone
         })
       }
