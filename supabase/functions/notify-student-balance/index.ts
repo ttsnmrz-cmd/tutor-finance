@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
       for (const member of members) {
         considered++;
         const { data: student, error: studentError } = await db.from("students")
-          .select("id,name,price,telegram_chat_id,archived,teacher_id")
+          .select("id,name,price,telegram_chat_id,telegram_notify_balance,archived,teacher_id")
           .eq("id", member.student_id)
           .eq("teacher_id", lesson.teacher_id)
           .maybeSingle();
@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
         }
 
         const recipients: Array<{ type: "student" | "teacher"; chatId: string | number }> = [];
-        if (student.telegram_chat_id) {
+        if (student.telegram_chat_id && student.telegram_notify_balance !== false) {
           recipients.push({ type: "student", chatId: student.telegram_chat_id });
         }
         const { data: teacher, error: teacherError } = await db.from("profiles")
