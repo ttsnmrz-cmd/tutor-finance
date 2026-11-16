@@ -420,3 +420,10 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
     overscroll-behavior-x:contain;
   }
 }
+/* Compact dashboard header: keep the key overview visible without scrolling. */
+#tab-dashboard .dashboard-heading{margin-bottom:12px!important}
+#tab-dashboard .dashboard-greeting{padding:0!important;margin:0 0 6px!important;background:transparent!important;border:0!important;box-shadow:none!important}
+#tab-dashboard .dashboard-greeting p{margin:0 0 2px!important;line-height:1.2!important}
+#tab-dashboard .dashboard-greeting h1{margin:0!important;line-height:1.2!important}
+#tab-dashboard #dashboard-cards{margin-bottom:12px!important}
+#tab-dashboard .dashboard-heading h2{line-height:1.2!important}
