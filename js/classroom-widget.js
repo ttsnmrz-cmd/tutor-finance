@@ -1,7 +1,8 @@
 /* Shared-origin presentation adapter. All editing stays in the original app. */
 (()=>{
  'use strict';
- const studentsView=new URLSearchParams(location.search).get('view')==='students';
+ const requestedView=new URLSearchParams(location.search).get('view'),studentsView=requestedView==='students',settingsView=requestedView==='settings',accountView=studentsView||settingsView;
+ if(settingsView)document.documentElement.classList.add('cw-settings','cw-identity-pending');
  if(studentsView)document.documentElement.classList.add('cw-students','cw-identity-pending');
  const parentOrigin='https://classroom.profiprofit.com';
  const english=typeof getLanguage==='function'&&getLanguage()==='en';
@@ -16,7 +17,7 @@
  autoCompletePastLessons=async function(){};
  initializePlatformMonitoring=async function(){};
  function scaffold(){
-  if(studentsView){originalSwitch('students',{replace:true});return;}
+  if(accountView){originalSwitch(settingsView?'settings':'students',{replace:true});return;}
   const dash=document.getElementById('tab-dashboard'),cal=document.getElementById('tab-calendar');if(!dash||!cal)return;
   if(cal.parentElement!==dash)dash.append(cal);cal.classList.remove('hidden');
   const compactLabels=english?['Active students','Accrued · month','Earned · total','Lessons today','Payments · month','Low balances']:['Ученики','Начислено · месяц','Заработано · всего','Занятий сегодня','Платежи · месяц','Низкий баланс'];document.querySelectorAll('#dashboard-cards button>div:first-child>span:first-child').forEach((label,i)=>{label.textContent=compactLabels[i]||label.textContent;});
@@ -26,7 +27,7 @@
   document.getElementById('cw-login')?.remove();sendHeight();
  }
  renderDashboard=function(){originalDashboard();scaffold();};
- switchTab=function(tab,options){originalSwitch(studentsView?'students':'dashboard',options);if(!studentsView)scaffold();};
+ switchTab=function(tab,options){originalSwitch(settingsView?'settings':studentsView?'students':'dashboard',options);if(!accountView)scaffold();};
  goToday=function(){centerRequested=true;originalToday();};
  const minute=t=>{const p=String(t||'').replace('.',':').split(':').map(Number);return p.length>=2&&Number.isFinite(p[0])&&Number.isFinite(p[1])?p[0]*60+p[1]:null;};
  function segments(days){const result=[];for(const l of lessons){const p=lessonDateTimeInTimezone(l,getTeacherTimezone()),start=minute(p.time);if(start===null||!p.date)continue;let remaining=Math.max(1,Number(l.duration)||60),date=p.date,from=start;while(remaining>0){const length=Math.min(1440-from,remaining);if(days.includes(date))result.push({l,date,start:from,end:from+length,continuation:from!==start||date!==p.date});remaining-=length;from=0;const d=dateAtLocalNoon(date);d.setDate(d.getDate()+1);date=localISO(d);if(length<=0||remaining>10080)break;}}return result;}
@@ -58,14 +59,16 @@
  document.addEventListener('click',e=>{if(e.target===document.getElementById('lesson-modal')){e.stopImmediatePropagation();confirmDismiss();}},true);
 
  // Student mode reuses the original CRM rows/forms and financial calculations.
- let expectedEmail='',identityEpoch=0,linkedIdentity=null,prefsAvailable=false,studentSearch='';
+ let expectedEmail='',identityEpoch=0,linkedIdentity=null,lastLoadedIdentity=null,prefsAvailable=false,studentSearch='';
  const nativeLanguages=[['ru','Russian'],['be','Belarusian'],['uk','Ukrainian'],['en','English'],['pl','Polish'],['de','German'],['es','Spanish'],['fr','French'],['other','Other']];
  const learningLanguages=[['en','English'],['de','German'],['es','Spanish'],['fr','French'],['other','Other']];
  const originalLoadData=loadData,originalRenderStudents=renderStudents,originalStudentDetail=studentDetail;
  if(studentsView){
   loadData=async function(){await originalLoadData();prefsAvailable=false;try{const rows=await db('/students?select=id,native_language,learning_language,english_variant');const preferences=new Map((rows||[]).map(row=>[String(row.id),row]));for(const student of students)Object.assign(student,preferences.get(String(student.id))||{});prefsAvailable=true;}catch{/* The financial section works before the additive language migration. */}};
-  studentDetail=function(student){return languageForm(student)+originalStudentDetail(student).replace('<div class="space-y-2 text-sm mb-4">','<div class="cw-finance-summary">');};
+  studentDetail=function(student){return originalStudentDetail(student).replace('<div class="space-y-2 text-sm mb-4">','<div class="cw-finance-summary">');};
   renderStudents=function(){originalRenderStudents();const list=document.getElementById('students-list');if(!list)return;for(const card of list.children){card.classList.add('cw-student-card');card.firstElementChild?.classList.add('cw-student-header');const student=students.find(s=>String(s.id)===String(card.querySelector('[id^="detail-"]')?.id.slice(7)));if(student&&card.firstElementChild){const header=card.firstElementChild;header.tabIndex=0;header.setAttribute('role','button');header.setAttribute('aria-label',(english?'Open student: ':'Открыть ученика: ')+student.name);header.onkeydown=e=>{if(e.target===header&&(e.key==='Enter'||e.key===' ')){e.preventDefault();toggleStudentDetail(String(student.id));}};}card.dataset.studentName=student?.name||'';card.hidden=!!studentSearch&&!card.dataset.studentName.toLocaleLowerCase().includes(studentSearch.toLocaleLowerCase());}let tools=document.getElementById('cw-student-tools');if(!tools){tools=document.createElement('div');tools.id='cw-student-tools';tools.innerHTML='<label>'+(english?'Search students':'Найти ученика')+'<input id="cw-student-search" type="search" autocomplete="off"/></label><button id="cw-add-student" type="button">'+(english?'+ Student':'+ Ученик')+'</button>';document.getElementById('tab-students').prepend(tools);tools.querySelector('input').value=studentSearch;tools.querySelector('input').oninput=e=>{studentSearch=e.target.value;for(const card of list.children)card.hidden=!!studentSearch&&!String(card.dataset.studentName||'').toLocaleLowerCase().includes(studentSearch.toLocaleLowerCase());};tools.querySelector('button').onclick=()=>openAdd('student');}};
+  const originalOpenStudentEdit=openStudentEdit;
+  openStudentEdit=async function(id){await originalOpenStudentEdit(id);const student=students.find(s=>String(s.id)===String(id));if(!student)return;const modal=document.querySelector('#student-modal>.app-card');let general=modal.querySelector('.cw-student-general'),learning=modal.querySelector('.cw-student-learning'),tabs=modal.querySelector('.cw-student-tabs');if(!general){const controls=[...modal.children].slice(1);tabs=document.createElement('div');tabs.className='cw-student-tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label',english?'Student settings':'Настройки ученика');tabs.innerHTML='<button type="button" role="tab" aria-selected="true">'+(english?'General':'Основное')+'</button><button type="button" role="tab" aria-selected="false">'+(english?'Learning':'Обучение')+'</button>';general=document.createElement('div');general.className='cw-student-general';general.setAttribute('role','tabpanel');learning=document.createElement('div');learning.className='cw-student-learning';learning.setAttribute('role','tabpanel');controls.forEach(c=>general.append(c));modal.append(tabs,general,learning);[...tabs.children].forEach((tab,index)=>tab.onclick=()=>{general.hidden=index!==0;learning.hidden=index!==1;[...tabs.children].forEach((t,i)=>t.setAttribute('aria-selected',String(i===index)));});}learning.innerHTML=languageForm(student);general.hidden=false;learning.hidden=true;[...tabs.children].forEach((tab,index)=>tab.setAttribute('aria-selected',String(index===0)));};
   copyStudentLink=async function(id){const url=new URL('/students',location.origin);url.searchParams.set('student',id);try{await navigator.clipboard.writeText(url.href);alert(english?'Student link copied.':'Ссылка для ученика скопирована.');}catch{prompt(english?'Copy student link:':'Скопируйте ссылку:',url.href);}};
  }
  function languageForm(student){
@@ -74,18 +77,21 @@
  }
  async function checkStudentIdentity(){
   const epoch=++identityEpoch;linkedIdentity=null;document.documentElement.classList.add('cw-identity-pending');let status='error';
-  try{const {data,error}=await supabaseClient.auth.getUser();if(error||!data?.user)status='signed-out';else if(String(data.user.email||'').trim().toLowerCase()!==expectedEmail)status='different';else{linkedIdentity=data.user.id;await loadData();const current=await supabaseClient.auth.getUser();if(current.error||current.data?.user?.id!==linkedIdentity)status='error';else{renderStudents();originalSwitch('students',{replace:true});status='ready';}}}catch{status='error';}
+  try{const {data,error}=await supabaseClient.auth.getUser();if(error||!data?.user)status='signed-out';else if(String(data.user.email||'').trim().toLowerCase()!==expectedEmail)status='different';else{linkedIdentity=data.user.id;if(lastLoadedIdentity!==linkedIdentity){if(settingsView)await loadTeacherTimezone(linkedIdentity);else await loadData();}const current=await supabaseClient.auth.getUser();if(current.error||current.data?.user?.id!==linkedIdentity)status='error';else{if(settingsView)originalSwitch('settings',{replace:true});else{if(lastLoadedIdentity!==linkedIdentity)renderStudents();originalSwitch('students',{replace:true});}lastLoadedIdentity=linkedIdentity;status='ready';}}}catch{status='error';}
   if(epoch!==identityEpoch)return;if(status==='ready')document.documentElement.classList.remove('cw-identity-pending');else linkedIdentity=null;
   window.parent.postMessage({type:'profiprofit:identity',status},parentOrigin);
  }
- if(studentsView){
+ if(accountView){
   window.addEventListener('message',e=>{if(e.origin!==parentOrigin||e.source!==window.parent||e.data?.type!=='classroom:widget'||typeof e.data.expectedEmail!=='string'||e.data.expectedEmail.length>254)return;expectedEmail=e.data.expectedEmail.trim().toLowerCase();void checkStudentIdentity();});
   supabaseClient.auth.onAuthStateChange(()=>{document.documentElement.classList.add('cw-identity-pending');linkedIdentity=null;setTimeout(()=>{if(expectedEmail)void checkStudentIdentity();},0);});
+ }
+ if(studentsView){
   document.addEventListener('change',e=>{const select=e.target.closest('[data-language="learning_language"]');if(!select)return;const fields=select.closest('.cw-languages'),accent=fields.querySelector('[data-language="english_variant"]');fields.querySelector('[data-accent-label]').hidden=select.value!=='en';accent.value=select.value==='en'?'UK':'';});
   document.addEventListener('click',async e=>{const button=e.target.closest('[data-save-languages]');if(!button||button.disabled)return;const fields=button.closest('.cw-languages'),status=fields.querySelector('[role="status"]'),id=fields.dataset.languageStudent,student=students.find(s=>String(s.id)===id);const value=key=>fields.querySelector('[data-language="'+key+'"]').value;const patch={native_language:value('native_language'),learning_language:value('learning_language'),english_variant:value('learning_language')==='en'?value('english_variant'):null};if(!student||!nativeLanguages.some(x=>x[0]===patch.native_language)||!learningLanguages.some(x=>x[0]===patch.learning_language)||(patch.learning_language==='en'&&!['UK','US'].includes(patch.english_variant))){status.textContent=english?'Choose the languages and English variant.':'Выберите языки и вариант английского.';return;}
    button.disabled=true;try{const current=await supabaseClient.auth.getUser();if(current.error||!linkedIdentity||current.data?.user?.id!==linkedIdentity||String(current.data.user.email||'').trim().toLowerCase()!==expectedEmail)throw Error();const rows=await db('/students?id=eq.'+encodeURIComponent(id)+'&teacher_id=eq.'+encodeURIComponent(linkedIdentity)+'&select=id,native_language,learning_language,english_variant',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify(patch)});if(!Array.isArray(rows)||rows.length!==1||String(rows[0].id)!==id)throw Error();Object.assign(student,rows[0]);status.textContent=english?'Language preferences saved.':'Настройки языков сохранены.';}catch{status.textContent=english?'Could not save. Your financial records were not changed.':'Не удалось сохранить. Финансовые записи не изменены.';}finally{button.disabled=false;}
   });
  }
+ if(settingsView){for(const name of ['saveTeacherDisplayName','saveTeacherTelegramUsername','setTeacherTimezone','setCurrency']){const original=window[name];if(typeof original==='function')window[name]=async function(...args){await original(...args);window.parent.postMessage({type:'profiprofit:settings-updated'},parentOrigin);};}const originalTelegramLink=createTeacherTelegramLink;createTeacherTelegramLink=async function(){if(window.teacherProfile?.telegram_chat_id&&!confirm(english?'Reconnect Telegram? The current connection will be replaced.':'Переподключить Telegram? Текущее подключение будет заменено.'))return;return originalTelegramLink();};}
  document.addEventListener('DOMContentLoaded',()=>{
   document.documentElement.classList.add('cw-widget');if(parentReady)document.documentElement.classList.add('cw-authorized-parent');
   const info=document.createElement('div');info.id='cw-login';info.innerHTML='<p>Connect your existing ProfiProfit calendar.</p><a href="https://profiprofit.com/dashboard" target="_blank" rel="noopener">Sign in to ProfiProfit</a><p>Then refresh this calendar.</p>';document.body.append(info);
