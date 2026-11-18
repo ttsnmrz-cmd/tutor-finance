@@ -4,9 +4,9 @@
  const parentOrigin='https://classroom.profiprofit.com';
  const english=typeof getLanguage==='function'&&getLanguage()==='en';
  const labels=english?{pending:'Planned',conducted:'Completed',rescheduled:'Rescheduled',cancelled_charge:'Cancelled · charged',cancelled_free:'Cancelled · no charge'}:statusLabels;
- let centerRequested=true,lastWeek='',renderedDate='',parentReady=window.parent===window,postedHeight=0;
+ let centerRequested=true,lastWeek='',renderedDate='',parentReady=window.parent===window,postedHeight=0,lastGreeting='';
  const originalDashboard=renderDashboard,originalToday=goToday,originalSwitch=switchTab;
- function sendHeight(){if(!parentReady)return;const dash=document.getElementById('tab-dashboard'),login=document.getElementById('cw-login'),bodyTop=document.body.getBoundingClientRect().top;const measured=dash&&dash.getBoundingClientRect().height>0?dash.getBoundingClientRect().bottom-bodyTop:login?.getBoundingClientRect().bottom-bodyTop;const h=Math.max(260,Math.min(1600,Math.ceil((measured||540)+4)));if(Math.abs(h-postedHeight)>2){postedHeight=h;window.parent.postMessage({type:'profiprofit:height',height:h},parentOrigin);}}
+ function sendHeight(){if(!parentReady)return;const dash=document.getElementById('tab-dashboard'),login=document.getElementById('cw-login'),bodyTop=document.body.getBoundingClientRect().top;const measured=dash&&dash.getBoundingClientRect().height>0?dash.getBoundingClientRect().bottom-bodyTop:login?.getBoundingClientRect().bottom-bodyTop;const h=Math.max(260,Math.min(1600,Math.ceil((measured||540)+4)));const greeting=(document.getElementById('dashboard-greeting-title')?.textContent||'').trim().slice(0,180);if(Math.abs(h-postedHeight)>2||greeting!==lastGreeting){postedHeight=h;lastGreeting=greeting;window.parent.postMessage({type:'profiprofit:height',height:h,greeting},parentOrigin);}}
  function setTheme(theme){document.documentElement.dataset.theme=theme;document.documentElement.classList.toggle('dark',theme==='dark');}
  window.addEventListener('message',event=>{if(event.origin!==parentOrigin||event.source!==window.parent||event.data?.type!=='classroom:widget')return;parentReady=true;document.documentElement.classList.add('cw-authorized-parent');setTheme(event.data.theme==='dark'?'dark':'light');sendHeight();});
  // The script is loaded before DOMContentLoaded in classroom.html.
