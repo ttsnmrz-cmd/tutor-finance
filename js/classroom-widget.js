@@ -16,6 +16,7 @@
  function scaffold(){
   const dash=document.getElementById('tab-dashboard'),cal=document.getElementById('tab-calendar');if(!dash||!cal)return;
   if(cal.parentElement!==dash)dash.append(cal);cal.classList.remove('hidden');
+  const compactLabels=english?['Active students','Accrued · month','Earned · total','Lessons today','Payments · month','Low balances']:['Ученики','Начислено · месяц','Заработано · всего','Занятий сегодня','Платежи · месяц','Низкий баланс'];document.querySelectorAll('#dashboard-cards button>div:first-child>span:first-child').forEach((label,i)=>{label.textContent=compactLabels[i]||label.textContent;});
   document.querySelectorAll('#dashboard-cards button').forEach(b=>{b.removeAttribute('onclick');b.tabIndex=-1;});
   let add=document.getElementById('cw-add');if(!add){add=document.createElement('button');add.id='cw-add';add.type='button';add.textContent=english?'+ Lesson':'+ Занятие';add.onclick=()=>openNewLessonForDate(todayISOInTimezone(getTeacherTimezone()));document.getElementById('week-range')?.parentElement.parentElement.lastElementChild.append(add);}
   document.querySelector('#tab-calendar h2').textContent=english?'Calendar':'Календарь';

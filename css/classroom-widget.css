@@ -6,3 +6,5 @@ html.cw-widget{overflow-y:hidden!important}html.cw-widget body{min-height:0!impo
 
 .cw-short-cost{display:none!important}.cw-short{padding:2px 4px;font-size:10px;line-height:1.05}.cw-short .cw-short-cost{display:inline!important;float:right;font-size:9px}.cw-short strong>[aria-label]{display:none}.cw-short .cw-cost{font-size:0;line-height:0;margin-top:0}.cw-short .cw-charge{font-size:9px;line-height:1.1}.cw-tiny .cw-cost{display:none}.cw-not-charged .cw-short-cost,.cw-partly-charged .cw-short-cost{color:#855600}.cw-widget[data-theme=dark] .cw-not-charged .cw-short-cost,.cw-widget[data-theme=dark] .cw-partly-charged .cw-short-cost{color:#f3ce83}
 
+@media(min-width:900px){.cw-widget #dashboard-cards{grid-template-columns:repeat(6,minmax(0,1fr))!important}.cw-widget #dashboard-cards>button>div:first-child>span:first-child{font-size:11px!important;line-height:1.25!important}}
+
