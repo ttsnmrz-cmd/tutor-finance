@@ -47,15 +47,17 @@
   if(days.includes(now.date)){const line=document.createElement('div');line.id='cw-now';line.className='cw-now';line.style.top=minute(now.time)+'px';line.innerHTML='<span>'+esc(now.time)+'</span>';track.append(line);}
   scroll.scrollTop=!centerRequested&&week===lastWeek&&previous!==undefined?previous:Math.max(0,Math.min(1140,(minute(now.time)||0)-150));lastWeek=week;renderedDate=now.date;centerRequested=false;scaffold();
  };
+ const originalEditLesson=openEditLesson;
+ openEditLesson=function(id){originalEditLesson(id);const lesson=lessons.find(l=>String(l.id)===String(id));if(!lesson)return;const button=document.getElementById('save-lesson-btn');button.onclick=()=>saveLesson('one');button.textContent=english?'Save':'Сохранить';let more=document.getElementById('cw-save-options');if(!more){more=document.createElement('button');more.id='cw-save-options';more.type='button';more.textContent='⋯';more.setAttribute('aria-label',english?'More save options':'Другие варианты сохранения');more.onclick=toggleLessonSaveMenu;button.parentElement.insertBefore(more,button.nextSibling);}more.hidden=!lesson.series_id;};
  const originalNewLesson=openNewLessonForDate;
- openNewLessonForDate=function(date){originalNewLesson(date);const select=document.getElementById('edit-student');const option=new Option(english?'Choose a student':'Выберите ученика','',true,true);option.disabled=true;select.prepend(option);select.value='';updateLessonGroupButton();};
+ openNewLessonForDate=function(date){originalNewLesson(date);const more=document.getElementById('cw-save-options');if(more)more.hidden=true;const select=document.getElementById('edit-student');const option=new Option(english?'Choose a student':'Выберите ученика','',true,true);option.disabled=true;select.prepend(option);select.value='';updateLessonGroupButton();};
  function confirmDismiss(){
   const modal=document.getElementById('lesson-modal');if(modal.classList.contains('hidden')||document.getElementById('cw-dismiss'))return;
   const editing=!!document.getElementById('edit-id').value,box=document.createElement('div');box.id='cw-dismiss';box.setAttribute('role','alertdialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-labelledby','cw-dismiss-title');
   box.innerHTML='<div class="app-card"><h3 id="cw-dismiss-title">'+(english?(editing?'Cancel lesson editing?':'Cancel lesson creation?'):(editing?'Отменить редактирование занятия?':'Отменить создание занятия?'))+'</h3><div><button type="button" id="cw-keep">'+(english?'Continue editing':'Продолжить редактирование')+'</button><button type="button" id="cw-discard">'+(english?'Discard':'Отменить')+'</button></div></div>';modal.append(box);
   const previous=document.activeElement,keep=box.querySelector('#cw-keep');const resume=()=>{box.remove();previous?.focus();};keep.onclick=resume;box.querySelector('#cw-discard').onclick=()=>{box.remove();closeModal('lesson-modal');};box.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();resume();}if(e.key==='Tab'){e.preventDefault();(document.activeElement===keep?box.querySelector('#cw-discard'):keep).focus();}};keep.focus();
  }
- closeLessonModal=confirmDismiss;
+ window.classroomDismissLesson=confirmDismiss;
  document.addEventListener('click',e=>{if(e.target===document.getElementById('lesson-modal')){e.stopImmediatePropagation();confirmDismiss();}},true);
 
  // Student mode reuses the original CRM rows/forms and financial calculations.
