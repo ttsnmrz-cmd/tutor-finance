@@ -30,3 +30,5 @@ html.cw-widget .hidden{display:none!important}
 #lesson-save-menu{display:flex;gap:6px}#cw-save-options{padding:5px 12px;border:1px solid #a389c3;border-radius:10px;font-size:21px}#cw-save-options[hidden]{display:none!important}
 
 .cw-event .cw-lesson-status{display:block;font-size:9px;line-height:11px;font-weight:600;margin-top:1px;text-decoration:none!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cw-event .cw-charge{display:none!important}.cw-event .cw-cost{margin-top:1px;font-size:10px;line-height:11px}.cw-short{padding:1px 3px;font-size:9px;line-height:9px}.cw-short strong{font-size:9px;line-height:9px}.cw-short .cw-cost{display:none}.cw-short .cw-lesson-status{font-size:8px;line-height:8px;margin-top:0}.cw-tiny .cw-lesson-status{display:block}.cw-short .cw-short-cost{font-size:8px}
+
+.cw-event strong .cw-comment-icon{float:right;font-size:10px;line-height:12px;margin-left:3px;opacity:.85}.cw-short strong .cw-comment-icon{font-size:8px;line-height:9px;margin-left:2px}
