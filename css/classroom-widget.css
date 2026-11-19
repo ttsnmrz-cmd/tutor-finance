@@ -39,3 +39,5 @@ html.cw-widget .hidden{display:none!important}
 html.cw-identity-pending #teacher-app{visibility:hidden!important}
 
 .cw-student-access{display:block;margin:0 12px 10px auto;padding:6px 10px;border:1px solid var(--cw-border);border-radius:8px;background:var(--cw-grid);color:var(--cw-text);font-size:12px;white-space:nowrap}
+
+.cw-settings #tab-settings>section{padding:12px 14px;margin-bottom:9px}.cw-settings #tab-settings label{margin:7px 0;font-size:12px}.cw-settings #tab-settings p,.cw-settings #tab-settings li{font-size:12px;line-height:1.4}.cw-settings #tab-settings h3{font-size:15px;margin-bottom:6px}.cw-settings #tab-settings input,.cw-settings #tab-settings select{padding:7px}.cw-settings #tab-settings button{padding:7px 10px}

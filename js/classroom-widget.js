@@ -18,6 +18,8 @@
  // These no-write overrides must also be present inline in the entry point.
  autoCompletePastLessons=async function(){};
  initializePlatformMonitoring=async function(){};
+ function fitCalendar(){if(accountView)return;const scroll=document.querySelector('.cw-scroll');if(!scroll)return;scroll.style.height=Math.max(150,Math.floor(innerHeight-scroll.getBoundingClientRect().top-8))+'px';scroll.style.maxHeight='none';}
+ window.addEventListener('resize',fitCalendar);
  function scaffold(){
   if(accountView){originalSwitch(settingsView?'settings':'students',{replace:true});return;}
   const dash=document.getElementById('tab-dashboard'),cal=document.getElementById('tab-calendar');if(!dash||!cal)return;
@@ -26,7 +28,7 @@
   document.querySelectorAll('#dashboard-cards button').forEach(b=>{b.removeAttribute('onclick');b.tabIndex=-1;});
   document.querySelector('#tab-calendar h2').textContent=english?'Calendar':'Календарь';
   const todayButton=document.querySelector('#tab-calendar button[onclick="goToday()"]');if(todayButton)todayButton.textContent=english?'Today':'Сегодня';
-  document.getElementById('cw-login')?.remove();sendHeight();
+  document.getElementById('cw-login')?.remove();fitCalendar();sendHeight();
  }
  renderDashboard=function(){originalDashboard();dashboardLoaded=dataLoaded;scaffold();};
  switchTab=function(tab,options){originalSwitch(settingsView?'settings':studentsView?'students':'dashboard',options);if(!accountView)scaffold();};
@@ -47,7 +49,7 @@
   const hours=document.createElement('div');hours.className='cw-hours';hours.innerHTML=Array.from({length:24},(_,h)=>'<span style="top:'+h*60+'px">'+String(h).padStart(2,'0')+':00</span>').join('');track.append(hours);
   for(const date of days){const col=document.createElement('div');col.className='cw-day'+(date===now.date?' is-today':'');col.setAttribute('aria-label',date);col.tabIndex=0;col.setAttribute('role','button');col.title=english?'Add lesson':'Добавить занятие';col.onkeydown=e=>{if(e.target===col&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openNewLessonForDate(date);}};col.onclick=e=>{if(e.target!==col)return;const offset=Math.max(0,Math.min(1410,Math.floor((e.clientY-col.getBoundingClientRect().top)/30)*30));openNewLessonForDate(date);setTime(String(Math.floor(offset/60)).padStart(2,'0')+':'+String(offset%60).padStart(2,'0'));};for(const item of layout(events.filter(e=>e.date===date))){const b=document.createElement('button'),l=item.l,status=labels[l.status]||l.status,cost=lessonPriceTotal(l);b.type='button';b.className='cw-event cw-'+l.status+(item.end-item.start<55?' cw-short':'')+(item.end-item.start<38?' cw-tiny':'');b.style.cssText='top:'+item.start+'px;height:'+Math.max(22,item.end-item.start-2)+'px;left:calc('+item.lane/item.columns*100+'% + 3px);width:calc('+100/item.columns+'% - 6px)';const comment=String(l.comment||'').trim();b.title=comment;b.setAttribute('aria-label',lessonTitle(l)+' · '+status+' · '+money(cost)+(comment?' · '+(english?'Comment: ':'Комментарий: ')+comment:''));b.innerHTML='<strong>'+(comment?'<span class="cw-comment-icon" aria-hidden="true">💬</span>':'')+esc(String(lessonDateTimeInTimezone(l,getTeacherTimezone()).time||'').slice(0,5))+(l.series_id?' <span aria-label="Repeating lesson">↻</span>':'')+'<span class="cw-short-cost">'+esc(money(cost))+'</span></strong><span>'+esc(lessonTitle(l))+'</span><small class="cw-cost">'+esc(money(cost))+'</small><span class="cw-lesson-status">'+esc(status)+'</span>';b.onclick=()=>openEditLesson(String(l.id));col.append(b);}track.append(col);}
   if(days.includes(now.date)){const line=document.createElement('div');line.id='cw-now';line.className='cw-now';line.style.top=minute(now.time)+'px';line.innerHTML='<span>'+esc(now.time)+'</span>';track.append(line);}
-  scroll.scrollTop=!centerRequested&&week===lastWeek&&previous!==undefined?previous:Math.max(0,Math.min(1140,(minute(now.time)||0)-150));lastWeek=week;renderedDate=now.date;centerRequested=false;dashboardLoaded=dataLoaded;scaffold();
+  fitCalendar();scroll.scrollTop=!centerRequested&&week===lastWeek&&previous!==undefined?previous:Math.max(0,Math.min(Math.max(0,1440-scroll.clientHeight),(minute(now.time)||0)-scroll.clientHeight/2));lastWeek=week;renderedDate=now.date;centerRequested=false;dashboardLoaded=dataLoaded;scaffold();
  };
  const originalEditLesson=openEditLesson;
  openEditLesson=function(id){originalEditLesson(id);const lesson=lessons.find(l=>String(l.id)===String(id));if(!lesson)return;const button=document.getElementById('save-lesson-btn');button.onclick=()=>saveLesson('one');button.textContent=english?'Save':'Сохранить';let more=document.getElementById('cw-save-options');if(!more){more=document.createElement('button');more.id='cw-save-options';more.type='button';more.textContent='⋯';more.setAttribute('aria-label',english?'More save options':'Другие варианты сохранения');more.onclick=toggleLessonSaveMenu;button.parentElement.insertBefore(more,button.nextSibling);}more.hidden=!lesson.series_id;};
