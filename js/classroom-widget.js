@@ -2,6 +2,7 @@
 (()=>{
  'use strict';
  const requestedView=new URLSearchParams(location.search).get('view'),studentsView=requestedView==='students',settingsView=requestedView==='settings',accountView=studentsView||settingsView;
+ document.documentElement.classList.add('cw-identity-pending');
  if(settingsView)document.documentElement.classList.add('cw-settings','cw-identity-pending');
  if(studentsView)document.documentElement.classList.add('cw-students','cw-identity-pending');
  const parentOrigin='https://classroom.profiprofit.com';
@@ -82,12 +83,12 @@
   return '<fieldset class="cw-languages" data-language-student="'+id+'"><legend>'+(english?'Learning preferences':'Настройки обучения')+'</legend><div class="cw-language-fields"><label>'+(english?'Native language':'Родной язык')+'<select data-language="native_language">'+options(nativeLanguages,student.native_language)+'</select></label><label>'+(english?'Learning language':'Изучаемый язык')+'<select data-language="learning_language">'+options(learningLanguages,student.learning_language)+'</select></label><label data-accent-label'+(student.learning_language==='en'?'':' hidden')+'>'+(english?'English pronunciation':'Вариант английского')+'<select data-language="english_variant">'+options([['UK','British English'],['US','American English']],student.english_variant)+'</select></label></div><p class="cw-language-help">'+(english?'Native language helps with learning. It does not change the interface language.':'Родной язык используется для обучения и не меняет язык интерфейса.')+'</p><button type="button" data-save-languages'+(!prefsAvailable?' disabled':'')+'>'+(english?'Save language preferences':'Сохранить настройки языков')+'</button><p role="status">'+(!prefsAvailable?(english?'Language settings are not connected yet. Your financial records remain available.':'Сохранение языковых настроек ещё не подключено. Ученики и финансовая история доступны.'):'')+'</p></fieldset>';
  }
  async function checkStudentIdentity(){
-  const epoch=++identityEpoch;linkedIdentity=null;document.documentElement.classList.add('cw-identity-pending');let status='error';
-  try{const {data,error}=await supabaseClient.auth.getUser();if(error||!data?.user)status='signed-out';else if(String(data.user.email||'').trim().toLowerCase()!==expectedEmail)status='different';else{linkedIdentity=data.user.id;if(lastLoadedIdentity!==linkedIdentity){if(settingsView)await loadTeacherTimezone(linkedIdentity);else await loadData();}const current=await supabaseClient.auth.getUser();if(current.error||current.data?.user?.id!==linkedIdentity)status='error';else{if(settingsView)originalSwitch('settings',{replace:true});else{if(lastLoadedIdentity!==linkedIdentity)renderStudents();originalSwitch('students',{replace:true});}lastLoadedIdentity=linkedIdentity;status='ready';}}}catch{status='error';}
+  const epoch=++identityEpoch;window.parent.postMessage({type:'profiprofit:identity',status:'checking'},parentOrigin);linkedIdentity=null;document.documentElement.classList.add('cw-identity-pending');let status='error';
+  try{const {data,error}=await supabaseClient.auth.getUser();if(error||!data?.user)status='signed-out';else if(String(data.user.email||'').trim().toLowerCase()!==expectedEmail)status='different';else{linkedIdentity=data.user.id;if(lastLoadedIdentity!==linkedIdentity){if(settingsView)await loadTeacherTimezone(linkedIdentity);else await loadData();}const current=await supabaseClient.auth.getUser();if(current.error||current.data?.user?.id!==linkedIdentity)status='error';else{if(settingsView)originalSwitch('settings',{replace:true});else{if(studentsView){if(lastLoadedIdentity!==linkedIdentity)renderStudents();originalSwitch('students',{replace:true});}else{originalSwitch('dashboard',{replace:true});scaffold();}}lastLoadedIdentity=linkedIdentity;status='ready';}}}catch{status='error';}
   if(epoch!==identityEpoch)return;if(status==='ready')document.documentElement.classList.remove('cw-identity-pending');else linkedIdentity=null;
-  window.parent.postMessage({type:'profiprofit:identity',status},parentOrigin);
+  window.parent.postMessage({type:'profiprofit:identity',status,email:status==='ready'?expectedEmail:null,greeting:status==='ready'?(document.getElementById('dashboard-greeting-title')?.textContent||'').trim().slice(0,180):''},parentOrigin);
  }
- if(accountView){
+ {
   window.addEventListener('message',e=>{if(e.origin!==parentOrigin||e.source!==window.parent||e.data?.type!=='classroom:widget'||typeof e.data.expectedEmail!=='string'||e.data.expectedEmail.length>254)return;expectedEmail=e.data.expectedEmail.trim().toLowerCase();void checkStudentIdentity();});
   supabaseClient.auth.onAuthStateChange(()=>{document.documentElement.classList.add('cw-identity-pending');linkedIdentity=null;setTimeout(()=>{if(expectedEmail)void checkStudentIdentity();},0);});
  }
