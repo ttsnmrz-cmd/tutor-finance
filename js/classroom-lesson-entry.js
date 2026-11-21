@@ -27,7 +27,10 @@
     const lessonId=document.getElementById('edit-id')?.value?.trim();
     if(!lessonId){refresh();return;}
     if(window.parent===window){alert('Откройте календарь внутри My English Classroom.');return;}
+    const control=button();
+    if(control){control.disabled=true;control.textContent='Открываем…';}
     window.parent.postMessage({type:'profiprofit:open-classroom-lesson',lessonId},target);
+    setTimeout(()=>{if(control){control.disabled=false;control.textContent='▶ Перейти к занятию';}},2500);
   };
   window.addEventListener('message',async event=>{
     if(event.origin!==target||event.source!==window.parent||event.data?.type!=='classroom:calendar-proof')return;
