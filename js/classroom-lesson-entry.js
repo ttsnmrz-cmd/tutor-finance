@@ -35,14 +35,14 @@
   window.addEventListener('message',async event=>{
     if(event.origin!==target||event.source!==window.parent||event.data?.type!=='classroom:calendar-proof')return;
     const {requestId,lessonId}=event.data;
-    if(typeof requestId!=='string'||requestId.length>100||typeof lessonId!=='string'||!/^[0-9a-f-]{36}$/i.test(lessonId))return;
+    if(typeof requestId!=='string'||requestId.length>100||typeof lessonId!=='string'||!/^(?:[1-9][0-9]{0,17}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.test(lessonId))return;
     const send=(payload)=>window.parent.postMessage({type:'profiprofit:calendar-proof',requestId,lessonId,...payload},target);
     try{
       const current=await supabaseClient.auth.getUser();
       const session=await supabaseClient.auth.getSession();
       const financeUser=current.data?.user;
       if(current.error||session.error||!financeUser?.id||session.data?.session?.user?.id!==financeUser.id)throw Error('Not signed in');
-      const lesson=lessons.find(item=>item.id===lessonId&&item.teacher_id===financeUser.id);
+      const lesson=lessons.find(item=>String(item.id)===lessonId&&item.teacher_id===financeUser.id);
       if(!lesson)throw Error('Appointment unavailable');
       send({legacyToken:session.data.session.access_token,legacyKey:SUPABASE_KEY});
     }catch{send({error:true});}
