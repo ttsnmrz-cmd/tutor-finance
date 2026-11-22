@@ -18,3 +18,8 @@ jobs:
       - run: corepack prepare pnpm@10.29.3 --activate
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: classroom-embed
+          path: legacy/classroom-assets/
+          if-no-files-found: error
