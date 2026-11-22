@@ -163,7 +163,7 @@
   window.parent.postMessage({type:'profiprofit:identity',status,email:status==='ready'?expectedEmail:null,greeting:status==='ready'?(document.getElementById('dashboard-greeting-title')?.textContent||'').trim().slice(0,180):''},parentOrigin);
  }
  {
-  window.addEventListener('message',e=>{if(e.origin!==parentOrigin||e.source!==window.parent||e.data?.type!=='classroom:widget'||typeof e.data.expectedEmail!=='string'||e.data.expectedEmail.length>254)return;expectedEmail=e.data.expectedEmail.trim().toLowerCase();void checkStudentIdentity();});
+  window.addEventListener('message',async e=>{if(e.origin!==parentOrigin||e.source!==window.parent||e.data?.type!=='classroom:widget'||typeof e.data.expectedEmail!=='string'||e.data.expectedEmail.length>254)return;expectedEmail=e.data.expectedEmail.trim().toLowerCase();if(typeof e.data.accessToken==='string'&&e.data.accessToken&&typeof e.data.refreshToken==='string'&&e.data.refreshToken){const result=await supabaseClient.auth.setSession({access_token:e.data.accessToken,refresh_token:e.data.refreshToken});if(result.error){window.parent.postMessage({type:'profiprofit:identity',status:'error'},parentOrigin);return;}}void checkStudentIdentity();});
   supabaseClient.auth.onAuthStateChange(()=>{document.documentElement.classList.add('cw-identity-pending');linkedIdentity=null;setTimeout(()=>{if(expectedEmail)void checkStudentIdentity();},0);});
  }
  if(studentsView){
