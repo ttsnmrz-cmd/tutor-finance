@@ -1912,9 +1912,10 @@ function renderPublicStudentCalendar(lessonRows){
 
 
 async function initPublicStudent(){
-  const id=new URLSearchParams(location.search).get('student');
-
-  if(!id)return false;
+  const params=new URLSearchParams(location.search);
+  const token=params.get('access');
+  const id=params.get('student');
+  if(!token&&!id)return false;
 
   const view=document.getElementById('student-public-view');
   const login=document.getElementById('student-public-login');
@@ -1930,8 +1931,8 @@ async function initPublicStudent(){
     // Use the Supabase client directly. This avoids relying on the mutable
     // REST headers used by the teacher session.
     const {data,error}=await supabaseClient.rpc(
-      'get_public_student_cabinet',
-      {p_student_id:id}
+      token?'get_student_portal_by_token':'get_public_student_cabinet',
+      token?{p_access_token:token}:{p_student_id:id}
     );
 
     if(error)throw error;
