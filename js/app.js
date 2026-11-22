@@ -1911,6 +1911,60 @@ function renderPublicStudentCalendar(lessonRows){
 }
 
 
+// Learning content is available only via the capability-token portal.
+// Legacy student UUID links continue to show finance information unchanged.
+async function loadPublicStudentLearning(accessToken){
+  const section=document.getElementById('student-learning-section');
+  if(!section)return;
+  section.classList.add('hidden');
+  if(!accessToken)return;
+  const status=document.getElementById('student-learning-status');
+  const assignments=document.getElementById('student-learning-assignments');
+  const notes=document.getElementById('student-learning-notes');
+  if(status)status.textContent='Загружаем учебные материалы…';
+  if(assignments)assignments.replaceChildren();
+  if(notes)notes.replaceChildren();
+  section.classList.remove('hidden');
+  try{
+    const {data,error}=await supabaseClient.rpc('get_student_learning_by_token',{
+      p_access_token:accessToken
+    });
+    if(error)throw error;
+    if(!data||data.student_id!==publicStudent?.id){
+      throw new Error('Нет доступа к учебным материалам.');
+    }
+    const render=(container,rows,empty,build)=>{
+      if(!container)return;
+      if(!Array.isArray(rows)||!rows.length){
+        const p=document.createElement('p');
+        p.className='text-slate-500';
+        p.textContent=empty;
+        container.append(p);
+        return;
+      }
+      for(const row of rows){
+        const item=document.createElement('div');
+        item.className='rounded-lg border border-slate-200 p-3 bg-white/70';
+        const heading=document.createElement('div');
+        heading.className='font-medium';
+        heading.textContent=build(row);
+        item.append(heading);
+        container.append(item);
+      }
+    };
+    render(assignments,data.assignments,'Пока нет домашних заданий.',a=>a.material_title||'Задание');
+    render(notes,data.notes,'Пока нет заметок с уроков.',n=>
+      [n.lesson_date,n.topic].filter(Boolean).join(' · ')||'Заметка'
+    );
+    if(status)status.textContent='';
+  }catch(e){
+    // Before migration 030 is installed, this section is unavailable; the
+    // existing finance cabinet still works and must not be blocked.
+    console.warn('Optional student learning module unavailable:',e);
+    section.classList.add('hidden');
+  }
+}
+
 async function initPublicStudent(){
   const params=new URLSearchParams(location.search);
   const token=params.get('access');
@@ -1956,6 +2010,7 @@ async function initPublicStudent(){
 
     nameEl.textContent='Ученик: '+publicStudent.name;
     await openStudentCabinet();
+    await loadPublicStudentLearning(token);
 
   }catch(e){
     console.error('Public cabinet error:',e);
