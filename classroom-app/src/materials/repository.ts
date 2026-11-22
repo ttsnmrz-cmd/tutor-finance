@@ -8,6 +8,7 @@ export interface StudioRepository {
  storageKey?:string;
  library():Promise<{drafts:PlanRow[];versions:VersionRow[]}>;
  savePlan(id:string|null,body:Plan,revision:number):Promise<PlanRow>;
+ publishPlan?(id:string,revision:number):Promise<VersionRow>;
 }
 export interface MaterialsRepository extends StudioRepository {
  sections():Promise<MaterialSection[]>;
