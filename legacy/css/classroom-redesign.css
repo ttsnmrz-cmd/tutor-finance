@@ -117,3 +117,15 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #dashboard-calendar .native-timed-event .calendar-event-title{font-size:12px;font-weight:650}
 #dashboard-calendar .native-timed-event .calendar-event-meta{font-size:11px}
 #dashboard-calendar .native-timed-event .status{font-size:9px;padding:1px 5px}
+
+/* Prevent the last weekday from wrapping into a second grid row. */
+#dashboard-calendar .native-week-calendar{display:grid!important;grid-template-columns:60px repeat(7,minmax(0,1fr))!important;grid-template-rows:1fr!important;grid-auto-flow:column!important;min-width:980px!important;width:100%!important;align-items:stretch!important}
+#dashboard-calendar .native-week-head-spacer{grid-column:1!important;grid-row:1!important}
+#dashboard-calendar .native-week-calendar>.native-day{grid-row:1!important;min-width:0!important}
+#dashboard-calendar .native-week-calendar>.native-day:nth-child(2){grid-column:2!important}
+#dashboard-calendar .native-week-calendar>.native-day:nth-child(3){grid-column:3!important}
+#dashboard-calendar .native-week-calendar>.native-day:nth-child(4){grid-column:4!important}
+#dashboard-calendar .native-week-calendar>.native-day:nth-child(5){grid-column:5!important}
+#dashboard-calendar .native-week-calendar>.native-day:nth-child(6){grid-column:6!important}
+#dashboard-calendar .native-week-calendar>.native-day:nth-child(7){grid-column:7!important}
+#dashboard-calendar .native-week-calendar>.native-day:nth-child(8){grid-column:8!important}
