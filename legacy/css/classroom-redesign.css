@@ -407,6 +407,9 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
   flex: 1;
   padding-bottom: 12px!important;
 }
+#teacher-app:has(.mb-student-preview) .native-sidebar {
+  min-height: 0!important;
+}
 #teacher-app #teacher-main:has(.mb-student-preview),
 #tab-materials:not(.hidden):has(.mb-student-preview),
 #classroom-materials-root:has(.mb-student-preview),
