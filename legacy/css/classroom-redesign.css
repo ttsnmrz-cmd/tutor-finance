@@ -13,15 +13,15 @@ body{background:linear-gradient(145deg,#fbf9fd 0%,#f5f0fa 60%,#fbfaf7 100%)!impo
 #profile-menu-button{background:#f3eef8!important;color:#6b5087!important;border-radius:14px!important}
 #teacher-app .app-card{border:1px solid #e9e3f0!important;box-shadow:0 8px 30px rgba(69,44,104,.045)!important;background:#fff;border-radius:20px!important}
 #teacher-app main>section>.app-card{padding:24px!important}
-#teacher-app h1,#teacher-app h2,#teacher-app h3{color:#3f3151;letter-spacing:-.025em}
+#teacher-app h1:where(:not(#classroom-materials-root *)),#teacher-app h2:where(:not(#classroom-materials-root *)),#teacher-app h3:where(:not(#classroom-materials-root *)){color:#3f3151;letter-spacing:-.025em}
 #teacher-app .text-slate-500,#teacher-app .text-slate-400{color:#887e92!important}
 #teacher-app .bg-indigo-600,#teacher-app button.bg-indigo-600,#teacher-app .primary-btn{background:#6b508b!important;color:white!important}
 #teacher-app .bg-indigo-50{background:#f1ebf8!important}
 #teacher-app .text-indigo-700{color:#684b86!important}
 #teacher-app .border-indigo-200{border-color:#ddd1eb!important}
 #teacher-app .bg-slate-100{background:#f5f2f8!important}
-#teacher-app button{transition:background .16s,box-shadow .16s,transform .16s}
-#teacher-app button:focus-visible{outline:3px solid #a98fc5;outline-offset:2px}
+#teacher-app button:where(:not(#classroom-materials-root *)){transition:background .16s,box-shadow .16s,transform .16s}
+#teacher-app button:where(:not(#classroom-materials-root *)):focus-visible{outline:3px solid #a98fc5;outline-offset:2px}
 #tab-dashboard .dashboard-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:4px 0 22px!important}
 #tab-dashboard .dashboard-greeting-kicker,#dashboard-greeting-kicker{color:#897a99!important;font-size:12px!important}
 #dashboard-greeting-title{font-size:clamp(25px,3vw,34px)!important;font-weight:750!important;color:#47325d!important;line-height:1.15!important;margin-top:5px}
@@ -35,12 +35,12 @@ body{background:linear-gradient(145deg,#fbf9fd 0%,#f5f0fa 60%,#fbfaf7 100%)!impo
 #tab-calendar .flex.gap-2>button{border-radius:12px!important}
 #week-calendar{gap:6px!important}
 #tab-students .app-card,#tab-materials .app-card{padding:22px!important}
-#teacher-app input:not([type=checkbox]),#teacher-app select,#teacher-app textarea{border-radius:12px!important;border-color:#e1d9e9!important}
+#teacher-app input:not([type=checkbox]):where(:not(#classroom-materials-root *)),#teacher-app select:where(:not(#classroom-materials-root *)),#teacher-app textarea:where(:not(#classroom-materials-root *)){border-radius:12px!important;border-color:#e1d9e9!important}
 #teacher-app .rounded-3xl{border-radius:20px!important}
 #teacher-app .rounded-2xl{border-radius:15px!important}
 html[data-theme=dark] body{background:#211c2b!important;color:#eee8f4!important}
 html[data-theme=dark] #teacher-header,html[data-theme=dark] #teacher-app .app-card{background:#30283b!important;border-color:#4b4059!important}
-html[data-theme=dark] #teacher-app h1,html[data-theme=dark] #teacher-app h2,html[data-theme=dark] #teacher-app h3{color:#f1eafa}
+html[data-theme=dark] #teacher-app h1:where(:not(#classroom-materials-root *)),html[data-theme=dark] #teacher-app h2:where(:not(#classroom-materials-root *)),html[data-theme=dark] #teacher-app h3:where(:not(#classroom-materials-root *)){color:#f1eafa}
 html[data-theme=dark] .teacher-nav{background:#393046}
 html[data-theme=dark] .teacher-nav button.bg-indigo-600{background:#4b3c60!important;color:#f1eafa!important}
 @media(max-width:950px){#teacher-app>div{padding:12px!important}#teacher-header{flex-wrap:wrap;padding:12px!important}.teacher-header-actions{width:100%;justify-content:space-between}.teacher-nav{overflow-x:auto;max-width:calc(100vw - 100px)}.teacher-nav button{padding:9px 11px!important}#tab-dashboard .dashboard-heading{align-items:start;flex-direction:column;gap:5px}#teacher-app main>section>.app-card{padding:16px!important}}
@@ -328,9 +328,9 @@ html[data-theme="dark"] #teacher-app .native-calendar-grid,
 html[data-theme="dark"] #teacher-app .native-calendar-day,
 html[data-theme="dark"] #teacher-app .native-calendar-time,
 html[data-theme="dark"] #teacher-app .native-calendar-header{background-color:#30283b!important;border-color:#50445e!important;color:#f0eafa!important}
-html[data-theme="dark"] #teacher-app h1,
-html[data-theme="dark"] #teacher-app h2,
-html[data-theme="dark"] #teacher-app h3,
+html[data-theme="dark"] #teacher-app h1:where(:not(#classroom-materials-root *)),
+html[data-theme="dark"] #teacher-app h2:where(:not(#classroom-materials-root *)),
+html[data-theme="dark"] #teacher-app h3:where(:not(#classroom-materials-root *)),
 html[data-theme="dark"] #teacher-app .text-slate-900,
 html[data-theme="dark"] #teacher-app .text-slate-800,
 html[data-theme="dark"] #teacher-app .text-slate-700{color:#f5effb!important}
@@ -341,11 +341,11 @@ html[data-theme="dark"] #teacher-app .bg-white,
 html[data-theme="dark"] #teacher-app .bg-slate-50,
 html[data-theme="dark"] #teacher-app .bg-slate-100,
 html[data-theme="dark"] #teacher-app .bg-indigo-50{background-color:#393044!important;color:#f0eafa!important}
-html[data-theme="dark"] #teacher-app input:not([type=checkbox]),
-html[data-theme="dark"] #teacher-app select,
-html[data-theme="dark"] #teacher-app textarea{background:#393044!important;border-color:#655673!important;color:#f5effb!important}
-html[data-theme="dark"] #teacher-app input::placeholder,
-html[data-theme="dark"] #teacher-app textarea::placeholder{color:#b9a9c8!important}
+html[data-theme="dark"] #teacher-app input:not([type=checkbox]):where(:not(#classroom-materials-root *)),
+html[data-theme="dark"] #teacher-app select:where(:not(#classroom-materials-root *)),
+html[data-theme="dark"] #teacher-app textarea:where(:not(#classroom-materials-root *)){background:#393044!important;border-color:#655673!important;color:#f5effb!important}
+html[data-theme="dark"] #teacher-app input:where(:not(#classroom-materials-root *))::placeholder,
+html[data-theme="dark"] #teacher-app textarea:where(:not(#classroom-materials-root *))::placeholder{color:#b9a9c8!important}
 html[data-theme="dark"] #teacher-app .border-slate-100,
 html[data-theme="dark"] #teacher-app .border-slate-200,
 html[data-theme="dark"] #teacher-app .border-indigo-200{border-color:#574967!important}
@@ -375,38 +375,3 @@ html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-
 #teacher-app .native-layout.sidebar-collapsed .classroom-sidebar-toggle svg{transform:rotate(180deg)!important}
 }
 html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{color:#e5d7f4!important;background:transparent!important}
-
-/* Embedded Classroom editor: its own builder stylesheet owns these controls.
-   Host-wide #teacher-app input/select !important rules must not restyle them. */
-#teacher-app #classroom-materials-root .mb-builder .mb-title-line>input{
- border:1px solid transparent!important;border-radius:6px!important;
- background:transparent!important;padding:4px 0!important;
- color:var(--ink)!important;font-size:26px!important;font-weight:750!important;
- line-height:1.3!important;letter-spacing:-.6px!important;
-}
-#teacher-app #classroom-materials-root .mb-builder .mb-title-line>input:is(:hover,:focus){
- border-color:var(--line)!important;background:var(--card)!important;
-}
-#teacher-app #classroom-materials-root .mb-editor-heading h2>input{
- border:1px solid transparent!important;border-radius:6px!important;
- background:transparent!important;padding:7px 4px!important;
- color:var(--ink)!important;font-size:19px!important;font-weight:750!important;
- box-shadow:none!important;
-}
-#teacher-app #classroom-materials-root .mb-editor-heading h2>input:focus{
- border-color:var(--line)!important;background:var(--page)!important;
-}
-#teacher-app #classroom-materials-root .mb-builder .mb-editor-heading select{
- border:1px solid var(--line)!important;background:var(--page)!important;
- color:var(--ink)!important;font-size:13px!important;
- border-radius:11px!important;max-width:225px!important;
-}
-#teacher-app #classroom-materials-root .mb-builder .mb-structure,
-#teacher-app #classroom-materials-root .mb-builder .mb-editor{
- border:1px solid var(--line)!important;border-radius:20px!important;
- background:color-mix(in srgb,var(--card) 75%,transparent)!important;
-}
-#teacher-app #classroom-materials-root .mb-builder .mb-tabs button[aria-pressed=true]{
- background:var(--soft)!important;border-bottom:2px solid var(--purple)!important;
- color:var(--purple)!important;
-}

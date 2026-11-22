@@ -269,3 +269,72 @@ dialog.ml-dialog .ml-dialog-actions .primary{background:#7042b6!important;color:
 .ml-preview.ml-tree-collapsed .ml-topline{padding-left:40px!important}
 .ml-preview.ml-tree-collapsed .ml-topline .ml-panel-toggle{position:absolute!important;left:20px!important;top:17px!important}
 @media(max-width:1150px){.ml-preview .ml-topline{padding-right:0!important}.ml-preview .ml-controls{position:static!important;justify-content:flex-end!important;margin:0 0 12px!important}.ml-preview .ml-controls .ml-view,.ml-preview .ml-controls select{position:static!important}.ml-preview .ml-title-row{margin-bottom:12px!important}}
+
+/* Supply the standalone Classroom base styles at the embedded builder boundary. */
+#classroom-materials-root .ml-builder-host {
+  --page: #f8f5ee;
+  --card: #fffdf9;
+  --ink: #3d344c;
+  --muted: #786981;
+  --line: #e2d8ea;
+  --purple: #725299;
+  --soft: #eee6f7;
+}
+#classroom-materials-root .ml-builder-host {
+  background: var(--card);
+  color: var(--ink);
+  font: 14px/normal 'Segoe UI', Arial, sans-serif;
+  padding: 0 0 20px;
+}
+:root[data-theme=dark] #classroom-materials-root .ml-builder-host {
+  --page: #211e2c;
+  --card: #2a2636;
+  --ink: #eeeaf7;
+  --muted: #b7afc7;
+  --line: #484052;
+  --purple: #b99add;
+  --soft: #393147;
+}
+:where(#classroom-materials-root .ml-builder-host) :where(button, input, select, textarea) {
+  font-family: inherit;
+}
+:where(#classroom-materials-root .ml-builder-host) :where(button) {
+  border: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--ink);
+  font-weight: 650;
+  cursor: pointer;
+}
+:where(#classroom-materials-root .ml-builder-host) :where(input, select, textarea) {
+  border: 1px solid var(--line);
+  background: var(--page);
+  color: var(--ink);
+}
+:where(#classroom-materials-root .ml-builder-host) :where(input, textarea) {
+  width: 100%;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 17px;
+}
+:where(#classroom-materials-root .ml-builder-host) :where(select) {
+  border-radius: 10px;
+  padding: 9px;
+}
+:where(#classroom-materials-root .ml-builder-host) :where(h1, h2, h3, h4) {
+  font-weight: 700;
+}
+:where(#classroom-materials-root .ml-builder-host) :where(dialog) {
+  margin: auto;
+}
+#classroom-materials-root .ml-builder-host .ml-inline-badge {
+  display: none;
+}
+#classroom-materials-root .ml-builder-host .mb-rich-input :where(ul, ol) {
+  padding-inline-start: 1.5em;
+}
+#classroom-materials-root .ml-builder-host .mb-rich-input ul {
+  list-style: disc;
+}
+#classroom-materials-root .ml-builder-host .mb-rich-input ol {
+  list-style: decimal;
+}
