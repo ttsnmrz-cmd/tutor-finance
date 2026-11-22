@@ -354,3 +354,16 @@ html[data-theme="dark"] #teacher-app .native-timed-event:not(.is-cancelled) .cal
 html[data-theme="dark"] #teacher-app .native-timed-event:not(.is-cancelled) .calendar-event-time{color:#261a38!important}
 html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-event-title,
 html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-event-time{color:#d0c0da!important}
+
+/* Classroom navigation: compact original-scale icons and labels, not oversized dashboard typography. */
+@media(min-width:951px){
+#teacher-app .native-layout:not(.sidebar-collapsed){grid-template-columns:186px minmax(0,1fr)!important}
+#teacher-app .native-sidebar{top:82px!important;gap:3px!important}
+#teacher-app .native-sidebar button[data-native-tab]{font-family:Inter,ui-sans-serif,system-ui,sans-serif!important;font-size:15px!important;font-weight:700!important;line-height:1.25!important;letter-spacing:0!important;min-height:48px!important;height:48px!important;padding:10px 12px!important;border-radius:12px!important;gap:12px!important;white-space:nowrap!important}
+#teacher-app .native-sidebar button[data-native-tab] .native-nav-text{font-size:15px!important;font-weight:700!important;line-height:20px!important;letter-spacing:0!important}
+#teacher-app .native-sidebar button[data-native-tab] .native-nav-icon{width:21px!important;height:21px!important;flex:0 0 21px!important}
+#teacher-app .native-sidebar button[data-native-tab] .native-nav-icon svg{width:21px!important;height:21px!important;stroke-width:1.9!important}
+#teacher-app .native-sidebar-toggle{width:34px!important;height:34px!important;margin:0 0 12px auto!important}
+#teacher-app .native-layout.sidebar-collapsed{grid-template-columns:64px minmax(0,1fr)!important}
+#teacher-app .native-layout.sidebar-collapsed .native-sidebar button[data-native-tab]{padding:10px!important}
+}
