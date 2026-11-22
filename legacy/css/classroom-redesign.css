@@ -209,3 +209,14 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 .native-notes-empty{border:1px dashed #dfd5e8;border-radius:14px;padding:30px 20px;text-align:center;color:#867b90}
 .native-notes-empty h3{font-weight:750;color:#463655;margin-bottom:8px}
 @media(max-width:650px){.native-history-row{grid-template-columns:1fr auto;gap:6px}.native-history-row>span:nth-child(2){display:none}.native-history-status{grid-column:1}.native-student-avatar{width:42px;height:42px}}
+
+/* Lesson-linked Live Notes; scoped to the student Notes tab. */
+#native-live-notes{min-height:330px}
+.native-notes-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.native-notes-toolbar label,.native-note-label{font-size:12px;font-weight:700;color:#69587b}
+.native-notes-toolbar select{flex:1;min-width:220px;border:1px solid #e3d9ed;border-radius:12px;padding:10px;background:#fff;color:#463752}
+#native-note-status{font-size:12px;color:#81728c}
+#native-note-editor{display:block;width:100%;margin-top:9px;min-height:230px;padding:16px;border:1px solid #e2d8eb;border-radius:14px;background:#fcfaff;color:#382d45;line-height:1.65;resize:vertical}
+#native-note-editor:focus{outline:2px solid #a78bca;outline-offset:1px}
+.native-notes-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;font-size:12px;color:#85768f}
+#native-note-save{padding:10px 16px;border-radius:11px;background:#655087;color:#fff;font-weight:700}
