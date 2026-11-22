@@ -60,7 +60,7 @@ function renderWeek(){
     const isToday=key===today;
     const items=dateLessons.filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
     const cards=items.map(l=>{
-      const match=String(l.time||'').replace('.',':').match(/^(\\d{1,2}):(\\d{2})/);
+      const match=String(l.time||'').replace('.',':').match(/^([0-9]{1,2}):([0-9]{2})/);
       if(!match)return '';
       const minutes=Number(match[1])*60+Number(match[2]);
       const top=Math.max(0,(minutes-hourStart*60)*pxPerHour/60);
