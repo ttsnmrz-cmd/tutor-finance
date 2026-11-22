@@ -1,7 +1,7 @@
 /* Teacher-only material library and read-only preview.
    Uses the existing Classroom learning_folders/learning_materials records. */
 let nativeMaterialStore={folders:[],materials:[],selected:null};
-function nativeMaterialText(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;':'&quot;',"'":'&#39;'}[ch]));}
+function nativeMaterialText(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function nativeMaterialContent(value,depth=0){
  if(depth>7||value==null)return '';
  if(typeof value==='string'||typeof value==='number')return '<p class="native-material-paragraph">'+nativeMaterialText(value)+'</p>';
