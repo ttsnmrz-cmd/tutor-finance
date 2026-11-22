@@ -375,3 +375,38 @@ html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-
 #teacher-app .native-layout.sidebar-collapsed .classroom-sidebar-toggle svg{transform:rotate(180deg)!important}
 }
 html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{color:#e5d7f4!important;background:transparent!important}
+
+/* Embedded Classroom editor: its own builder stylesheet owns these controls.
+   Host-wide #teacher-app input/select !important rules must not restyle them. */
+#teacher-app #classroom-materials-root .mb-builder .mb-title-line>input{
+ border:1px solid transparent!important;border-radius:6px!important;
+ background:transparent!important;padding:4px 0!important;
+ color:var(--ink)!important;font-size:26px!important;font-weight:750!important;
+ line-height:1.3!important;letter-spacing:-.6px!important;
+}
+#teacher-app #classroom-materials-root .mb-builder .mb-title-line>input:is(:hover,:focus){
+ border-color:var(--line)!important;background:var(--card)!important;
+}
+#teacher-app #classroom-materials-root .mb-editor-heading h2>input{
+ border:1px solid transparent!important;border-radius:6px!important;
+ background:transparent!important;padding:7px 4px!important;
+ color:var(--ink)!important;font-size:19px!important;font-weight:750!important;
+ box-shadow:none!important;
+}
+#teacher-app #classroom-materials-root .mb-editor-heading h2>input:focus{
+ border-color:var(--line)!important;background:var(--page)!important;
+}
+#teacher-app #classroom-materials-root .mb-builder .mb-editor-heading select{
+ border:1px solid var(--line)!important;background:var(--page)!important;
+ color:var(--ink)!important;font-size:13px!important;
+ border-radius:11px!important;max-width:225px!important;
+}
+#teacher-app #classroom-materials-root .mb-builder .mb-structure,
+#teacher-app #classroom-materials-root .mb-builder .mb-editor{
+ border:1px solid var(--line)!important;border-radius:20px!important;
+ background:color-mix(in srgb,var(--card) 75%,transparent)!important;
+}
+#teacher-app #classroom-materials-root .mb-builder .mb-tabs button[aria-pressed=true]{
+ background:var(--soft)!important;border-bottom:2px solid var(--purple)!important;
+ color:var(--purple)!important;
+}
