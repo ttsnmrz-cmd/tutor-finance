@@ -29,3 +29,27 @@ Source reviewed: `ttsnmrz-cmd/classroom-web` deployed bundle `assets/index-Cf2gz
 6. Test in browser and confirm publication only after feature verification.
 
 This file is a migration checklist, not a claim that the feature has been restored.
+
+
+## Verified source integration — 2026-11-22
+
+Source repository: `ttsnmrz-cmd/my-english-classroom`, branch `source/latest-classroom-2026-11-22`, path `source/app/`.
+
+- Vite + React 19 + TypeScript app: `source/app/package.json`.
+- Real editor: `src/builder/MaterialBuilder.tsx`, `ExerciseEditor.tsx`, `ExercisePreview.tsx`.
+- Library UI: `src/materials/MaterialsLibraryPreview.tsx`; currently imports **mockRepository** (localStorage), not production persistence.
+- Existing `src/blocks/MaterialsLibrary.tsx` also uses localStorage for folders/text drafts.
+- Main entry `src/main.tsx` checks `teacher_accounts` and `student_access_links` for authorization; this is incompatible with production teacher auth until adapted.
+- `src/planning/api.ts` calls `save_teaching_plan`, `publish_teaching_plan`, and `create_planned_live_session` RPCs. These were NOT created by the five-table production SQL migration.
+- Classroom migration `source/app/supabase/migrations/006_teaching_lesson_plans.sql` references Classroom-specific `teacher_accounts`, `live_sessions` and other functions. **Do not run it unmodified against ProfiProfit**.
+
+### Safe integration gates
+
+1. Preserve production Dashboard, Students, Calendar, Payments and existing Supabase Auth.
+2. Copy the existing React builder source into an isolated build target, rather than copying the public compiled JS.
+3. Replace mockRepository with a real production repository using `material_sections`, `teaching_lesson_plans` and `teaching_lesson_versions`, scoped by the existing authenticated user. Never seed sample content into production.
+4. Implement and test revision-aware save and publish with matching database functions or equivalent secure repository methods. Enforce teacher ownership and revision conflicts.
+5. Mount the built UI only inside the Materials section, reusing the parent session. Do not introduce a second sign-in, replace the main entrypoint, or change the finance tables.
+6. Validate build, folder nesting, edit/save/reload, publish/preview, and permissions in a staging deployment before changing production.
+
+This branch is staging only; the Builder is **not** integrated or published by this document.
