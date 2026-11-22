@@ -577,11 +577,12 @@ function studentDetail(s){
 let nativeStudentDetailTab='overview';
 let nativeLessonDateFilter='all';
 let nativeLessonStatusFilter='all';
-function nativeStudentLessonRows(s,limit=Infinity){
+function nativeStudentLessonRows(s,limit=Infinity,applyFilters=true){
   const st=studentStats(s);
   const sorted=st.ls.slice().sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
   const today=localISO(new Date());
   const filtered=sorted.filter(l=>{
+    if(!applyFilters)return true;
     if(nativeLessonDateFilter==='past'&&String(l.date)>today)return false;
     if(nativeLessonDateFilter==='upcoming'&&String(l.date)<today)return false;
     if(nativeLessonStatusFilter!=='all'&&l.status!==nativeLessonStatusFilter)return false;
@@ -606,11 +607,11 @@ function renderNativeStudentDetail(){
   const nav='<div class="native-detail-tabs">'+tabs.map(([key,label])=>'<button type="button" class="'+(nativeStudentDetailTab===key?'is-active':'')+'" onclick="switchNativeStudentTab(\''+key+'\',this)">'+label+'</button>').join('')+'</div>';
   let content='';
   if(nativeStudentDetailTab==='overview'){
-    content='<div class="native-overview-section"><div class="native-section-heading"><h3>Recent lessons</h3><button onclick="switchNativeStudentTab(\'lessons\')">View all</button></div>'+nativeStudentLessonRows(s,3)+'</div><div class="native-overview-section"><div class="native-section-heading"><h3>Recent payments</h3><button onclick="switchNativeStudentTab(\'payments\')">View all</button></div>'+nativeStudentPaymentRows(s,3)+'</div>';
+    content='<div class="native-overview-section"><div class="native-section-heading"><h3>Recent lessons</h3><button onclick="switchNativeStudentTab(\'lessons\')" aria-label="View all records">View all <span aria-hidden="true">→</span></button></div>'+nativeStudentLessonRows(s,3,false)+'</div><div class="native-overview-section"><div class="native-section-heading"><h3>Recent payments</h3><button onclick="switchNativeStudentTab(\'payments\')" aria-label="View all records">View all <span aria-hidden="true">→</span></button></div>'+nativeStudentPaymentRows(s,3)+'</div>';
   }else if(nativeStudentDetailTab==='lessons'){
     content='<div class="native-lesson-filters"><select aria-label="Filter lesson dates" onchange="nativeLessonDateFilter=this.value;renderNativeStudentDetail()"><option value="all" '+(nativeLessonDateFilter==='all'?'selected':'')+'>All dates</option><option value="past" '+(nativeLessonDateFilter==='past'?'selected':'')+'>Past</option><option value="upcoming" '+(nativeLessonDateFilter==='upcoming'?'selected':'')+'>Upcoming</option></select><select aria-label="Filter lesson status" onchange="nativeLessonStatusFilter=this.value;renderNativeStudentDetail()">'+[['all','All statuses'],['scheduled','Scheduled'],['conducted','Completed'],['rescheduled','Rescheduled'],['cancelled_charge','Cancelled · charged'],['cancelled_free','Cancelled · free']].map(([v,t])=>'<option value="'+v+'" '+(nativeLessonStatusFilter===v?'selected':'')+'>'+t+'</option>').join('')+'</select></div><div class="native-history-scroll">'+nativeStudentLessonRows(s)+'</div>';
   }else if(nativeStudentDetailTab==='notes'){
-    content='<div class="native-notes-empty"><h3>Notes</h3><p>Заметки к занятиям появятся здесь после подключения сохранения новых заметок. Тестовые записи Classroom не переносим.</p></div>';
+    content='<div class="native-notes-empty"><h3>Notes</h3><p>Заметки к занятиям пока не подключены.</p></div>';
   }else{
     content='<div class="native-section-heading"><h3>Payments</h3><button class="native-add-button" onclick="openStudentPayment(\''+id+'\')">+ Add payment</button></div><div class="native-history-scroll">'+nativeStudentPaymentRows(s)+'</div>';
   }
