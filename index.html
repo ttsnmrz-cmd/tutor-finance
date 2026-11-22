@@ -28,6 +28,14 @@
 </div>
 <div class="mb-4"><div class="inline-flex items-center gap-2 rounded-xl student-theme-panel px-3 py-2 text-sm"><span class="text-slate-500">Проведённых занятий</span><b id="public-conducted"></b></div></div>
 <div class="mb-4"><h3 class="font-bold mb-1">Пополнения</h3><div id="public-payments" class="space-y-1 text-sm"></div></div>
+<section id="student-learning-section" class="hidden mb-5" aria-label="Учебные материалы">
+  <h3 class="font-bold mb-3">Материалы и заметки</h3>
+  <p id="student-learning-status" class="text-sm text-slate-500 mb-2" role="status"></p>
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-xl student-theme-panel p-3"><h4 class="font-semibold mb-2">Домашние задания</h4><div id="student-learning-assignments" class="space-y-2 text-sm"></div></div>
+    <div class="rounded-xl student-theme-panel p-3"><h4 class="font-semibold mb-2">Заметки с уроков</h4><div id="student-learning-notes" class="space-y-2 text-sm"></div></div>
+  </div>
+</section>
 <div class="mb-5"><div class="flex items-center justify-between gap-3 mb-3"><h3 class="font-bold">Календарь занятий</h3><div class="flex items-center gap-2"><button type="button" onclick="changePublicStudentWeek(-1)" class="w-8 h-8 rounded-lg student-theme-panel" aria-label="Предыдущая неделя">‹</button><span id="public-week-range" class="text-xs text-slate-500 text-center min-w-0"></span><button type="button" onclick="changePublicStudentWeek(1)" class="w-8 h-8 rounded-lg student-theme-panel" aria-label="Следующая неделя">›</button></div></div><div id="public-week-calendar" class="calendar-week-grid public-calendar-week-grid"></div></div>
 </div></div></div>
 
