@@ -41,6 +41,21 @@ async function loadNativeMaterials(){
   ]);
   if(folders.error)throw Error(folders.error.message);
   if(materials.error)throw Error(materials.error.message);
+  const createFolder=document.createElement('button');
+  createFolder.type='button';
+  createFolder.className='native-material-row';
+  createFolder.textContent='＋ New folder';
+  createFolder.addEventListener('click',async()=>{
+    const title=window.prompt('Folder name');
+    if(!title||!title.trim())return;
+    createFolder.disabled=true;
+    const result=await supabaseClient.from('material_sections').insert({
+      teacher_id:teacher,title:title.trim(),parent_id:null,position:0
+    });
+    if(result.error){window.alert('Could not create folder: '+result.error.message);createFolder.disabled=false;return;}
+    await loadNativeMaterials();
+  });
+  host.append(createFolder);
   const fs=folders.data||[],ms=(materials.data||[]).map(m=>({...m,folder_id:m.section_id,title:(m.body&&typeof m.body==='object'&&(m.body.title||m.body.name))||'Untitled lesson'}));
   nativeMaterialStore.folders=fs;nativeMaterialStore.materials=ms;
   const seen=new Set();
