@@ -436,3 +436,103 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 .calendar-event-card .calendar-event-comment{grid-column:1/-1}
 .calendar-event-card .status{grid-column:1/-1;max-width:100%;width:max-content;min-width:0;line-height:1.25;padding:3px 7px;overflow-wrap:anywhere}
 @media(max-width:1050px){.calendar-week-grid{overflow-x:auto;grid-template-columns:repeat(7,minmax(145px,1fr));padding-bottom:6px}}
+
+
+/* Next UI: opt-in visual preview (?ui=next). No changes to application logic. */
+:root.next-ui-preview{
+  --bg-color:#f6f7fb;
+  --card-bg:#ffffff;
+  --text-color:#1b2340;
+  --text-secondary:#68738b;
+  --primary-color:#6255d9;
+  --primary-hover:#4e42be;
+  --accent-soft:#efedff;
+  --border-color:#e6e9f2;
+}
+.next-ui-preview body{background:#f6f7fb!important}
+.next-ui-preview #teacher-app>.max-w-5xl{
+  max-width:1440px;
+  padding:24px 32px;
+}
+.next-ui-preview #teacher-header{
+  position:sticky;
+  top:12px;
+  z-index:40;
+  border:1px solid #e6e9f2!important;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(16px);
+  box-shadow:0 8px 28px rgba(28,39,76,.06);
+  border-radius:22px;
+  padding:14px 22px;
+}
+.next-ui-preview #teacher-header img{width:48px;height:48px}
+.next-ui-preview #teacher-header .teacher-nav{
+  margin-right:12px;
+  gap:4px;
+  padding:5px;
+  background:#f3f4fa;
+  border-radius:14px;
+}
+.next-ui-preview #teacher-header .teacher-nav button{
+  border-radius:10px;
+  padding:10px 15px;
+  font-size:13px;
+  letter-spacing:.01em;
+}
+.next-ui-preview #teacher-header .teacher-nav button:not(.bg-indigo-600):hover{
+  background:#fff!important;
+}
+.next-ui-preview #teacher-main{
+  max-width:100%!important;
+}
+.next-ui-preview #teacher-main .app-card{
+  border:1px solid #e6e9f2!important;
+  border-radius:20px;
+  box-shadow:0 4px 18px rgba(28,39,76,.035);
+}
+.next-ui-preview #tab-dashboard .dashboard-greeting h1{
+  font-size:clamp(23px,2.4vw,32px);
+  font-weight:750;
+  letter-spacing:-.035em;
+}
+.next-ui-preview #tab-dashboard #dashboard-cards .app-card{
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.next-ui-preview #tab-dashboard #dashboard-cards .app-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 28px rgba(28,39,76,.09);
+}
+.next-ui-preview .primary-btn,
+.next-ui-preview .bg-indigo-600{
+  background:#6255d9!important;
+  color:#fff!important;
+}
+.next-ui-preview .soft-input{
+  background:#fff!important;
+  border:1px solid #e1e5ef!important;
+  border-radius:12px;
+}
+.next-ui-preview .calendar-day-column{
+  background:#fff;
+  border-radius:14px;
+  border-color:#e8eaf3;
+}
+.next-ui-preview .calendar-event-card{
+  border-radius:10px;
+  background:#f6f5ff;
+}
+.next-ui-preview #profile-menu{
+  border:1px solid #e6e9f2;
+  box-shadow:0 16px 40px rgba(28,39,76,.12);
+}
+@media(max-width:800px){
+  .next-ui-preview #teacher-app>.max-w-5xl{padding:12px}
+  .next-ui-preview #teacher-header{top:4px;padding:12px;flex-wrap:wrap}
+  .next-ui-preview #teacher-header .teacher-nav{margin-right:0;width:100%;overflow-x:auto}
+  .next-ui-preview #teacher-header .teacher-nav button{padding:9px 11px}
+}
+@media(max-width:640px){
+  .next-ui-preview #teacher-header{position:relative}
+  .next-ui-preview #teacher-header .teacher-nav{padding:4px!important;display:flex!important;gap:4px}
+  .next-ui-preview #teacher-header .teacher-nav button{flex:1;min-width:0}
+}
