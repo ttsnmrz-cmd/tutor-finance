@@ -875,6 +875,9 @@ async function saveLesson(scope='one'){
 
     await loadData();
 
+    // Rebuild the embedded Students > Lessons history after a status/price edit.
+    // Calendar repaint alone leaves the previous badge and charged amount visible.
+    renderStudents();
     renderWeek();
     renderDay();
 
