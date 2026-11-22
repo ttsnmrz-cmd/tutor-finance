@@ -1,8 +1,6 @@
 import type {SupabaseClient} from '@supabase/supabase-js';
-
-// The host ProfiProfit page owns authentication and refresh tokens.
-// Never instantiate a second client against the legacy Classroom project.
-declare global {interface Window {profiProfitMaterialsClient?:SupabaseClient}}
-export const supabase=typeof window!=='undefined'?(window.profiProfitMaterialsClient??null):null;
+let sharedClient:SupabaseClient|null=null;
+export function setProfiProfitSupabase(client:SupabaseClient){sharedClient=client;}
+export const supabase=new Proxy({} as SupabaseClient,{get(_target,key){if(!sharedClient)throw Error('ProfiProfit session is not connected');const value=Reflect.get(sharedClient,key);return typeof value==='function'?value.bind(sharedClient):value;}});
 export const callbackUrl=()=>new URL('./',location.origin).href;
 export const localMaterialsPreview=false;
