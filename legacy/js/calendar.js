@@ -54,6 +54,13 @@ function renderWeek(){
   if(range)range.textContent=days[0].toLocaleDateString(lang,{day:'numeric',month:'short'})+' – '+days[6].toLocaleDateString(lang,{day:'numeric',month:'short',year:'numeric'});
   const hourStart=7,hourEnd=23,pxPerHour=72;
   const dateLessons=lessons.map(l=>({...l,...lessonDateTimeInTimezone(l,getTeacherTimezone())}));
+  const weekKeys=new Set(days.map(d=>localISO(d)));
+  const weekStartMinutes=dateLessons.filter(l=>weekKeys.has(l.date)).map(l=>{
+    const m=String(l.time||'').replace('.',':').match(/^([0-9]{1,2}):([0-9]{2})/);
+    return m?Number(m[1])*60+Number(m[2]):null;
+  }).filter(v=>v!==null);
+  const firstHour=weekStartMinutes.length?Math.min(...weekStartMinutes)/60:13;
+  const targetScroll=Math.max(0,(Math.floor(firstHour)-1-hourStart)*pxPerHour);
   const axis='<div class="native-time-axis">'+Array.from({length:hourEnd-hourStart},(_,i)=>'<span style="top:'+(i*pxPerHour)+'px">'+String(hourStart+i).padStart(2,'0')+':00</span>').join('')+'</div>';
   const columns=days.map(d=>{
     const key=localISO(d);
@@ -66,7 +73,7 @@ function renderWeek(){
       const top=Math.max(0,(minutes-hourStart*60)*pxPerHour/60);
       const height=Math.max(48,Math.min(180,Number(l.duration||60)*pxPerHour/60-4));
       const cancelled=['rescheduled','cancelled_charge','cancelled_free'].includes(l.status);
-      return '<button type="button" style="top:'+top+'px;height:'+height+'px" onclick="openEditLesson(\''+esc(l.id)+'\')" class="calendar-event-card native-timed-event '+(cancelled?'is-cancelled':'')+'"><span class="calendar-event-time">'+esc(displayTime(l.time))+'</span><span class="calendar-event-title">'+esc(lessonTitle(l))+'</span><span class="calendar-event-meta">'+money(lessonPriceTotal(l))+'</span><span class="status '+(statusClass[l.status]||'bg-slate-100')+'">'+(statusLabels[l.status]||l.status)+'</span></button>';
+      return '<button type="button" style="top:'+top+'px;height:'+height+'px" onclick="openEditLesson(\''+esc(l.id)+'\')" class="calendar-event-card native-timed-event '+(cancelled?'is-cancelled':'')+'"><span class="native-event-row"><strong class="calendar-event-time">'+esc(displayTime(l.time))+'</strong><strong class="calendar-event-title">'+esc(lessonTitle(l))+'</strong></span><span class="native-event-row"><span class="calendar-event-meta">'+money(lessonPriceTotal(l))+'</span><span class="status '+(statusClass[l.status]||'bg-slate-100')+'">'+(statusLabels[l.status]||l.status)+'</span></span></button>';
     }).join('');
     return '<div class="native-day"><button type="button" class="calendar-day-heading '+(isToday?'is-today':'')+'" onclick="selectDay(\''+key+'\')"><span class="calendar-weekday">'+d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')+'</span><span class="calendar-day-number">'+d.getDate()+'</span></button><div class="native-day-track" data-date="'+key+'" style="height:'+((hourEnd-hourStart)*pxPerHour)+'px">'+cards+'</div></div>';
   }).join('');
@@ -83,9 +90,10 @@ function renderWeek(){
   const oldAxis=scroller.querySelector('.native-time-axis');
   if(oldAxis)oldAxis.remove();
   scroller.insertAdjacentHTML('afterbegin',axis);
-  if(!scroller.dataset.initialized){
-    scroller.scrollTop=(13-hourStart)*pxPerHour;
-    scroller.dataset.initialized='true';
+  const weekId=days[0].toISOString().slice(0,10);
+  if(scroller.dataset.week!==weekId){
+    scroller.scrollTop=targetScroll;
+    scroller.dataset.week=weekId;
   }
 }
 
