@@ -1957,6 +1957,28 @@ function publicLearningDocument(container,documentData){
   container.append(root);
 }
 
+async function submitPublicLearningAnswer(accessToken,assignmentId,input,button,status){
+  const answer=input.value.trim();
+  if(!answer){status.textContent='Напишите ответ перед отправкой.';return;}
+  if(answer.length>10000){status.textContent='Ответ слишком длинный (максимум 10 000 символов).';return;}
+  button.disabled=true;
+  status.textContent='Отправляем…';
+  try{
+    const {data,error}=await supabaseClient.rpc('learning_submit_answers',{
+      p_access_token:accessToken,p_assignment_id:assignmentId,
+      p_answers:{text:answer}
+    });
+    if(error)throw error;
+    status.textContent='Ответ отправлен на проверку. Попытка №'+data.attempt_number+'.';
+    input.value='';
+  }catch(e){
+    console.warn('Learning submission failed:',e);
+    status.textContent='Не удалось отправить ответ: '+(e?.message||'попробуйте позже');
+  }finally{
+    button.disabled=false;
+  }
+}
+
 async function loadPublicStudentLearning(accessToken){
   const section=document.getElementById('student-learning-section');
   if(!section)return;
@@ -1999,6 +2021,39 @@ async function loadPublicStudentLearning(accessToken){
     };
     render(assignments,data.assignments,'Пока нет домашних заданий.',
       a=>a.material_title||'Задание',a=>a.body);
+    // Free-text submissions are an initial fallback; structured exercise
+    // answer widgets and automated checking will be implemented separately.
+    if(assignments&&Array.isArray(data.assignments)){
+      const cards=assignments.querySelectorAll('details');
+      data.assignments.forEach((assignment,index)=>{
+        const card=cards[index];
+        if(!card)return;
+        const form=document.createElement('form');
+        form.className='mt-3 space-y-2';
+        const label=document.createElement('label');
+        label.className='block text-xs font-medium';
+        label.textContent='Мой ответ';
+        const input=document.createElement('textarea');
+        input.className='soft-input w-full rounded-lg p-2 text-sm';
+        input.rows=3;
+        input.maxLength=10000;
+        input.placeholder='Напишите ответ на задание…';
+        label.append(input);
+        const button=document.createElement('button');
+        button.type='submit';
+        button.className='primary-btn rounded-lg px-3 py-2 text-sm';
+        button.textContent='Отправить на проверку';
+        const status=document.createElement('p');
+        status.className='text-xs text-slate-500';
+        status.setAttribute('role','status');
+        form.append(label,button,status);
+        form.addEventListener('submit',event=>{
+          event.preventDefault();
+          submitPublicLearningAnswer(accessToken,assignment.id,input,button,status);
+        });
+        card.append(form);
+      });
+    }
     render(notes,data.notes,'Пока нет заметок с уроков.',
       n=>[n.lesson_date,n.topic].filter(Boolean).join(' · ')||'Заметка',
       n=>n.document);
