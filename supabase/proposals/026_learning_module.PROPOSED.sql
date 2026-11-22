@@ -81,6 +81,9 @@ alter table public.learning_assignments add constraint learning_assignment_stude
  foreign key(student_id) references public.students(id) on delete cascade;
 alter table public.learning_notes add constraint learning_note_student_owner
  foreign key(student_id) references public.students(id) on delete cascade;
+-- Assignments must retain a published version from the same teacher.
+-- Composite FK above prevents cross-teacher versions; the trigger below
+-- independently checks finance lesson membership for each student.
 -- Prevent cross-teacher references even if IDs are supplied maliciously.
 create or replace function public.learning_check_student_owner()
 returns trigger language plpgsql set search_path='' as $$
