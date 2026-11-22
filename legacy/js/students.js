@@ -97,11 +97,21 @@ function sortedActiveStudents(){
   return active;
 }
 
+let nativeStudentListMode='students';
+function switchNativeListTab(mode){
+  nativeStudentListMode=mode==='groups'?'groups':'students';
+  const studentsPanel=document.querySelector('#tab-students .native-students-panel');
+  const groupsPanel=document.querySelector('#tab-students .native-groups-panel');
+  studentsPanel?.classList.toggle('native-show-groups',nativeStudentListMode==='groups');
+  groupsPanel?.classList.toggle('hidden',nativeStudentListMode!=='groups');
+  document.getElementById('native-tab-individual')?.classList.toggle('is-active',nativeStudentListMode==='students');
+  document.getElementById('native-tab-groups')?.classList.toggle('is-active',nativeStudentListMode==='groups');
+}
 let nativeSelectedStudentId=null;
 function renderStudents(){
   renderGroups();
 
-  const show=document.getElementById('show-archived').checked;
+  const show=false;
   const active=show?students.slice():sortedActiveStudents();
 
   if(show){
