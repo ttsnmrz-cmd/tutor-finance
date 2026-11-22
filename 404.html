@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="/legacy/css/style.css?v=20261122-materials1">
-<style id="student-lesson-controls">.student-lessons-scroll{max-height:294px;overflow-y:auto;scroll-behavior:smooth;padding-right:4px}.student-lessons-scroll::-webkit-scrollbar{width:5px}.student-lessons-scroll::-webkit-scrollbar-thumb{background:#c9c2d2;border-radius:99px}.student-attendance-menu{min-width:250px}</style><link rel="stylesheet" href="/legacy/css/classroom-redesign.css?v=7">
+<style id="student-lesson-controls">.student-lessons-scroll{max-height:294px;overflow-y:auto;scroll-behavior:smooth;padding-right:4px}.student-lessons-scroll::-webkit-scrollbar{width:5px}.student-lessons-scroll::-webkit-scrollbar-thumb{background:#c9c2d2;border-radius:99px}.student-attendance-menu{min-width:250px}</style><link rel="stylesheet" href="/legacy/css/classroom-redesign.css?v=9">
 </head>
 <body class="text-slate-800 min-h-screen">
 <div id="student-public-view" class="hidden max-w-3xl mx-auto p-4">
@@ -191,13 +191,13 @@
 </div></section>
 <section id="tab-students" class="hidden"><div class="native-page-heading"><div><div class="native-eyebrow">PEOPLE & GROUPS</div><h1>Ученики</h1><p>Список учеников, группы и история занятий</p></div><button type="button" class="native-add-button" onclick="openAdd()">+ Добавить ученика</button></div><div class="native-students-grid"><div class="app-card native-groups-panel rounded-3xl p-5"><div class="flex justify-between items-center mb-4"><h2 class="font-bold text-lg">Группы</h2></div><div id="groups-list" class="space-y-2 mb-6"></div></div><div class="app-card native-students-panel rounded-3xl p-5">
 <div class="flex justify-between items-center mb-4"><div class="student-sort-wrap relative"><div class="flex items-center gap-2"><h2 class="font-bold text-lg">Ученики</h2><button onclick="event.stopPropagation();toggleStudentSort()" title="Настройка списка" class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 hover:bg-purple-50 hover:text-purple-700 flex items-center justify-center" aria-label="Настройка списка">⚙</button></div><p class="text-xs text-slate-400">Нажмите на ученика, чтобы увидеть детали</p><div id="student-sort-menu" class="hidden absolute mt-2 z-30 bg-white border rounded-2xl shadow-xl p-2 w-56"><div class="text-xs text-slate-400 px-3 py-2">Сортировать</div><button onclick="setStudentSort('new')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100">Сначала новые</button><button onclick="setStudentSort('old')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100">Сначала старые</button><button onclick="setStudentSort('name_asc')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100">А-Я (A-Z)</button><button onclick="setStudentSort('name_desc')" class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100">Я-А (Z-A)</button></div></div><label class="flex items-center gap-2 text-sm"><input id="show-archived" type="checkbox" onchange="renderStudents()"> Показать архив</label></div>
-<div id="students-list" class="space-y-2"></div></div></div>
-<button onclick="openAdd()" class="fixed right-6 bottom-6 w-14 h-14 rounded-full bg-indigo-600 text-white text-3xl shadow-xl inline-flex items-center justify-center leading-none">+</button></section>
+<div id="students-list" class="space-y-2"></div></div><div id="native-student-detail" class="app-card native-student-detail rounded-3xl p-5"><div class="native-student-empty">Выберите ученика из списка, чтобы посмотреть занятия, оплаты и заметки</div></div></div>
+</section>
 <section id="tab-materials" class="hidden"><div class="native-page-heading"><div><div class="native-eyebrow">LIBRARY</div><h1>Материалы</h1><p>Библиотека учебных материалов</p></div></div><div class="app-card rounded-3xl p-5"><div class="flex justify-between items-center mb-4"><div><h2 class="font-bold text-lg">Материалы</h2><p class="text-xs text-slate-400">Учебная библиотека в ProfiProfit</p></div></div><div id="materials-status" class="text-sm text-slate-500 mb-3">Подключаем библиотеку…</div><div id="materials-library" class="space-y-2"></div></div></section></main></div><div id="error-box" class="hidden fixed bottom-4 left-4 bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl shadow-lg"></div>
 </div></div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad&render=explicit" async defer></script>
 <script src="/legacy/js/config.js?v=20261005-2"></script>
-<script src="/legacy/js/students.js?v=20261115-payment-notify"></script>
+<script src="/legacy/js/students.js?v=20261122-masterdetail2"></script>
 <script src="/legacy/js/app.js?v=20261122-unified-dashboard1"></script>
 <script src="/legacy/js/lessons.js?v=20261112-student-id1"></script>
 <script src="/legacy/js/calendar.js?v=20261122-hourgrid3"></script>
