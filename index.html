@@ -48,10 +48,18 @@
     <button type="button" class="next-side-dashboard" onclick="switchTab('dashboard')"><span aria-hidden="true">⌂</span> Обзор</button>
     <button type="button" class="next-side-calendar" onclick="switchTab('calendar')"><span aria-hidden="true">▦</span> Календарь</button>
     <button type="button" class="next-side-students" onclick="switchTab('students')"><span aria-hidden="true">♙</span> Ученики и финансы</button>
-    <a class="next-side-classroom" href="https://classroom.profiprofit.com/" target="_blank" rel="noopener noreferrer" title="Открыть существующую учебную платформу в новой вкладке"><span aria-hidden="true">▤</span><span>Учебные материалы<small>Открыть Classroom ↗</small></span></a>
+    <button type="button" class="next-side-classroom" onclick="nextOpenClassroom()" aria-controls="next-classroom-panel"><span aria-hidden="true">▤</span><span>Учебные материалы<small>Внутри рабочего пространства</small></span></button>
   </nav>
   <div class="next-sidebar-footer">Новый интерфейс · Предпросмотр</div>
 </aside>
+<section id="next-classroom-panel" hidden aria-label="Учебные материалы">
+  <div class="next-classroom-head">
+    <div><span class="next-classroom-eyebrow">PROFIPROFIT / CLASSROOM</span><h1>Учебные материалы</h1><p>Упражнения, материалы и занятия в одном рабочем пространстве.</p></div>
+    <div class="next-classroom-actions"><button type="button" onclick="nextCloseClassroom()">← Вернуться</button><a href="https://classroom.profiprofit.com/" target="_blank" rel="noopener noreferrer">Открыть отдельно ↗</a></div>
+  </div>
+  <div class="next-classroom-frame"><iframe id="next-classroom-iframe" title="My English Classroom" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="clipboard-write" data-src="https://classroom.profiprofit.com/"></iframe></div>
+  <p class="next-classroom-note">Classroom пока использует отдельный вход. Ваши финансовые данные здесь не передаются.</p>
+</section>
 <div class="max-w-5xl mx-auto p-4 md:p-6">
 <header id="teacher-header" class="app-card rounded-3xl p-4 mb-5 flex justify-between items-center gap-3 relative">
 <button type="button" onclick="switchTab('dashboard')" title="На главную" aria-label="На главную" class="flex items-center gap-3 min-w-0 text-left rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"><img src="/ProfoProfit_logo svg.svg" alt="ProfiProfit" class="w-16 h-16 object-contain rounded-xl"><span><span class="block text-2xl font-bold">ProfiProfit</span><span class="block text-sm text-slate-500">Занятия, ученики и оплаты</span></span></button>
@@ -227,5 +235,6 @@
 <script src="/js/lessons.js?v=20261112-student-id1"></script>
 <script src="/js/calendar.js?v=20261106-calendar1"></script>
 <script src="/js/i18n.js?v=20261013-1"></script>
+<script src="/js/next-workspace.js?v=1"></script>
 </body></html>
 
