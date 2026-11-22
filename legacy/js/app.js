@@ -525,7 +525,7 @@ async function autoCompletePastLessons(){
 
   due.forEach(l=>l.status='conducted');
 }
-const TAB_PATHS={dashboard:'/dashboard',calendar:'/calendar',students:'/students',admin:'/admin',settings:'/settings'};
+const TAB_PATHS={dashboard:'/dashboard',calendar:'/calendar',students:'/students',materials:'/materials',admin:'/admin',settings:'/settings'};
 function getTabFromPath(){
   const path=location.pathname.replace(/\/+$/,'')||'/';
   const entry=Object.entries(TAB_PATHS).find(([,route])=>route===path);
