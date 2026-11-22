@@ -252,3 +252,20 @@ dialog.ml-dialog .ml-dialog-actions .primary{background:#7042b6!important;color:
 .ml-preview .ml-item-open strong{font-size:14px!important;font-weight:750!important}
 .ml-preview .ml-item-open small{font-size:12px!important}
 @media(max-width:900px){.ml-preview .ml-layout{grid-template-columns:210px minmax(0,1fr)!important;gap:10px!important}.ml-preview .ml-workspace{padding:12px!important}.ml-preview .ml-folders{padding:14px 10px!important}}
+
+/* Match original Classroom: breadcrumb and search on one line, compact header. */
+.ml-preview .ml-folders-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;margin:0 0 16px!important}
+.ml-preview .ml-folders-heading h2{margin:0!important}
+.ml-preview .ml-folders-heading .ml-panel-toggle{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;min-width:34px!important;padding:6px!important;border:1px solid #e5d8fb!important;border-radius:50%!important;background:#fff!important;color:#6928c5!important;cursor:pointer!important}
+.ml-preview .ml-workspace{position:relative!important;padding-top:18px!important}
+.ml-preview .ml-topline{min-height:36px!important;margin-bottom:8px!important;padding-right:330px!important}
+.ml-preview .ml-controls{position:absolute!important;top:14px!important;right:20px!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;margin:0!important}
+.ml-preview .ml-controls>input{width:290px!important;min-height:39px!important}
+.ml-preview .ml-controls .ml-view,.ml-preview .ml-controls select{position:relative!important;top:0!important}
+.ml-preview .ml-title-row{margin-bottom:54px!important}
+.ml-preview .ml-controls .ml-view{position:absolute!important;top:105px!important;right:175px!important}
+.ml-preview .ml-controls select{position:absolute!important;top:105px!important;right:0!important}
+.ml-preview.ml-tree-collapsed .ml-layout{grid-template-columns:minmax(0,1fr)!important}
+.ml-preview.ml-tree-collapsed .ml-topline{padding-left:40px!important}
+.ml-preview.ml-tree-collapsed .ml-topline .ml-panel-toggle{position:absolute!important;left:20px!important;top:17px!important}
+@media(max-width:1150px){.ml-preview .ml-topline{padding-right:0!important}.ml-preview .ml-controls{position:static!important;justify-content:flex-end!important;margin:0 0 12px!important}.ml-preview .ml-controls .ml-view,.ml-preview .ml-controls select{position:static!important}.ml-preview .ml-title-row{margin-bottom:12px!important}}
