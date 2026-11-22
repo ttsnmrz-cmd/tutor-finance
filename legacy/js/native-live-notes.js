@@ -9,9 +9,12 @@ async function renderNativeLessonNotes(student){
   if(!root||!student)return;
   const lessonsForStudent=studentStats(student).ls.slice().sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
   if(!lessonsForStudent.length){root.innerHTML='<p class="native-history-empty">Нет занятий для заметок.</p>';return;}
+  const today=localISO(new Date());
+  const latestCompleted=lessonsForStudent.find(l=>String(l.date||'')<=today&&['conducted','completed','cancelled_charge','cancelled_free'].includes(String(l.status||'').toLowerCase()));
   const choices=lessonsForStudent.map(l=>'<option value="'+nativeNotesEscape(l.id)+'">'+nativeNotesEscape(l.date+' · '+(l.time||'')+' · '+(l.comment||'Lesson'))+'</option>').join('');
   root.innerHTML='<div class="native-notes-toolbar"><label for="native-note-lesson">Lesson</label><select id="native-note-lesson">'+choices+'</select><span id="native-note-status" role="status"></span></div><label class="native-note-label" for="native-note-editor">Live Notes</label><textarea id="native-note-editor" rows="12" placeholder="Write lesson notes here…"></textarea><div class="native-notes-footer"><span>Notes are linked to the selected lesson.</span><button type="button" id="native-note-save">Save notes</button></div>';
   const select=root.querySelector('#native-note-lesson'),editor=root.querySelector('#native-note-editor'),status=root.querySelector('#native-note-status');
+  if(latestCompleted)select.value=String(latestCompleted.id);
   nativeLiveNotesState.studentId=String(student.id);
   const user=await supabaseClient.auth.getUser();
   if(!user.data?.user){status.textContent='Sign in to save notes';editor.disabled=true;return;}
@@ -30,6 +33,7 @@ async function renderNativeLessonNotes(student){
     const lessonId=nativeLiveNotesState.lessonId,teacherId=nativeLiveNotesState.teacherId;
     if(!lessonId||!teacherId||editor.disabled)return;
     const plain=editor.value;
+    if(!plain.trim()){status.textContent='Empty notes are not saved';nativeLiveNotesState.dirty=false;return;}
     status.textContent='Saving…';
     const title=student.name+' · '+(lessonsForStudent.find(l=>String(l.id)===lessonId)?.date||'Lesson');
     const response=await supabaseClient.from('calendar_live_notes').upsert({teacher_id:teacherId,lesson_id:lessonId,title,plain,html:nativeNotesEscape(plain).replace(/\n/g,'<br>'),updated_at:new Date().toISOString()},{onConflict:'teacher_id,lesson_id'});
