@@ -375,3 +375,7 @@ html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-
 #teacher-app .native-layout.sidebar-collapsed .classroom-sidebar-toggle svg{transform:rotate(180deg)!important}
 }
 html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{color:#e5d7f4!important;background:transparent!important}
+
+/* In the material editor, the header and work area share one vertical gap. */
+#teacher-app:has(.ml-builder-host) > .native-workspace{padding-bottom:0!important}
+#teacher-app:has(.ml-builder-host) > .native-layout{padding-top:0!important}
