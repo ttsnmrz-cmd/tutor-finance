@@ -260,3 +260,10 @@ dialog.mb-dialog::backdrop,dialog.ml-dialog::backdrop{background:rgba(25,20,40,.
 dialog.mb-dialog form,dialog.ml-dialog form{display:grid!important;gap:14px!important;margin:14px 0 0!important}
 dialog.mb-dialog input,dialog.mb-dialog select,dialog.ml-dialog input,dialog.ml-dialog select{width:100%!important;min-height:42px!important;border:1px solid #ded8e7!important;border-radius:9px!important;padding:9px 12px!important;background:#fff!important}
 dialog.mb-dialog .mb-dialog-actions,dialog.ml-dialog .ml-dialog-actions{display:flex!important;justify-content:flex-end!important;gap:10px!important;margin-top:12px!important}
+
+/* Calendar: cancelled lessons retain readable identity, notes use status-sized text. */
+#dashboard-calendar .native-timed-event .calendar-event-time,
+#dashboard-calendar .native-timed-event .calendar-event-title{color:#30213e!important;font-size:13px!important;font-weight:800!important;text-decoration:none!important;opacity:1!important}
+#dashboard-calendar .native-timed-event.is-cancelled .calendar-event-time,
+#dashboard-calendar .native-timed-event.is-cancelled .calendar-event-title{color:#554760!important;text-decoration:line-through!important;text-decoration-color:#9a8da6!important;opacity:1!important}
+#dashboard-calendar .native-timed-event .native-event-comment{display:block!important;max-width:100%!important;color:#726781!important;font-size:10px!important;font-weight:500!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;text-decoration:none!important;opacity:1!important}
