@@ -128,3 +128,10 @@ html.cw-students [id$="-modal"]:not(.hidden){z-index:1000!important}
 
 /* Student access is handled elsewhere; hide obsolete link in profile header/menu. */
 .cw-students-workspace .cw-student-access{display:none!important}
+
+/* Payment history is a contained panel, not a cut-off column. */
+.cw-students-workspace .cw-student-detail [data-student-pane="payments"] .grid-cols-1{width:min(100%,740px);max-width:100%;min-width:0}
+.cw-students-workspace .cw-student-detail [data-student-pane="payments"] .teacher-detail-list.cw-payments-scroll{width:100%;max-width:100%;box-sizing:border-box;padding-right:10px}
+.cw-lesson-status-edit{border:0;cursor:pointer;font:inherit;transition:filter .15s,box-shadow .15s}
+.cw-lesson-status-edit:hover{filter:brightness(.95);box-shadow:0 0 0 2px #a389c366}
+.cw-lesson-status-edit:focus-visible{outline:2px solid #8b5bd8;outline-offset:2px}
