@@ -45,3 +45,19 @@ html[data-theme=dark] .teacher-nav{background:#393046}
 html[data-theme=dark] .teacher-nav button.bg-indigo-600{background:#4b3c60!important;color:#f1eafa!important}
 @media(max-width:950px){#teacher-app>div{padding:12px!important}#teacher-header{flex-wrap:wrap;padding:12px!important}.teacher-header-actions{width:100%;justify-content:space-between}.teacher-nav{overflow-x:auto;max-width:calc(100vw - 100px)}.teacher-nav button{padding:9px 11px!important}#tab-dashboard .dashboard-heading{align-items:start;flex-direction:column;gap:5px}#teacher-app main>section>.app-card{padding:16px!important}}
 @media(max-width:560px){#teacher-header>button:first-child img{width:42px!important;height:42px!important}#teacher-header>button:first-child .text-2xl{font-size:19px!important}#dashboard-cards{gap:9px!important}#dashboard-cards>*{min-height:100px}#tab-dashboard>.grid>.app-card{min-height:0}}
+
+/* Native Classroom-like workspace navigation. Existing switchTab handlers remain the source of truth. */
+.native-layout{display:grid;grid-template-columns:206px minmax(0,1fr);gap:22px;align-items:start}
+.native-layout>#teacher-main{min-width:0}
+.native-sidebar{position:sticky;top:18px;min-height:calc(100vh - 160px);padding:20px 12px;background:#fff;border:1px solid #e9e3f0;border-radius:21px;box-shadow:0 8px 30px rgba(69,44,104,.045);display:flex;flex-direction:column;gap:5px}
+.native-sidebar-label{font-size:10px;letter-spacing:.17em;color:#a198aa;font-weight:750;padding:6px 14px 13px}
+.native-sidebar button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border-radius:12px;font-size:13px;font-weight:650;color:#716680;transition:background .16s,color .16s}
+.native-sidebar button span{font-size:20px;line-height:1;width:22px;text-align:center}
+.native-sidebar button:hover{background:#f4eff9;color:#513b6a}
+.native-sidebar button.is-active{background:#efe8f7;color:#604381}
+.native-sidebar-footer{margin-top:auto;padding:18px 12px 4px;font-size:10px;color:#9a90a3}
+#teacher-header .teacher-nav{display:none!important}
+html[data-theme=dark] .native-sidebar{background:#30283b;border-color:#4b4059}
+html[data-theme=dark] .native-sidebar button{color:#c9bed5}
+html[data-theme=dark] .native-sidebar button.is-active{background:#4a3a5b;color:#f4e9ff}
+@media(max-width:950px){.native-layout{grid-template-columns:1fr;gap:12px}.native-sidebar{position:static;min-height:0;display:flex;flex-direction:row;align-items:center;overflow-x:auto;padding:6px 8px;border-radius:14px;gap:4px}.native-sidebar-label,.native-sidebar-footer{display:none}.native-sidebar button{flex:0 0 auto;width:auto;padding:10px 12px;white-space:nowrap}.native-sidebar button span{font-size:16px;width:17px}}
