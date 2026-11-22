@@ -100,7 +100,7 @@ create trigger learning_notes_owner before insert or update on public.learning_n
 -- For a lesson reference, verify the lesson is genuinely linked to this student.
 -- Group membership is checked through lesson_members, not group_id alone.
 create or replace function public.learning_check_lesson_member()
-returns trigger language plpgsql set search_path='' as $$$
+returns trigger language plpgsql set search_path='' as $$
 begin
  if new.finance_lesson_id is null then return new; end if;
  if not exists(
@@ -115,7 +115,7 @@ begin
    using errcode='42501';
  end if;
  return new;
-end $$$;
+end $$;
 revoke all on function public.learning_check_lesson_member() from public,anon,authenticated;
 create trigger learning_assignment_lesson_member before insert or update
  on public.learning_assignments for each row
