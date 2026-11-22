@@ -310,3 +310,47 @@ dialog.mb-dialog .mb-dialog-actions,dialog.ml-dialog .ml-dialog-actions{display:
 #teacher-app .native-workspace>header button[title="На главную"] span.block.text-2xl{font-weight:850!important;letter-spacing:-.8px!important;color:#6430ba!important}
 #teacher-app .native-workspace>header button[title="На главную"] span.block.text-sm{color:#8c809c!important;font-size:12px!important}
 #teacher-app #profile-menu-button{background:#f1eafa!important;color:#6430ba!important;border:1px solid #e7dcfc!important;border-radius:50%!}
+
+/* Dark theme: restore readable contrast after Classroom navigation overrides. */
+html[data-theme="dark"] #teacher-app{color:#f0eafa!important}
+html[data-theme="dark"] #teacher-app .native-workspace>header,
+html[data-theme="dark"] #teacher-header{background:#30283b!important;border-color:#51435f!important;color:#f0eafa!important}
+html[data-theme="dark"] #teacher-app .native-workspace>header button[title="На главную"] span.block.text-2xl{color:#d5adff!important}
+html[data-theme="dark"] #teacher-app .native-workspace>header button[title="На главную"] span.block.text-sm{color:#c6b9d3!important}
+html[data-theme="dark"] #teacher-app .native-sidebar button[data-native-tab]{color:#e4d9f0!important}
+html[data-theme="dark"] #teacher-app .native-sidebar button[data-native-tab].is-active{background:#503b69!important;color:#f6e9ff!important}
+html[data-theme="dark"] #teacher-app .native-sidebar button[data-native-tab]:hover{background:#463652!important;color:#fff!important}
+html[data-theme="dark"] #teacher-app .native-sidebar-toggle{background:#443450!important;border-color:#67547a!important;color:#e8caff!important}
+html[data-theme="dark"] #teacher-app #profile-menu-button{background:#493a5b!important;border-color:#67547a!important;color:#ead5ff!important}
+html[data-theme="dark"] #teacher-app .app-card,
+html[data-theme="dark"] #teacher-app .native-calendar,
+html[data-theme="dark"] #teacher-app .native-calendar-grid,
+html[data-theme="dark"] #teacher-app .native-calendar-day,
+html[data-theme="dark"] #teacher-app .native-calendar-time,
+html[data-theme="dark"] #teacher-app .native-calendar-header{background-color:#30283b!important;border-color:#50445e!important;color:#f0eafa!important}
+html[data-theme="dark"] #teacher-app h1,
+html[data-theme="dark"] #teacher-app h2,
+html[data-theme="dark"] #teacher-app h3,
+html[data-theme="dark"] #teacher-app .text-slate-900,
+html[data-theme="dark"] #teacher-app .text-slate-800,
+html[data-theme="dark"] #teacher-app .text-slate-700{color:#f5effb!important}
+html[data-theme="dark"] #teacher-app .text-slate-500,
+html[data-theme="dark"] #teacher-app .text-slate-400,
+html[data-theme="dark"] #teacher-app .text-slate-600{color:#c8bbd5!important}
+html[data-theme="dark"] #teacher-app .bg-white,
+html[data-theme="dark"] #teacher-app .bg-slate-50,
+html[data-theme="dark"] #teacher-app .bg-slate-100,
+html[data-theme="dark"] #teacher-app .bg-indigo-50{background-color:#393044!important;color:#f0eafa!important}
+html[data-theme="dark"] #teacher-app input:not([type=checkbox]),
+html[data-theme="dark"] #teacher-app select,
+html[data-theme="dark"] #teacher-app textarea{background:#393044!important;border-color:#655673!important;color:#f5effb!important}
+html[data-theme="dark"] #teacher-app input::placeholder,
+html[data-theme="dark"] #teacher-app textarea::placeholder{color:#b9a9c8!important}
+html[data-theme="dark"] #teacher-app .border-slate-100,
+html[data-theme="dark"] #teacher-app .border-slate-200,
+html[data-theme="dark"] #teacher-app .border-indigo-200{border-color:#574967!important}
+html[data-theme="dark"] #teacher-app .native-timed-event:not(.is-cancelled){color:#1d1630!important}
+html[data-theme="dark"] #teacher-app .native-timed-event:not(.is-cancelled) .calendar-event-title,
+html[data-theme="dark"] #teacher-app .native-timed-event:not(.is-cancelled) .calendar-event-time{color:#261a38!important}
+html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-event-title,
+html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-event-time{color:#d0c0da!important}
