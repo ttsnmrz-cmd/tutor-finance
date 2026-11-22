@@ -62,7 +62,9 @@ begin
    raise exception 'Invalid note';
  end if;
  if p_finance_lesson_ref is not null and
-   (p_finance_lesson_ref !~ '^[0-9]{1,18}
+    p_finance_lesson_ref !~ '^[0-9]{1,18}$' then
+   raise exception 'Invalid finance lesson ID';
+ end if;
  if p_id is null then
    insert into public.learning_notes(teacher_id,student_id,topic,document,lesson_date,finance_lesson_id)
    values(v_teacher,p_student_id,coalesce(p_topic,''),p_document,p_lesson_date,
@@ -85,29 +87,4 @@ grant execute on function public.learning_save_material(uuid,text,jsonb,integer,
 grant execute on function public.learning_publish_material(uuid) to authenticated;
 grant execute on function public.learning_save_note(uuid,uuid,text,jsonb,date,text) to authenticated;
 commit;
--- Do not run without applying/reviewing 026 first and testing as two teachers.
-) then
-   raise exception 'Invalid finance lesson ID';
- end if;
- if p_id is null then
-   insert into public.learning_notes(teacher_id,student_id,topic,document,lesson_date)
-   values(v_teacher,p_student_id,coalesce(p_topic,''),p_document,p_lesson_date)
-   returning id into v_id;
- else
-   update public.learning_notes set topic=coalesce(p_topic,''),document=p_document,
-     lesson_date=p_lesson_date,updated_at=now()
-   where id=p_id and student_id=p_student_id and teacher_id=v_teacher
-   returning id into v_id;
-   if not found then raise exception 'Note not found' using errcode='42501'; end if;
- end if;
- return v_id;
-end $$;
-
-revoke all on function public.learning_save_material(uuid,text,jsonb,integer,uuid) from public,anon,authenticated;
-revoke all on function public.learning_publish_material(uuid) from public,anon,authenticated;
-revoke all on function public.learning_save_note(uuid,uuid,text,jsonb,date,text) from public,anon,authenticated;
-grant execute on function public.learning_save_material(uuid,text,jsonb,integer,uuid) to authenticated;
-grant execute on function public.learning_publish_material(uuid) to authenticated;
-grant execute on function public.learning_save_note(uuid,uuid,text,jsonb,date,text) to authenticated;
-commit;
--- Do not run without applying/reviewing 026 first and testing as two teachers.
+-- Do not apply until reviewed and tested with separate teacher accounts.
