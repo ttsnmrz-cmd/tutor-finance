@@ -777,15 +777,25 @@ async function copyTelegramStudentLink(id){
 }
 
 async function copyStudentLink(id){
-  const url=new URL(location.href);
-  url.search='';
-  url.searchParams.set('student',id);
-
+  // Issue an opaque capability only to the authenticated owner of this student.
+  // Never fall back to publishing the student's UUID as a new access link.
   try{
-    await navigator.clipboard.writeText(url.toString());
-    alert('Ссылка для ученика скопирована.');
+    const {data,error}=await supabaseClient.rpc('issue_student_portal_token',{
+      p_student_id:id,p_rotate:false
+    });
+    if(error)throw error;
+    if(!data)throw new Error('Не удалось создать защищённую ссылку.');
+    const url=new URL(location.origin+'/');
+    url.searchParams.set('access',data);
+    try{
+      await navigator.clipboard.writeText(url.toString());
+      alert('Защищённая ссылка для ученика скопирована.');
+    }catch{
+      prompt('Скопируйте защищённую ссылку:',url.toString());
+    }
   }catch(e){
-    prompt('Скопируйте ссылку:',url.toString());
+    console.error('Could not issue student portal capability',e);
+    alert('Защищённая ссылка пока недоступна. Проверьте миграцию 018 в Supabase. Старую ссылку по ID не создаём.');
   }
 }
 
