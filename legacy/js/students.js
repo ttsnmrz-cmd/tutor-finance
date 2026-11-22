@@ -588,8 +588,7 @@ function nativeStudentLessonRows(s,limit=Infinity,applyFilters=true){
     if(nativeLessonStatusFilter!=='all'&&l.status!==nativeLessonStatusFilter)return false;
     return true;
   });
-  if(applyFilters&&nativeLessonDateFilter==='all'&&nativeLessonStatusFilter==='all'){const lastCompleted=filtered.filter(l=>['conducted','completed','cancelled_charge','cancelled_free'].includes(String(l.status||'').toLowerCase())&&String(l.date||'')<=today).sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')))[0];if(lastCompleted){const idx=filtered.findIndex(l=>String(l.id)===String(lastCompleted.id));if(idx>0)filtered.splice(0,idx);}}
-  return filtered.slice(0,limit).map(l=>'<button type="button" class="native-history-row" onclick="openEditLesson(\''+esc(l.id)+'\')"><span>'+esc(l.date)+' · '+esc(displayTime(l.time||''))+'</span><span>'+esc(l.comment||'—')+'</span><span class="native-history-status">'+esc(studentLessonStatusText(l,s))+'</span><strong>'+money(l.group_id?Number(lessonMembers.find(m=>String(m.lesson_id)===String(l.id)&&String(m.student_id)===String(s.id))?.price??s.price??0):Number(l.price||0))+'</strong></button>').join('')||'<p class="native-history-empty">Занятий нет</p>';
+    return filtered.slice(0,limit).map(l=>'<button type="button" data-lesson-id="'+esc(l.id)+'" class="native-history-row" onclick="openEditLesson(\''+esc(l.id)+'\')"><span>'+esc(l.date)+' · '+esc(displayTime(l.time||''))+'</span><span>'+esc(l.comment||'—')+'</span><span class="native-history-status">'+esc(studentLessonStatusText(l,s))+'</span><strong>'+money(l.group_id?Number(lessonMembers.find(m=>String(m.lesson_id)===String(l.id)&&String(m.student_id)===String(s.id))?.price??s.price??0):Number(l.price||0))+'</strong></button>').join('')||'<p class="native-history-empty">Занятий нет</p>';
 }
 function nativeStudentPaymentRows(s,limit=Infinity){
   const items=payments.filter(p=>String(p.student_id||'')===String(s.id)).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
@@ -618,6 +617,13 @@ function renderNativeStudentDetail(){
   }
   const persistentStats='<div class="native-student-stats"><div><span>Balance</span><strong>'+money(st.bal)+'</strong></div><div><span>Payments received</span><strong>'+money(st.income)+'</strong></div><div><span>Amount charged</span><strong>'+money(st.expenses)+'</strong></div><div><span>Lessons</span><strong>'+st.ls.length+'</strong></div></div>';
   panel.innerHTML=head+persistentStats+nav+'<div class="native-detail-body">'+content+'</div>';
+  if(nativeStudentDetailTab==='lessons'&&nativeLessonDateFilter==='all'&&nativeLessonStatusFilter==='all'){
+    const today=localISO(new Date());
+    const last=st.ls.filter(l=>String(l.date||'')<=today&&['conducted','completed','cancelled_charge','cancelled_free'].includes(String(l.status||'').toLowerCase())).sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')))[0];
+    const scroller=panel.querySelector('.native-history-scroll');
+    const row=last&&Array.from(scroller?.querySelectorAll('[data-lesson-id]')||[]).find(el=>el.dataset.lessonId===String(last.id));
+    if(row&&scroller)scroller.scrollTop=Math.max(0,row.offsetTop-scroller.offsetTop);
+  }
   if(nativeStudentDetailTab==='notes'&&typeof renderNativeLessonNotes==='function')renderNativeLessonNotes(s);
 }
 function switchNativeStudentTab(tab){
