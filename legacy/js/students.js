@@ -611,12 +611,13 @@ function renderNativeStudentDetail(){
   }else if(nativeStudentDetailTab==='lessons'){
     content='<div class="native-lesson-filters"><select aria-label="Filter lesson dates" onchange="nativeLessonDateFilter=this.value;renderNativeStudentDetail()"><option value="all" '+(nativeLessonDateFilter==='all'?'selected':'')+'>All dates</option><option value="past" '+(nativeLessonDateFilter==='past'?'selected':'')+'>Past</option><option value="upcoming" '+(nativeLessonDateFilter==='upcoming'?'selected':'')+'>Upcoming</option></select><select aria-label="Filter lesson status" onchange="nativeLessonStatusFilter=this.value;renderNativeStudentDetail()">'+[['all','All statuses'],['scheduled','Scheduled'],['conducted','Completed'],['rescheduled','Rescheduled'],['cancelled_charge','Cancelled · charged'],['cancelled_free','Cancelled · free']].map(([v,t])=>'<option value="'+v+'" '+(nativeLessonStatusFilter===v?'selected':'')+'>'+t+'</option>').join('')+'</select></div><div class="native-history-scroll">'+nativeStudentLessonRows(s)+'</div>';
   }else if(nativeStudentDetailTab==='notes'){
-    content='<div class="native-notes-empty"><h3>Notes</h3><p>Заметки к занятиям пока не подключены.</p></div>';
+    content='<div id="native-live-notes"></div>';
   }else{
     content='<div class="native-section-heading"><h3>Payments</h3><button class="native-add-button" onclick="openStudentPayment(\''+id+'\')">+ Add payment</button></div><div class="native-history-scroll">'+nativeStudentPaymentRows(s)+'</div>';
   }
   const persistentStats='<div class="native-student-stats"><div><span>Balance</span><strong>'+money(st.bal)+'</strong></div><div><span>Payments received</span><strong>'+money(st.income)+'</strong></div><div><span>Amount charged</span><strong>'+money(st.expenses)+'</strong></div><div><span>Lessons</span><strong>'+st.ls.length+'</strong></div></div>';
   panel.innerHTML=head+persistentStats+nav+'<div class="native-detail-body">'+content+'</div>';
+  if(nativeStudentDetailTab==='notes'&&typeof renderNativeLessonNotes==='function')renderNativeLessonNotes(s);
 }
 function switchNativeStudentTab(tab){
   nativeStudentDetailTab=['overview','lessons','notes','payments'].includes(tab)?tab:'overview';
