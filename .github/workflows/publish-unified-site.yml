@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
       - name: Download verified unified build
         run: |
-          curl -fL 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-872c-81f4-9b78-4e287317077a/raw?se=2026-11-22T17%3A19%3A03Z&sp=r&sv=2026-06-06&sr=b&scid=795622b3-cb2a-5563-9842-eb55dbb051a2&skoid=e32cbaad-a1eb-4299-9f16-1b364ab43781&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-22T03%3A58%3A49Z&ske=2026-11-23T03%3A58%3A49Z&sks=b&skv=2026-06-06&sig=Se7jp6bQk7kr4D0xak2n6zVrGZ5Ptya6YCPZoq4pW6g%3D' -o /tmp/site.zip
+          curl -fL 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-90ec-81f4-b967-c7c1212cf147/raw?se=2026-11-22T17%3A33%3A52Z&sp=r&sv=2026-06-06&sr=b&scid=918dae2b-181c-5504-9615-d7406979473f&skoid=e32cbaad-a1eb-4299-9f16-1b364ab43781&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-22T08%3A21%3A33Z&ske=2026-11-23T08%3A21%3A33Z&sks=b&skv=2026-06-06&sig=yPapeHkRZo4dXfIcwqLAScMvXX1V/fEAfIv7vbyndCc%3D' -o /tmp/site.zip
           rm -rf /tmp/site && mkdir /tmp/site
           unzip -q /tmp/site.zip -d /tmp/site
           test -f /tmp/site/index.html
