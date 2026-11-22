@@ -1,7 +1,7 @@
 name: Stage compiled Classroom assets
 on:
   push:
-    branches: [integration/classroom-builder-20261122]
+    branches: [integration/classroom-builder-20261122, refactor-modules]
     paths:
       - 'classroom-app/**'
       - '.github/workflows/stage-classroom-assets.yml'
@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: integration/classroom-builder-20261122
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -33,5 +33,5 @@ jobs:
           git add -f legacy/classroom-assets/classroom.js legacy/classroom-assets/classroom.css
           if ! git diff --cached --quiet; then
             git commit -m 'build: stage verified Classroom bundle'
-            git push origin HEAD:integration/classroom-builder-20261122
+            git push origin HEAD:${{ github.ref_name }}
           fi
