@@ -1,5 +1,5 @@
-/* Teacher-only material library and read-only preview.
-   Uses the existing Classroom learning_folders/learning_materials records. */
+/* ProfiProfit native materials library: Classroom sections and lesson plans.
+   Uses the production schema; no Classroom test data is copied. */
 let nativeMaterialStore={folders:[],materials:[],selected:null};
 function nativeMaterialText(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function nativeMaterialContent(value,depth=0){
@@ -36,12 +36,12 @@ async function loadNativeMaterials(){
   if(auth.error||!auth.data.user)throw Error('Войдите в ProfiProfit.');
   const teacher=auth.data.user.id;
   const [folders,materials]=await Promise.all([
-   supabaseClient.from('learning_folders').select('id,title,parent_id,position').eq('teacher_id',teacher).order('position'),
-   supabaseClient.from('learning_materials').select('id,title,folder_id,revision,updated_at,body').eq('teacher_id',teacher).order('updated_at',{ascending:false})
+   supabaseClient.from('material_sections').select('id,title,parent_id,position').eq('teacher_id',teacher).order('position'),
+   supabaseClient.from('teaching_lesson_plans').select('id,section_id,revision,updated_at,body').eq('teacher_id',teacher).order('updated_at',{ascending:false})
   ]);
   if(folders.error)throw Error(folders.error.message);
   if(materials.error)throw Error(materials.error.message);
-  const fs=folders.data||[],ms=materials.data||[];
+  const fs=folders.data||[],ms=(materials.data||[]).map(m=>({...m,folder_id:m.section_id,title:(m.body&&typeof m.body==='object'&&(m.body.title||m.body.name))||'Untitled lesson'}));
   nativeMaterialStore.folders=fs;nativeMaterialStore.materials=ms;
   const seen=new Set();
   const render=(parent,depth)=>{
