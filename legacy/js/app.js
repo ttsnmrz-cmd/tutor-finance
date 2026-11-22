@@ -529,11 +529,12 @@ const TAB_PATHS={dashboard:'/dashboard',calendar:'/calendar',students:'/students
 function getTabFromPath(){
   const path=location.pathname.replace(/\/+$/,'')||'/';
   const entry=Object.entries(TAB_PATHS).find(([,route])=>route===path);
-  return entry?.[0]||'dashboard';
+  return entry?.[0]==='calendar'?'dashboard':entry?.[0]||'dashboard';
 }
 function switchTab(t,options={}){
   const allowed=['dashboard','calendar','students','materials','admin','settings'];
   if(!allowed.includes(t))t='dashboard';
+  if(t==='calendar')t='dashboard';
   if(t==='admin'&&!platformAdmin)t='dashboard';
   ['dashboard','calendar','students','materials','admin','settings'].forEach(name=>{
     document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
@@ -621,7 +622,7 @@ function renderDashboard(){
   const greetingKicker=document.getElementById('dashboard-greeting-kicker');
   if(greetingTitle)greetingTitle.textContent=greeting+(userName?', '+userName:'')+'!';
   if(greetingKicker)greetingKicker.textContent=en?'Welcome to ProfiProfit':'Рады видеть тебя в ProfiProfit';
-  document.getElementById('dashboard-date').textContent=now.toLocaleDateString(en?'en-US':'ru-RU',{month:'long',year:'numeric'});
+  const dashboardDate=document.getElementById('dashboard-date');if(dashboardDate)dashboardDate.textContent=now.toLocaleDateString(en?'en-US':'ru-RU',{month:'long',year:'numeric'});
   const cards=[
     {label:en?'Active students':'Активные ученики',value:active.length,icon:'♙',action:"switchTab('students')"},
     {label:en?'Accrued this month':'Начислено за месяц',value:money(earnedMonth),icon:'₿'},
@@ -631,12 +632,12 @@ function renderDashboard(){
     {label:en?'Low student balances':'Низкие балансы',value:low.length,icon:'!',action:"switchTab('students')"}
   ];
   document.getElementById('dashboard-cards').innerHTML=cards.map(c=>'<button '+(c.action?'onclick="'+c.action+'"':'')+' class="app-card rounded-2xl p-4 md:p-5 text-left border min-w-0"><div class="flex items-center justify-between gap-2 mb-3"><span class="text-xs md:text-sm text-slate-500">'+c.label+'</span><span class="text-xl">'+c.icon+'</span></div><div class="text-xl md:text-2xl font-bold break-words">'+c.value+'</div></button>').join('');
-  document.getElementById('dashboard-summary').innerHTML='<div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Lessons this month':'Занятий в этом месяце')+'</span><strong>'+monthLessons.length+'</strong></div><div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Lessons today':'Занятий сегодня')+'</span><strong>'+todayCount+'</strong></div><div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Active students':'Активных учеников')+'</span><strong>'+active.length+'</strong></div>';
+  document.getElementById('dashboard-summary') && (document.getElementById('dashboard-summary').innerHTML='<div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Lessons this month':'Занятий в этом месяце')+'</span><strong>'+monthLessons.length+'</strong></div><div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Lessons today':'Занятий сегодня')+'</span><strong>'+todayCount+'</strong></div><div class="flex justify-between gap-3"><span class="text-sm text-slate-500">'+(en?'Active students':'Активных учеников')+'</span><strong>'+active.length+'</strong></div>');
   const lowContainer=document.getElementById('dashboard-low-balances');
-  lowContainer.innerHTML=low.length?low.slice(0,5).map(x=>{const label=x.status==='debt'?(en?'Debt':'Задолженность'):x.status==='topup'?(en?'Top up needed':'Нужно пополнить'):(en?'Low balance':'Низкий баланс');const color=x.status==='debt'?'text-red-700':x.status==='topup'?'text-orange-600':'text-amber-600';const count=x.status==='debt'?'':(en?' · '+x.remaining+' lessons left':' · осталось занятий: '+x.remaining);return '<button onclick="switchTab(\'students\')" class="w-full flex flex-col gap-1 text-left border-b last:border-0 py-2"><span class="flex justify-between gap-3"><span class="font-medium">'+esc(x.student.name)+'</span><span class="text-sm '+color+'">'+label+'</span></span><span class="flex justify-between gap-3 text-xs text-slate-500"><span>'+money(x.stats.bal)+count+'</span></span></button>';}).join(''):'<p class="text-sm text-slate-500">'+(en?'No low balances':'Нет учеников с низким балансом')+'</p>';
+  if(lowContainer)lowContainer.innerHTML=low.length?low.slice(0,5).map(x=>{const label=x.status==='debt'?(en?'Debt':'Задолженность'):x.status==='topup'?(en?'Top up needed':'Нужно пополнить'):(en?'Low balance':'Низкий баланс');const color=x.status==='debt'?'text-red-700':x.status==='topup'?'text-orange-600':'text-amber-600';const count=x.status==='debt'?'':(en?' · '+x.remaining+' lessons left':' · осталось занятий: '+x.remaining);return '<button onclick="switchTab(\'students\')" class="w-full flex flex-col gap-1 text-left border-b last:border-0 py-2"><span class="flex justify-between gap-3"><span class="font-medium">'+esc(x.student.name)+'</span><span class="text-sm '+color+'">'+label+'</span></span><span class="flex justify-between gap-3 text-xs text-slate-500"><span>'+money(x.stats.bal)+count+'</span></span></button>';}).join(''):'<p class="text-sm text-slate-500">'+(en?'No low balances':'Нет учеников с низким балансом')+'</p>';
 }
 
-function openTodayCalendar(){selectedDate=todayISOInTimezone(getTeacherTimezone());weekAnchor=dateAtLocalNoon(selectedDate);switchTab('calendar');}
+function openTodayCalendar(){selectedDate=todayISOInTimezone(getTeacherTimezone());weekAnchor=dateAtLocalNoon(selectedDate);switchTab('dashboard');renderWeek();document.getElementById('dashboard-calendar')?.scrollIntoView({block:'start',behavior:'smooth'});}
 function fillStudentSelects(){
   const active=sortedActiveStudents();
 
