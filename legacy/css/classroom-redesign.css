@@ -129,3 +129,11 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #dashboard-calendar .native-week-calendar>.native-day:nth-child(6){grid-column:6!important}
 #dashboard-calendar .native-week-calendar>.native-day:nth-child(7){grid-column:7!important}
 #dashboard-calendar .native-week-calendar>.native-day:nth-child(8){grid-column:8!important}
+
+/* Compact two-line lesson events: time + student, price + status. */
+#dashboard-calendar .native-timed-event{justify-content:flex-start;gap:5px!important;min-width:0}
+#dashboard-calendar .native-timed-event .native-event-row{display:flex;align-items:center;justify-content:space-between;gap:5px;width:100%;min-width:0}
+#dashboard-calendar .native-timed-event .native-event-row>*{min-width:0}
+#dashboard-calendar .native-timed-event .calendar-event-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+#dashboard-calendar .native-timed-event .calendar-event-meta{white-space:nowrap;font-weight:650}
+#dashboard-calendar .native-timed-event .status{max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
