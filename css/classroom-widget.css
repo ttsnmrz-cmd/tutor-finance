@@ -117,3 +117,11 @@ html.cw-students [id$="-modal"]:not(.hidden){z-index:1000!important}
 
 /* Student records: nearest lesson and semantic statuses. */
 .cw-lesson-history-row.cw-lesson-nearest{background:color-mix(in srgb,#8b5bd8 9%,transparent);box-shadow:inset 3px 0 #8b5bd8}.cw-lesson-status{display:inline-flex;align-items:center;justify-content:center;justify-self:start;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:650;background:#eef0f4;color:#596075}.cw-lesson-status[data-status="conducted"],.cw-lesson-status[data-status="completed"]{background:#e2f5e9;color:#217747}.cw-lesson-status[data-status="cancelled_charge"],.cw-lesson-status[data-status="cancelled_charged"]{background:#fce8e5;color:#a63e38}.cw-lesson-status[data-status="cancelled_free"],.cw-lesson-status[data-status="cancelled"]{background:#fff0dc;color:#996019}.cw-lesson-status[data-status="rescheduled"]{background:#e8efff;color:#4569a9}.cw-lesson-status[data-status="scheduled"]{background:#edf0fa;color:#56618d}.cw-payments-scroll{max-height:480px!important;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-gutter:stable}
+
+/* Student detail: keep payment history in its own scroll region. */
+.cw-students-workspace .cw-student-detail [data-student-pane="payments"] .teacher-detail-list.cw-payments-scroll{display:block!important;max-height:380px!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain;scrollbar-gutter:stable}
+.cw-students-workspace .cw-student-detail [data-student-pane="payments"] .teacher-detail-list.cw-payments-scroll>div{min-height:35px}
+/* Match Classroom Notes filter fields and avoid clipping narrow history columns. */
+.cw-lesson-history-controls select{font:inherit;font-size:14px;min-height:42px;padding:9px 12px;border:1px solid #e2d7f4;border-radius:12px;min-width:170px}
+.cw-lesson-history-row{grid-template-columns:minmax(145px,1.2fr) minmax(75px,1fr) minmax(110px,1fr) minmax(65px,.65fr)}
+.cw-lesson-history-row time{white-space:nowrap;font-variant-numeric:tabular-nums}
