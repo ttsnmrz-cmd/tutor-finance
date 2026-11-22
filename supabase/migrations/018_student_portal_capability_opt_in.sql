@@ -60,8 +60,8 @@ as $$
  where a.access_token=p_access_token and s.archived=false;
 $$;
 
-revoke all on function public.issue_student_portal_token(uuid,boolean) from public;
-revoke all on function public.get_student_portal_by_token(uuid) from public;
+revoke all on function public.issue_student_portal_token(uuid,boolean) from public, anon;
+revoke all on function public.get_student_portal_by_token(uuid) from public, anon, authenticated;
 grant execute on function public.issue_student_portal_token(uuid,boolean) to authenticated;
 grant execute on function public.get_student_portal_by_token(uuid) to anon,authenticated;
 notify pgrst,'reload schema';
