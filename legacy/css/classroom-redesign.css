@@ -240,3 +240,9 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #tab-materials .native-material-field{margin:9px 0}
 #tab-materials .native-material-field>span{font-size:11px;color:#9485a0;text-transform:capitalize}
 @media(max-width:850px){#tab-materials .native-materials-workspace{grid-template-columns:1fr}#tab-materials .native-materials-list{max-height:260px}}
+
+/* Compact header-to-workspace spacing and single Materials title. */
+#teacher-app .native-layout{margin-top:-32px}
+#tab-materials .native-page-heading{margin-bottom:12px;padding-top:0}
+#tab-materials>.app-card{padding-top:16px!important}
+@media(max-width:950px){#teacher-app .native-layout{margin-top:-12px}}
