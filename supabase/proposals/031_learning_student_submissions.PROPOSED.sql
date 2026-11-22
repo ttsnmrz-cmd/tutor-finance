@@ -15,9 +15,17 @@ declare
  v_attempt uuid;
 begin
  if p_answers is null
-    or jsonb_typeof(p_answers) not in ('object','array')
-    or octet_length(p_answers::text)>100000 then
+    or jsonb_typeof(p_answers)<>'object'
+    or jsonb_typeof(p_answers->'text')<>'string'
+    or length(btrim(p_answers->>'text'))=0
+    or length(p_answers->>'text')>10000
+    or octet_length(p_answers::text)>40000 then
   raise exception 'Invalid submission';
+ end if;
+ -- Only the free-text response shape is supported in this first version.
+ -- Reject extra keys until structured exercises have a validated schema.
+ if (select count(*) from jsonb_object_keys(p_answers))<>1 then
+  raise exception 'Unsupported submission fields';
  end if;
  -- Resolve a valid, non-archived student from the secret token.
  select s.id,s.teacher_id into v_student,v_teacher
