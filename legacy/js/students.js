@@ -97,6 +97,7 @@ function sortedActiveStudents(){
   return active;
 }
 
+let nativeSelectedStudentId=null;
 function renderStudents(){
   renderGroups();
 
@@ -135,6 +136,8 @@ function renderStudents(){
   c.innerHTML=active.length
     ?active.map(s=>studentRow(s)).join('')
     :'<div class="py-8 text-center text-slate-400">Учеников нет</div>';
+  if(!active.some(s=>String(s.id)===String(nativeSelectedStudentId)))nativeSelectedStudentId=active[0]?.id||null;
+  renderNativeStudentDetail();
 }
 
 function studentRow(s){
@@ -143,7 +146,7 @@ function studentRow(s){
   const isArchived=!!s.archived;
   const id=String(s.id);
 
-  return `<div class="border rounded-2xl overflow-visible mb-2 ${isArchived?'opacity-60':''}">
+  return `<div class="native-student-row border rounded-2xl overflow-visible mb-2 ${isArchived?'opacity-60':''} ${String(nativeSelectedStudentId)===id?'is-selected':''}" data-student-id="${esc(id)}">
     <div onclick="toggleStudentDetail('${esc(id)}')" class="p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50">
       <div class="flex-1 min-w-0">
         <div class="font-semibold">${esc(s.name)}</div>
@@ -192,10 +195,6 @@ function studentRow(s){
       </div>
     </div>
 
-    <div
-      id="detail-${esc(id)}"
-      class="hidden border-t bg-slate-50 p-4"
-    >${studentDetail(s)}</div>
   </div>`;
 }
 function studentLessonAttendance(l,s){
@@ -561,16 +560,32 @@ function studentDetail(s){
     '</div>';
 }
 
+function renderNativeStudentDetail(){
+  const panel=document.getElementById('native-student-detail');
+  if(!panel)return;
+  const s=students.find(x=>String(x.id)===String(nativeSelectedStudentId));
+  document.querySelectorAll('.native-student-row').forEach(row=>row.classList.toggle('is-selected',row.dataset.studentId===String(nativeSelectedStudentId)));
+  if(!s){panel.innerHTML='<div class="native-student-empty">Выберите ученика</div>';return;}
+  const st=studentStats(s);
+  panel.innerHTML='<div class="native-selected-heading"><div><div class="native-eyebrow">STUDENT PROFILE</div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Индивидуальные занятия')+'</p></div><button class="native-add-button" onclick="openStudentEdit(\\''+esc(s.id)+'\\')">Настройки</button></div>'+
+  '<div class="native-student-stats"><div><span>Баланс</span><strong>'+money(st.bal)+'</strong></div><div><span>Внесено</span><strong>'+money(st.income)+'</strong></div><div><span>Списано</span><strong>'+money(st.expenses)+'</strong></div><div><span>Занятий</span><strong>'+st.ls.length+'</strong></div></div>'+
+  '<div class="native-detail-tabs"><button class="is-active" onclick="switchNativeStudentTab(\\'lessons\\',this)">Lessons & Notes</button><button onclick="switchNativeStudentTab(\\'payments\\',this)">Payments</button></div>'+
+  '<div class="native-detail-tab-content" id="native-student-lessons">'+studentDetail(s)+'</div>'+
+  '<div class="native-detail-tab-content hidden" id="native-student-payments"></div>';
+  const source=panel.querySelector('#native-student-lessons');
+  const payment=panel.querySelector('#native-student-payments');
+  const details=source?.querySelector('.teacher-detail-list');
+  if(payment&&details){payment.innerHTML='<div class="native-payment-content"><h3>История платежей</h3>'+details.outerHTML+'</div>';}
+}
+function switchNativeStudentTab(tab,button){
+  document.querySelectorAll('.native-detail-tabs button').forEach(b=>b.classList.toggle('is-active',b===button));
+  document.getElementById('native-student-lessons')?.classList.toggle('hidden',tab!=='lessons');
+  document.getElementById('native-student-payments')?.classList.toggle('hidden',tab!=='payments');
+}
 function toggleStudentDetail(id){
-  const e=document.getElementById('detail-'+id);
-
-  e?.classList.toggle('hidden');
-
-  if(!e?.classList.contains('hidden')){
-    requestAnimationFrame(
-      ()=>scrollStudentLessonsToNearest(id)
-    );
-  }
+  nativeSelectedStudentId=id;
+  renderNativeStudentDetail();
+  requestAnimationFrame(()=>scrollStudentLessonsToNearest(id));
 }
 
 // Close student/group action menus when clicking anywhere outside them.
