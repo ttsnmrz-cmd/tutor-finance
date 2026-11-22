@@ -574,6 +574,25 @@ function studentDetail(s){
     '</div>';
 }
 
+let nativeStudentDetailTab='overview';
+let nativeLessonDateFilter='all';
+let nativeLessonStatusFilter='all';
+function nativeStudentLessonRows(s,limit=Infinity){
+  const st=studentStats(s);
+  const sorted=st.ls.slice().sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
+  const today=localISO(new Date());
+  const filtered=sorted.filter(l=>{
+    if(nativeLessonDateFilter==='past'&&String(l.date)>today)return false;
+    if(nativeLessonDateFilter==='upcoming'&&String(l.date)<today)return false;
+    if(nativeLessonStatusFilter!=='all'&&l.status!==nativeLessonStatusFilter)return false;
+    return true;
+  });
+  return filtered.slice(0,limit).map(l=>'<button type="button" class="native-history-row" onclick="openEditLesson(\''+esc(l.id)+'\')"><span>'+esc(l.date)+' · '+esc(displayTime(l.time||''))+'</span><span>'+esc(l.comment||'—')+'</span><span class="native-history-status">'+esc(studentLessonStatusText(l,s))+'</span><strong>'+money(l.group_id?Number(lessonMembers.find(m=>String(m.lesson_id)===String(l.id)&&String(m.student_id)===String(s.id))?.price??s.price??0):Number(l.price||0))+'</strong></button>').join('')||'<p class="native-history-empty">Занятий нет</p>';
+}
+function nativeStudentPaymentRows(s,limit=Infinity){
+  const items=payments.filter(p=>String(p.student_id||'')===String(s.id)).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  return items.slice(0,limit).map(p=>'<div class="native-history-row"><span>'+esc(p.date)+'</span><span></span><span></span><strong class="text-emerald-600">+'+money(p.amount)+'</strong></div>').join('')||'<p class="native-history-empty">Платежей нет</p>';
+}
 function renderNativeStudentDetail(){
   const panel=document.getElementById('native-student-detail');
   if(!panel)return;
@@ -581,25 +600,30 @@ function renderNativeStudentDetail(){
   document.querySelectorAll('.native-student-row').forEach(row=>row.classList.toggle('is-selected',row.dataset.studentId===String(nativeSelectedStudentId)));
   if(!s){panel.innerHTML='<div class="native-student-empty">Выберите ученика</div>';return;}
   const st=studentStats(s);
-  panel.innerHTML='<div class="native-selected-heading"><div><div class="native-eyebrow">STUDENT PROFILE</div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Индивидуальные занятия')+'</p></div><button class="native-add-button" onclick="openStudentEdit(\''+esc(s.id)+'\')">Настройки</button></div>'+
-  '<div class="native-student-stats"><div><span>Баланс</span><strong>'+money(st.bal)+'</strong></div><div><span>Внесено</span><strong>'+money(st.income)+'</strong></div><div><span>Списано</span><strong>'+money(st.expenses)+'</strong></div><div><span>Занятий</span><strong>'+st.ls.length+'</strong></div></div>'+
-  '<div class="native-detail-tabs"><button class="is-active" onclick="switchNativeStudentTab(\'lessons\',this)">Lessons & Notes</button><button onclick="switchNativeStudentTab(\'payments\',this)">Payments</button></div>'+
-  '<div class="native-detail-tab-content" id="native-student-lessons">'+studentDetail(s)+'</div>'+
-  '<div class="native-detail-tab-content hidden" id="native-student-payments"></div>';
-  const source=panel.querySelector('#native-student-lessons');
-  const payment=panel.querySelector('#native-student-payments');
-  const details=source?.querySelector('.teacher-detail-list');
-  if(payment&&details){payment.innerHTML='<div class="native-payment-content"><h3>История платежей</h3>'+details.outerHTML+'</div>';}
+  const id=esc(s.id);
+  const tabs=[['overview','Overview'],['lessons','Lessons'],['notes','Notes'],['payments','Payments']];
+  const head='<div class="native-selected-heading"><div class="native-student-identity"><span class="native-student-avatar">'+esc((s.name||'?').charAt(0).toUpperCase())+'</span><div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Individual student')+'</p></div></div><button class="native-student-edit" onclick="openStudentEdit(\''+id+'\')" title="Edit student">✎</button></div>';
+  const nav='<div class="native-detail-tabs">'+tabs.map(([key,label])=>'<button type="button" class="'+(nativeStudentDetailTab===key?'is-active':'')+'" onclick="switchNativeStudentTab(\''+key+'\',this)">'+label+'</button>').join('')+'</div>';
+  let content='';
+  if(nativeStudentDetailTab==='overview'){
+    content='<div class="native-student-stats"><div><span>Balance</span><strong>'+money(st.bal)+'</strong></div><div><span>Payments received</span><strong>'+money(st.income)+'</strong></div><div><span>Amount charged</span><strong>'+money(st.expenses)+'</strong></div><div><span>Lessons</span><strong>'+st.ls.length+'</strong></div></div><div class="native-overview-section"><div class="native-section-heading"><h3>Recent lessons</h3><button onclick="switchNativeStudentTab(\'lessons\')">View all</button></div>'+nativeStudentLessonRows(s,3)+'</div><div class="native-overview-section"><div class="native-section-heading"><h3>Recent payments</h3><button onclick="switchNativeStudentTab(\'payments\')">View all</button></div>'+nativeStudentPaymentRows(s,3)+'</div>';
+  }else if(nativeStudentDetailTab==='lessons'){
+    content='<div class="native-lesson-filters"><select aria-label="Filter lesson dates" onchange="nativeLessonDateFilter=this.value;renderNativeStudentDetail()"><option value="all" '+(nativeLessonDateFilter==='all'?'selected':'')+'>All dates</option><option value="past" '+(nativeLessonDateFilter==='past'?'selected':'')+'>Past</option><option value="upcoming" '+(nativeLessonDateFilter==='upcoming'?'selected':'')+'>Upcoming</option></select><select aria-label="Filter lesson status" onchange="nativeLessonStatusFilter=this.value;renderNativeStudentDetail()">'+[['all','All statuses'],['scheduled','Scheduled'],['conducted','Completed'],['rescheduled','Rescheduled'],['cancelled_charge','Cancelled · charged'],['cancelled_free','Cancelled · free']].map(([v,t])=>'<option value="'+v+'" '+(nativeLessonStatusFilter===v?'selected':'')+'>'+t+'</option>').join('')+'</select></div><div class="native-history-scroll">'+nativeStudentLessonRows(s)+'</div>';
+  }else if(nativeStudentDetailTab==='notes'){
+    content='<div class="native-notes-empty"><h3>Notes</h3><p>Заметки к занятиям появятся здесь после подключения сохранения новых заметок. Тестовые записи Classroom не переносим.</p></div>';
+  }else{
+    content='<div class="native-section-heading"><h3>Payments</h3><button class="native-add-button" onclick="openStudentPayment(\''+id+'\')">+ Add payment</button></div><div class="native-history-scroll">'+nativeStudentPaymentRows(s)+'</div>';
+  }
+  panel.innerHTML=head+nav+'<div class="native-detail-body">'+content+'</div>';
 }
-function switchNativeStudentTab(tab,button){
-  document.querySelectorAll('.native-detail-tabs button').forEach(b=>b.classList.toggle('is-active',b===button));
-  document.getElementById('native-student-lessons')?.classList.toggle('hidden',tab!=='lessons');
-  document.getElementById('native-student-payments')?.classList.toggle('hidden',tab!=='payments');
+function switchNativeStudentTab(tab){
+  nativeStudentDetailTab=['overview','lessons','notes','payments'].includes(tab)?tab:'overview';
+  renderNativeStudentDetail();
 }
 function toggleStudentDetail(id){
   nativeSelectedStudentId=id;
+  nativeStudentDetailTab='overview';
   renderNativeStudentDetail();
-  requestAnimationFrame(()=>scrollStudentLessonsToNearest(id));
 }
 
 // Close student/group action menus when clicking anywhere outside them.
