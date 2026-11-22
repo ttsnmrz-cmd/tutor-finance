@@ -188,3 +188,13 @@ body.local-materials-preview .teacher-desk .desk-nav>button:first-child{width:30
  .ml-preview .ml-items:not(.ml-grid) .ml-item>span{grid-column:1;grid-row:2}
  .ml-preview .ml-items:not(.ml-grid) .ml-item>.ml-menu-wrap{grid-column:2;grid-row:1/3}
 }
+
+/* Keep native dialog centered above the host site's layout and Tailwind resets. */
+dialog.ml-dialog[open]{position:fixed!important;inset:0!important;margin:auto!important;box-sizing:border-box!important;width:min(480px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;max-height:min(85dvh,680px)!important;min-height:0!important;padding:24px!important;background:#fff!important;color:#302a40!important;border:1px solid #ded8e7!important;border-radius:18px!important;box-shadow:0 24px 80px #21163144!important;overflow:auto!important;z-index:2147483647!important;transform:none!important;}
+dialog.ml-dialog::backdrop{background:rgba(25,20,40,.52)!important;}
+dialog.ml-dialog .ml-dialog-heading{display:flex!important;justify-content:space-between!important;align-items:center!important;margin-bottom:16px!important;}
+dialog.ml-dialog form{display:grid!important;gap:12px!important;margin:0!important;}
+dialog.ml-dialog input,dialog.ml-dialog select{display:block!important;width:100%!important;min-height:42px!important;padding:9px 12px!important;border:1px solid #d9d2e3!important;border-radius:9px!important;background:#fff!important;color:#302a40!important;}
+dialog.ml-dialog .ml-dialog-actions{display:flex!important;justify-content:flex-end!important;gap:10px!important;margin-top:12px!important;}
+dialog.ml-dialog .ml-dialog-actions button{min-height:38px!important;padding:8px 16px!important;border-radius:9px!important;}
+dialog.ml-dialog .ml-dialog-actions .primary{background:#7042b6!important;color:white!important;}
