@@ -166,3 +166,24 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #native-student-payments .teacher-detail-list{max-height:460px;overflow:auto}
 .native-payment-content h3{font-size:15px;font-weight:700;margin-bottom:12px}
 @media(max-width:950px){#tab-students .native-students-grid{grid-template-columns:1fr!important}#tab-students .native-students-panel,#tab-students .native-groups-panel,#tab-students .native-student-detail{grid-column:1;grid-row:auto}.native-student-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Align header and content directly, with compact tabs in the student list. */
+#teacher-app>.native-workspace{padding-top:12px!important}
+#teacher-header{margin-bottom:12px!important}
+#teacher-app .native-layout{align-items:start!important}
+#tab-students .native-page-heading{margin-bottom:12px!important;padding-top:0!important}
+#tab-students .native-page-heading p{display:none!important}
+#tab-students .native-page-heading .native-eyebrow{display:none!important}
+#tab-students .native-students-grid{grid-template-columns:minmax(245px,320px) minmax(0,1fr)!important}
+#tab-students .native-students-panel{grid-column:1!important;grid-row:1!important}
+#tab-students .native-student-detail{grid-column:2!important;grid-row:1!important}
+#tab-students .native-groups-panel{margin-top:10px}
+#tab-students .native-student-list-tabs{display:flex;gap:5px;border-bottom:1px solid #e9e1ee;margin-bottom:14px}
+#tab-students .native-student-list-tabs button{flex:1;text-align:center;padding:11px 8px;color:#84738d;font-size:13px;font-weight:700;border-bottom:2px solid transparent}
+#tab-students .native-student-list-tabs button.is-active{color:#674a88;border-bottom-color:#674a88}
+#tab-students .native-students-panel.native-show-groups #students-list{display:none!important}
+#tab-students .native-students-panel.native-show-groups .native-groups-panel{display:block!important}
+#tab-students .native-students-panel.native-show-groups .student-sort-wrap{display:none!important}
+#tab-students .native-student-list-tabs+.flex{margin-bottom:8px!important}
+#tab-students .native-add-button{padding:10px 18px!important}
+@media(max-width:950px){#tab-students .native-students-grid{grid-template-columns:1fr!important}#tab-students .native-student-detail{grid-column:1!important;grid-row:2!important}}
