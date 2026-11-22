@@ -125,3 +125,6 @@ html.cw-students [id$="-modal"]:not(.hidden){z-index:1000!important}
 .cw-lesson-history-controls select{font:inherit;font-size:14px;min-height:42px;padding:9px 12px;border:1px solid #e2d7f4;border-radius:12px;min-width:170px}
 .cw-lesson-history-row{grid-template-columns:minmax(145px,1.2fr) minmax(75px,1fr) minmax(110px,1fr) minmax(65px,.65fr)}
 .cw-lesson-history-row time{white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* Student access is handled elsewhere; hide obsolete link in profile header/menu. */
+.cw-students-workspace .cw-student-access{display:none!important}
