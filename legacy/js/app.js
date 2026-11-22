@@ -552,7 +552,7 @@ function switchTab(t,options={}){
     history[method]({tab:t},'',nextPath+location.search+location.hash);
   }
   if(t==='admin')loadPlatformAdminDashboard();
-  if(t==='materials')loadNativeMaterials();
+  if(t==='materials')loadIntegratedMaterials();
 }
 window.addEventListener('popstate',()=>{
   if(!document.getElementById('teacher-app')?.classList.contains('hidden')){
@@ -2491,4 +2491,26 @@ async function loadNativeMaterials(){
   render(null,0);status.textContent=fs.length+' папок · '+ms.length+' материалов';
   if(!fs.length&&!ms.length)status.textContent+=' — библиотека пока пустая.';
  }catch(error){status.textContent=error?.message||'Не удалось загрузить библиотеку.';}
+}
+
+// React Classroom mounts only in Materials and reuses this app's authenticated client.
+let classroomMountCleanup=null;
+async function loadIntegratedMaterials(){
+ const host=document.getElementById('classroom-materials-root');
+ if(!host)return loadNativeMaterials();
+ if(classroomMountCleanup)return;
+ if(typeof window.mountProfiProfitMaterials!=='function'){
+  host.textContent='Classroom builder is unavailable; showing existing materials.';
+  document.getElementById('native-materials-fallback')?.classList.remove('hidden');
+  return loadNativeMaterials();
+ }
+ try{
+  const {data,error}=await supabaseClient.auth.getUser();
+  if(error||!data.user)throw Error('Please sign in again.');
+  classroomMountCleanup=window.mountProfiProfitMaterials(host,data.user.id,supabaseClient);
+ }catch(error){
+  host.textContent='Cannot open Classroom: '+error.message;
+  document.getElementById('native-materials-fallback')?.classList.remove('hidden');
+  await loadNativeMaterials();
+ }
 }
