@@ -536,3 +536,56 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
   .next-ui-preview #teacher-header .teacher-nav{padding:4px!important;display:flex!important;gap:4px}
   .next-ui-preview #teacher-header .teacher-nav button{flex:1;min-width:0}
 }
+
+/* Unified workspace shell — preview only; reuse original tab handlers. */
+#next-workspace-sidebar{display:none}
+.next-ui-preview #next-workspace-sidebar{
+  display:flex;flex-direction:column;position:fixed;z-index:35;
+  top:0;left:0;bottom:0;width:244px;padding:26px 15px 18px;
+  background:#fff;border-right:1px solid #e6e9f2;
+  box-shadow:4px 0 25px rgba(35,40,75,.025);
+}
+.next-ui-preview #teacher-app>.max-w-5xl{
+  width:calc(100% - 244px);max-width:1500px;
+  margin-left:244px;margin-right:0;
+}
+.next-sidebar-brand{display:flex;align-items:center;gap:10px;padding:3px 8px 31px}
+.next-sidebar-brand img{object-fit:contain;flex:none}
+.next-sidebar-brand strong{display:block;font-size:19px;letter-spacing:-.04em;color:#1b2340}
+.next-sidebar-brand small{display:block;font-size:11px;color:#8b94a8;margin-top:2px}
+.next-sidebar-label{font-size:10px;font-weight:800;letter-spacing:.14em;color:#98a1b4;padding:0 15px;margin-bottom:10px}
+.next-sidebar-nav{display:flex;flex-direction:column;gap:5px}
+.next-sidebar-nav button{
+  display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  border:0;border-radius:12px;padding:12px 14px;
+  color:#526078;font-weight:650;font-size:13px;
+}
+.next-sidebar-nav button span{width:23px;text-align:center;font-size:20px;font-weight:400;line-height:1}
+.next-sidebar-nav button:hover{background:#f5f4ff;color:#6255d9}
+.next-ui-preview #teacher-app:has(#nav-dashboard.bg-indigo-600) .next-side-dashboard,
+.next-ui-preview #teacher-app:has(#nav-calendar.bg-indigo-600) .next-side-calendar,
+.next-ui-preview #teacher-app:has(#nav-students.bg-indigo-600) .next-side-students{
+  background:#efedff;color:#5145bc;
+}
+.next-sidebar-footer{margin-top:auto;padding:16px 12px 0;border-top:1px solid #eceef5;color:#9ba4b5;font-size:11px}
+.next-ui-preview #teacher-header .teacher-nav{display:none!important}
+.next-ui-preview #teacher-header{top:12px}
+@media(max-width:900px){
+  .next-ui-preview #next-workspace-sidebar{width:200px;padding:18px 10px}
+  .next-ui-preview #teacher-app>.max-w-5xl{width:calc(100% - 200px);margin-left:200px}
+  .next-sidebar-brand strong{font-size:16px}
+  .next-sidebar-nav button{font-size:12px;padding:11px 9px;gap:6px}
+}
+@media(max-width:640px){
+  .next-ui-preview #next-workspace-sidebar{
+    position:relative;width:100%;height:auto;top:auto;bottom:auto;
+    padding:10px 12px;border-right:0;border-bottom:1px solid #e6e9f2;
+  }
+  .next-ui-preview #teacher-app>.max-w-5xl{width:100%;margin:0;max-width:100%}
+  .next-ui-preview .next-sidebar-brand{padding:2px 4px 8px}
+  .next-ui-preview .next-sidebar-label,.next-ui-preview .next-sidebar-footer{display:none}
+  .next-ui-preview .next-sidebar-nav{flex-direction:row;gap:5px}
+  .next-ui-preview .next-sidebar-nav button{justify-content:center;padding:9px 5px;font-size:11px;gap:5px}
+  .next-ui-preview .next-sidebar-nav button span{font-size:16px;width:auto}
+  .next-ui-preview #teacher-header{margin-top:8px}
+}
