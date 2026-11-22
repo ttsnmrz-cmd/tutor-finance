@@ -91,6 +91,8 @@ begin
  end if;
  return new;
 end $$;
+-- Trigger helpers are not public RPC endpoints.
+revoke all on function public.learning_check_student_owner() from public,anon,authenticated;
 create trigger learning_assignments_owner before insert or update on public.learning_assignments
  for each row execute function public.learning_check_student_owner();
 create trigger learning_notes_owner before insert or update on public.learning_notes
@@ -104,9 +106,9 @@ begin
  if not exists(
   select 1 from public.lessons l
   where l.id=new.finance_lesson_id and l.teacher_id=new.teacher_id
-   and (l.student_id=new.student_id or exists(
+   and ((l.group_id is null and l.student_id=new.student_id) or exists(
     select 1 from public.lesson_members lm
-    where lm.lesson_id=l.id and lm.student_id=new.student_id
+    where lm.lesson_id=l.id and lm.student_id=new.student_id and lm.teacher_id=new.teacher_id
    ))
  ) then
   raise exception 'Lesson is not linked to this student and teacher'
@@ -114,6 +116,7 @@ begin
  end if;
  return new;
 end $;
+revoke all on function public.learning_check_lesson_member() from public,anon,authenticated;
 create trigger learning_assignment_lesson_member before insert or update
  on public.learning_assignments for each row
  execute function public.learning_check_lesson_member();
