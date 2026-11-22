@@ -106,7 +106,7 @@ begin
  if not exists(
   select 1 from public.lessons l
   where l.id=new.finance_lesson_id and l.teacher_id=new.teacher_id
-   and ((l.group_id is null and l.student_id=new.student_id) or exists(
+   and (l.student_id=new.student_id or exists(
     select 1 from public.lesson_members lm
     where lm.lesson_id=l.id and lm.student_id=new.student_id and lm.teacher_id=new.teacher_id
    ))
