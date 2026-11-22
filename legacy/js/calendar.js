@@ -45,58 +45,48 @@ function displayTime(v){
 }
 function renderWeek(){
   const c=document.getElementById('week-calendar');
-
+  if(!c)return;
   const start=weekStart(weekAnchor);
   const today=todayISOInTimezone(getTeacherTimezone());
-  const days=[];
-
-  for(let i=0;i<7;i++){
-    const d=new Date(start);
-    d.setDate(d.getDate()+i);
-    days.push(d);
-  }
-
-  document.getElementById('week-range').textContent=
-    days[0].toLocaleDateString((window.getLanguage?.()==='en'?'en-US':'ru-RU'),{
-      day:'2-digit',
-      month:'long'
-    })+
-    ' — '+
-    days[6].toLocaleDateString((window.getLanguage?.()==='en'?'en-US':'ru-RU'),{
-      day:'2-digit',
-      month:'long',
-      year:'numeric'
-    });
-
   const lang=window.getLanguage?.()==='en'?'en-US':'ru-RU';
-  c.className='calendar-week-grid';
-  c.innerHTML=days.map(d=>{
+  const days=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);return d;});
+  const range=document.getElementById('week-range');
+  if(range)range.textContent=days[0].toLocaleDateString(lang,{day:'numeric',month:'short'})+' – '+days[6].toLocaleDateString(lang,{day:'numeric',month:'short',year:'numeric'});
+  const hourStart=7,hourEnd=23,pxPerHour=72;
+  const dateLessons=lessons.map(l=>({...l,...lessonDateTimeInTimezone(l,getTeacherTimezone())}));
+  const axis='<div class="native-time-axis">'+Array.from({length:hourEnd-hourStart},(_,i)=>'<span style="top:'+(i*pxPerHour)+'px">'+String(hourStart+i).padStart(2,'0')+':00</span>').join('')+'</div>';
+  const columns=days.map(d=>{
     const key=localISO(d);
-    const sel=key===selectedDate;
     const isToday=key===today;
-    const dayLessons=lessons
-      .map(l=>({...l,...lessonDateTimeInTimezone(l,getTeacherTimezone())}))
-      .filter(l=>l.date===key)
-      .sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
-
-    return `<section class="calendar-day-column ${sel?'is-selected ':''}${isToday?'is-today':''}">
-      <button type="button" onclick="selectDay('${key}')" class="calendar-day-heading">
-        <span class="calendar-weekday">${d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')}</span>
-        <span class="calendar-day-number">${d.getDate()}</span>
-      </button>
-      <div class="calendar-day-events">
-        ${dayLessons.length?dayLessons.map(l=>`
-          <button type="button" onclick="openEditLesson('${esc(l.id)}')" class="calendar-event-card ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">
-            <span class="calendar-event-time">${esc(displayTime(l.time))}</span>
-            <span class="calendar-event-title ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">${esc(lessonTitle(l))}</span>
-            <span class="calendar-event-meta">${l.duration||60} мин · ${money(lessonPriceTotal(l))}</span>
-            ${l.comment?`<span class="calendar-event-comment">${esc(l.comment)}</span>`:''}
-            <span class="status ${statusClass[l.status]||'bg-slate-100'}">${statusLabels[l.status]||l.status}</span>
-          </button>`).join(''):'<p class="calendar-empty-day">Нет занятий</p>'}
-      </div>
-      <button type="button" onclick="openNewLessonForDate('${key}')" class="calendar-add-day">+ Добавить</button>
-    </section>`;
+    const items=dateLessons.filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
+    const cards=items.map(l=>{
+      const match=String(l.time||'').replace('.',':').match(/^(\\d{1,2}):(\\d{2})/);
+      if(!match)return '';
+      const minutes=Number(match[1])*60+Number(match[2]);
+      const top=Math.max(0,(minutes-hourStart*60)*pxPerHour/60);
+      const height=Math.max(48,Math.min(180,Number(l.duration||60)*pxPerHour/60-4));
+      const cancelled=['rescheduled','cancelled_charge','cancelled_free'].includes(l.status);
+      return '<button type="button" style="top:'+top+'px;height:'+height+'px" onclick="openEditLesson(\\''+esc(l.id)+'\\')" class="calendar-event-card native-timed-event '+(cancelled?'is-cancelled':'')+'"><span class="calendar-event-time">'+esc(displayTime(l.time))+'</span><span class="calendar-event-title">'+esc(lessonTitle(l))+'</span><span class="calendar-event-meta">'+money(lessonPriceTotal(l))+'</span><span class="status '+(statusClass[l.status]||'bg-slate-100')+'">'+(statusLabels[l.status]||l.status)+'</span></button>';
+    }).join('');
+    return '<div class="native-day"><button type="button" class="calendar-day-heading '+(isToday?'is-today':'')+'" onclick="selectDay(\\''+key+'\\')"><span class="calendar-weekday">'+d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')+'</span><span class="calendar-day-number">'+d.getDate()+'</span></button><div class="native-day-track" data-date="'+key+'" style="height:'+((hourEnd-hourStart)*pxPerHour)+'px">'+cards+'</div></div>';
   }).join('');
+  c.className='native-week-calendar';
+  c.innerHTML='<div class="native-week-head-spacer"></div>'+columns;
+  let scroller=document.getElementById('native-calendar-scroll');
+  if(!scroller){
+    scroller=document.createElement('div');
+    scroller.id='native-calendar-scroll';
+    scroller.className='native-calendar-scroll';
+    c.parentNode.insertBefore(scroller,c);
+    scroller.appendChild(c);
+  }
+  const oldAxis=scroller.querySelector('.native-time-axis');
+  if(oldAxis)oldAxis.remove();
+  scroller.insertAdjacentHTML('afterbegin',axis);
+  if(!scroller.dataset.initialized){
+    scroller.scrollTop=(13-hourStart)*pxPerHour;
+    scroller.dataset.initialized='true';
+  }
 }
 
 function selectDay(k){
