@@ -17,7 +17,7 @@ as $$
  visible_assignments as (
    select a.id, a.student_id, a.teacher_id, a.finance_lesson_id,
           a.assigned_at, v.id as version_id, v.version,
-          v.body, m.title as material_title
+          m.title as material_title
    from public.learning_assignments a
    join portal_student ps
      on ps.student_id=a.student_id and ps.teacher_id=a.teacher_id
@@ -38,7 +38,7 @@ as $$
          'material_title',a.material_title,
          'material_version_id',a.version_id,
          'version',a.version,
-         'body',a.body
+         'body',null
        ) order by a.assigned_at desc,a.id
      ) from visible_assignments a
    ),'[]'::jsonb),
@@ -59,6 +59,10 @@ as $$
  )
  from portal_student ps;
 $$;
+-- SECURITY HOLD: do not return raw material JSON. It may include answer keys,
+-- grading rubrics or teacher-only metadata. Student-facing projection must be
+-- defined against the real Classroom material schema before enabling exercises.
+-- The UI displays an unavailable-content placeholder until that review.
 -- A token is a bearer credential. Do not expose drafts, other students' notes,
 -- hidden assignments, teacher IDs or full teacher library through this RPC.
 revoke all on function public.get_student_learning_by_token(uuid)
