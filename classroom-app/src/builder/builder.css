@@ -343,3 +343,13 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-student-preview .mb-student-content{font-size:17px!important;line-height:1.7!important}
 .mb-student-preview .mb-preview-footer{display:flex!important;align-items:center!important;justify-content:space-between!important;border-top:1px solid #e7dfef!important;padding:14px 24px!important}
 .mb-student-preview .mb-preview-notes:not([open]){display:none}
+
+/* Integrated Classroom: keep editor controls together and restore clear visual hierarchy. */
+.mb-builder .mb-top-tools{flex-direction:row;align-items:center;gap:14px}
+.mb-builder .mb-top-buttons{gap:10px}
+.mb-builder .mb-top-buttons .mb-structure-top{border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:9px 13px;color:var(--text);font-weight:650;white-space:nowrap}
+.mb-builder .mb-top-buttons .mb-structure-top:hover{border-color:var(--purple);color:var(--purple)}
+.mb-builder .mb-top-buttons>button:not(.mb-structure-top){border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-weight:700}
+.mb-builder .mb-save-state.saved{font-size:11px;opacity:.7}
+.mb-builder .mb-breadcrumb .ml-inline-badge{display:none}
+@media(max-width:900px){.mb-builder .mb-top-tools{flex-wrap:wrap}.mb-builder .mb-top-buttons{flex-wrap:wrap}}
