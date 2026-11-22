@@ -28,12 +28,12 @@ export function createMockRepository(user:string):MaterialsRepository {
  return {
   recoveryKey:key+':editor-recovery',
   storageKey:key,
-  sections:()=>copy(read().sections),
+  sections:async()=>copy(read().sections),
   library:async()=>{const s=read();return {drafts:copy(s.drafts),versions:copy(s.versions)};},
-  createFolder(value,parent){const s=read();destination(s,parent);s.sections.push({id:crypto.randomUUID(),teacher_id:user,parent_id:parent,title:title(value),position:s.sections.length,updated_at:now()});write(s);},
-  renameFolder(id,value){const s=read(),f=s.sections.find(f=>f.id===id);if(!f)throw Error('Folder not found.');f.title=title(value);f.updated_at=now();write(s);},
-  moveFolder(id,parent){const s=read(),f=s.sections.find(f=>f.id===id);if(!f)throw Error('Folder not found.');destination(s,parent);let cursor=parent;const seen=new Set<string>([id]);while(cursor){if(seen.has(cursor))throw Error('A folder cannot be moved inside itself.');seen.add(cursor);cursor=s.sections.find(x=>x.id===cursor)?.parent_id??null;}f.parent_id=parent;f.updated_at=now();write(s);},
-  moveMaterial(id,parent){const s=read();destination(s,parent);const r=s.drafts.find(r=>r.id===id);if(!r)throw Error('Material not found.');r.section_id=parent;r.updated_at=now();write(s);},
+  async createFolder(value,parent){const s=read();destination(s,parent);s.sections.push({id:crypto.randomUUID(),teacher_id:user,parent_id:parent,title:title(value),position:s.sections.length,updated_at:now()});write(s);},
+  async renameFolder(id,value){const s=read(),f=s.sections.find(f=>f.id===id);if(!f)throw Error('Folder not found.');f.title=title(value);f.updated_at=now();write(s);},
+  async moveFolder(id,parent){const s=read(),f=s.sections.find(f=>f.id===id);if(!f)throw Error('Folder not found.');destination(s,parent);let cursor=parent;const seen=new Set<string>([id]);while(cursor){if(seen.has(cursor))throw Error('A folder cannot be moved inside itself.');seen.add(cursor);cursor=s.sections.find(x=>x.id===cursor)?.parent_id??null;}f.parent_id=parent;f.updated_at=now();write(s);},
+  async moveMaterial(id,parent){const s=read();destination(s,parent);const r=s.drafts.find(r=>r.id===id);if(!r)throw Error('Material not found.');r.section_id=parent;r.updated_at=now();write(s);},
   async createDraft(value,parent){const s=read();destination(s,parent);const body=blankPlan();body.title=title(value);const row:LibraryPlan={id:crypto.randomUUID(),teacher_id:user,section_id:parent,body,revision:1,updated_at:now()};s.drafts.push(row);write(s);return copy(row);},
   async savePlan(id,body:Plan,revision){const save=()=>{if(!isPlan(body))throw Error('Invalid material.');const s=read();let r=s.drafts.find(r=>r.id===id);if(id&&!r)throw Error('Material not found.');if(r&&r.revision!==revision)throw Error('This local draft changed in another tab. Reopen it before saving.');if(!r){r={id:crypto.randomUUID(),teacher_id:user,section_id:null,body:copy(body),revision:0,updated_at:now()};s.drafts.push(r);}r.body=copy(body);r.revision++;r.updated_at=now();write(s);return copy(r);};return globalThis.navigator?.locks?globalThis.navigator.locks.request(key+':draft-write',save):save();}
  };
