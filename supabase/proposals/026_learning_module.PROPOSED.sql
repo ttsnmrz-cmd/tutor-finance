@@ -42,8 +42,8 @@ create table public.learning_assignments (
  teacher_id uuid not null references auth.users(id),
  student_id uuid not null,
  material_version_id uuid not null,
- -- Finance lesson binding will be added after verifying lessons.id type and group membership.
- finance_lesson_ref text,
+ -- Existing finance lesson IDs are bigint; nullable for independent homework.
+ finance_lesson_id bigint references public.lessons(id) on delete set null,
  assigned_at timestamptz not null default now(),
  visible boolean not null default true,
  unique(id,teacher_id,student_id),
@@ -53,7 +53,7 @@ create table public.learning_notes (
  id uuid primary key default gen_random_uuid(),
  teacher_id uuid not null references auth.users(id),
  student_id uuid not null,
- finance_lesson_ref text,
+ finance_lesson_id bigint references public.lessons(id) on delete set null,
  topic text not null default '',
  document jsonb not null default '[]'::jsonb,
  lesson_date date,
@@ -95,6 +95,31 @@ create trigger learning_assignments_owner before insert or update on public.lear
  for each row execute function public.learning_check_student_owner();
 create trigger learning_notes_owner before insert or update on public.learning_notes
  for each row execute function public.learning_check_student_owner();
+-- For a lesson reference, verify the lesson is genuinely linked to this student.
+-- Group membership is checked through lesson_members, not group_id alone.
+create or replace function public.learning_check_lesson_member()
+returns trigger language plpgsql set search_path='' as $
+begin
+ if new.finance_lesson_id is null then return new; end if;
+ if not exists(
+  select 1 from public.lessons l
+  where l.id=new.finance_lesson_id and l.teacher_id=new.teacher_id
+   and (l.student_id=new.student_id or exists(
+    select 1 from public.lesson_members lm
+    where lm.lesson_id=l.id and lm.student_id=new.student_id
+   ))
+ ) then
+  raise exception 'Lesson is not linked to this student and teacher'
+   using errcode='42501';
+ end if;
+ return new;
+end $;
+create trigger learning_assignment_lesson_member before insert or update
+ on public.learning_assignments for each row
+ execute function public.learning_check_lesson_member();
+create trigger learning_note_lesson_member before insert or update
+ on public.learning_notes for each row
+ execute function public.learning_check_lesson_member();
 
 alter table public.learning_folders enable row level security;
 alter table public.learning_materials enable row level security;
@@ -117,4 +142,4 @@ create index learning_assignments_student_idx on public.learning_assignments(tea
 create index learning_notes_student_idx on public.learning_notes(teacher_id,student_id,lesson_date desc);
 create index learning_attempts_assignment_idx on public.learning_attempts(assignment_id,submitted_at desc);
 commit;
--- STOP: do not apply until the schema, lesson IDs, group lessons, write RPCs and token portal reads are reviewed.
+-- STOP: do not apply until all migrations, permissions and token portal reads are reviewed.
