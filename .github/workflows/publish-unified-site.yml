@@ -25,12 +25,12 @@ jobs:
         with:
           repository: ttsnmrz-cmd/my-english-classroom
           ref: feature/unified-student-platform-2026-11-22
-          path: /tmp/classroom
+          path: _classroom
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Build Classroom against ProfiProfit Supabase
-        working-directory: /tmp/classroom/source/app
+        working-directory: _classroom/source/app
         env:
           VITE_SUPABASE_URL: https://dmasuczggcxzrxasgoov.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_nXL_z4-dtwKcGXmMAXgJSg_v1Op_W1q
@@ -41,7 +41,7 @@ jobs:
       - name: Replace public site and restore finance widgets under legacy
         run: |
           find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github -exec rm -rf {} +
-          cp -a /tmp/classroom/source/app/dist/. ./
+          cp -a _classroom/source/app/dist/. ./
           mkdir -p legacy
           cp -a /tmp/legacy/. legacy/
           printf 'profiprofit.com\n' > CNAME
