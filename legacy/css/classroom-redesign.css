@@ -137,3 +137,32 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #dashboard-calendar .native-timed-event .calendar-event-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
 #dashboard-calendar .native-timed-event .calendar-event-meta{white-space:nowrap;font-weight:650}
 #dashboard-calendar .native-timed-event .status{max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Classroom-style student master/detail workspace */
+#tab-students .native-students-grid{display:grid!important;grid-template-columns:minmax(220px,290px) minmax(0,1fr)!important;gap:16px!important;align-items:start}
+#tab-students .native-groups-panel{grid-column:1;grid-row:2}
+#tab-students .native-students-panel{grid-column:1;grid-row:1}
+#tab-students .native-student-detail{grid-column:2;grid-row:1/span 2;min-width:0;min-height:520px;background:#fff;border:1px solid #e9e2ef;box-shadow:none}
+#tab-students .native-student-row{border:1px solid #eee7f3!important;background:#fff;transition:background .15s,border-color .15s}
+#tab-students .native-student-row.is-selected{background:#f1eafa;border-color:#b9a4d1!important}
+#tab-students .native-student-row>.flex{padding:12px!important}
+#tab-students .native-student-row .px-3.py-2{padding:6px 8px!important;font-size:12px}
+.native-selected-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.native-selected-heading h2{font-size:25px;font-weight:750;color:#463656}
+.native-selected-heading p{font-size:12px;color:#8b7d96;margin-top:3px}
+.native-student-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:22px}
+.native-student-stats>div{background:#f4eff8;border:1px solid #e7ddee;border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:9px}
+.native-student-stats span{font-size:11px;color:#86758f}
+.native-student-stats strong{font-size:17px;color:#32273e}
+.native-detail-tabs{display:flex;gap:5px;border-bottom:1px solid #eae3ef;margin-bottom:16px}
+.native-detail-tabs button{padding:10px 16px;font-weight:650;font-size:13px;color:#84738d;border-bottom:2px solid transparent}
+.native-detail-tabs button.is-active{color:#684b8a;border-bottom-color:#684b8a}
+.native-detail-tab-content{min-width:0}
+.native-detail-tab-content.hidden{display:none!important}
+.native-student-empty{padding:100px 18px;text-align:center;color:#8e8296;font-size:14px}
+#native-student-lessons>.space-y-2>div:first-child,#native-student-lessons>.space-y-2>div:nth-child(2){display:none}
+#native-student-lessons>.space-y-2>.grid{display:none}
+#native-student-lessons .student-lessons-scroll{max-height:420px!important;overflow:auto}
+#native-student-payments .teacher-detail-list{max-height:460px;overflow:auto}
+.native-payment-content h3{font-size:15px;font-weight:700;margin-bottom:12px}
+@media(max-width:950px){#tab-students .native-students-grid{grid-template-columns:1fr!important}#tab-students .native-students-panel,#tab-students .native-groups-panel,#tab-students .native-student-detail{grid-column:1;grid-row:auto}.native-student-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
