@@ -1,0 +1,11 @@
+export type Accent='UK'|'US'|'unspecified';
+export type LearningStatus='Struggling'|'Practising'|'Mastered';
+export type PronunciationItem={id:string;word:string;ipa:string;accent:Accent;example:string};
+export type PronunciationConfig={mode:'read_aloud'|'read_context';items:PronunciationItem[]};
+export type WordRecord={id:string;student_id:string;word:string;ipa:string;accent:Accent;status:LearningStatus;needs_review:boolean;revision:number;attempts_count:number;correct_count:number;last_attempt_at:string|null};
+export type ExerciseDraft={id:string;type:'pronunciation_practice';title:string;instructions:string;draft_config:PronunciationConfig;revision:number};
+export type ExerciseVersion={id:string;block_id:string;type:'pronunciation_practice';title:string;instructions:string;public_config:PronunciationConfig;version_number:number};
+export type SessionBlock={id:string;session_id:string;block_version_id:string;stage_key:string;position:number;estimated_minutes:number;version:ExerciseVersion};
+export type PracticeView={active_block_id:string|null;item_index:number;show_ipa:boolean;layout:'single'|'list';writer_epoch:number;sequence:number;revision:number};
+export type Attempt={id:string;student_item_id:string;session_id:string;session_block_id:string;item_id:string;result:'Correct'|'Needs Practice';word_snapshot:string;ipa_snapshot:string;accent_snapshot:Accent;example_snapshot:string;occurred_at:string};
+export type AssessmentInput={attempt_id:string;item_id:string;result:'Correct'|'Needs Practice';private_comment:string};
