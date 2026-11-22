@@ -582,12 +582,13 @@ function nativeStudentLessonRows(s,limit=Infinity,applyFilters=true){
   const sorted=st.ls.slice().sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
   const today=localISO(new Date());
   const filtered=sorted.filter(l=>{
-    if(!applyFilters)return true;
+    if(!applyFilters)return String(l.date||'')<=today;
     if(nativeLessonDateFilter==='past'&&String(l.date)>today)return false;
     if(nativeLessonDateFilter==='upcoming'&&String(l.date)<today)return false;
     if(nativeLessonStatusFilter!=='all'&&l.status!==nativeLessonStatusFilter)return false;
     return true;
   });
+  if(applyFilters&&nativeLessonDateFilter==='all'&&nativeLessonStatusFilter==='all'){const lastCompleted=filtered.filter(l=>['conducted','completed','cancelled_charge','cancelled_free'].includes(String(l.status||'').toLowerCase())&&String(l.date||'')<=today).sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')))[0];if(lastCompleted){const idx=filtered.findIndex(l=>String(l.id)===String(lastCompleted.id));if(idx>0)filtered.splice(0,idx);}}
   return filtered.slice(0,limit).map(l=>'<button type="button" class="native-history-row" onclick="openEditLesson(\''+esc(l.id)+'\')"><span>'+esc(l.date)+' · '+esc(displayTime(l.time||''))+'</span><span>'+esc(l.comment||'—')+'</span><span class="native-history-status">'+esc(studentLessonStatusText(l,s))+'</span><strong>'+money(l.group_id?Number(lessonMembers.find(m=>String(m.lesson_id)===String(l.id)&&String(m.student_id)===String(s.id))?.price??s.price??0):Number(l.price||0))+'</strong></button>').join('')||'<p class="native-history-empty">Занятий нет</p>';
 }
 function nativeStudentPaymentRows(s,limit=Infinity){
