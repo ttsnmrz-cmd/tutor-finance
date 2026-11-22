@@ -1913,6 +1913,50 @@ function renderPublicStudentCalendar(lessonRows){
 
 // Learning content is available only via the capability-token portal.
 // Legacy student UUID links continue to show finance information unchanged.
+// Render a published material snapshot as readable, non-editable lesson content.
+// Never interpret arbitrary JSON as HTML in a public student portal.
+function publicLearningDocument(container,documentData){
+  const root=document.createElement('div');
+  root.className='mt-2 space-y-2 text-sm';
+  const appendText=(value,depth=0)=>{
+    if(value==null||depth>6)return;
+    if(typeof value==='string'||typeof value==='number'||typeof value==='boolean'){
+      const p=document.createElement('p');
+      p.className='whitespace-pre-wrap break-words';
+      p.textContent=String(value);
+      root.append(p);
+      return;
+    }
+    if(Array.isArray(value)){
+      for(const part of value.slice(0,150))appendText(part,depth+1);
+      return;
+    }
+    if(typeof value==='object'){
+      // Prefer human-readable fields from common exercise and note formats.
+      const keys=['title','topic','heading','text','content','instruction','instructions','question','prompt','sentence','word','translation','description','notes'];
+      const used=new Set();
+      for(const key of keys){
+        if(Object.prototype.hasOwnProperty.call(value,key)){
+          used.add(key);
+          appendText(value[key],depth+1);
+        }
+      }
+      for(const [key,part] of Object.entries(value).slice(0,60)){
+        if(used.has(key)||['id','type','created_at','updated_at','teacher_id','student_id','answer','correctAnswer','correct_answer','solution','solutions','isCorrect','explanation'].includes(key))continue;
+        if(typeof part==='object'&&part!==null)appendText(part,depth+1);
+      }
+    }
+  };
+  appendText(documentData);
+  if(!root.childNodes.length){
+    const empty=document.createElement('p');
+    empty.className='text-slate-500';
+    empty.textContent='Содержимое этого материала пока недоступно для просмотра.';
+    root.append(empty);
+  }
+  container.append(root);
+}
+
 async function loadPublicStudentLearning(accessToken){
   const section=document.getElementById('student-learning-section');
   if(!section)return;
@@ -1930,10 +1974,10 @@ async function loadPublicStudentLearning(accessToken){
       p_access_token:accessToken
     });
     if(error)throw error;
-    if(!data||data.student_id!==publicStudent?.id){
+    if(!data||String(data.student_id)!==String(publicStudent?.id)){
       throw new Error('Нет доступа к учебным материалам.');
     }
-    const render=(container,rows,empty,build)=>{
+    const render=(container,rows,empty,headingFor,documentFor)=>{
       if(!container)return;
       if(!Array.isArray(rows)||!rows.length){
         const p=document.createElement('p');
@@ -1943,23 +1987,24 @@ async function loadPublicStudentLearning(accessToken){
         return;
       }
       for(const row of rows){
-        const item=document.createElement('div');
-        item.className='rounded-lg border border-slate-200 p-3 bg-white/70';
-        const heading=document.createElement('div');
-        heading.className='font-medium';
-        heading.textContent=build(row);
-        item.append(heading);
-        container.append(item);
+        const details=document.createElement('details');
+        details.className='rounded-lg border border-slate-200 p-3 bg-white/70';
+        const summary=document.createElement('summary');
+        summary.className='font-medium cursor-pointer';
+        summary.textContent=headingFor(row);
+        details.append(summary);
+        publicLearningDocument(details,documentFor(row));
+        container.append(details);
       }
     };
-    render(assignments,data.assignments,'Пока нет домашних заданий.',a=>a.material_title||'Задание');
-    render(notes,data.notes,'Пока нет заметок с уроков.',n=>
-      [n.lesson_date,n.topic].filter(Boolean).join(' · ')||'Заметка'
-    );
+    render(assignments,data.assignments,'Пока нет домашних заданий.',
+      a=>a.material_title||'Задание',a=>a.body);
+    render(notes,data.notes,'Пока нет заметок с уроков.',
+      n=>[n.lesson_date,n.topic].filter(Boolean).join(' · ')||'Заметка',
+      n=>n.document);
     if(status)status.textContent='';
   }catch(e){
-    // Before migration 030 is installed, this section is unavailable; the
-    // existing finance cabinet still works and must not be blocked.
+    // A missing optional RPC must never break existing finance functionality.
     console.warn('Optional student learning module unavailable:',e);
     section.classList.add('hidden');
   }
