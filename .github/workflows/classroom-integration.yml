@@ -1,0 +1,20 @@
+name: Classroom integration build
+on:
+  push:
+    branches: [integration/classroom-builder-20261122]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: classroom-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - run: corepack prepare pnpm@10.29.3 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
