@@ -567,9 +567,9 @@ function renderNativeStudentDetail(){
   document.querySelectorAll('.native-student-row').forEach(row=>row.classList.toggle('is-selected',row.dataset.studentId===String(nativeSelectedStudentId)));
   if(!s){panel.innerHTML='<div class="native-student-empty">Выберите ученика</div>';return;}
   const st=studentStats(s);
-  panel.innerHTML='<div class="native-selected-heading"><div><div class="native-eyebrow">STUDENT PROFILE</div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Индивидуальные занятия')+'</p></div><button class="native-add-button" onclick="openStudentEdit(\\''+esc(s.id)+'\\')">Настройки</button></div>'+
+  panel.innerHTML='<div class="native-selected-heading"><div><div class="native-eyebrow">STUDENT PROFILE</div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Индивидуальные занятия')+'</p></div><button class="native-add-button" onclick="openStudentEdit(\''+esc(s.id)+'\')">Настройки</button></div>'+
   '<div class="native-student-stats"><div><span>Баланс</span><strong>'+money(st.bal)+'</strong></div><div><span>Внесено</span><strong>'+money(st.income)+'</strong></div><div><span>Списано</span><strong>'+money(st.expenses)+'</strong></div><div><span>Занятий</span><strong>'+st.ls.length+'</strong></div></div>'+
-  '<div class="native-detail-tabs"><button class="is-active" onclick="switchNativeStudentTab(\\'lessons\\',this)">Lessons & Notes</button><button onclick="switchNativeStudentTab(\\'payments\\',this)">Payments</button></div>'+
+  '<div class="native-detail-tabs"><button class="is-active" onclick="switchNativeStudentTab(\'lessons\',this)">Lessons & Notes</button><button onclick="switchNativeStudentTab(\'payments\',this)">Payments</button></div>'+
   '<div class="native-detail-tab-content" id="native-student-lessons">'+studentDetail(s)+'</div>'+
   '<div class="native-detail-tab-content hidden" id="native-student-payments"></div>';
   const source=panel.querySelector('#native-student-lessons');
