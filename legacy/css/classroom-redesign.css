@@ -367,3 +367,11 @@ html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-
 #teacher-app .native-layout.sidebar-collapsed{grid-template-columns:64px minmax(0,1fr)!important}
 #teacher-app .native-layout.sidebar-collapsed .native-sidebar button[data-native-tab]{padding:10px!important}
 }
+
+/* Classroom navigation control: use the original unboxed double-chevron. */
+@media(min-width:951px){
+#teacher-app .native-sidebar .classroom-sidebar-toggle{border:0!important;background:transparent!important;box-shadow:none!important;color:#30283e!important;border-radius:8px!important;font-size:18px!important}
+#teacher-app .native-sidebar .classroom-sidebar-toggle svg{width:22px!important;height:22px!important}
+#teacher-app .native-layout.sidebar-collapsed .classroom-sidebar-toggle svg{transform:rotate(180deg)!important}
+}
+html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{color:#e5d7f4!important;background:transparent!important}
