@@ -532,6 +532,9 @@ function getTabFromPath(){
   return entry?.[0]==='calendar'?'dashboard':entry?.[0]||'dashboard';
 }
 function switchTab(t,options={}){
+  if(t!=='materials' && !document.getElementById('tab-materials')?.classList.contains('hidden')){
+    window.dispatchEvent(new Event('profiprofit:leave-materials'));
+  }
   const allowed=['dashboard','calendar','students','materials','admin','settings'];
   if(!allowed.includes(t))t='dashboard';
   if(t==='calendar')t='dashboard';
