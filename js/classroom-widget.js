@@ -96,7 +96,7 @@
     const summary=detail.querySelector('.cw-finance-summary'),allSections=[...detail.children],paymentSection=allSections.find(el=>el.classList.contains('grid-cols-1')),lessonList=detail.querySelector('[id^="student-lessons-"]'),lessonSection=lessonList?.parentElement;
     const overview=document.createElement('div'),lessonsPane=document.createElement('div'),notesPane=document.createElement('div'),paymentsPane=document.createElement('div');overview.dataset.studentPane='overview';lessonsPane.dataset.studentPane='lessons';notesPane.dataset.studentPane='notes';paymentsPane.dataset.studentPane='payments';
     for(const el of [...detail.children])if(el!==profileHead&&el!==title&&el!==paymentSection&&el!==lessonSection)overview.append(el);
-    if(paymentSection)paymentsPane.append(paymentSection);
+    if(paymentSection){paymentsPane.append(paymentSection);const paymentList=paymentSection.querySelector('[id^="student-payments-"]')||paymentSection;paymentList.classList.add('cw-payments-scroll');const entries=[...paymentList.children];if(entries.length>1){entries.sort((a,b)=>{const dateOf=e=>e.querySelector('time')?.getAttribute('datetime')||e.querySelector('time')?.textContent||e.textContent?.match(/20\d\d-\d\d-\d\d/)?.[0]||'';return dateOf(b).localeCompare(dateOf(a));});entries.forEach(e=>paymentList.append(e));}}
     const slot=document.createElement('div');slot.className='cw-learning-notes-slot';slot.dataset.studentId=id;slot.dataset.name=student.name;notesPane.append(slot);
     const historyControls=document.createElement('div');historyControls.className='cw-lesson-history-controls';
     const periodSelect=document.createElement('select'),statusSelect=document.createElement('select');
@@ -108,10 +108,10 @@
     const renderLessonHistory=()=>{historyList.replaceChildren();const cutoff=periodSelect.value==='all'?null:Date.now()-Number(periodSelect.value)*86400000;
       const rows=studentStats(student).ls.slice().filter(l=>(statusSelect.value==='all'||l.status===statusSelect.value)&&(!cutoff||new Date(String(l.date)+'T23:59:59').getTime()>=cutoff)).sort((a,b)=>(String(b.date)+String(b.time||'')).localeCompare(String(a.date)+String(a.time||'')));
       if(!rows.length){const empty=document.createElement('p');empty.textContent=english?'No lessons for this filter.':'Нет занятий по выбранным фильтрам.';historyList.append(empty);return;}
-      for(const l of rows){const row=document.createElement('div');row.className='cw-lesson-history-row';
+      let nearest=null,nearestDistance=Infinity;for(const l of rows){const distance=Math.abs(new Date(String(l.date)+'T'+String(l.time||'12:00').slice(0,5)).getTime()-Date.now());if(Number.isFinite(distance)&&distance<nearestDistance){nearestDistance=distance;nearest=String(l.id);}}for(const l of rows){const row=document.createElement('div');row.className='cw-lesson-history-row';if(String(l.id)===nearest){row.classList.add('cw-lesson-nearest');row.setAttribute('aria-label',english?'Closest lesson':'Ближайшее занятие');}
         const date=document.createElement('time');date.textContent=String(l.date||'')+' '+String(l.time||'').slice(0,5);
         const name=document.createElement('strong');name.textContent=String(l.title||l.topic||studentGroup(student.id)?.name||(english?'Lesson':'Занятие'));
-        const status=document.createElement('span');status.textContent=studentLessonStatusText(l,student);
+        const status=document.createElement('span');status.textContent=studentLessonStatusText(l,student);status.className='cw-lesson-status';const attendance=studentLessonAttendance(l,student);status.dataset.status=String(attendance||l.status||'');
         const amount=document.createElement('b');const charged=charge.has(l.status);const member=l.group_id?lessonMembers.find(m=>String(m.lesson_id)===String(l.id)&&String(m.student_id)===id):null;
         const actual=charged&&(!l.group_id||member&&member.charged!==false)?Number(l.group_id?(member?.price??student.price??0):(l.price||0)):0;
         amount.textContent=money(actual);row.append(date,name,status,amount);historyList.append(row);
