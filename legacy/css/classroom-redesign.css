@@ -379,3 +379,74 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
 /* In the material editor, the header and work area share one vertical gap. */
 #teacher-app:has(.ml-builder-host) > .native-workspace{padding-bottom:0!important}
 #teacher-app:has(.ml-builder-host) > .native-layout{padding-top:0!important}
+
+/* Match the editor's outer edges to the teacher header and use the full grid column. */
+#teacher-app:has(.ml-builder-host) > .native-layout {
+  max-width: none!important;
+  padding-inline: 16px!important;
+}
+#teacher-app #teacher-main:has(.ml-builder-host) {
+  max-width: none;
+}
+#classroom-materials-root .ml-builder-host {
+  padding-inline: 12px;
+}
+@media(max-width:950px) {
+  #teacher-app:has(.ml-builder-host) > .native-layout {
+    padding-inline: 12px!important;
+  }
+}
+
+/* Fill the available screen with the preview while letting long exercises grow. */
+#teacher-app:not(.hidden):has(.mb-student-preview) {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+#teacher-app:has(.mb-student-preview) > .native-layout {
+  flex: 1;
+  padding-bottom: 12px!important;
+}
+#teacher-app #teacher-main:has(.mb-student-preview),
+#tab-materials:not(.hidden):has(.mb-student-preview),
+#classroom-materials-root:has(.mb-student-preview),
+#classroom-materials-root .ml-builder-host:has(.mb-student-preview) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+#teacher-app #teacher-main:has(.mb-student-preview) {
+  align-self: stretch;
+}
+#classroom-materials-root .ml-builder-host:has(.mb-student-preview) {
+  padding-block: 8px 12px;
+}
+#classroom-materials-root .mb-student-preview,
+#classroom-materials-root .mb-student-card {
+  display: flex;
+  flex-direction: column;
+}
+#classroom-materials-root .mb-preview-workspace,
+#classroom-materials-root .mb-student-body {
+  flex: 1;
+}
+#classroom-materials-root .mb-student-card {
+  align-self: stretch;
+}
+@container builder (width > 620px) {
+  #classroom-materials-root .mb-preview-notes:not(.expanded) {
+    align-self: stretch;
+    position: relative;
+    top: auto;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+  }
+  #classroom-materials-root .mb-preview-notes:not(.expanded) .mb-rich-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  #classroom-materials-root .mb-preview-notes:not(.expanded) .mb-rich-input {
+    flex: 1;
+  }
+}
