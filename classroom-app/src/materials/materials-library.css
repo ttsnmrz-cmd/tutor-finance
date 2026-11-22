@@ -215,3 +215,40 @@ dialog.ml-dialog .ml-dialog-actions .primary{background:#7042b6!important;color:
 .ml-preview .ml-controls{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;margin:4px 0 10px!important}
 .ml-preview .ml-controls>input{margin-right:auto!important;width:min(300px,40%)!important;min-width:130px!important;padding:8px 12px!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--card)!important}
 @media(max-width:760px){.ml-preview .ml-layout{grid-template-columns:180px minmax(0,1fr)!important;gap:8px!important}.ml-preview .ml-controls{flex-wrap:wrap!important}.ml-preview .ml-controls>input{width:100%!important}}
+
+/* Restore the original My English Classroom visual hierarchy in embedded ProfiProfit. */
+.ml-preview{--ink:#161238;--muted:#625780;--purple:#6928c5;--soft:#f1e8ff;--line:#e7dcfc;--card:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;color:var(--ink)!important;font-size:14px!important}
+.ml-preview .ml-layout{grid-template-columns:310px minmax(0,1fr)!important;gap:18px!important;min-height:calc(100dvh - 190px)!important}
+.ml-preview .ml-folders{background:rgba(255,255,255,.94)!important;border:1px solid #e7dcfc!important;border-radius:20px!important;padding:20px 16px!important;box-shadow:0 3px 16px #35205b08!important}
+.ml-preview .ml-folders-heading h2{font-size:21px!important;font-weight:800!important;letter-spacing:-.5px!important;margin:0 0 18px!important;color:#171132!important}
+.ml-preview .ml-tree-root{display:flex!important;align-items:center!important;gap:12px!important;font-size:14px!important;font-weight:750!important;padding:10px 12px!important;margin:0 0 5px!important;border:0!important;background:transparent!important;border-radius:11px!important}
+.ml-preview .ml-tree-root svg{width:23px!important;height:23px!important;flex-shrink:0!important}
+.ml-preview .ml-tree-root.active,.ml-preview .ml-tree-row.active{background:#f0e6fd!important;color:#6020b5!important}
+.ml-preview .ml-tree-row{min-height:42px!important;margin:2px 0!important}
+.ml-preview .ml-tree-link{font-size:14px!important;font-weight:680!important;min-height:40px!important;gap:10px!important}
+.ml-preview .ml-tree-link svg{width:23px!important;height:23px!important}
+.ml-preview .ml-tree-link span{color:#181337!important}
+.ml-preview .ml-expander{flex-basis:24px!important}
+.ml-preview .ml-workspace{background:rgba(255,255,255,.83)!important;border:1px solid #e7dcfc!important;border-radius:20px!important;padding:18px 20px 24px!important;box-shadow:0 3px 16px #35205b08!important}
+.ml-preview .ml-topline{display:flex!important;margin:0 0 10px!important;min-height:30px!important}
+.ml-preview .ml-breadcrumbs:not(:has(span)){display:flex!important}
+.ml-preview .ml-breadcrumbs button{font-size:13px!important;font-weight:650!important}
+.ml-preview .ml-title-row{margin:0 0 12px!important;gap:12px!important}
+.ml-preview .ml-title-row h1{font-size:27px!important;font-weight:800!important;color:#171132!important;letter-spacing:-.65px!important}
+.ml-preview .ml-title-row h1 svg{width:36px!important;height:36px!important}
+.ml-preview .ml-title-row p{font-size:13px!important;margin:4px 0 0!important}
+.ml-preview .ml-actions{gap:8px!important;align-items:center!important}
+.ml-preview .ml-actions>button{font-size:13px!important;font-weight:650!important;min-height:42px!important;padding:9px 15px!important;border:1px solid #e6dafa!important;background:#f2eafd!important;color:#171132!important;border-radius:12px!important}
+.ml-preview .ml-actions>.primary{background:linear-gradient(110deg,#8742d5,#6525bb)!important;color:#fff!important;border:0!important}
+.ml-preview .ml-controls{margin:0 0 10px!important;gap:10px!important}
+.ml-preview .ml-controls>input{width:min(320px,38%)!important;border:1px solid #e3d6fa!important;border-radius:14px!important;min-height:42px!important;background:#fff!important}
+.ml-preview .ml-controls select{margin-left:0!important;min-width:155px!important;min-height:42px!important;border:1px solid #e3d6fa!important;border-radius:12px!important}
+.ml-preview .ml-view{display:flex!important;gap:3px!important;background:#f4edff!important;border:1px solid #e8ddfa!important;border-radius:12px!important;padding:3px!important}
+.ml-preview .ml-view button{min-width:38px!important;min-height:34px!important;padding:4px 8px!important}
+.ml-preview .ml-view button[aria-pressed=true]{background:#d9b7fa!important;color:#4e169b!important;border-radius:9px!important}
+.ml-preview .ml-list-panel{border:1px solid #e7dcfc!important;background:#fff!important;border-radius:15px!important;overflow:hidden!important}
+.ml-preview .ml-list-head{background:#faf7ff!important;border-bottom:1px solid #e7dcfc!important;font-size:12px!important;font-weight:750!important}
+.ml-preview .ml-item{min-height:68px!important;border-bottom:1px solid #ece5f8!important}
+.ml-preview .ml-item-open strong{font-size:14px!important;font-weight:750!important}
+.ml-preview .ml-item-open small{font-size:12px!important}
+@media(max-width:900px){.ml-preview .ml-layout{grid-template-columns:210px minmax(0,1fr)!important;gap:10px!important}.ml-preview .ml-workspace{padding:12px!important}.ml-preview .ml-folders{padding:14px 10px!important}}
