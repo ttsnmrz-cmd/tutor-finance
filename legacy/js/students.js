@@ -104,6 +104,9 @@ function switchNativeListTab(mode){
   const groupsPanel=document.querySelector('#tab-students .native-groups-panel');
   studentsPanel?.classList.toggle('native-show-groups',nativeStudentListMode==='groups');
   groupsPanel?.classList.toggle('hidden',nativeStudentListMode!=='groups');
+  document.getElementById('students-list')?.classList.toggle('hidden',nativeStudentListMode==='groups');
+  const sort=document.querySelector('#tab-students .student-sort-wrap');
+  sort?.classList.toggle('hidden',nativeStudentListMode==='groups');
   document.getElementById('native-tab-individual')?.classList.toggle('is-active',nativeStudentListMode==='students');
   document.getElementById('native-tab-groups')?.classList.toggle('is-active',nativeStudentListMode==='groups');
 }
@@ -148,6 +151,7 @@ function renderStudents(){
     :'<div class="py-8 text-center text-slate-400">Учеников нет</div>';
   if(!active.some(s=>String(s.id)===String(nativeSelectedStudentId)))nativeSelectedStudentId=active[0]?.id||null;
   renderNativeStudentDetail();
+  switchNativeListTab(nativeStudentListMode);
 }
 
 function studentRow(s){
