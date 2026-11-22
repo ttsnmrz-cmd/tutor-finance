@@ -17,6 +17,7 @@ export function MaterialsLibraryPreview({user,onOld}:{user:string;onOld:()=>void
  const repo=useMemo(()=>createProductionRepository(user),[user]);
  const [sections,setSections]=useState<MaterialSection[]>([]),[drafts,setDrafts]=useState<LibraryPlan[]>([]),[versions,setVersions]=useState<VersionRow[]>([]),[folder,setFolder]=useState<string|null>(null),[open,setOpen]=useState(new Set<string>()),[treeChoice,setTreeChoice]=useState<boolean|null>(null),[narrow,setNarrow]=useState(false),[search,setSearch]=useState(''),[sort,setSort]=useState('updated'),[grid,setGrid]=useState(false),[editor,setEditor]=useState<LibraryPlan|null>(null),[legacyEditor,setLegacyEditor]=useState(false),[action,setAction]=useState<LibraryAction|null>(null),[menu,setMenu]=useState<string|null>(null),[error,setError]=useState('');
  const tree=treeChoice!==false;
+ useEffect(()=>{const leave=()=>{setEditor(null);setLegacyEditor(false);setFolder(null);setMenu(null);setAction(null);rememberLocation(null);};window.addEventListener('profiprofit:leave-materials',leave);return()=>window.removeEventListener('profiprofit:leave-materials',leave);},[user]);
  const locationKey='profiprofit:classroom:location:'+user;
  function rememberLocation(id:string|null,mode:'builder'|'studio'='builder'){try{if(id)sessionStorage.setItem(locationKey,JSON.stringify({id,mode}));else sessionStorage.removeItem(locationKey);}catch{}}
  function openEditor(row:LibraryPlan){setEditor(row);setLegacyEditor(false);rememberLocation(row.id);}
