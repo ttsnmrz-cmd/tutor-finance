@@ -1,6 +1,6 @@
 /* ProfiProfit native materials library: Classroom sections and lesson plans.
    Uses the production schema; no Classroom test data is copied. */
-let nativeMaterialStore={folders:[],materials:[],selected:null};
+let nativeMaterialStore={folders:[],materials:[],selected:null,activeFolder:null};
 function nativeMaterialText(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function nativeMaterialContent(value,depth=0){
  if(depth>7||value==null)return '';
@@ -44,13 +44,13 @@ async function loadNativeMaterials(){
   const createFolder=document.createElement('button');
   createFolder.type='button';
   createFolder.className='native-material-row';
-  createFolder.textContent='＋ New folder';
+  createFolder.textContent='＋ Создать папку';
   createFolder.addEventListener('click',async()=>{
-    const title=window.prompt('Folder name');
+    const title=window.prompt('Название папки');
     if(!title||!title.trim())return;
     createFolder.disabled=true;
     const result=await supabaseClient.from('material_sections').insert({
-      teacher_id:teacher,title:title.trim(),parent_id:null,position:0
+      teacher_id:teacher,title:title.trim(),parent_id:nativeMaterialStore.activeFolder,position:0
     });
     if(result.error){window.alert('Could not create folder: '+result.error.message);createFolder.disabled=false;return;}
     await loadNativeMaterials();
@@ -58,27 +58,40 @@ async function loadNativeMaterials(){
   host.append(createFolder);
   const fs=folders.data||[],ms=(materials.data||[]).map(m=>({...m,folder_id:m.section_id,title:(m.body&&typeof m.body==='object'&&(m.body.title||m.body.name))||'Untitled lesson'}));
   nativeMaterialStore.folders=fs;nativeMaterialStore.materials=ms;
-  const seen=new Set();
-  const render=(parent,depth)=>{
+  const addRow=(m,container,depth)=>{
+   const row=document.createElement('button');row.type='button';row.className='native-material-row';
+   row.dataset.nativeMaterialId=String(m.id);row.style.paddingLeft=(12+depth*12)+'px';
+   row.textContent='📄 '+m.title;row.addEventListener('click',()=>nativeMaterialSelect(m.id));container.append(row);
+  };
+  const seen=new Set(),rendered=new Set();
+  const render=(parent,depth,container)=>{
    if(depth>25)return;
    fs.filter(f=>String(f.parent_id??'')===String(parent??'')).forEach(f=>{
-    if(seen.has(String(f.id)))return;seen.add(String(f.id));
+    if(seen.has(String(f.id)))return;
+    seen.add(String(f.id));
     const section=document.createElement('div');section.className='native-material-folder';
-    section.style.setProperty('--folder-depth',String(depth));
-    const label=document.createElement('div');label.className='native-material-folder-title';label.textContent='▾  '+f.title;
-    section.append(label);host.append(section);
-    const children=document.createElement('div');section.append(children);
-    fs.filter(x=>String(x.parent_id)===String(f.id)).forEach(x=>{const row=document.createElement('div');row.className='native-material-subfolder';row.textContent='📁 '+x.title;children.append(row);});
-    ms.filter(x=>String(x.folder_id)===String(f.id)).forEach(x=>addRow(x,children,depth+1));
+    const label=document.createElement('button');label.type='button';
+    label.className='native-material-folder-title native-material-row';
+    label.style.paddingLeft=(12+depth*12)+'px';
+    label.textContent='📁 '+f.title;
+    const children=document.createElement('div');
+    children.hidden=true;
+    label.setAttribute('aria-expanded','false');
+    label.addEventListener('click',()=>{
+      children.hidden=!children.hidden;
+      label.setAttribute('aria-expanded',String(!children.hidden));
+      nativeMaterialStore.activeFolder=children.hidden?null:f.id;
+      createFolder.textContent=children.hidden?'＋ Создать папку':'＋ Создать подпапку в «'+f.title+'»';
+    });
+    section.append(label,children);container.append(section);
+    render(f.id,depth+1,children);
    });
-   ms.filter(x=>String(x.folder_id??'')===String(parent??'')).forEach(x=>addRow(x,host,depth));
+   ms.filter(m=>String(m.folder_id??'')===String(parent??'')).forEach(m=>{
+    rendered.add(String(m.id));addRow(m,container,depth);
+   });
   };
-  const addRow=(m,container,depth)=>{
-   const row=document.createElement('button');row.type='button';row.className='native-material-row';row.dataset.nativeMaterialId=String(m.id);row.style.paddingLeft=(12+depth*12)+'px';row.textContent='📄 '+m.title;row.addEventListener('click',()=>nativeMaterialSelect(m.id));container.append(row);
-  };
-  render(null,0);
-  // Include nested-folder materials even if their folder is not at the root.
-  const rendered=new Set([...host.querySelectorAll('[data-native-material-id]')].map(el=>el.dataset.nativeMaterialId));
+  nativeMaterialStore.activeFolder=null;
+  render(null,0,host);
   ms.filter(m=>!rendered.has(String(m.id))).forEach(m=>addRow(m,host,0));
   status.textContent=fs.length+' папок · '+ms.length+' материалов';
   if(!ms.length)status.textContent+=' — библиотека пока пустая.';
