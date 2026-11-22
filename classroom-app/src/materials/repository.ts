@@ -10,10 +10,10 @@ export interface StudioRepository {
  savePlan(id:string|null,body:Plan,revision:number):Promise<PlanRow>;
 }
 export interface MaterialsRepository extends StudioRepository {
- sections():MaterialSection[];
- createFolder(title:string,parent:string|null):void;
- renameFolder(id:string,title:string):void;
- moveFolder(id:string,parent:string|null):void;
- moveMaterial(id:string,parent:string|null):void;
+ sections():Promise<MaterialSection[]>;
+ createFolder(title:string,parent:string|null):Promise<void>;
+ renameFolder(id:string,title:string):Promise<void>;
+ moveFolder(id:string,parent:string|null):Promise<void>;
+ moveMaterial(id:string,parent:string|null):Promise<void>;
  createDraft(title:string,parent:string|null):Promise<LibraryPlan>;
 }
