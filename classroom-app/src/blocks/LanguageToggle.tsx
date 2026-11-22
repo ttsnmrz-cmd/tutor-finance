@@ -1,0 +1,2 @@
+import {setLanguage,useLanguage} from '../i18n';
+export function LanguageToggle(){const language=useLanguage();return <button className="language-toggle" aria-label={language==='en'?'Switch interface to Russian':'Переключить интерфейс на английский'} title={language==='en'?'Русский интерфейс':'English interface'} onClick={()=>setLanguage(language==='en'?'ru':'en')}>{language==='en'?'EN':'RU'}</button>;}
