@@ -81,19 +81,35 @@ Deno.serve(async (req) => {
   const wholeLessons = lessonPrice > 0 ? Math.max(0, Math.floor((balance + 1e-9) / lessonPrice)) : 0;
   const remainder = lessonPrice > 0 ? Math.max(0, balance - wholeLessons * lessonPrice) : balance;
 
+  // Use the new capability only if the opt-in migration has been applied and
+  // the teacher has issued a token. Do not expose the capability in logs.
+  // Legacy links remain supported during the controlled migration period.
+  const { data: portalAccess, error: portalAccessError } = await db
+    .from("student_portal_access")
+    .select("access_token")
+    .eq("student_id", student.id)
+    .eq("teacher_id", user.id)
+    .maybeSingle();
+  if (portalAccessError && portalAccessError.code !== "42P01" && portalAccessError.code !== "PGRST205") {
+    console.warn("Student portal capability lookup failed; keeping legacy link");
+  }
+  const cabinetUrl = portalAccess?.access_token
+    ? "https://profiprofit.com/?access=" + encodeURIComponent(portalAccess.access_token)
+    : "https://profiprofit.com/?student=" + encodeURIComponent(student.id);
+
   const recipients: Array<{ type: "student" | "teacher"; chat: string | number; message: string }> = [];
   if (student.telegram_chat_id && student.telegram_notify_payments === true) {
     const countText = wholeLessons === 1 ? "1 занятие" : wholeLessons >= 2 && wholeLessons <= 4 ? `${wholeLessons} занятия` : `${wholeLessons} занятий`;
     const remainderText = remainder > 0 ? ` и ещё ${money(remainder)} BYN остатка` : "";
     recipients.push({
       type: "student", chat: student.telegram_chat_id,
-      message: `💚 Thank you for topping up your balance!\n\nWe received your payment of ${money(Number(payment.amount))} BYN.\nYour current balance covers ${wholeLessons} lesson(s)${remainder > 0 ? ` with ${money(remainder)} BYN remaining` : ""}.\n\nSee you in class! 😊\n\n💚 Спасибо за пополнение баланса!\n\nНа ваш счёт поступило ${money(Number(payment.amount))} BYN.\nТеперь средств хватит на ${countText}${remainderText} по текущей стоимости.\n\nДо встречи на занятии! 😊\n\nYour personal account / Ваш личный кабинет: https://profiprofit.com/?student=${student.id}`,
+      message: `💚 Thank you for topping up your balance!\n\nWe received your payment of ${money(Number(payment.amount))} BYN.\nYour current balance covers ${wholeLessons} lesson(s)${remainder > 0 ? ` with ${money(remainder)} BYN remaining` : ""}.\n\nSee you in class! 😊\n\n💚 Спасибо за пополнение баланса!\n\nНа ваш счёт поступило ${money(Number(payment.amount))} BYN.\nТеперь средств хватит на ${countText}${remainderText} по текущей стоимости.\n\nДо встречи на занятии! 😊\n\nYour personal account / Ваш личный кабинет: ${cabinetUrl}`,
     });
   }
   if (teacher?.telegram_chat_id) {
     recipients.push({
       type: "teacher", chat: teacher.telegram_chat_id,
-      message: `💰 ${student.name || payment.student || "Student"} topped up their balance by ${money(Number(payment.amount))} BYN.\nNew balance: ${money(balance)} BYN.\nCovers ${wholeLessons} lesson(s)${remainder > 0 ? ` with ${money(remainder)} BYN remaining` : ""}.\n\n💰 ${student.name || payment.student || "Ученик"} пополнил(а) баланс на ${money(Number(payment.amount))} BYN.\nНовый баланс: ${money(balance)} BYN.\nХватит на ${wholeLessons} ${wholeLessons === 1 ? "занятие" : "занятий"}${remainder > 0 ? ` и ${money(remainder)} BYN остатка` : ""}.\n\nStudent account / Кабинет ученика: https://profiprofit.com/?student=${student.id}`,
+      message: `💰 ${student.name || payment.student || "Student"} topped up their balance by ${money(Number(payment.amount))} BYN.\nNew balance: ${money(balance)} BYN.\nCovers ${wholeLessons} lesson(s)${remainder > 0 ? ` with ${money(remainder)} BYN remaining` : ""}.\n\n💰 ${student.name || payment.student || "Ученик"} пополнил(а) баланс на ${money(Number(payment.amount))} BYN.\nНовый баланс: ${money(balance)} BYN.\nХватит на ${wholeLessons} ${wholeLessons === 1 ? "занятие" : "занятий"}${remainder > 0 ? ` и ${money(remainder)} BYN остатка` : ""}.\n\nStudent account / Кабинет ученика: ${cabinetUrl}`,
     });
   }
 
