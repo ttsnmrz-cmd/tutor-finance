@@ -61,3 +61,25 @@ html[data-theme=dark] .native-sidebar{background:#30283b;border-color:#4b4059}
 html[data-theme=dark] .native-sidebar button{color:#c9bed5}
 html[data-theme=dark] .native-sidebar button.is-active{background:#4a3a5b;color:#f4e9ff}
 @media(max-width:950px){.native-layout{grid-template-columns:1fr;gap:12px}.native-sidebar{position:static;min-height:0;display:flex;flex-direction:row;align-items:center;overflow-x:auto;padding:6px 8px;border-radius:14px;gap:4px}.native-sidebar-label,.native-sidebar-footer{display:none}.native-sidebar button{flex:0 0 auto;width:auto;padding:10px 12px;white-space:nowrap}.native-sidebar button span{font-size:16px;width:17px}}
+
+/* Content-area redesign: separate functional panels, not merely a new app shell. */
+.native-page-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 20px;padding:5px 2px 0}
+.native-page-heading h1{font-size:27px;font-weight:760;line-height:1.2;color:#433352;letter-spacing:-.035em}
+.native-page-heading p{font-size:13px;color:#91859b;margin-top:6px}
+.native-eyebrow{font-size:10px;font-weight:800;letter-spacing:.17em;color:#9677b0;margin-bottom:7px}
+.native-add-button{border:0;border-radius:12px;background:#695087;color:#fff;padding:11px 17px;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 6px 16px #69508722}
+.native-add-button:hover{background:#553c75}
+.native-students-grid{display:grid;grid-template-columns:minmax(180px,245px) minmax(0,1fr);align-items:start;gap:18px}
+.native-students-grid .native-groups-panel{padding:19px!important}
+.native-students-grid .native-students-panel{padding:20px!important;min-width:0}
+.native-students-grid .native-groups-panel h2,.native-students-grid .native-students-panel h2{font-size:15px!important}
+.native-students-grid #students-list{max-height:min(66vh,720px);overflow-y:auto;overscroll-behavior:contain;padding-right:5px}
+.native-students-grid #students-list>*{border-radius:13px!important}
+.native-students-grid #groups-list{max-height:320px;overflow-y:auto}
+#tab-calendar>.app-card{border-radius:19px!important;overflow:hidden}
+#tab-calendar #week-calendar{background:#fff;border-radius:12px}
+#tab-materials>.app-card{min-height:380px}
+#tab-dashboard #dashboard-cards>*{background:#fff!important;border:1px solid #eae3f1!important;padding:20px!important}
+#tab-dashboard #dashboard-low-balances>*{border-radius:12px}
+@media(max-width:750px){.native-students-grid{grid-template-columns:1fr}.native-students-grid #students-list{max-height:none}.native-page-heading{align-items:flex-start}.native-page-heading h1{font-size:23px}.native-add-button{font-size:12px;padding:10px 12px}}
+html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
