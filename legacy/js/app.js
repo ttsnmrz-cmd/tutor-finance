@@ -537,6 +537,8 @@ function switchTab(t,options={}){
   if(t==='admin'&&!platformAdmin)t='dashboard';
   ['dashboard','calendar','students','materials','admin','settings'].forEach(name=>{
     document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
+    const side=document.querySelector('.native-sidebar [data-native-tab="'+name+'"]');
+    if(side){side.classList.toggle('is-active',t===name);side.setAttribute('aria-current',t===name?'page':'false');}
     const nav=document.getElementById('nav-'+name);
     if(nav){
       nav.className='px-4 py-2 rounded-xl font-semibold '+(t===name?'bg-indigo-600 text-white':'bg-slate-100');
