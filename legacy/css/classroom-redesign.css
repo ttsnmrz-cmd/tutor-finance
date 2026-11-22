@@ -83,3 +83,17 @@ html[data-theme=dark] .native-sidebar button.is-active{background:#4a3a5b;color:
 #tab-dashboard #dashboard-low-balances>*{border-radius:12px}
 @media(max-width:750px){.native-students-grid{grid-template-columns:1fr}.native-students-grid #students-list{max-height:none}.native-page-heading{align-items:flex-start}.native-page-heading h1{font-size:23px}.native-add-button{font-size:12px;padding:10px 12px}}
 html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
+
+/* Reference dashboard: six compact metrics above one continuous weekly calendar. */
+#tab-dashboard{background:#fff;border:1px solid #e8dfef;border-radius:22px;padding:20px!important;min-height:calc(100vh - 150px)}
+#dashboard-cards.native-metric-strip{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:8px!important;margin:0 0 22px!important}
+#dashboard-cards.native-metric-strip>*{min-height:84px!important;border-radius:15px!important;padding:13px 14px!important;background:#f3eef8!important;box-shadow:none!important;border:1px solid #e4d9ee!important}
+#dashboard-cards.native-metric-strip .text-xl.md\:text-2xl{font-size:21px!important;line-height:1.2}
+#dashboard-cards.native-metric-strip .mb-3{margin-bottom:7px!important}
+#dashboard-cards.native-metric-strip .text-xs{font-size:11px!important}
+#dashboard-calendar{min-width:0}
+#dashboard-calendar>.app-card{padding:0!important;box-shadow:none!important;border:0!important;background:transparent!important}
+#dashboard-calendar #week-calendar{min-height:540px}
+#dashboard-calendar .fixed.right-6.bottom-6{display:none!important}
+@media(max-width:1200px){#dashboard-cards.native-metric-strip{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:680px){#dashboard-cards.native-metric-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}#tab-dashboard{padding:12px!important}}
