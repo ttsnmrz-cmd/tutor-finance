@@ -53,12 +53,9 @@
   <div class="next-sidebar-footer">Новый интерфейс · Предпросмотр</div>
 </aside>
 <section id="next-classroom-panel" hidden aria-label="Учебные материалы">
-  <div class="next-classroom-head">
-    <div><span class="next-classroom-eyebrow">PROFIPROFIT / CLASSROOM</span><h1>Учебные материалы</h1><p>Упражнения, материалы и занятия в одном рабочем пространстве.</p></div>
-    <div class="next-classroom-actions"><button type="button" onclick="nextCloseClassroom()">← Вернуться</button><a href="https://classroom.profiprofit.com/" target="_blank" rel="noopener noreferrer">Открыть отдельно ↗</a></div>
-  </div>
-  <div class="next-classroom-frame"><iframe id="next-classroom-iframe" title="My English Classroom" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="clipboard-write" data-src="https://classroom.profiprofit.com/"></iframe></div>
-  <p class="next-classroom-note">Classroom пока использует отдельный вход. Ваши финансовые данные здесь не передаются.</p>
+  <div class="next-classroom-head"><div><h1>Materials</h1><p>Библиотека материалов ProfiProfit</p></div><button type="button" onclick="nextCloseClassroom()">← Назад</button></div>
+  <div id="next-classroom-status" role="status"></div>
+  <div id="next-classroom-library" aria-label="Материалы преподавателя"></div>
 </section>
 <div class="max-w-5xl mx-auto p-4 md:p-6">
 <header id="teacher-header" class="app-card rounded-3xl p-4 mb-5 flex justify-between items-center gap-3 relative">
