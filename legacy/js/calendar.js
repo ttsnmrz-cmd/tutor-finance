@@ -66,9 +66,9 @@ function renderWeek(){
       const top=Math.max(0,(minutes-hourStart*60)*pxPerHour/60);
       const height=Math.max(48,Math.min(180,Number(l.duration||60)*pxPerHour/60-4));
       const cancelled=['rescheduled','cancelled_charge','cancelled_free'].includes(l.status);
-      return '<button type="button" style="top:'+top+'px;height:'+height+'px" onclick="openEditLesson(\\''+esc(l.id)+'\\')" class="calendar-event-card native-timed-event '+(cancelled?'is-cancelled':'')+'"><span class="calendar-event-time">'+esc(displayTime(l.time))+'</span><span class="calendar-event-title">'+esc(lessonTitle(l))+'</span><span class="calendar-event-meta">'+money(lessonPriceTotal(l))+'</span><span class="status '+(statusClass[l.status]||'bg-slate-100')+'">'+(statusLabels[l.status]||l.status)+'</span></button>';
+      return '<button type="button" style="top:'+top+'px;height:'+height+'px" onclick="openEditLesson(\''+esc(l.id)+'\')" class="calendar-event-card native-timed-event '+(cancelled?'is-cancelled':'')+'"><span class="calendar-event-time">'+esc(displayTime(l.time))+'</span><span class="calendar-event-title">'+esc(lessonTitle(l))+'</span><span class="calendar-event-meta">'+money(lessonPriceTotal(l))+'</span><span class="status '+(statusClass[l.status]||'bg-slate-100')+'">'+(statusLabels[l.status]||l.status)+'</span></button>';
     }).join('');
-    return '<div class="native-day"><button type="button" class="calendar-day-heading '+(isToday?'is-today':'')+'" onclick="selectDay(\\''+key+'\\')"><span class="calendar-weekday">'+d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')+'</span><span class="calendar-day-number">'+d.getDate()+'</span></button><div class="native-day-track" data-date="'+key+'" style="height:'+((hourEnd-hourStart)*pxPerHour)+'px">'+cards+'</div></div>';
+    return '<div class="native-day"><button type="button" class="calendar-day-heading '+(isToday?'is-today':'')+'" onclick="selectDay(\''+key+'\')"><span class="calendar-weekday">'+d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')+'</span><span class="calendar-day-number">'+d.getDate()+'</span></button><div class="native-day-track" data-date="'+key+'" style="height:'+((hourEnd-hourStart)*pxPerHour)+'px">'+cards+'</div></div>';
   }).join('');
   c.className='native-week-calendar';
   c.innerHTML='<div class="native-week-head-spacer"></div>'+columns;
