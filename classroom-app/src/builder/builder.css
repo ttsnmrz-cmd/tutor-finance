@@ -329,3 +329,17 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-tag-field>small{color:var(--muted);font-size:11px;margin-top:4px;display:block}
 .mb-teacher-prep-notes{font:inherit;line-height:1.5;font-size:14px;width:100%;min-height:100px;max-height:280px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--page);color:var(--ink);resize:vertical}
 @container builder (max-width:850px){.mb-settings-details{grid-template-columns:1fr}}
+
+/* Standalone lesson preview within the ProfiProfit host. */
+.mb-student-preview{display:block!important;width:100%!important;max-width:1180px!important;margin:0 auto!important;padding:8px 12px 28px!important;box-sizing:border-box!important}
+.mb-student-preview .mb-preview-top{display:flex!important;align-items:center!important;margin:0 0 12px!important}
+.mb-student-preview>h1{font-size:28px!important;font-weight:750!important;margin:8px 0 12px!important}
+.mb-student-preview .mb-preview-controls{display:flex!important;justify-content:flex-end!important;gap:8px!important;flex-wrap:wrap!important;margin:8px 0 16px!important}
+.mb-student-preview .mb-preview-workspace{display:block!important;width:100%!important;max-width:100%!important}
+.mb-student-preview .mb-student-card{display:block!important;width:100%!important;max-width:100%!important;border:1px solid #e7dfef!important;border-radius:18px!important;background:#fff!important;box-shadow:0 8px 25px #3020440b!important;overflow:hidden!important}
+.mb-student-preview .mb-student-body{padding:28px 32px!important;min-height:300px!important}
+.mb-student-preview .mb-combined-element{display:block!important;margin:0 0 26px!important}
+.mb-student-preview .mb-combined-element>h2{font-size:24px!important;margin:0 0 16px!important}
+.mb-student-preview .mb-student-content{font-size:17px!important;line-height:1.7!important}
+.mb-student-preview .mb-preview-footer{display:flex!important;align-items:center!important;justify-content:space-between!important;border-top:1px solid #e7dfef!important;padding:14px 24px!important}
+.mb-student-preview .mb-preview-notes:not([open]){display:none}
