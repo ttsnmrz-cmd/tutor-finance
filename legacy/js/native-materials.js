@@ -53,7 +53,6 @@ async function loadNativeMaterials(){
     const label=document.createElement('div');label.className='native-material-folder-title';label.textContent='▾  '+f.title;
     section.append(label);host.append(section);
     const children=document.createElement('div');section.append(children);
-    const prevHost=host; // folders and materials are rendered in the same section
     fs.filter(x=>String(x.parent_id)===String(f.id)).forEach(x=>{const row=document.createElement('div');row.className='native-material-subfolder';row.textContent='📁 '+x.title;children.append(row);});
     ms.filter(x=>String(x.folder_id)===String(f.id)).forEach(x=>addRow(x,children,depth+1));
    });
