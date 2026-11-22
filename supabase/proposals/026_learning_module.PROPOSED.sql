@@ -9,6 +9,7 @@ create table public.learning_folders (
  title text not null check(length(trim(title)) between 0 and 160 and length(trim(title))>0),
  position integer not null default 0,
  created_at timestamptz not null default now(),
+ updated_at timestamptz not null default now(),
  unique(id,teacher_id),
  foreign key(parent_id,teacher_id) references public.learning_folders(id,teacher_id)
 );
@@ -71,13 +72,15 @@ create table public.learning_attempts (
  submitted_at timestamptz not null default now(),
  unique(assignment_id,attempt_number),
  foreign key(assignment_id,teacher_id,student_id)
-  references public.learning_assignments(id,teacher_id,student_id)
+  references public.learning_assignments(id,teacher_id,student_id) on delete cascade
 );
 -- Critical: finance student ownership is verified by DB, never by client-supplied teacher_id.
+-- Student deletion must remain possible: learning records cascade; finance payment/lesson
+-- deletion behavior is unchanged. Attempts cascade through assignments below.
 alter table public.learning_assignments add constraint learning_assignment_student_owner
- foreign key(student_id) references public.students(id) on delete restrict;
+ foreign key(student_id) references public.students(id) on delete cascade;
 alter table public.learning_notes add constraint learning_note_student_owner
- foreign key(student_id) references public.students(id) on delete restrict;
+ foreign key(student_id) references public.students(id) on delete cascade;
 -- Prevent cross-teacher references even if IDs are supplied maliciously.
 create or replace function public.learning_check_student_owner()
 returns trigger language plpgsql set search_path='' as $$
