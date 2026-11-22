@@ -621,3 +621,37 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
   .next-ui-preview .next-sidebar-nav button,
   .next-ui-preview .next-sidebar-nav .next-side-classroom{justify-content:flex-start;text-align:left}
 }
+
+/* Classroom embedded workspace. Preview only; separate-origin session stays separate. */
+.next-ui-preview #next-classroom-panel[hidden]{display:none!important}
+.next-ui-preview #next-classroom-panel{
+  display:block;width:calc(100% - 244px);margin-left:244px;
+  padding:24px 32px;min-width:0;box-sizing:border-box;
+}
+.next-ui-preview.next-classroom-active #teacher-app>.max-w-5xl{display:none!important}
+.next-ui-preview #next-classroom-panel .next-classroom-head{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:20px 22px;margin-bottom:15px;border-radius:20px;
+  background:#fff;border:1px solid #e6e9f2;
+}
+.next-classroom-eyebrow{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;color:#8b85cf;margin-bottom:8px}
+.next-classroom-head h1{font-size:26px;font-weight:800;letter-spacing:-.04em;color:#1b2340}
+.next-classroom-head p{font-size:13px;color:#68738b;margin-top:5px}
+.next-classroom-actions{display:flex;gap:8px;flex-wrap:wrap}
+.next-classroom-actions button,.next-classroom-actions a{
+  padding:9px 12px;border:1px solid #e2e5ef;border-radius:10px;
+  background:#f7f7fc;color:#5145bc;font-size:12px;font-weight:700;text-decoration:none;
+}
+.next-classroom-frame{height:calc(100vh - 200px);min-height:500px;border-radius:20px;overflow:hidden;background:#fff;border:1px solid #e6e9f2}
+.next-classroom-frame iframe{display:block;width:100%;height:100%;border:0}
+.next-classroom-note{margin-top:10px;color:#788398;font-size:11px}
+.next-ui-preview #next-workspace-sidebar .next-side-classroom[aria-current="page"]{background:#efedff;color:#5145bc}
+@media(max-width:900px){
+ .next-ui-preview #next-classroom-panel{width:calc(100% - 200px);margin-left:200px;padding:14px}
+ .next-ui-preview #next-classroom-panel .next-classroom-head{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:640px){
+ .next-ui-preview #next-classroom-panel{width:100%;margin:0;padding:12px}
+ .next-ui-preview #next-classroom-panel .next-classroom-head{padding:14px}
+ .next-classroom-frame{height:70vh;min-height:420px}
+}
