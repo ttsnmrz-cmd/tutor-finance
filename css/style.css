@@ -427,3 +427,12 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 #tab-dashboard .dashboard-greeting h1{margin:0!important;line-height:1.2!important}
 #tab-dashboard #dashboard-cards{margin-bottom:12px!important}
 #tab-dashboard .dashboard-heading h2{line-height:1.2!important}
+
+/* Compact week calendar cards: show time and learner on one line when space allows. */
+.calendar-event-card{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;column-gap:7px;row-gap:3px;overflow:visible;min-width:0}
+.calendar-event-card .calendar-event-time{grid-column:1;white-space:nowrap;line-height:1.35}
+.calendar-event-card .calendar-event-title{grid-column:2;min-width:0;overflow-wrap:anywhere;line-height:1.35}
+.calendar-event-card .calendar-event-meta{grid-column:1/-1}
+.calendar-event-card .calendar-event-comment{grid-column:1/-1}
+.calendar-event-card .status{grid-column:1/-1;max-width:100%;width:max-content;min-width:0;line-height:1.25;padding:3px 7px;overflow-wrap:anywhere}
+@media(max-width:1050px){.calendar-week-grid{overflow-x:auto;grid-template-columns:repeat(7,minmax(145px,1fr));padding-bottom:6px}}
