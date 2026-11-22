@@ -532,10 +532,10 @@ function getTabFromPath(){
   return entry?.[0]||'dashboard';
 }
 function switchTab(t,options={}){
-  const allowed=['dashboard','calendar','students','admin','settings'];
+  const allowed=['dashboard','calendar','students','materials','admin','settings'];
   if(!allowed.includes(t))t='dashboard';
   if(t==='admin'&&!platformAdmin)t='dashboard';
-  ['dashboard','calendar','students','admin','settings'].forEach(name=>{
+  ['dashboard','calendar','students','materials','admin','settings'].forEach(name=>{
     document.getElementById('tab-'+name)?.classList.toggle('hidden',t!==name);
     const nav=document.getElementById('nav-'+name);
     if(nav){
@@ -549,6 +549,7 @@ function switchTab(t,options={}){
     history[method]({tab:t},'',nextPath+location.search+location.hash);
   }
   if(t==='admin')loadPlatformAdminDashboard();
+  if(t==='materials')loadNativeMaterials();
 }
 window.addEventListener('popstate',()=>{
   if(!document.getElementById('teacher-app')?.classList.contains('hidden')){
@@ -2464,3 +2465,27 @@ function closeHelp(){
   if(modal){modal.classList.add('hidden');modal.classList.remove('flex');}
 }
 document.addEventListener('keydown',event=>{if(event.key==='Escape')closeHelp()});
+
+async function loadNativeMaterials(){
+ const status=document.getElementById('materials-status'),host=document.getElementById('materials-library');
+ if(!status||!host)return;
+ status.textContent='Загружаем материалы…';host.replaceChildren();
+ try{
+  const auth=await supabaseClient.auth.getUser();
+  if(auth.error||!auth.data.user)throw Error('Войдите в ProfiProfit.');
+  const teacher=auth.data.user.id;
+  const [folders,materials]=await Promise.all([
+   supabaseClient.from('learning_folders').select('id,title,parent_id,position').eq('teacher_id',teacher).order('position'),
+   supabaseClient.from('learning_materials').select('id,title,folder_id,updated_at').eq('teacher_id',teacher).order('updated_at',{ascending:false})
+  ]);
+  if(folders.error||materials.error)throw Error('Библиотека ещё не подключена к основной базе ProfiProfit.');
+  const fs=folders.data||[],ms=materials.data||[];
+  const render=(parent,depth)=>{
+   if(depth>30)return;
+   fs.filter(f=>f.parent_id===parent).forEach(f=>{const row=document.createElement('div');row.className='rounded-xl bg-slate-50 px-3 py-2 font-semibold';row.style.marginLeft=(depth*16)+'px';row.textContent='📁 '+f.title;host.append(row);render(f.id,depth+1);});
+   ms.filter(x=>x.folder_id===parent).forEach(x=>{const row=document.createElement('div');row.className='rounded-xl border border-slate-100 px-3 py-2';row.style.marginLeft=(depth*16)+'px';row.textContent='📄 '+x.title;host.append(row);});
+  };
+  render(null,0);status.textContent=fs.length+' папок · '+ms.length+' материалов';
+  if(!fs.length&&!ms.length)status.textContent+=' — библиотека пока пустая.';
+ }catch(error){status.textContent=error?.message||'Не удалось загрузить библиотеку.';}
+}
