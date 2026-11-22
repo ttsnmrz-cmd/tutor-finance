@@ -1,0 +1,37 @@
+name: Stage compiled Classroom assets
+on:
+  push:
+    branches: [integration/classroom-builder-20261122]
+    paths:
+      - 'classroom-app/**'
+      - '.github/workflows/stage-classroom-assets.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: integration/classroom-builder-20261122
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable && corepack prepare pnpm@10.29.3 --activate
+      - run: pnpm install --frozen-lockfile && pnpm build
+        working-directory: classroom-app
+      - name: Confirm embedded assets
+        run: |
+          test -s legacy/classroom-assets/classroom.js
+          test -s legacy/classroom-assets/classroom.css
+      - name: Commit staged bundle only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f legacy/classroom-assets/classroom.js legacy/classroom-assets/classroom.css
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: stage verified Classroom bundle'
+            git push origin HEAD:integration/classroom-builder-20261122
+          fi
