@@ -1,0 +1,13 @@
+import {supabase} from '../supabase';
+import type {ExerciseDraft,ExerciseVersion,WordRecord,Attempt,SessionBlock,PracticeView} from './types';
+const client=()=>{if(!supabase)throw Error('Not connected');return supabase;};
+function checked<T>(r:{data:T;error:{message:string}|null}):T{if(r.error)throw Error(r.error.message);return r.data;}
+export async function practiceRequest(action:string,payload:unknown,live?:{session:string;client:string;epoch:number}){
+ const r=await client().functions.invoke('pronunciation-practice',{body:{action,payload,...live}});
+ if(r.error){let message='Could not save pronunciation practice. Check connection and access.';try{const body=await (r.error as {context?:Response}).context?.json();if(body?.error)message=body.error;}catch{}throw Error(message);}if(r.data?.error)throw Error(r.data.error);return r.data.result;
+}
+export async function wordBank(student:string){return checked(await client().from('student_pronunciation_progress').select('*').eq('student_id',student).order('updated_at',{ascending:false})) as WordRecord[];}
+export async function wordHistory(word:string){return checked(await client().from('pronunciation_attempts').select('*').eq('student_item_id',word).order('occurred_at',{ascending:false}).limit(30)) as Attempt[];}
+export async function privateAttemptNotes(ids:string[]){if(!ids.length)return[];return checked(await client().from('pronunciation_attempt_private_notes').select('attempt_id,body').in('attempt_id',ids)) as {attempt_id:string;body:string}[];}
+export async function exerciseLibrary(){const [a,b]=await Promise.all([client().from('lesson_blocks').select('*').order('updated_at',{ascending:false}),client().from('lesson_block_versions').select('*').order('published_at',{ascending:false})]);return{drafts:checked(a) as ExerciseDraft[],versions:checked(b) as ExerciseVersion[]};}
+export async function practiceSnapshot(session:string,student:string){const [blocks,view,words,annotations]=await Promise.all([client().from('live_session_blocks').select('*').eq('session_id',session).order('position'),client().from('pronunciation_live_state').select('*').eq('session_id',session).maybeSingle(),wordBank(student),client().from('live_annotations').select('activity_id,shapes').eq('session_id',session).like('activity_id','practice:%')]);const rows=checked(blocks)||[];const versions=rows.length?checked(await client().from('lesson_block_versions').select('*').in('id',rows.map(b=>b.block_version_id))):[];return{blocks:rows.map(b=>({...b,version:versions?.find(v=>v.id===b.block_version_id)})).filter(b=>b.version) as SessionBlock[],view:checked(view) as PracticeView|null,words,annotations:checked(annotations)||[]};}
