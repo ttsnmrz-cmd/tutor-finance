@@ -1,11 +1,86 @@
-import {useRef} from 'react';
+import {useRef,useState} from 'react';
 import type {Block,Plan} from '../planning/model';
 import {ui} from '../i18n';
+import './materialStructureDnd.css';
 
 type Drag={kind:'section'|'exercise';id:string};
-export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onToggle,onSelect,onSection,onRename,onAddExercise,onCopy,onMove,onDelete,onDrop,onStep}:{plan:Plan;active:string;section:string;collapsed:Set<string>;menu:string|null;onMenu:(id:string|null)=>void;onToggle:(id:string)=>void;onSelect:(b:Block)=>void;onSection:(id:string)=>void;onRename:(id:string)=>void;onAddSection:()=>void;onAddExercise:(stage:string)=>void;onCopy:(id:string)=>void;onMove:(id:string)=>void;onDelete:(id:string)=>void;onDrop:(drag:Drag,stage:string,before?:string)=>void;onStep:(drag:Drag,delta:number)=>void}){
+type DragKind=Drag['kind'];
+type Props={
+ plan:Plan;active:string;section:string;collapsed:Set<string>;menu:string|null;
+ onMenu:(id:string|null)=>void;onToggle:(id:string)=>void;onSelect:(b:Block)=>void;
+ onSection:(id:string)=>void;onRename:(id:string)=>void;onAddSection:()=>void;
+ onAddExercise:(stage:string)=>void;onCopy:(id:string)=>void;onMove:(id:string)=>void;
+ onDelete:(id:string)=>void;onDrop:(drag:Drag,stage:string,before?:string)=>void;
+ onStep:(drag:Drag,delta:number)=>void;
+};
+
+function Grip(){return <svg aria-hidden="true" width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="5" r="1.4"/><circle cx="10" cy="5" r="1.4"/><circle cx="4" cy="10" r="1.4"/><circle cx="10" cy="10" r="1.4"/><circle cx="4" cy="15" r="1.4"/><circle cx="10" cy="15" r="1.4"/></svg>;}
+
+export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onToggle,onSelect,onSection,onRename,onAddSection,onAddExercise,onCopy,onMove,onDelete,onDrop,onStep}:Props){
  const drag=useRef<Drag|null>(null);
- function drop(e:React.DragEvent,stage:string,before?:string){e.preventDefault();e.stopPropagation();if(drag.current){onDrop(drag.current,stage,before);drag.current=null;}}
- function exercise(b:Block){return <div className={'mb-structure-exercise'+(active===b.id?' active':'')} key={b.id} data-mb-stage={b.stage} data-mb-block={b.id} onDragOver={e=>e.preventDefault()} onDrop={e=>drop(e,b.stage,b.id)}><button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title} onClick={()=>onSelect(b)}><span aria-hidden="true">{plan.blocks.findIndex(x=>x.id===b.id)+1}.</span><span>{b.title||ui('Untitled exercise')}</span></button><div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onCopy(b.id)}>{ui('Copy')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},-1)}>{ui('Move up')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},1)}>{ui('Move down')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div></div>;}
- return <aside className="mb-structure" aria-label={ui('Material structure')}><div className="mb-structure-heading"><h2>{ui('Material structure')}</h2></div><div className="mb-structure-list">{plan.stages.map(s=><div className="mb-stage" key={s.id}><div className={'mb-section-row'+(section===s.id?' selected':'')} data-mb-stage={s.id} onDragOver={e=>e.preventDefault()} onDrop={e=>drop(e,s.id)}><button className="mb-chevron" aria-label={ui(collapsed.has(s.id)?'Expand section':'Collapse section')+' '+s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>onToggle(s.id)}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d={collapsed.has(s.id)?'m6 4 4 4-4 4':'m4 6 4 4 4-4'}/></svg></button><button className="mb-select-section" title={s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>{onSection(s.id);onToggle(s.id);}}><span>{s.name||ui('Untitled section')}</span></button><span className="mb-stage-count" aria-label={ui('Exercises created')}>{plan.blocks.filter(b=>b.stage===s.id).length}{typeof (s as unknown as {plannedTotal?:number}).plannedTotal==='number'?'/'+(s as unknown as {plannedTotal:number}).plannedTotal:''}</span><div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Section actions')+' '+s.name} onClick={()=>onMenu(menu===s.id?null:s.id)}>···</button>{menu===s.id&&<div className="mb-menu"><button onClick={()=>onRename(s.id)}>{ui('Rename section')}</button><button onClick={()=>onStep({kind:'section',id:s.id},-1)}>{ui('Move up')}</button><button onClick={()=>onStep({kind:'section',id:s.id},1)}>{ui('Move down')}</button></div>}</div></div>{!collapsed.has(s.id)&&<>{plan.blocks.filter(b=>b.stage===s.id).map(exercise)}<button className="mb-stage-add" onClick={()=>onAddExercise(s.id)}>+ {ui('Add exercise')}</button></>}</div>)}{plan.blocks.some(b=>!plan.stages.some(s=>s.id===b.stage))&&<div><h3>{ui('Unassigned exercises')}</h3>{plan.blocks.filter(b=>!plan.stages.some(s=>s.id===b.stage)).map(exercise)}</div>}</div></aside>;
+ const [dragging,setDragging]=useState<Drag|null>(null);
+ const [dropTarget,setDropTarget]=useState<string|null>(null);
+ const stageIds=new Set(plan.stages.map(s=>s.id));
+ const unassigned=plan.blocks.filter(b=>!stageIds.has(b.stage));
+ const ordered=[...plan.stages.flatMap(s=>plan.blocks.filter(b=>b.stage===s.id)),...unassigned];
+ const numbers=new Map(ordered.map((b,i)=>[b.id,i+1]));
+
+ function start(e:React.DragEvent<HTMLElement>,item:Drag){
+  drag.current=item;
+  setDragging(item);
+  setDropTarget(null);
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',item.id);
+ }
+ function finish(){drag.current=null;setDragging(null);setDropTarget(null);}
+ function allow(e:React.DragEvent<HTMLElement>,target:string,kind?:DragKind){
+  if(!drag.current||(kind&&drag.current.kind!==kind))return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.dataTransfer.dropEffect='move';
+  setDropTarget(current=>current===target?current:target);
+ }
+ function drop(e:React.DragEvent<HTMLElement>,stage:string,before?:string,kind?:DragKind){
+  e.preventDefault();
+  e.stopPropagation();
+  const item=drag.current;
+  finish();
+  if(!item||(kind&&item.kind!==kind))return;
+  if(item.kind==='section'&&item.id===stage)return;
+  if(item.kind==='exercise'&&item.id===before)return;
+  onDrop(item,stage,before);
+ }
+ function exercise(b:Block){
+  const target='exercise:'+b.id;
+  return <div className={'mb-structure-exercise'+(active===b.id?' active':'')} key={b.id} data-mb-stage={b.stage} data-mb-block={b.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target,'exercise')} onDrop={e=>drop(e,b.stage,b.id,'exercise')}>
+   <button type="button" className="mb-drag" draggable onDragStart={e=>start(e,{kind:'exercise',id:b.id})} onDragEnd={finish} title={'Drag exercise: '+b.title} aria-label={'Drag exercise: '+b.title}><Grip/></button>
+   <button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title} onClick={()=>onSelect(b)}><span aria-hidden="true">{numbers.get(b.id)}.</span><span>{b.title||ui('Untitled exercise')}</span></button>
+   <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onCopy(b.id)}>{ui('Copy')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},-1)}>{ui('Move up')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},1)}>{ui('Move down')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div>
+  </div>;
+ }
+ return <aside className="mb-structure" aria-label={ui('Material structure')}>
+  <div className="mb-structure-heading"><h2>{ui('Material structure')}</h2><button type="button" className="mb-add-section" title={ui('Add section')} aria-label={ui('Add section')} onClick={onAddSection}>+</button></div>
+  <div className="mb-structure-list">
+   {plan.stages.map(s=>{
+    const target='section:'+s.id;
+    return <div className="mb-stage" key={s.id}>
+     <div className={'mb-section-row'+(section===s.id?' selected':'')} data-mb-stage={s.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target)} onDrop={e=>drop(e,s.id)}>
+      <button type="button" className="mb-drag" draggable onDragStart={e=>start(e,{kind:'section',id:s.id})} onDragEnd={finish} title={'Drag section: '+s.name} aria-label={'Drag section: '+s.name}><Grip/></button>
+      <button className="mb-chevron" aria-label={ui(collapsed.has(s.id)?'Expand section':'Collapse section')+' '+s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>onToggle(s.id)}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d={collapsed.has(s.id)?'m6 4 4 4-4 4':'m4 6 4 4 4-4'}/></svg></button>
+      <button className="mb-select-section" title={s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>{onSection(s.id);onToggle(s.id);}}><span>{s.name||ui('Untitled section')}</span></button>
+      <span className="mb-stage-count" aria-label={ui('Exercises created')}>{plan.blocks.filter(b=>b.stage===s.id).length}{typeof (s as unknown as {plannedTotal?:number}).plannedTotal==='number'?'/'+(s as unknown as {plannedTotal:number}).plannedTotal:''}</span>
+      <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Section actions')+' '+s.name} aria-expanded={menu===s.id} onClick={()=>onMenu(menu===s.id?null:s.id)}>···</button>{menu===s.id&&<div className="mb-menu"><button onClick={()=>onRename(s.id)}>{ui('Rename section')}</button><button onClick={()=>onStep({kind:'section',id:s.id},-1)}>{ui('Move up')}</button><button onClick={()=>onStep({kind:'section',id:s.id},1)}>{ui('Move down')}</button></div>}</div>
+     </div>
+     {!collapsed.has(s.id)&&<>
+      {plan.blocks.filter(b=>b.stage===s.id).map(exercise)}
+      {dragging?.kind==='exercise'&&<div className="mb-exercise-drop-end" data-drop-target={dropTarget==='exercise-end:'+s.id?'true':undefined} onDragOver={e=>allow(e,'exercise-end:'+s.id,'exercise')} onDrop={e=>drop(e,s.id,undefined,'exercise')}>{ui('Move to…')} {s.name} ↓</div>}
+      <button className="mb-stage-add" onClick={()=>onAddExercise(s.id)}>+ {ui('Add exercise')}</button>
+     </>}
+    </div>;
+   })}
+   {unassigned.length>0&&<div><h3>{ui('Unassigned exercises')}</h3>{unassigned.map(exercise)}</div>}
+   {dragging?.kind==='section'&&<div className="mb-section-drop-end" data-drop-target={dropTarget==='sections-end'?'true':undefined} onDragOver={e=>allow(e,'sections-end','section')} onDrop={e=>drop(e,'',undefined,'section')}>{ui('Move down')} ↓</div>}
+   <button type="button" className="mb-add-section-footer" onClick={onAddSection}>+ {ui('Add section')}</button>
+  </div>
+ </aside>;
 }
