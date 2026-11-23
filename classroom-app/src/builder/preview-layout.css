@@ -279,3 +279,39 @@
 .mb-builder.mb-student-preview .mb-preview-notes-heading h2{
  color:#1f242d!important;font-weight:750!important;
 }
+
+/* Fit short lessons into the available viewport: header and toolbar already occupy space.
+   A full 100dvh inside the lesson adds unwanted document scrolling. */
+.mb-builder.mb-student-preview{
+ --lesson-viewport-height:max(440px,calc(100dvh - 260px));
+ min-height:0!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace{
+ min-height:var(--lesson-viewport-height)!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{
+ min-height:var(--lesson-viewport-height)!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
+ min-height:var(--lesson-viewport-height)!important;
+}
+.mb-builder.mb-student-preview .mb-preview-notes .mb-rich-input{
+ min-height:180px!important;
+}
+/* Neutral gray surfaces, with purple reserved for branding and selected states. */
+.mb-builder.mb-student-preview{
+ --page:#f4f5f7;--soft:#f4f5f7;--line:#dfe3e8;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card,
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
+ border-color:#dfe3e8!important;background:#fff!important;
+}
+.mb-builder.mb-student-preview .mb-preview-notes .mb-rich-input{
+ background:#f4f5f7!important;border-color:#dfe3e8!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer{
+ border-top-color:#dfe3e8!important;
+}
+@media(max-width:700px){
+ .mb-builder.mb-student-preview{--lesson-viewport-height:max(380px,calc(100dvh - 220px))}
+}
