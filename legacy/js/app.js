@@ -1900,25 +1900,13 @@ async function openPublicCalendarLesson(index){
 }
 function showPublicLessonMaterial(data){
  let overlay=document.getElementById('student-live-material');
- if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f8f7fb;overflow:auto;padding:24px';document.body.append(overlay);}
+ if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f8f7fb;overflow:auto;padding:18px';document.body.append(overlay);}
  overlay.replaceChildren();
- const wrap=document.createElement('main');wrap.style.cssText='max-width:920px;margin:auto;background:white;border-radius:18px;padding:24px;box-shadow:0 4px 24px #21163115';
- const back=document.createElement('button');back.textContent='← Back to dashboard';back.style.cssText='padding:9px 14px;border-radius:10px;background:#eee8f7;color:#4b287e;margin-bottom:18px';back.onclick=()=>overlay.remove();wrap.append(back);
- const title=document.createElement('h1');title.textContent=data.title||data.plan.title||'Lesson';title.style.cssText='font-size:28px;font-weight:700;margin-bottom:22px';wrap.append(title);
- const stages=Array.isArray(data.plan.stages)?data.plan.stages:[];
- for(const stage of stages){
-  const blocks=(data.plan.blocks||[]).filter(b=>b.stage===stage.id&&!b.hiddenFromStudent);
-  if(!blocks.length)continue;
-  const heading=document.createElement('h2');heading.textContent=stage.name||'Section';heading.style.cssText='font-size:20px;font-weight:650;margin:24px 0 12px';wrap.append(heading);
-  for(const block of blocks){
-   const card=document.createElement('section');card.style.cssText='border:1px solid #e5e0ed;border-radius:12px;padding:18px;margin-bottom:12px';
-   const name=document.createElement('h3');name.textContent=block.title||block.type;name.style.cssText='font-weight:650;font-size:17px;margin-bottom:8px';card.append(name);
-   for(const value of [block.instructions,block.content])if(value){const p=document.createElement('p');p.textContent=value;p.style.cssText='white-space:pre-wrap;margin:8px 0';card.append(p);}
-   for(const item of block.items||[]){const p=document.createElement('p');p.textContent=item.prompt||'';p.style.cssText='margin:10px 0';card.append(p);}
-   wrap.append(card);
-  }
- }
- overlay.append(wrap);
+ const wrap=document.createElement('main');wrap.style.cssText='max-width:1120px;margin:auto;background:white;border-radius:16px;padding:18px';
+ const back=document.createElement('button');back.textContent='← Back to dashboard';back.style.cssText='padding:9px 14px;border-radius:10px;background:#eee8f7;color:#4b287e;margin-bottom:14px';back.onclick=()=>overlay.remove();wrap.append(back);
+ const host=document.createElement('div');wrap.append(host);overlay.append(wrap);
+ if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan);
+ else {host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
 }
 
 function renderPublicLessonsHistory(rows){
