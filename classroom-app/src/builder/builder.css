@@ -340,3 +340,9 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder .mb-teacher-note-card textarea{width:100%;min-height:80px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);padding:10px 12px;font:inherit;font-size:14px;line-height:1.5}
 .mb-builder .mb-preview-teacher-note{white-space:pre-wrap}
 .mb-builder .mb-preview-teacher-note p{margin:8px 0 0;font-size:14px;line-height:1.5}
+
+/* One-click text color and highlight controls. */
+.mb-builder .mb-format-toolbar button.mb-format-color{display:inline-flex;align-items:center;justify-content:center;min-width:39px;min-height:36px;cursor:pointer;border:0;background:transparent;color:#4E2A84;font:700 22px/1 inherit}
+.mb-builder .mb-format-toolbar button.mb-format-color.highlight{color:#D99B26}
+.mb-builder .mb-format-toolbar button.mb-format-color:hover{background:#EDE8F4;border-radius:8px}
+.mb-builder .mb-rich-input span[style*="background-color"],.mb-builder .mb-rich-input font[style*="background-color"]{padding:0 .12em;border-radius:.14em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
