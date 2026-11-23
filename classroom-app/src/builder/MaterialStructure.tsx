@@ -10,13 +10,13 @@ type Props={
  onMenu:(id:string|null)=>void;onToggle:(id:string)=>void;onSelect:(b:Block)=>void;
  onSection:(id:string)=>void;onRename:(id:string)=>void;onAddSection:()=>void;
  onAddExercise:(stage:string)=>void;onCopy:(id:string)=>void;onMove:(id:string)=>void;
- onDelete:(id:string)=>void;onDrop:(drag:Drag,stage:string,before?:string)=>void;
+ onDelete:(id:string)=>void;onToggleStudentVisibility:(id:string)=>void;onDrop:(drag:Drag,stage:string,before?:string)=>void;
  onStep:(drag:Drag,delta:number)=>void;
 };
 
 function Grip(){return <svg aria-hidden="true" width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="5" r="1.4"/><circle cx="10" cy="5" r="1.4"/><circle cx="4" cy="10" r="1.4"/><circle cx="10" cy="10" r="1.4"/><circle cx="4" cy="15" r="1.4"/><circle cx="10" cy="15" r="1.4"/></svg>;}
 
-export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onToggle,onSelect,onSection,onRename,onAddSection,onAddExercise,onCopy,onMove,onDelete,onDrop,onStep}:Props){
+export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onToggle,onSelect,onSection,onRename,onAddSection,onAddExercise,onCopy,onMove,onDelete,onToggleStudentVisibility,onDrop,onStep}:Props){
  const drag=useRef<Drag|null>(null);
  const [dragging,setDragging]=useState<Drag|null>(null);
  const [dropTarget,setDropTarget]=useState<string|null>(null);
@@ -52,10 +52,10 @@ export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onT
  }
  function exercise(b:Block){
   const target='exercise:'+b.id;
-  return <div className={'mb-structure-exercise'+(active===b.id?' active':'')} key={b.id} data-mb-stage={b.stage} data-mb-block={b.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target,'exercise')} onDrop={e=>drop(e,b.stage,b.id,'exercise')}>
+  return <div className={'mb-structure-exercise'+(active===b.id?' active':'')+(b.hiddenFromStudent?' mb-hidden-exercise':'')} key={b.id} data-mb-stage={b.stage} data-mb-block={b.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target,'exercise')} onDrop={e=>drop(e,b.stage,b.id,'exercise')}>
    <button type="button" className="mb-drag" draggable onDragStart={e=>start(e,{kind:'exercise',id:b.id})} onDragEnd={finish} title={'Drag exercise: '+b.title} aria-label={'Drag exercise: '+b.title}><Grip/></button>
-   <button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title} onClick={()=>onSelect(b)}><span aria-hidden="true">{numbers.get(b.id)}.</span><span>{b.title||ui('Untitled exercise')}</span></button>
-   <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onCopy(b.id)}>{ui('Copy')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},-1)}>{ui('Move up')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},1)}>{ui('Move down')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div>
+   {b.hiddenFromStudent&&<span className="mb-hidden-eye" title={ui("Hidden from students")} aria-label={ui("Hidden from students")}>◉̸</span>}<button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title} onClick={()=>onSelect(b)}><span aria-hidden="true">{numbers.get(b.id)}.</span><span>{b.title||ui('Untitled exercise')}</span></button>
+   <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onToggleStudentVisibility(b.id)}>{b.hiddenFromStudent?'◉ '+ui('Show to students'):'◉̸ '+ui('Hide from students')}</button><button onClick={()=>onCopy(b.id)}>{ui('Copy')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},-1)}>{ui('Move up')}</button><button onClick={()=>onStep({kind:'exercise',id:b.id},1)}>{ui('Move down')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div>
   </div>;
  }
  return <aside className="mb-structure" aria-label={ui('Material structure')}>
