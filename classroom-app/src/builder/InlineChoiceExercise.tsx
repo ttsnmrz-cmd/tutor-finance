@@ -48,7 +48,7 @@ function shuffledIndices(count:number):number[]{
  }
  return indices;
 }
-export function InlineChoicePreview({block}:{block:Block}){
+export function InlineChoicePreview({block,teacherHints=false}:{block:Block;teacherHints?:boolean}){
  const [answers,setAnswers]=useState<Record<string,number>>({}),[checked,setChecked]=useState(false);
  const items=entries(block);
  // Stable while the student interacts; a new preview mount produces a new shuffle.
@@ -63,5 +63,5 @@ export function InlineChoicePreview({block}:{block:Block}){
   return indices;
  };
  const ready=items.length>0&&items.every(i=>i.options?.length&&answerIndex(i)!==undefined);
- return <div className="mb-inline-preview"><div className="mb-inline-paragraph"><FormattedText text={block.content} html={formatOf(block,'content',block.content)} renderToken={id=>{const item=items.find(i=>i.inlineChoiceId===id);if(!item)return token(id);return <span className="mb-inline-group" role="group" aria-label={ui('Choose the correct option')+' '+(items.indexOf(item)+1)}>{displayed(item).map((originalIndex,position)=><Fragment key={originalIndex}>{position>0&&<span className="mb-inline-slash"> / </span>}<button aria-pressed={answers[id]===originalIndex} data-result={checked&&answers[id]===originalIndex?(originalIndex===answerIndex(item)?'correct':'incorrect'):undefined} onClick={()=>{setAnswers({...answers,[id]:originalIndex});setChecked(false);}}>{item.options?.[originalIndex]}</button></Fragment>)}</span>;}}/></div><div className="mb-inline-check"><button className="primary" disabled={!ready} onClick={()=>setChecked(true)}>{ui('Check answers')}</button>{checked&&<span role="status">{items.filter(i=>answers[i.inlineChoiceId]===answerIndex(i)).length} / {items.length} {ui('correct')}</span>}</div></div>;
+ return <div className="mb-inline-preview"><div className="mb-inline-paragraph"><FormattedText text={block.content} html={formatOf(block,'content',block.content)} renderToken={id=>{const item=items.find(i=>i.inlineChoiceId===id);if(!item)return token(id);return <span className="mb-inline-group" role="group" aria-label={ui('Choose the correct option')+' '+(items.indexOf(item)+1)}>{displayed(item).map((originalIndex,position)=><Fragment key={originalIndex}>{position>0&&<span className="mb-inline-slash"> / </span>}<button className={teacherHints&&originalIndex===answerIndex(item)?'mb-teacher-inline-correct':''} aria-pressed={answers[id]===originalIndex} data-result={checked&&answers[id]===originalIndex?(originalIndex===answerIndex(item)?'correct':'incorrect'):undefined} onClick={()=>{setAnswers({...answers,[id]:originalIndex});setChecked(false);}}>{item.options?.[originalIndex]}</button></Fragment>)}</span>;}}/></div><div className="mb-inline-check"><button className="primary" disabled={!ready} onClick={()=>setChecked(true)}>{ui('Check answers')}</button>{checked&&<span role="status">{items.filter(i=>answers[i.inlineChoiceId]===answerIndex(i)).length} / {items.length} {ui('correct')}</span>}</div></div>;
 }

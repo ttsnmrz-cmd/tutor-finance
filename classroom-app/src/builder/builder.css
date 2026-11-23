@@ -365,3 +365,14 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder .mb-order-correct-index{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 7px;background:#E7F7ED;border:1px solid #91D4A9;border-radius:8px;color:#17653A;font-size:13px;font-weight:700}
 .mb-builder .mb-column-teacher-label{display:inline-flex;align-items:center;margin-left:9px;padding:2px 7px;background:#E7F7ED;border:1px solid #91D4A9;border-radius:6px;color:#17653A;font-size:12px;font-weight:600;white-space:normal}
 .mb-builder .mb-order-plain-input{display:block;width:100%;min-width:0;min-height:42px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+
+/* Teacher-only green fill for correct inline choice, regardless of selection. */
+.mb-builder .mb-inline-preview .mb-inline-group button.mb-teacher-inline-correct{background:#E6F7EC!important;border-color:#90D4A7!important;color:#17653A!important}
+.mb-builder .mb-inline-preview .mb-inline-group button.mb-teacher-inline-correct[aria-pressed="true"]{background:#D3EFDE!important}
+/* Ordering: compact hover-only drag grips, no arrow controls. */
+.mb-builder .mb-order-editor-item{position:relative;padding-right:54px}
+.mb-builder .mb-order-editor-grip{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:grab;color:#6B7280;font-size:22px;opacity:0;touch-action:none;user-select:none}
+.mb-builder .mb-order-editor-item:hover .mb-order-editor-grip,.mb-builder .mb-order-editor-grip:focus{opacity:1}
+.mb-builder .mb-order-preview-grip{margin-left:auto;cursor:grab;color:#6B7280;font-size:22px;opacity:0;user-select:none}
+.mb-builder .mb-order-row:hover .mb-order-preview-grip{opacity:1}
+@media (hover:none){.mb-builder .mb-order-editor-grip,.mb-builder .mb-order-preview-grip{opacity:1}}

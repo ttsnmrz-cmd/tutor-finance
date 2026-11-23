@@ -49,7 +49,7 @@ export function ExercisePresentation({block,assetScope='',teacherHints=true}:{bl
  if(isLetters(block))return <LettersPreview key={block.id} block={block}/>;
  if(isSentence(block))return <SentencePreview key={block.id} block={block}/>;
  if(isColumns(block))return <ColumnsPreview key={block.id} block={block} teacherHints={teacherHints}/>;
- if(isInlineChoice(block))return <InlineChoicePreview key={block.id} block={block}/>;
+ if(isInlineChoice(block))return <InlineChoicePreview key={block.id} block={block} teacherHints={teacherHints}/>;
  if(block.type==='true_false')return <TrueFalsePreview key={block.id} block={block} teacherHints={teacherHints}/>;
  if(isMultipleChoice(block))return <MultipleChoicePreview key={block.id} block={block} teacherHints={teacherHints}/>;
  if(block.type==='matching')return <MatchingPreview key={block.id} block={block} teacherHints={teacherHints}/>;
