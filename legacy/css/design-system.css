@@ -277,3 +277,29 @@ html[data-theme="dark"] #teacher-app #teacher-header.app-header .app-header-bran
  #student-public-view .pp-finances-grid{grid-template-columns:minmax(0,1fr)!important}
  #student-public-view .pp-finances-topups{grid-column:auto}
 }
+
+/* Shared dashboard controls: canonical styles, excluded from Classroom editor. */
+:root {
+ --pp-ui-accent:#D99B26;
+ --pp-ui-accent-hover:#C48918;
+ --pp-ui-focus:#a98fc5;
+ --pp-ui-input-border:#e1d9e9;
+}
+#teacher-app button:where(:not(#classroom-materials-root *)) {
+ transition:background .16s,box-shadow .16s,transform .16s;
+}
+#teacher-app button:where(:not(#classroom-materials-root *)):focus-visible {
+ outline:3px solid var(--pp-ui-focus);outline-offset:2px;
+}
+#teacher-app :is(input:not([type=checkbox]),select,textarea):where(:not(#classroom-materials-root *)) {
+ border-radius:var(--pp-ui-radius-control)!important;
+ border-color:var(--pp-ui-input-border)!important;
+}
+html:not([data-theme="dark"]) #teacher-app :is(.primary-btn,button[data-variant="primary"]) {
+ background:var(--pp-ui-accent)!important;
+ color:#1F242D!important;
+ border-color:var(--pp-ui-accent)!important;
+}
+html:not([data-theme="dark"]) #teacher-app :is(.primary-btn,button[data-variant="primary"]):hover {
+ background:var(--pp-ui-accent-hover)!important;
+}
