@@ -44,3 +44,13 @@
 .mb-builder .mb-structure-exercise.mb-hidden-exercise.active{opacity:.72}
 .mb-builder .mb-hidden-eye{display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px;font-size:13px;color:var(--muted)}
 .mb-builder .mb-structure-exercise.mb-hidden-exercise .mb-select-exercise{color:var(--muted)}
+
+/* Keep the drag hit area stable, reveal the grip only on hover/focus. */
+@media (hover:hover) and (pointer:fine){
+ .mb-builder .mb-structure .mb-drag{opacity:0;transition:opacity .15s ease,color .15s ease}
+ .mb-builder .mb-structure .mb-section-row:hover .mb-drag,
+ .mb-builder .mb-structure .mb-structure-exercise:hover .mb-drag,
+ .mb-builder .mb-structure .mb-drag:hover,
+ .mb-builder .mb-structure .mb-drag:focus-visible,
+ .mb-builder .mb-structure .mb-drag:active{opacity:1}
+}
