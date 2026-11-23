@@ -23,9 +23,9 @@ window.mountProfiProfitMaterials=(target,userId,client)=>{
 (window as Window & {mountProfiProfitStudentLesson?:(target:HTMLElement,plan:Plan)=>void}).mountProfiProfitStudentLesson=(target,plan)=>{
  const frame=document.createElement('iframe');
  frame.title=plan.title||'Lesson';
- frame.setAttribute('sandbox','allow-scripts');
+ frame.setAttribute('sandbox','allow-scripts allow-same-origin');
  frame.style.cssText='display:block;width:100%;min-height:75vh;border:0;border-radius:12px;background:white';
- frame.srcdoc=buildLessonHTML(plan);
+ frame.srcdoc=buildLessonHTML(plan).replace('/*CLASSROOM_INITIAL_DRAFT*/','{}');
  target.replaceChildren(frame);
  const resize=()=>{try{const height=frame.contentDocument?.documentElement?.scrollHeight;if(height)frame.style.height=Math.max(650,height+30)+'px';}catch{}};
  frame.addEventListener('load',resize);
