@@ -538,6 +538,16 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 #teacher-app #dashboard-calendar>.app-card {
  margin-bottom:0!important;
 }
+/* Payment rows may carry legacy light utility backgrounds.  Keep the
+   row surface and date readable without overriding positive amount colors. */
+html[data-theme="dark"] #student-public-view.pp-student-one-page #public-payments > :is(div,li) {
+ background:var(--pp-dark-surface-raised)!important;
+ border-color:var(--pp-dark-border-raised)!important;
+ color:var(--pp-dark-text)!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #public-payments > :is(div,li) :is(.text-gray-400,.text-gray-500,.text-slate-400,.text-slate-500) {
+ color:#cbbfd8!important;
+}
 /* Canonical student finance dark-theme component rules (real DOM classes). */
 html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-stat {
  background:var(--pp-dark-surface-raised)!important;
