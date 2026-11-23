@@ -74,10 +74,9 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
   <div className="mb-preview-top">
    <div className="mb-preview-heading-row">
     <h1>{plan.title}</h1>
-    
+    {!studentMode&&<button className="mb-preview-back" onClick={onBack}>✎ {ui('Builder')}</button>}
    </div>
    <div className="mb-preview-tools-row">
-    {!studentMode&&<button className="mb-preview-back" onClick={onBack}>✎ {ui('Builder')}</button>}
     {!studentMode&&<label className="mb-teacher-hints-toggle"><input type="checkbox" checked={teacherHints} onChange={e=>setTeacherHints(e.target.checked)}/> {ui('Teacher Hints')}</label>}
     <PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} onNotes={()=>setNotesOpen(true)}/>
    </div>
