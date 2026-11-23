@@ -58,19 +58,8 @@
   border:1px solid var(--line)!important;border-radius:11px!important;
   padding:9px 14px!important;font-weight:700!important;width:auto!important;
 }
-.mb-builder.mb-student-preview .mb-preview-pointer{
-  width:auto!important;flex:0 0 auto!important;min-width:0!important;
-}
-.mb-builder.mb-student-preview #pointerToggle{
-  width:auto!important;min-width:110px!important;max-width:180px!important;
-}
-.mb-builder.mb-student-preview .mb-preview-controls{
-  display:flex!important;align-items:center!important;justify-content:flex-end!important;
-  flex-wrap:wrap!important;gap:8px!important;width:auto!important;
-}
-.mb-builder.mb-student-preview .mb-preview-footer{
-  margin-top:auto!important;
-}
+/* Pointer dimensions, controls and footer alignment are defined in the
+   shared toolbar and navigation rules; avoid duplicate declarations here. */
 @media(max-width:700px){
  .mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding:18px 16px!important}
 }
