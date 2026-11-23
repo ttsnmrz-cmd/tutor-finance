@@ -1954,7 +1954,7 @@ function ensureStudentPortalLayout(){
  const portal=document.getElementById('student-public-view');
  if(!portal)return;
  syncStudentPortalHeader();
- if(portal.querySelector('.pp-student-layout'))return;
+ if(portal.classList.contains('pp-student-one-page'))return;
  const content=portal.querySelector('#student-public-content');
  if(!content)return;
  // One-page student dashboard: no sidebar, tabs or cloned navigation.
@@ -1962,6 +1962,7 @@ function ensureStudentPortalLayout(){
  if(oldTabs)oldTabs.remove();
  ['dashboard','lessons','finances'].forEach(tab=>document.getElementById('student-portal-'+tab)?.classList.remove('hidden'));
  portal.classList.add('pp-student-one-page');
+ if(document.getElementById('pp-student-shell-styles'))return;
  const style=document.createElement('style');style.id='pp-student-shell-styles';style.textContent=`
  #student-public-view{max-width:none!important;padding:12px!important}
  #student-public-view>.app-card{max-width:none!important}
@@ -2028,7 +2029,7 @@ function initializePublicStudentShell(){
  const content=document.getElementById('student-public-content');
  if(!portal||!content||portal.classList.contains('hidden')||content.classList.contains('hidden'))return false;
  ensureStudentPortalLayout();
- return !!portal.querySelector('.pp-student-layout');
+ return portal.classList.contains('pp-student-one-page');
 }
 function watchPublicStudentShell(){
  const portal=document.getElementById('student-public-view');
