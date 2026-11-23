@@ -2,18 +2,8 @@
 /*$vite$:1*/
 /* Shared exercise preview geometry for teacher and student modes.
    Both modes render the same .mb-student-preview React component. */
-.mb-builder.mb-student-preview,
-.mb-builder.mb-student-preview .mb-student-card {
-  display: flex;
-  flex-direction: column;
-}
-.mb-builder.mb-student-preview .mb-preview-workspace,
-.mb-builder.mb-student-preview .mb-student-body {
-  flex: 1;
-}
-.mb-builder.mb-student-preview .mb-student-card {
-  align-self: stretch;
-}
+/* The base Classroom stylesheet already defines preview card flex layout,
+   footer positioning and responsive workspace sizing for both roles. */
 @container builder (width > 620px) {
   .mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) {
     align-self: stretch;
