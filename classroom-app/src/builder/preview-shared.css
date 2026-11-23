@@ -87,20 +87,6 @@
 .mb-image-label-actions .mb-image-label-score{grid-column:2;min-width:0;text-align:center}
 .mb-image-label-actions .mb-image-label-check{grid-column:3}
 
-/* Compact preview toolbar: title, teacher hints and actions without a tall empty row. */
-.mb-builder.mb-student-preview .mb-preview-top{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:12px!important;row-gap:8px!important;margin:0 0 12px!important;padding:0 0 8px!important}
-.mb-builder.mb-student-preview .mb-preview-top>button:first-child{grid-column:1;margin:0!important;padding:8px 12px!important;font-size:13px!important;min-height:36px}
-.mb-builder.mb-student-preview .mb-preview-top>.ml-inline-badge{display:none!important}
-.mb-builder.mb-student-preview .mb-preview-top>h1{grid-column:2;flex:none;font-size:20px!important;line-height:1.2!important;margin:0!important;min-width:0}
-.mb-builder.mb-student-preview .mb-preview-top>.mb-teacher-hints-toggle{grid-column:3;font-size:12px;gap:5px}
-.mb-builder.mb-student-preview .mb-preview-top>.mb-preview-controls{grid-column:1/-1;justify-content:flex-end!important;width:100%;margin:0!important;gap:6px!important;min-height:0}
-.mb-builder.mb-student-preview .mb-preview-controls button{font-size:12px!important;padding:7px 10px!important;min-height:34px}
-.mb-builder.mb-student-preview .mb-preview-controls .mb-preview-timer{padding:3px 5px!important;gap:6px!important;font-size:13px!important}
-.mb-builder.mb-student-preview .mb-preview-workspace{gap:12px!important}
-.mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding:16px 20px!important}
-.mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body>h2,.mb-builder.mb-student-preview .mb-combined-element>h2{font-size:22px!important;line-height:1.25!important}
-@container builder (max-width:680px){.mb-builder.mb-student-preview .mb-preview-top{grid-template-columns:auto minmax(0,1fr)!important}.mb-builder.mb-student-preview .mb-preview-top>.mb-teacher-hints-toggle{grid-column:2;justify-self:end}.mb-builder.mb-student-preview .mb-preview-top>h1{grid-column:1/-1;grid-row:2}.mb-builder.mb-student-preview .mb-preview-top>.mb-preview-controls{grid-row:3;justify-content:flex-start!important;flex-wrap:wrap}}
-
 /* Preview dark theme: accessible contrast for image labels and teacher hints. */
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-teacher-hints-toggle{color:#ead8ff!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-teacher-hints-toggle input{accent-color:#b996e2}
@@ -129,20 +115,3 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-preview-timer{background:#382e44!important;color:#f4ecfa!important;border-color:#655572!important;box-shadow:0 7px 18px rgba(0,0,0,.24)!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-mark-completed:disabled{background:#382e44!important;color:#f4ecfa!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#pointerToggle[aria-pressed="true"]){background:#6c5189!important}
-
-/* Keep Teacher Hints directly below the lesson title, not at the far right. */
-.mb-builder.mb-student-preview .mb-preview-top>.mb-preview-title-group{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;min-width:0!important}
-.mb-builder.mb-student-preview .mb-preview-title-group>h1{margin:0!important;line-height:1.2!important}
-.mb-builder.mb-student-preview .mb-preview-title-group>.mb-teacher-hints-toggle{position:static!important;justify-self:start!important;align-self:flex-start!important;margin:0!important;font-size:12px!important;line-height:1.35!important}
-@media(max-width:700px){.mb-builder.mb-student-preview .mb-preview-top>.mb-preview-title-group{grid-column:1/-1!important;grid-row:2!important}}
-
-/* Preview header: explicit two-row layout, independent of old child-grid rules. */
-.mb-builder.mb-student-preview .mb-preview-top{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;margin:0 0 14px!important;padding:0!important}
-.mb-builder.mb-student-preview .mb-preview-heading-row{display:flex;align-items:center;gap:16px;min-width:0}
-.mb-builder.mb-student-preview .mb-preview-heading-row>button{flex:none;margin:0!important;min-height:40px;padding:8px 14px!important;border-radius:14px}
-.mb-builder.mb-student-preview .mb-preview-heading-row>h1{margin:0!important;flex:1;min-width:0;font-size:22px!important;line-height:1.25!important}
-.mb-builder.mb-student-preview .mb-preview-tools-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
-.mb-builder.mb-student-preview .mb-preview-tools-row>.mb-teacher-hints-toggle{flex:none;margin:0!important;font-size:13px!important}
-.mb-builder.mb-student-preview .mb-preview-tools-row>.mb-preview-controls{margin:0 0 0 auto!important;width:auto!important;justify-content:flex-end!important;min-width:0}
-@media(max-width:800px){.mb-builder.mb-student-preview .mb-preview-tools-row{flex-wrap:wrap}.mb-builder.mb-student-preview .mb-preview-tools-row>.mb-preview-controls{flex-wrap:wrap}.mb-builder.mb-student-preview .mb-preview-heading-row>h1{font-size:19px!important}}
-
