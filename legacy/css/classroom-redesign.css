@@ -1,34 +1,34 @@
 /* ProfiProfit native interface redesign — presentation only, no business logic changes. */
-:root{--bg-color:#f9f7fc;--card-bg:#fff;--text-color:#30283e;--text-secondary:#756d82;--primary-color:#655087;--primary-hover:#4f3b72;--accent-soft:#f2edf8;--border-color:#e8e2f0}
-body{background:linear-gradient(145deg,#fbf9fd 0%,#f5f0fa 60%,#fbfaf7 100%)!important;color:var(--text-color)!important}
+:root{--bg-color:#F4F5F7;--card-bg:#fff;--text-color:#1F242D;--text-secondary:#6B7280;--primary-color:#4E2A84;--primary-hover:#3D2169;--accent-soft:#F0F1F4;--border-color:#E0E3E9}
+body{background:#F4F5F7!important;color:var(--text-color)!important}
 #teacher-app>div{max-width:1420px!important;padding:22px 26px!important}
-#teacher-header{border:1px solid #e8e2f0!important;background:rgba(255,255,255,.92)!important;box-shadow:0 12px 35px rgba(74,48,110,.055)!important;border-radius:22px!important;padding:14px 22px!important;gap:20px!important}
+#teacher-header{border:1px solid #E0E3E9!important;background:rgba(255,255,255,.92)!important;box-shadow:0 12px 35px rgba(74,48,110,.055)!important;border-radius:22px!important;padding:14px 22px!important;gap:20px!important}
 #teacher-header>button:first-child img{width:50px!important;height:50px!important}
-#teacher-header>button:first-child .text-2xl{font-size:21px!important;letter-spacing:-.045em;color:#403052}
-#teacher-header>button:first-child .text-sm{font-size:11px!important;color:#85798f}
-.teacher-nav{background:#f5f1f9;padding:5px;border-radius:16px;gap:3px!important}
-.teacher-nav button{background:transparent!important;color:#726581!important;border-radius:12px!important;font-size:13px!important;padding:10px 15px!important;white-space:nowrap}
-.teacher-nav button:hover{background:#eae3f3!important;color:#48365e!important}
-.teacher-nav button.bg-indigo-600,.teacher-nav button[aria-current="page"]{background:#fff!important;color:#60447f!important;box-shadow:0 2px 10px rgba(66,42,91,.11)!important}
-#profile-menu-button{background:#f3eef8!important;color:#6b5087!important;border-radius:14px!important}
-#teacher-app .app-card{border:1px solid #e9e3f0!important;box-shadow:0 8px 30px rgba(69,44,104,.045)!important;background:#fff;border-radius:20px!important}
+#teacher-header>button:first-child .text-2xl{font-size:21px!important;letter-spacing:-.045em;color:#1F242D}
+#teacher-header>button:first-child .text-sm{font-size:11px!important;color:#6B7280}
+.teacher-nav{background:#F0F1F4;padding:5px;border-radius:16px;gap:3px!important}
+.teacher-nav button{background:transparent!important;color:#6B7280!important;border-radius:12px!important;font-size:13px!important;padding:10px 15px!important;white-space:nowrap}
+.teacher-nav button:hover{background:#E7E9EE!important;color:#48365e!important}
+.teacher-nav button.bg-indigo-600,.teacher-nav button[aria-current="page"]{background:#fff!important;color:#4E2A84!important;box-shadow:0 2px 10px rgba(66,42,91,.11)!important}
+#profile-menu-button{background:#F0F1F4!important;color:#4E2A84!important;border-radius:14px!important}
+#teacher-app .app-card{border:1px solid #E0E3E9!important;box-shadow:0 8px 30px rgba(69,44,104,.045)!important;background:#fff;border-radius:20px!important}
 #teacher-app main>section>.app-card{padding:24px!important}
-#teacher-app h1:where(:not(#classroom-materials-root *)),#teacher-app h2:where(:not(#classroom-materials-root *)),#teacher-app h3:where(:not(#classroom-materials-root *)){color:#3f3151;letter-spacing:-.025em}
-#teacher-app .text-slate-500,#teacher-app .text-slate-400{color:#887e92!important}
-#teacher-app .bg-indigo-600,#teacher-app button.bg-indigo-600,#teacher-app .primary-btn{background:#6b508b!important;color:white!important}
-#teacher-app .bg-indigo-50{background:#f1ebf8!important}
-#teacher-app .text-indigo-700{color:#684b86!important}
-#teacher-app .border-indigo-200{border-color:#ddd1eb!important}
-#teacher-app .bg-slate-100{background:#f5f2f8!important}
+#teacher-app h1:where(:not(#classroom-materials-root *)),#teacher-app h2:where(:not(#classroom-materials-root *)),#teacher-app h3:where(:not(#classroom-materials-root *)){color:#1F242D;letter-spacing:-.025em}
+#teacher-app .text-slate-500,#teacher-app .text-slate-400{color:#6B7280!important}
+#teacher-app .bg-indigo-600,#teacher-app button.bg-indigo-600,#teacher-app .primary-btn{background:#4E2A84!important;color:white!important}
+#teacher-app .bg-indigo-50{background:#F0F1F4!important}
+#teacher-app .text-indigo-700{color:#4E2A84!important}
+#teacher-app .border-indigo-200{border-color:#D7DAE2!important}
+#teacher-app .bg-slate-100{background:#F0F1F4!important}
 #teacher-app button:where(:not(#classroom-materials-root *)){transition:background .16s,box-shadow .16s,transform .16s}
 #teacher-app button:where(:not(#classroom-materials-root *)):focus-visible{outline:3px solid #a98fc5;outline-offset:2px}
 #tab-dashboard .dashboard-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:4px 0 22px!important}
-#tab-dashboard .dashboard-greeting-kicker,#dashboard-greeting-kicker{color:#897a99!important;font-size:12px!important}
-#dashboard-greeting-title{font-size:clamp(25px,3vw,34px)!important;font-weight:750!important;color:#47325d!important;line-height:1.15!important;margin-top:5px}
+#tab-dashboard .dashboard-greeting-kicker,#dashboard-greeting-kicker{color:#6B7280!important;font-size:12px!important}
+#dashboard-greeting-title{font-size:clamp(25px,3vw,34px)!important;font-weight:750!important;color:#1F242D!important;line-height:1.15!important;margin-top:5px}
 #tab-dashboard .dashboard-heading>div:last-child h2{display:none}
-#dashboard-date{font-size:13px!important;color:#887b94!important}
+#dashboard-date{font-size:13px!important;color:#6B7280!important}
 #dashboard-cards{gap:16px!important;margin-bottom:18px!important}
-#dashboard-cards>*{border:1px solid #eae2f0!important;border-radius:20px!important;box-shadow:0 8px 28px rgba(74,50,108,.045)!important;min-height:120px}
+#dashboard-cards>*{border:1px solid #E0E3E9!important;border-radius:20px!important;box-shadow:0 8px 28px rgba(74,50,108,.045)!important;min-height:120px}
 #tab-dashboard>.grid{gap:18px!important}
 #tab-dashboard>.grid>.app-card{min-height:200px;padding:22px!important}
 #tab-calendar>.app-card{padding:24px!important}
@@ -49,7 +49,7 @@ html[data-theme=dark] .teacher-nav button.bg-indigo-600{background:#4b3c60!impor
 /* Native Classroom-like workspace navigation. Existing switchTab handlers remain the source of truth. */
 .native-layout{display:grid;grid-template-columns:206px minmax(0,1fr);gap:22px;align-items:start}
 .native-layout>#teacher-main{min-width:0}
-.native-sidebar{position:sticky;top:18px;min-height:calc(100vh - 160px);padding:20px 12px;background:#fff;border:1px solid #e9e3f0;border-radius:21px;box-shadow:0 8px 30px rgba(69,44,104,.045);display:flex;flex-direction:column;gap:5px}
+.native-sidebar{position:sticky;top:18px;min-height:calc(100vh - 160px);padding:20px 12px;background:#fff;border:1px solid #E0E3E9;border-radius:21px;box-shadow:0 8px 30px rgba(69,44,104,.045);display:flex;flex-direction:column;gap:5px}
 .native-sidebar-label{font-size:10px;letter-spacing:.17em;color:#a198aa;font-weight:750;padding:6px 14px 13px}
 .native-sidebar button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border-radius:12px;font-size:13px;font-weight:650;color:#716680;transition:background .16s,color .16s}
 .native-sidebar button span{font-size:20px;line-height:1;width:22px;text-align:center}
@@ -87,7 +87,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 /* Reference dashboard: six compact metrics above one continuous weekly calendar. */
 #tab-dashboard{background:#fff;border:1px solid #e8dfef;border-radius:22px;padding:20px!important;min-height:calc(100vh - 150px)}
 #dashboard-cards.native-metric-strip{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:8px!important;margin:0 0 22px!important}
-#dashboard-cards.native-metric-strip>*{min-height:84px!important;border-radius:15px!important;padding:13px 14px!important;background:#f3eef8!important;box-shadow:none!important;border:1px solid #e4d9ee!important}
+#dashboard-cards.native-metric-strip>*{min-height:84px!important;border-radius:15px!important;padding:13px 14px!important;background:#F0F1F4!important;box-shadow:none!important;border:1px solid #e4d9ee!important}
 #dashboard-cards.native-metric-strip .text-xl.md\:text-2xl{font-size:21px!important;line-height:1.2}
 #dashboard-cards.native-metric-strip .mb-3{margin-bottom:7px!important}
 #dashboard-cards.native-metric-strip .text-xs{font-size:11px!important}
@@ -219,7 +219,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #native-note-editor{display:block;width:100%;margin-top:9px;min-height:230px;padding:16px;border:1px solid #e2d8eb;border-radius:14px;background:#fcfaff;color:#382d45;line-height:1.65;resize:vertical}
 #native-note-editor:focus{outline:2px solid #a78bca;outline-offset:1px}
 .native-notes-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;font-size:12px;color:#85768f}
-#native-note-save{padding:10px 16px;border-radius:11px;background:#655087;color:#fff;font-weight:700}
+#native-note-save{padding:10px 16px;border-radius:11px;background:#4E2A84;color:#fff;font-weight:700}
 
 /* Teacher Materials library + read-only preview, scoped to Materials only. */
 #tab-materials .native-materials-workspace{display:grid;grid-template-columns:minmax(230px,32%) minmax(0,1fr);gap:18px;min-height:500px}
@@ -247,7 +247,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #tab-materials>.app-card{padding-top:16px!important}
 @media(max-width:950px){#teacher-app .native-layout{margin-top:-12px}}
 
-.native-sidebar-toggle{display:flex!important;justify-content:center!important;width:34px!important;height:34px!important;padding:4px!important;margin:0 0 10px auto!important;background:#f2edf8!important;border-radius:10px!important}
+.native-sidebar-toggle{display:flex!important;justify-content:center!important;width:34px!important;height:34px!important;padding:4px!important;margin:0 0 10px auto!important;background:#F0F1F4!important;border-radius:10px!important}
 .native-layout.sidebar-collapsed{grid-template-columns:72px minmax(0,1fr)!important}
 .native-layout.sidebar-collapsed .native-sidebar{padding:12px 8px!important}
 .native-layout.sidebar-collapsed .native-sidebar-label,.native-layout.sidebar-collapsed .native-sidebar-footer,.native-layout.sidebar-collapsed .native-nav-text{display:none!important}
@@ -255,7 +255,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 @media(max-width:950px){.native-layout.sidebar-collapsed{grid-template-columns:minmax(0,1fr)!important}}
 #groups-list .group-card{min-width:0!important}
 #groups-list .group-card>div{min-width:0!important;flex-wrap:wrap!important;gap:8px!important}
-dialog.mb-dialog[open],dialog.ml-dialog[open]{position:fixed!important;inset:0!important;margin:auto!important;width:min(520px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;max-height:85dvh!important;padding:24px!important;background:#fff!important;color:#30283e!important;border:1px solid #e8e2f0!important;border-radius:18px!important;box-shadow:0 24px 80px #21163155!important;overflow:auto!important;transform:none!important;z-index:2147483647!important}
+dialog.mb-dialog[open],dialog.ml-dialog[open]{position:fixed!important;inset:0!important;margin:auto!important;width:min(520px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;max-height:85dvh!important;padding:24px!important;background:#fff!important;color:#1F242D!important;border:1px solid #E0E3E9!important;border-radius:18px!important;box-shadow:0 24px 80px #21163155!important;overflow:auto!important;transform:none!important;z-index:2147483647!important}
 dialog.mb-dialog::backdrop,dialog.ml-dialog::backdrop{background:rgba(25,20,40,.52)!important}
 dialog.mb-dialog form,dialog.ml-dialog form{display:grid!important;gap:14px!important;margin:14px 0 0!important}
 dialog.mb-dialog input,dialog.mb-dialog select,dialog.ml-dialog input,dialog.ml-dialog select{width:100%!important;min-height:42px!important;border:1px solid #ded8e7!important;border-radius:9px!important;padding:9px 12px!important;background:#fff!important}
@@ -370,7 +370,7 @@ html[data-theme="dark"] #teacher-app .native-timed-event.is-cancelled .calendar-
 
 /* Classroom navigation control: use the original unboxed double-chevron. */
 @media(min-width:951px){
-#teacher-app .native-sidebar .classroom-sidebar-toggle{border:0!important;background:transparent!important;box-shadow:none!important;color:#30283e!important;border-radius:8px!important;font-size:18px!important}
+#teacher-app .native-sidebar .classroom-sidebar-toggle{border:0!important;background:transparent!important;box-shadow:none!important;color:#1F242D!important;border-radius:8px!important;font-size:18px!important}
 #teacher-app .native-sidebar .classroom-sidebar-toggle svg{width:22px!important;height:22px!important}
 #teacher-app .native-layout.sidebar-collapsed .classroom-sidebar-toggle svg{transform:rotate(180deg)!important}
 }
@@ -453,3 +453,10 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
     flex: 1;
   }
 }
+
+/* Unified ProfiProfit light theme: neutral surfaces and gold primary actions. */
+html:not([data-theme="dark"]) #teacher-app{--bg-color:#F4F5F7;--card-bg:#FFFFFF;--text-color:#1F242D;--text-secondary:#6B7280;--primary-color:#4E2A84;--primary-hover:#3D2169;--accent-soft:#F0F1F4;--border-color:#E0E3E9;--cta-color:#D99B26}
+html:not([data-theme="dark"]) #teacher-app .native-sidebar button.is-active{background:#EAE5F2!important;color:#4E2A84!important}
+html:not([data-theme="dark"]) #teacher-app .native-sidebar,html:not([data-theme="dark"]) #teacher-header{background:#FFFFFF!important;border-color:#E0E3E9!important}
+html:not([data-theme="dark"]) #teacher-app .primary-btn,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]{background:#D99B26!important;color:#1F242D!important;border-color:#D99B26!important}
+html:not([data-theme="dark"]) #teacher-app .primary-btn:hover,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]:hover{background:#C48918!important}
