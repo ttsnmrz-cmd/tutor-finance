@@ -420,3 +420,7 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-image-label-zone[data-shape=rectangle],.mb-image-label-teacher-zone[data-shape=rectangle]{border-radius:7px}
 .mb-image-label-zone[data-shape=oval],.mb-image-label-teacher-zone[data-shape=oval]{border-radius:50%}
 .mb-image-label-zone-row select,.mb-image-label-toolbar select{min-width:105px}
+
+.mb-image-label-placed{pointer-events:auto;cursor:grab;font:inherit;line-height:1.25;z-index:2}
+.mb-image-label-placed:active{cursor:grabbing}
+.mb-image-label-placed:focus-visible{outline:3px solid #7543AE;outline-offset:2px}
