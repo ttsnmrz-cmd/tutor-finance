@@ -1930,7 +1930,7 @@ function renderPublicStudentCalendar(lessonRows){
         <span class="calendar-event-title ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">${esc(l.student||'Занятие')}</span>
         <span class="calendar-event-meta">${l.duration||60} мин</span>
         <span class="calendar-event-meta">${esc(money(l.price??publicStudent?.price??0))}</span>
-        <span class="status ${statusClass[l.status]||'bg-slate-100 text-slate-700'}">${statusLabels[l.status]||l.status}</span>
+        <span class="status ${publicStudentLiveStatuses.get(String(l.id))?.status==='active'?'bg-green-100 text-green-800':statusClass[l.status]||'bg-slate-100 text-slate-700'}">${publicStudentLiveStatuses.get(String(l.id))?.status==='active'?'● In progress':statusLabels[l.status]||l.status}</span>
       </div>`).join(''):'<p class="calendar-empty-day">Нет занятий</p>'}</div>
     </section>`;
   }).join('');
