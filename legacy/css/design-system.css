@@ -190,19 +190,6 @@ html[data-theme="dark"] #student-live-material .app-header.pp-student-live-heade
  #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{font-size:17px!important}
 }
 html[data-theme="dark"] #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{color:#f0eafa!important}
-/* Shared dashboard design tokens: only the main teacher/student pages. */
-#teacher-app .native-workspace,
-#student-public-view.pp-student-one-page{
- --pp-radius-shell:26px;--pp-radius-panel:24px;
- --pp-radius-card:16px;--pp-radius-control:12px;
- --pp-shell-gap:16px;
-}
-/* Both headers: same corner radius and bottom rhythm. */
-#teacher-app #teacher-header.app-header,
-#student-public-view .app-header.student-brand-header{
- border-radius:var(--pp-radius-shell)!important;
- margin-bottom:var(--pp-shell-gap)!important;
-}
 #teacher-app>.native-workspace>#teacher-header.app-header{
  margin-top:0!important;
 }
