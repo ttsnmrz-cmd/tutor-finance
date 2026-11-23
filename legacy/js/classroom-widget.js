@@ -5,7 +5,7 @@
  document.documentElement.classList.add('cw-identity-pending');
  if(settingsView)document.documentElement.classList.add('cw-settings','cw-identity-pending');
  if(studentsView)document.documentElement.classList.add('cw-students','cw-identity-pending');
- const parentOrigin='https://classroom.profiprofit.com';
+ const parentOrigin=location.origin;
  let english=typeof getLanguage==='function'&&getLanguage()==='en';
  let labels=english?{pending:'Planned',conducted:'Completed',rescheduled:'Rescheduled',cancelled_charge:'Cancelled · charged',cancelled_free:'Cancelled · no charge'}:statusLabels;
  let centerRequested=true,lastWeek='',renderedDate='',parentReady=window.parent===window,postedHeight=0,lastGreeting='',dashboardLoaded=false,loginReady=false,dataLoaded=false;
