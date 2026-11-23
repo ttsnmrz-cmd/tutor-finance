@@ -779,6 +779,14 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
  #teacher-app .native-sidebar .native-nav-icon{margin:0!important}
  #teacher-app .native-sidebar .classroom-sidebar-toggle{margin:0 auto 10px!important}
 }
+/* Teacher navigation rail: use the same neutral surface as the student portal. */
+html:not([data-theme="dark"]) #teacher-app .native-layout>.native-sidebar{
+ background:#fff!important;border:1px solid #e1e4e8!important;
+ box-shadow:none!important;color:#716680!important;
+}
+html:not([data-theme="dark"]) #teacher-app .native-layout>.native-sidebar .native-sidebar-toggle{
+ background:#f0f1f4!important;color:#4e2a84!important;
+}
 /* AppHeader — one geometric contract for every role and viewport.
    Theme changes only tokens (colors), never spacing, typography or layout. */
 #teacher-header.app-header,
