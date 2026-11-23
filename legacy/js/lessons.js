@@ -98,6 +98,7 @@ function openNewLessonForDate(date){
   timeOptions();
 
   document.getElementById('edit-id').value='';
+  document.getElementById('calendar-live-open')?.classList.add('hidden');
   setLessonDate(date||selectedDate);
   document.getElementById('edit-duration').value='60';
 
@@ -198,6 +199,7 @@ function openEditLesson(id){
   timeOptions();
 
   document.getElementById('edit-id').value=l.id;
+  document.getElementById('calendar-live-open')?.classList.remove('hidden');
 
   const linkedStudent=l.student_id?students.find(x=>String(x.id)===String(l.student_id)):null;
   const legacyMatches=students.filter(x=>x.name===l.student);
