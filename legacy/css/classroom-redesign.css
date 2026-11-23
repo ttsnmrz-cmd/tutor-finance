@@ -536,12 +536,12 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout.sidebar-co
   grid-template-columns:70px minmax(0,1fr)!important;
 }
 html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.native-sidebar{
-  border-radius:0!important;background:#FFFFFF!important;border-color:#E1E4E8!important;
-  min-height:0!important;padding:10px 4px!important;margin:0!important;
+  border-radius:21px!important;background:#FFFFFF!important;border-color:#E1E4E8!important;
+  min-height:0!important;padding:16px 12px!important;margin:0!important;
 }
 html:not([data-theme="dark"]) #student-public-view .pp-student-layout>#student-public-content{
   min-width:0!important;width:100%!important;max-width:none!important;
-  background:#FFFFFF!important;border-radius:12px!important;
+  background:transparent!important;border-radius: 0px!important;
 }
 html:not([data-theme="dark"]) #student-public-view :is(.student-portal-tabs,.student-theme-panel){
   background:#F0F1F4!important;border-color:#E1E4E8!important;border-radius:10px!important;
@@ -634,4 +634,27 @@ html:not([data-theme="dark"]) #student-public-view .student-portal-tabs button.i
 }
 #student-public-view .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar button[data-student-tab]{
  justify-content:center!important;padding:10px 6px!important;
+}
+
+/* Student portal: neutral grey canvas and content separation. */
+html:not([data-theme="dark"]) #student-public-view,
+html:not([data-theme="dark"]) #student-public-view>.app-card,
+html:not([data-theme="dark"]) #student-public-view .pp-student-layout,
+html:not([data-theme="dark"]) #student-public-view #student-public-content{
+ background:#F4F5F7!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-native-sidebar.native-sidebar{
+ border-radius:21px!important;padding:16px 12px!important;overflow:hidden!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-native-sidebar .native-sidebar-toggle{
+ margin:0 0 12px auto!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-native-sidebar button[data-student-tab]{
+ min-width:0!important;box-sizing:border-box!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-native-sidebar .native-nav-text{
+ min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+html:not([data-theme="dark"]) #student-public-view .student-portal-panel{
+ background:#fff!important;border-radius:21px!important;padding:18px!important;
 }
