@@ -472,3 +472,9 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-preview-timer{background:#382e44!important;color:#f4ecfa!important;border-color:#655572!important;box-shadow:0 7px 18px rgba(0,0,0,.24)!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-mark-completed:disabled{background:#382e44!important;color:#f4ecfa!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#pointerToggle[aria-pressed="true"]){background:#6c5189!important}
+
+/* Keep Teacher Hints directly below the lesson title, not at the far right. */
+.mb-builder.mb-student-preview .mb-preview-top>.mb-preview-title-group{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;min-width:0!important}
+.mb-builder.mb-student-preview .mb-preview-title-group>h1{margin:0!important;line-height:1.2!important}
+.mb-builder.mb-student-preview .mb-preview-title-group>.mb-teacher-hints-toggle{position:static!important;justify-self:start!important;align-self:flex-start!important;margin:0!important;font-size:12px!important;line-height:1.35!important}
+@media(max-width:700px){.mb-builder.mb-student-preview .mb-preview-top>.mb-preview-title-group{grid-column:1/-1!important;grid-row:2!important}}
