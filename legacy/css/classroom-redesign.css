@@ -468,7 +468,7 @@ html[data-theme="dark"] #teacher-app .native-calendar .native-timed-event:not(.i
  #teacher-app > .native-workspace{width:100%!important;max-width:none!important;padding:0 12px!important;margin:0!important;min-height:0!important;height:auto!important}
  #teacher-app > .native-layout{display:grid!important;grid-template-columns:186px minmax(0,1fr)!important;gap:12px!important;align-items:start!important;margin:8px 0 0!important;padding:0 12px!important;width:100%!important;max-width:none!important;box-sizing:border-box!important}
  #teacher-app > .native-layout.sidebar-collapsed{grid-template-columns:70px minmax(0,1fr)!important}
- #teacher-app > .native-layout > .native-sidebar{position:sticky!important;top:12px!important;align-self:start!important;display:flex!important;flex-direction:column!important;gap:3px!important;min-height:0!important;padding:10px 4px!important;margin:0!important;background:#fff!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+ #teacher-app > .native-layout > .native-sidebar{position:sticky!important;top:12px!important;align-self:start!important;display:flex!important;flex-direction:column!important;gap:3px!important;min-height:0!important;padding:10px 4px!important;margin:0!important;background:#fff!important;border:1px solid #E1E4E8!important;border-radius:12px!important;box-shadow:none!important;overflow:visible!important}
  #teacher-app .native-sidebar-label,#teacher-app .native-sidebar-footer{display:none!important}
  #teacher-app .native-sidebar button[data-native-tab]{display:flex!important;align-items:center!important;width:100%!important;flex:0 0 auto!important;height:48px!important;min-height:48px!important;padding:10px 12px!important;gap:12px!important;border-radius:12px!important;font:700 15px/1.25 Inter,ui-sans-serif,system-ui,sans-serif!important;white-space:nowrap!important;color:#1F242D!important}
  #teacher-app .native-sidebar button[data-native-tab].is-active{background:#EAE5F2!important;color:#4E2A84!important}
@@ -509,7 +509,7 @@ html:not([data-theme="dark"]) #teacher-app :is(.native-calendar-header,.native-c
   background-color:#FFFFFF!important;border-color:#E1E4E8!important;
 }
 html:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-sidebar){
-  border-radius:0!important;border-color:#E1E4E8!important;
+  border-radius:12px!important;border-color:#E1E4E8!important;
 }
 html:not([data-theme="dark"]) #teacher-app :is(#tab-dashboard,#dashboard-calendar,.app-card){
   border-radius:12px!important;
