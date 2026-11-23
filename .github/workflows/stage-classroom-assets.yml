@@ -50,6 +50,15 @@ jobs:
           git add index.html 404.html
           if ! git diff --cached --quiet; then
             git commit -m 'build: stage verified Classroom bundle'
-            git pull --rebase origin ${{ github.ref_name }}
-            git push origin HEAD:${{ github.ref_name }}
+            for attempt in 1 2 3 4 5; do
+              git fetch origin ${{ github.ref_name }}
+              git rebase origin/${{ github.ref_name }}
+              if git push origin HEAD:${{ github.ref_name }}; then
+                exit 0
+              fi
+              echo "Concurrent push detected; retrying ($attempt/5)"
+              sleep 2
+            done
+            echo 'Failed to push staged assets after retries' >&2
+            exit 1
           fi
