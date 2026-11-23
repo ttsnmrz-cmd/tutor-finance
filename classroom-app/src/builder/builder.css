@@ -412,3 +412,5 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-image-label-placed{position:absolute;transform:translate(-50%,-50%);padding:5px 10px;background:#fff;border:2px solid #7543AE;border-radius:10px;color:#1F242D;font-weight:600;pointer-events:none;white-space:nowrap;max-width:60%;overflow:hidden;text-overflow:ellipsis}
 .mb-image-label-placed[data-result=correct]{background:#E6F7EC;border-color:#26965B;color:#17653A}
 .mb-image-label-placed[data-result=incorrect]{background:#FDECEC;border-color:#D45656;color:#9A2929}
+
+.mb-image-label-zone,.mb-image-label-teacher-zone{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;overflow:visible}
