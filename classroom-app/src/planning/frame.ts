@@ -8,7 +8,8 @@ function runtime(plan:Plan,initial:Record<string,string>,locale:{language:string
  const $=(s:string)=>document.querySelector(s) as HTMLElement;
  const send=(type:string,payload:any)=>{if(type==='grade'){gradeVersions[payload.block]=(gradeVersions[payload.block]||0)+1;payload={...payload,requestId:gradeVersions[payload.block]};}if(channel)parent.postMessage({classroom:channel,type,payload},'*');};
  const make=(tag:string,text?:string)=>{const el=document.createElement(tag);if(text)el.textContent=text;return el;};
- const visibleBlocks=()=>plan.blocks.filter(b=>role==='teacher'||!b.hiddenFromStudent);\n const nav=(id:string,remote=false)=>{if(!visibleBlocks().some(b=>b.id===id))return;current=id;render();(window as any).ClassroomPointer?.setActivity(id);if(!remote&&canNavigate)send('navigate',{activity:id});};
+ const visibleBlocks=()=>plan.blocks.filter(b=>role==='teacher'||!b.hiddenFromStudent);
+ const nav=(id:string,remote=false)=>{if(!visibleBlocks().some(b=>b.id===id))return;current=id;render();(window as any).ClassroomPointer?.setActivity(id);if(!remote&&canNavigate)send('navigate',{activity:id});};
  function wordGaps(b:Plan['blocks'][number]){return b.type==='gaps'&&b.items.length>0&&b.items.every(i=>!!i.options?.length)&&((b.content.match(/_{2,}/g)||[]).length===b.items.length||!b.content.trim()&&b.items.every(i=>(i.prompt.match(/_{2,}/g)||[]).length===1));}
  function gapExercise(root:HTMLElement,b:Plan['blocks'][number]){
  let selected='',dragIndex=-1,suppressClick=false;
