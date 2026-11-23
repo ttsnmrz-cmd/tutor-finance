@@ -581,3 +581,57 @@ html:not([data-theme="dark"]) #student-public-view .student-portal-tabs button.i
   width:21px!important;
   height:21px!important;
 }
+
+/* Shared shell: the student header and sidebar are cloned from teacher DOM.
+   Scope to the actual shared elements, not legacy student portal cards. */
+#student-public-view .student-brand-header[data-shared-header="1"]{
+ display:flex!important;flex-direction:row!important;align-items:center!important;
+ justify-content:space-between!important;width:100%!important;max-width:none!important;
+ min-height:0!important;margin:0 0 12px!important;padding:16px 20px!important;
+ border:1px solid #e0e3e9!important;border-radius:21px!important;
+ background:#fff!important;box-shadow:none!important;box-sizing:border-box!important;
+}
+#student-public-view .student-brand-header[data-shared-header="1"]>button{
+ display:flex!important;align-items:center!important;gap:12px!important;
+ width:auto!important;min-width:0!important;padding:0!important;margin:0!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+}
+#student-public-view .student-brand-header[data-shared-header="1"] img{
+ width:64px!important;height:64px!important;max-width:64px!important;object-fit:contain!important;
+}
+#student-public-view .student-brand-header[data-shared-header="1"] .text-2xl{
+ font-size:24px!important;line-height:1.2!important;font-weight:750!important;color:#3b1764!important;
+}
+#student-public-view .student-brand-header[data-shared-header="1"] .text-slate-500{
+ font-size:14px!important;line-height:1.35!important;color:#818096!important;
+}
+#student-public-view .pp-student-native-sidebar.native-sidebar{
+ display:flex!important;flex-direction:column!important;gap:5px!important;
+ padding:20px 12px!important;background:#fff!important;
+ border:1px solid #e0e3e9!important;border-radius:21px!important;
+ box-shadow:0 8px 30px rgba(69,44,104,.045)!important;
+}
+#student-public-view .pp-student-native-sidebar.native-sidebar button[data-student-tab]{
+ display:flex!important;align-items:center!important;justify-content:flex-start!important;
+ gap:10px!important;padding:10px 12px!important;border-radius:12px!important;
+ font-size:15px!important;font-weight:550!important;line-height:1.3!important;
+ color:#716680!important;
+}
+#student-public-view .pp-student-native-sidebar.native-sidebar button[data-student-tab].is-active{
+ background:#eae5f2!important;color:#4e2a84!important;
+}
+#student-public-view .pp-student-native-sidebar.native-sidebar .native-nav-text{
+ font-size:15px!important;font-weight:550!important;line-height:1.3!important;
+}
+#student-public-view .pp-student-native-sidebar.native-sidebar .native-sidebar-toggle{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:34px!important;height:34px!important;min-height:34px!important;
+ padding:4px!important;margin:0 0 10px auto!important;
+ border-radius:10px!important;background:#f0f1f4!important;
+}
+#student-public-view .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar.native-sidebar{
+ padding:12px 8px!important;
+}
+#student-public-view .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar button[data-student-tab]{
+ justify-content:center!important;padding:10px 6px!important;
+}
