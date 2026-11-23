@@ -19,7 +19,7 @@ import {ui} from '../i18n';
 import {exerciseLabel} from './commands';
 import {GapTextEditor,supportsGapAuthoring} from './GapTextEditor';
 
-function exerciseTypeLabel(type:BuilderExerciseType,block:Block):string{return type==='image_labeling'?'Image Labeling':type==='gallery'?'Image / Gallery':type==='image_labeling'?'Image Labeling':type==='typed_gap'?'Type the Missing Word':type==='letters'?'Build a Word':type==='sentence'?'Build a Sentence':type==='columns'?'Sort into Columns':type==='inline_choice'?'Inline Choice':type==='multiple_choice'?'Multiple Choice':type==='questions'?'Speaking / Discussion':type==='gaps'?'Gap Fill (Text)':exerciseLabel({...block,type,choiceMode:undefined} as Block);}
+function exerciseTypeLabel(type:BuilderExerciseType,block:Block):string{return type==='image_labeling'?'Image Labeling':type==='gallery'?'Image / Gallery':type==='typed_gap'?'Type the Missing Word':type==='letters'?'Build a Word':type==='sentence'?'Build a Sentence':type==='columns'?'Sort into Columns':type==='inline_choice'?'Inline Choice':type==='multiple_choice'?'Multiple Choice':type==='questions'?'Speaking / Discussion':type==='gaps'?'Gap Fill (Text)':exerciseLabel({...block,type,choiceMode:undefined} as Block);}
 
 export function ExerciseEditor({block,onChange,onSave,saveStatus,assetScope='',canJoinPrevious=false}:{canJoinPrevious?:boolean;assetScope?:string;block:Block;onChange:(block:Block)=>void;onSave:()=>void;saveStatus:string}){
  useEffect(()=>{if(hasUnconvertedPairs(block))onChange(matchingToGapText(block));},[block.id,block.type,block.content,block.items]);
