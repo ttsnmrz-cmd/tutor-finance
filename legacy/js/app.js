@@ -1963,13 +1963,6 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-live-content{flex:1;min-height:calc(100vh - 155px)}
  #student-live-material .pp-student-pointer{min-width:0;display:flex;flex-direction:column}
  #student-live-material .pp-student-pointer>div{flex:1;min-height:0}
- #student-live-material .mb-student-preview{min-height:100%;display:flex;flex-direction:column}
- #student-live-material .mb-preview-workspace{flex:1;display:flex;min-height:0}
- #student-live-material .mb-student-card{flex:1;display:flex;flex-direction:column;min-height:0}
- #student-live-material .mb-student-body{flex:1}
- #student-live-material .mb-preview-footer{display:flex;justify-content:space-between;align-items:center;gap:12px}
- #student-live-material .mb-student-previous{background:#eee8f7;color:#4b287e;border:1px solid #d9cce9;border-radius:10px;padding:10px 20px;font-weight:600}
- #student-live-material .mb-student-previous:disabled{opacity:.45}
  #student-live-material .pp-student-live-notes{display:flex;flex-direction:column}
  #student-live-material .pp-student-live-notes textarea{flex:1;min-height:0;resize:none;border:0;outline:0;box-shadow:none;cursor:default}
  #student-live-material .pp-student-profile-wrap{position:relative}
@@ -1978,18 +1971,8 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-menu[hidden]{display:none}
  #student-live-material .pp-student-profile-menu label,#student-live-material .pp-student-profile-menu button{display:block;margin-top:14px}
  #student-live-material .pp-student-profile-menu select{padding:5px}
- #student-live-material .mb-combined-element h2{font-weight:700;line-height:1.3}
- #student-live-material .mb-student-text h1,#student-live-material .mb-student-text h2,#student-live-material .mb-student-text h3{font-weight:700}
  #student-live-material .pp-student-live-main{background:#fff;border-radius:18px;padding:18px}
  #student-live-material .pp-student-pointer{background:#fff;border-radius:14px}
- #student-live-material .mb-builder,#student-live-material .mb-preview-workspace,#student-live-material .mb-student-card,#student-live-material .mb-student-body,#student-live-material .mb-preview-top{background:#fff!important}
- #student-live-material .mb-preview-heading-row h1{font-family:inherit!important;font-weight:750!important;font-size:24px!important;letter-spacing:-.025em;line-height:1.3}
- #student-live-material .mb-preview-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
- #student-live-material #pointerToolbar{position:relative;z-index:10}
- #student-live-material #pointerTools:not([hidden]){display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #e4dcef;border-radius:12px;padding:8px;box-shadow:0 4px 18px #27153516}
- #student-live-material #pointerTools button{color:#4b287e!important;background:#f4f0fa!important;border:1px solid #ded4ed!important;border-radius:8px!important;padding:8px 12px!important;opacity:1!important}
- #student-live-material .mb-preview-pointer button,#student-live-material .mb-preview-pointer svg{color:#4b287e}
- #student-live-material .mb-preview-annotation{pointer-events:none}
  #student-live-material .pp-student-profile-menu{min-width:240px;padding:18px;border-radius:18px;font-size:15px}
  #student-live-material .pp-student-menu-title{display:block;color:#746e84;font-size:14px;font-weight:600;margin-bottom:18px}
  #student-live-material .pp-student-profile-menu label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:12px 0}
@@ -2002,18 +1985,6 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-live-layout{padding:10px;gap:10px}
  #student-live-material .pp-student-live-main{padding:12px 16px}
  #student-live-material .pp-student-live-content{gap:12px}
- #student-live-material .mb-student-card{display:flex;flex-direction:column;min-height:calc(100vh - 155px)}
- #student-live-material .mb-student-body{flex:1 1 auto}
- #student-live-material .mb-preview-footer{margin-top:auto!important;flex-shrink:0}
- #student-live-material .mb-student-check-row{display:flex;justify-content:flex-end;align-items:center;margin-top:auto}
- #student-live-material .mb-student-check-row button,#student-live-material .mb-student-check{background:#eee8f7!important;color:#382064!important;border:1px solid #d9cce9!important;border-radius:10px!important;padding:10px 18px!important;font-weight:650!important}
- #student-live-material .mb-preview-controls{margin:0 0 8px!important}
- #student-live-material .mb-preview-heading-row{margin:0 0 8px!important}
- #student-live-material .mb-preview-workspace{gap:8px!important}
- #student-live-material #pointerTools select{color:#4b287e!important;background:#f4f0fa!important;border:1px solid #ded4ed!important;border-radius:8px!important;padding:8px!important;min-width:80px}
- #student-live-material #pointerTools option{color:#282032;background:white}
- #student-live-material #pointerTools{max-width:min(100%,680px)}
- #student-live-material .mb-preview-timer button{display:none}
  #student-live-material{padding:0!important}
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#fff;border-bottom:1px solid #e9e3f1}
  #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
