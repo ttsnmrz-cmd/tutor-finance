@@ -1957,6 +1957,28 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-live-notes{min-height:0}
  #student-live-material .pp-student-live-content{align-items:stretch}
  @media(max-width:780px){.pp-student-native-sidebar.native-sidebar{flex-basis:64px;width:64px}.pp-student-native-sidebar .native-nav-text,.pp-student-native-sidebar .native-sidebar-label,.pp-student-native-sidebar .native-sidebar-footer{display:none}}
+ #student-live-material .pp-student-live-layout{min-height:calc(100vh - 90px)}
+ #student-live-material .pp-student-live-main{display:flex;flex-direction:column;min-height:calc(100vh - 120px)}
+ #student-live-material .pp-student-live-content{flex:1;min-height:calc(100vh - 155px)}
+ #student-live-material .pp-student-pointer{min-width:0;display:flex;flex-direction:column}
+ #student-live-material .pp-student-pointer>div{flex:1;min-height:0}
+ #student-live-material .mb-student-preview{min-height:100%;display:flex;flex-direction:column}
+ #student-live-material .mb-preview-workspace{flex:1;display:flex;min-height:0}
+ #student-live-material .mb-student-card{flex:1;display:flex;flex-direction:column;min-height:0}
+ #student-live-material .mb-student-body{flex:1}
+ #student-live-material .mb-preview-footer{display:flex;justify-content:space-between;align-items:center;gap:12px}
+ #student-live-material .mb-student-previous{background:#eee8f7;color:#4b287e;border:1px solid #d9cce9;border-radius:10px;padding:10px 20px;font-weight:600}
+ #student-live-material .mb-student-previous:disabled{opacity:.45}
+ #student-live-material .pp-student-live-notes{display:flex;flex-direction:column}
+ #student-live-material .pp-student-live-notes textarea{flex:1;min-height:0;resize:none;border:0;outline:0;box-shadow:none;cursor:default}
+ #student-live-material .pp-student-profile-wrap{position:relative}
+ #student-live-material .pp-student-profile-button{width:44px;height:44px;border-radius:12px;background:#eee8f7;color:#4b287e;font-size:26px}
+ #student-live-material .pp-student-profile-menu{position:absolute;right:0;top:52px;z-index:100;background:white;color:#292336;border:1px solid #e4dcef;box-shadow:0 12px 30px #24143225;border-radius:12px;padding:14px;min-width:190px}
+ #student-live-material .pp-student-profile-menu[hidden]{display:none}
+ #student-live-material .pp-student-profile-menu label,#student-live-material .pp-student-profile-menu button{display:block;margin-top:14px}
+ #student-live-material .pp-student-profile-menu select{padding:5px}
+ #student-live-material .mb-combined-element h2{font-weight:700;line-height:1.3}
+ #student-live-material .mb-student-text h1,#student-live-material .mb-student-text h2,#student-live-material .mb-student-text h3{font-weight:700}
  #student-live-material{padding:0!important}
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#fff;border-bottom:1px solid #e9e3f1}
  #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
@@ -1979,7 +2001,13 @@ function showPublicLessonMaterial(data){
  const header=document.createElement('header');header.className='pp-student-live-header';
  const brand=document.createElement('div');brand.style.cssText='display:flex;align-items:center;gap:12px;font-weight:700;color:#4b287e;font-size:22px';
  const logo=document.createElement('img');logo.src='/legacy/ProfoProfit_logo svg.svg';logo.alt='';logo.style.cssText='width:46px;height:46px';brand.append(logo,document.createTextNode('ProfiProfit'));
- const profile=document.createElement('span');profile.textContent=publicStudent?.name||'Student';header.append(brand,profile);overlay.append(header);
+ const profileWrap=document.createElement('div');profileWrap.className='pp-student-profile-wrap';
+ const profile=document.createElement('button');profile.type='button';profile.className='pp-student-profile-button';profile.textContent='♙';profile.title=publicStudent?.name||'Student';profile.setAttribute('aria-label','Profile settings');
+ const menu=document.createElement('div');menu.className='pp-student-profile-menu';menu.hidden=true;
+ const studentName=document.createElement('strong');studentName.textContent=publicStudent?.name||'Student';menu.append(studentName);
+ const language=document.createElement('label');language.textContent='Language ';const select=document.createElement('select');select.innerHTML='<option value="en">English</option><option value="ru">Русский</option>';select.value=localStorage.getItem('profiprofit-language')||'en';select.onchange=()=>{localStorage.setItem('profiprofit-language',select.value);if(typeof setLanguage==='function')setLanguage(select.value);};language.append(select);menu.append(language);
+ const theme=document.createElement('button');theme.type='button';theme.textContent='◐ Toggle theme';theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();};menu.append(theme);
+ profile.onclick=()=>{menu.hidden=!menu.hidden;};profileWrap.append(profile,menu);header.append(brand,profileWrap);overlay.append(header);
  const layout=document.createElement('div');layout.className='native-layout pp-student-live-layout';restoreStudentSidebar(layout);
  const backTo=tab=>{overlay.remove();switchPublicStudentTab(tab);};
  layout.append(studentPortalSidebar(backTo));
