@@ -911,6 +911,53 @@ html[data-theme="dark"] #student-live-material .app-header.pp-student-live-heade
  #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{font-size:17px!important}
 }
 html[data-theme="dark"] #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{color:#f0eafa!important}
+/* Shared dashboard design tokens: only the main teacher/student pages. */
+#teacher-app .native-workspace,
+#student-public-view.pp-student-one-page{
+ --pp-radius-shell:26px;--pp-radius-panel:24px;
+ --pp-radius-card:16px;--pp-radius-control:12px;
+ --pp-shell-gap:16px;
+}
+/* Both headers: same corner radius and bottom rhythm. */
+#teacher-app #teacher-header.app-header,
+#student-public-view .app-header.student-brand-header{
+ border-radius:var(--pp-radius-shell)!important;
+ margin-bottom:var(--pp-shell-gap)!important;
+}
+/* The layout is nested in .native-workspace, not directly in #teacher-app. */
+#teacher-app>.native-workspace>.native-layout{
+ margin:0!important;padding:0!important;
+ align-items:start!important;
+}
+#teacher-app>.native-workspace>#teacher-header.app-header{
+ margin-top:0!important;
+}
+/* Apply the same visual hierarchy without changing student layout or behavior. */
+#teacher-app #tab-dashboard{
+ border-radius:var(--pp-radius-panel)!important;
+}
+#teacher-app #dashboard-cards>*{
+ border-radius:var(--pp-radius-card)!important;
+}
+#teacher-app .native-workspace>.native-layout>.native-sidebar{
+ border-radius:var(--pp-radius-card)!important;
+}
+#teacher-app #tab-dashboard :is(.native-calendar-controls button,.native-calendar-title button){
+ border-radius:var(--pp-radius-control)!important;
+}
+@media(min-width:701px){
+ #teacher-app>.native-workspace>.native-layout{
+  display:grid!important;grid-template-columns:60px minmax(0,1fr)!important;
+  gap:12px!important;width:100%!important;max-width:none!important;
+  box-sizing:border-box!important;
+ }
+ #teacher-app>.native-workspace>.native-layout.sidebar-collapsed{
+  grid-template-columns:60px minmax(0,1fr)!important;
+ }
+ #teacher-app>.native-workspace>.native-layout>#teacher-main{
+  min-width:0!important;margin:0!important;
+ }
+}
 /* Teacher has sidebar navigation; do not squeeze a second nav into mobile header. */
 @media(max-width:760px){
  #teacher-header.app-header .teacher-nav{display:none!important}
