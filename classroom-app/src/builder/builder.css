@@ -346,3 +346,12 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder .mb-format-toolbar button.mb-format-color.highlight{color:#D99B26}
 .mb-builder .mb-format-toolbar button.mb-format-color:hover{background:#EDE8F4;border-radius:8px}
 .mb-builder .mb-rich-input span[style*="background-color"],.mb-builder .mb-rich-input font[style*="background-color"]{padding:0 .12em;border-radius:.14em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* Teacher-only answer hints in local lesson preview. */
+.mb-teacher-hints-toggle{display:inline-flex;align-items:center;gap:8px;color:#4E2A84;font-weight:600;white-space:nowrap}
+.mb-teacher-hints-toggle input{accent-color:#4E2A84}
+.mb-teacher-hint-anchor{position:relative;display:inline-flex;vertical-align:baseline;align-items:center}
+.mb-teacher-answer-hint{display:none;position:absolute;z-index:60;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%);min-width:max-content;max-width:min(320px,80vw);padding:10px 14px;background:#FFF3D6;border:1px solid #D99B26;border-radius:12px;box-shadow:0 8px 24px #1F242D22;color:#1F242D;pointer-events:none;text-align:left;white-space:normal}
+.mb-teacher-answer-hint small{display:block;font-size:12px;font-weight:600;color:#6B7280}
+.mb-teacher-answer-hint strong{display:block;font-size:16px;line-height:1.35}
+.mb-teacher-hint-anchor:hover>.mb-teacher-answer-hint,.mb-teacher-hint-anchor:focus-within>.mb-teacher-answer-hint{display:block}
