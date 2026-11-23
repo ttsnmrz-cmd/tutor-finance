@@ -315,3 +315,15 @@
 @media(max-width:700px){
  .mb-builder.mb-student-preview{--lesson-viewport-height:max(380px,calc(100dvh - 220px))}
 }
+
+/* Primary Check action: brand violet with soft light-gray lettering. */
+.mb-builder.mb-student-preview .mb-check-actions button:last-of-type,
+.mb-builder.mb-student-preview .mb-image-label-check{
+ background:#4e2a84!important;
+ border-color:#4e2a84!important;
+ color:#f4f5f7!important;
+}
+.mb-builder.mb-student-preview .mb-check-actions button:last-of-type:hover:not(:disabled),
+.mb-builder.mb-student-preview .mb-image-label-check:hover:not(:disabled){
+ background:#3d2169!important;border-color:#3d2169!important;
+}
