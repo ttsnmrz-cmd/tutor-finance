@@ -485,3 +485,54 @@ html[data-theme="dark"] #teacher-app .native-calendar-header{background:#30283b!
 html[data-theme="dark"] #teacher-app .native-calendar :is(.text-slate-300,.text-slate-400,.text-slate-500,.text-slate-600){color:#c6b8d5!important}
 html[data-theme="dark"] #teacher-app .native-calendar .native-timed-event:not(.is-cancelled){background:#dce9e2!important;color:#241a31!important}
 
+
+/* Dark-theme regression fix: student panels were forced white by role-only
+   rules, while the inherited text remained light. Scope all overrides to dark. */
+html[data-theme="dark"] #student-public-view.pp-student-one-page {
+ padding-top:0!important;
+ background:#1d1925!important;
+ color:#f4eefa!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page > .app-card,
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-public-content,
+html[data-theme="dark"] #student-public-view.pp-student-one-page .pp-student-layout {
+ background:transparent!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page .student-portal-panel,
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances {
+ background:#30283b!important;
+ border-color:#51445f!important;
+ color:#f4eefa!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page .student-portal-panel :is(h1,h2,h3,h4),
+html[data-theme="dark"] #student-public-view.pp-student-one-page .student-portal-panel :is(.text-slate-900,.text-slate-800,.text-slate-700) {
+ color:#f4eefa!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page .pp-student-lesson-row,
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .student-theme-panel {
+ background:#3b3248!important;
+ border-color:#645573!important;
+ color:#f4eefa!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page .pp-student-calendar-day,
+html[data-theme="dark"] #student-public-view.pp-student-one-page .student-calendar-day {
+ background:#211c29!important;
+ border-color:#51445f!important;
+ color:#f4eefa!important;
+}
+/* The teacher hour grid must use the same dark surfaces as its surrounding
+   panel; the light calendar background was left visible after migration. */
+html[data-theme="dark"] #teacher-app #dashboard-calendar :is(.native-calendar-scroll,.native-week-calendar,.native-day-track,.native-day,.native-time-axis,.native-week-head-spacer,.calendar-day-heading) {
+ background-color:#30283b!important;
+ border-color:#51445f!important;
+ color:#f4eefa!important;
+}
+html[data-theme="dark"] #teacher-app #dashboard-calendar .native-day-track {
+ background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 71px,#51445f 71px,#51445f 72px)!important;
+}
+html[data-theme="dark"] #teacher-app #dashboard-calendar .native-day:nth-child(even) .native-day-track {
+ background-color:#352b40!important;
+}
+html[data-theme="dark"] #teacher-app #dashboard-calendar :is(.calendar-weekday,.calendar-day-number,.native-time-axis span) {
+ color:#d8c9e6!important;
+}
