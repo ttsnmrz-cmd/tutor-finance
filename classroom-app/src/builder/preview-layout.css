@@ -334,7 +334,7 @@
 }
 .mb-builder.mb-student-preview .mb-preview-heading-row{
  display:flex!important;align-items:center!important;min-height:48px!important;
- padding-right:170px!important;
+ padding-right:0!important;
 }
 .mb-builder.mb-student-preview .mb-preview-heading-row>h1{
  flex:1 1 auto!important;min-width:0!important;white-space:normal!important;
@@ -355,16 +355,18 @@
  flex:0 1 auto!important;gap:8px!important;flex-wrap:wrap!important;
  width:auto!important;order:2!important;
 }
+/* Keep Pointer in the same toolbar flow as Timer and teacher actions.
+   The former absolute positioning stranded Pointer above the other buttons. */
 .mb-builder.mb-student-preview .mb-preview-controls #pointerToolbar{
- position:absolute!important;top:0!important;right:0!important;
- z-index:175!important;width:max-content!important;max-width:max-content!important;
+ position:relative!important;top:auto!important;right:auto!important;
+ z-index:175!important;width:auto!important;max-width:none!important;
 }
 .mb-builder.mb-student-preview .mb-preview-controls #pointerTools{
  position:absolute!important;top:calc(100% + 8px)!important;left:auto!important;
  right:0!important;max-width:min(480px,90vw)!important;
 }
 @media(max-width:700px){
- .mb-builder.mb-student-preview .mb-preview-heading-row{padding-right:130px!important}
+ .mb-builder.mb-student-preview .mb-preview-heading-row{padding-right:0!important}
  .mb-builder.mb-student-preview .mb-preview-tools-row>.mb-preview-controls{
   justify-content:flex-start!important;
  }
