@@ -1954,13 +1954,15 @@ function ensureStudentPortalLayout(){
  const portal=document.getElementById('student-public-view');
  if(!portal)return;
  syncStudentPortalHeader();
- if(portal.querySelector('.pp-student-layout'))return;
+ if(portal.classList.contains('pp-student-one-page'))return;
  const content=portal.querySelector('#student-public-content');
  if(!content)return;
- const layout=document.createElement('div');layout.className='native-layout pp-student-layout';restoreStudentSidebar(layout);
- const sidebar=studentPortalSidebar(tab=>switchPublicStudentTab(tab));
- content.parentNode.insertBefore(layout,content);layout.append(sidebar,content);
- const oldTabs=content.querySelector('.student-portal-tabs');if(oldTabs)oldTabs.classList.add('hidden');
+ // One-page student dashboard: no sidebar, tabs or cloned navigation.
+ const oldTabs=content.querySelector('.student-portal-tabs');
+ if(oldTabs)oldTabs.remove();
+ ['dashboard','lessons','finances'].forEach(tab=>document.getElementById('student-portal-'+tab)?.classList.remove('hidden'));
+ portal.classList.add('pp-student-one-page');
+ if(document.getElementById('pp-student-shell-styles'))return;
  const style=document.createElement('style');style.id='pp-student-shell-styles';style.textContent=`
  #student-public-view{max-width:none!important;padding:12px!important}
  #student-public-view>.app-card{max-width:none!important}
@@ -2027,7 +2029,7 @@ function initializePublicStudentShell(){
  const content=document.getElementById('student-public-content');
  if(!portal||!content||portal.classList.contains('hidden')||content.classList.contains('hidden'))return false;
  ensureStudentPortalLayout();
- return !!portal.querySelector('.pp-student-layout');
+ return portal.classList.contains('pp-student-one-page');
 }
 function watchPublicStudentShell(){
  const portal=document.getElementById('student-public-view');
@@ -2108,7 +2110,7 @@ function renderPublicLessonsHistory(rows){
  const past=rows.filter(l=>['conducted','completed'].includes(l.status)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
  el.replaceChildren();
  if(!past.length){el.textContent='No completed lessons yet.';return;}
- past.forEach(l=>{const card=document.createElement('div');card.className='rounded-xl student-theme-panel p-3';card.textContent=l.date+' · '+displayTime(l.time)+' — Notes will appear when your teacher shares them.';el.append(card);});
+ past.forEach(l=>{const card=document.createElement('button');card.type='button';card.className='pp-student-lesson-row';card.textContent=l.date+' · '+displayTime(l.time);card.addEventListener('click',()=>{const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;dialog.querySelector('[data-lesson-heading]').textContent=l.date+' · '+displayTime(l.time);dialog.querySelector('[data-lesson-notes]').textContent=l.notes||l.teacher_notes||'No teacher notes have been shared for this lesson yet.';dialog.showModal();});el.append(card);});
 }
 function changePublicStudentWeek(offset){
   if(!publicStudentWeekAnchor)return;
@@ -2297,7 +2299,7 @@ async function openStudentCabinet(){
       .slice()
       .sort(
         (a,b)=>
-          String(a.date).localeCompare(String(b.date))
+          String(b.date).localeCompare(String(a.date))
       )
       .map(
         p=>
