@@ -414,3 +414,9 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-image-label-placed[data-result=incorrect]{background:#FDECEC;border-color:#D45656;color:#9A2929}
 
 .mb-image-label-zone,.mb-image-label-teacher-zone{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;overflow:visible}
+
+/* Light translucent zones keep their numbers legible over detailed photos. */
+.mb-image-label-zone,.mb-image-label-teacher-zone{background:rgba(255,255,255,.62);color:#39215d;text-shadow:0 1px 0 #fff;border-color:#7543AE}
+.mb-image-label-zone[data-shape=rectangle],.mb-image-label-teacher-zone[data-shape=rectangle]{border-radius:7px}
+.mb-image-label-zone[data-shape=oval],.mb-image-label-teacher-zone[data-shape=oval]{border-radius:50%}
+.mb-image-label-zone-row select,.mb-image-label-toolbar select{min-width:105px}
