@@ -1900,26 +1900,36 @@ async function openPublicCalendarLesson(index){
  }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
 function studentPortalSidebar(onNavigate){
- const nav=document.createElement('aside');nav.className='pp-student-sidebar';
- const collapsed=localStorage.getItem('pp-student-sidebar-collapsed')==='true';
- if(collapsed)nav.classList.add('collapsed');
- const toggle=document.createElement('button');toggle.type='button';toggle.className='pp-student-sidebar-toggle';toggle.textContent='☰';toggle.title='Collapse or expand menu';toggle.setAttribute('aria-label','Collapse or expand menu');
- toggle.onclick=()=>{nav.classList.toggle('collapsed');localStorage.setItem('pp-student-sidebar-collapsed',String(nav.classList.contains('collapsed')));};
- nav.append(toggle);
- for(const [tab,icon,label] of [['dashboard','⌂','Dashboard'],['lessons','▤','Lessons'],['finances','▣','Payments']]){
-  const button=document.createElement('button');button.type='button';button.className='pp-student-sidebar-link';button.title=label;button.dataset.studentTab=tab;
-  const glyph=document.createElement('span');glyph.textContent=icon;glyph.className='pp-student-sidebar-icon';
-  const text=document.createElement('span');text.textContent=label;text.className='pp-student-sidebar-label';
-  button.append(glyph,text);button.onclick=()=>onNavigate(tab);nav.append(button);
- }
+ // Clone the actual teacher workspace navigation, rather than recreating it.
+ const original=document.querySelector('#teacher-app .native-sidebar');
+ const nav=original?original.cloneNode(true):document.createElement('aside');
+ nav.className='native-sidebar pp-student-native-sidebar';
+ nav.setAttribute('aria-label','Student navigation');
+ nav.querySelectorAll('[onclick]').forEach(el=>el.removeAttribute('onclick'));
+ const label=nav.querySelector('.native-sidebar-label');if(label)label.textContent='STUDENT WORKSPACE';
+ const footer=nav.querySelector('.native-sidebar-footer');if(footer)footer.textContent='ProfiProfit · Student workspace';
+ const buttons=[...nav.querySelectorAll('[data-native-tab]')];
+ const items=[['dashboard','Dashboard'],['lessons','Lessons'],['finances','Payments']];
+ buttons.forEach((button,i)=>{
+  if(!items[i]){button.remove();return;}
+  const [tab,title]=items[i];button.dataset.studentTab=tab;button.removeAttribute('data-native-tab');
+  const caption=button.querySelector('.native-nav-text');if(caption)caption.textContent=title;
+  button.title=title;button.onclick=()=>onNavigate(tab);
+ });
+ const toggle=nav.querySelector('.native-sidebar-toggle');
+ if(toggle){toggle.onclick=()=>{const layout=nav.closest('.native-layout');if(!layout)return;layout.classList.toggle('sidebar-collapsed');localStorage.setItem('pp-student-sidebar-collapsed',layout.classList.contains('sidebar-collapsed')?'1':'0');};}
  return nav;
 }
+function restoreStudentSidebar(layout){
+ if(localStorage.getItem('pp-student-sidebar-collapsed')==='1')layout.classList.add('sidebar-collapsed');
+}
+
 function ensureStudentPortalLayout(){
  const portal=document.getElementById('student-public-view');
  if(!portal||portal.querySelector('.pp-student-layout'))return;
  const content=portal.querySelector('#student-public-content');
  if(!content)return;
- const layout=document.createElement('div');layout.className='pp-student-layout';
+ const layout=document.createElement('div');layout.className='native-layout pp-student-layout';restoreStudentSidebar(layout);
  const sidebar=studentPortalSidebar(tab=>switchPublicStudentTab(tab));
  content.parentNode.insertBefore(layout,content);layout.append(sidebar,content);
  const oldTabs=content.querySelector('.student-portal-tabs');if(oldTabs)oldTabs.classList.add('hidden');
@@ -1958,19 +1968,18 @@ function showPublicLessonMaterial(data){
  const brand=document.createElement('div');brand.style.cssText='display:flex;align-items:center;gap:12px;font-weight:700;color:#4b287e;font-size:22px';
  const logo=document.createElement('img');logo.src='/legacy/ProfoProfit_logo svg.svg';logo.alt='';logo.style.cssText='width:46px;height:46px';brand.append(logo,document.createTextNode('ProfiProfit'));
  const profile=document.createElement('span');profile.textContent=publicStudent?.name||'Student';header.append(brand,profile);overlay.append(header);
- const layout=document.createElement('div');layout.className='pp-student-live-layout';
+ const layout=document.createElement('div');layout.className='native-layout pp-student-live-layout';restoreStudentSidebar(layout);
  const backTo=tab=>{overlay.remove();switchPublicStudentTab(tab);};
  layout.append(studentPortalSidebar(backTo));
  const main=document.createElement('main');main.className='pp-student-live-main';
- const back=document.createElement('button');back.textContent='← Back to dashboard';back.style.cssText='padding:8px 12px;border-radius:10px;background:#eee8f7;color:#4b287e;margin-bottom:12px';back.onclick=()=>backTo('dashboard');main.append(back);
  const columns=document.createElement('div');columns.className='pp-student-live-content';
  const drawWrap=document.createElement('div');drawWrap.className='pp-student-pointer';
  const host=document.createElement('div');drawWrap.append(host);
  const notes=document.createElement('aside');notes.className='pp-student-live-notes';const notesTitle=document.createElement('h3');notesTitle.textContent='▤ Live Notes';notesTitle.style.cssText='font-weight:700;margin-bottom:12px';
  const noteArea=document.createElement('textarea');noteArea.placeholder='Teacher notes will appear here when live sharing is enabled.';noteArea.readOnly=true;notes.append(notesTitle,noteArea);
  columns.append(drawWrap,notes);main.append(columns);layout.append(main);overlay.append(layout);
- const cleanup=()=>{};back.addEventListener('click',cleanup);
- layout.querySelectorAll('.pp-student-sidebar-link[data-student-tab]').forEach(b=>b.addEventListener('click',cleanup));
+ const cleanup=()=>{};
+ layout.querySelectorAll('.pp-student-native-sidebar [data-student-tab]').forEach(b=>b.addEventListener('click',cleanup));
  if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan);
  else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
 }
