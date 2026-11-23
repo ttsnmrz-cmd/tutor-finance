@@ -493,11 +493,7 @@ html[data-theme=dark] #teacher-app > .native-layout > .native-sidebar{background
 }
 
 /* Unified neutral light theme and shared teacher/student shell. */
-html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view){
-  --bg-color:#F5F6F8;--card-bg:#FFFFFF;--text-color:#22252D;
-  --text-secondary:#6B7280;--primary-color:#4E2A84;
-  --accent-soft:#F0F1F4;--border-color:#E1E4E8;
-}
+
 html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view) :is(.app-card,.native-sidebar,.native-metric-strip>*,.student-theme-panel){
   border-color:#E1E4E8!important;
 }
