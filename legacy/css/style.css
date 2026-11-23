@@ -1,11 +1,13 @@
 :root{
-  --bg-color:#ffffff;
+  --bg-color:#F4F5F7;
   --card-bg:#ffffff;
-  --text-color:#000000;
-  --text-secondary:#000000;
-  --primary-color:#3B1664;
-  --primary-hover:#2a1048;
-  --accent-soft:#f3eef7;
+  --text-color:#1F242D;
+  --text-secondary:#6B7280;
+  --primary-color:#4E2A84;
+  --cta-color:#D99B26;
+  --cta-hover:#C48918;
+  --primary-hover:#3D2169;
+  --accent-soft:#F0F1F4;
   --border-color:#d9d9d9;
   --green-bg:#e6f4ea;
   --green-text:#137333;
@@ -54,7 +56,7 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 /* Цветовая палитра из референса — без изменения размеров/раскладки */
 .text-slate-800,.text-slate-900,.font-bold,.font-semibold{color:var(--text-color)}
 .text-slate-500,.text-slate-400{color:var(--text-secondary)!important}
-.bg-slate-50{background:#faf9fc!important}
+.bg-slate-50{background:#F4F5F7!important}
 .bg-slate-100{background:var(--accent-soft)!important;color:var(--primary-color)!important}
 .bg-indigo-50,.bg-violet-50{background:var(--accent-soft)!important;color:var(--primary-color)!important}
 .bg-indigo-600{background:var(--primary-color)!important;color:#fff!important}
@@ -99,7 +101,7 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 /* Password visibility controls */
 .password-field{position:relative;width:100%}
 .password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#6b6475;background:transparent}
-.password-toggle:hover{background:#f3eef7;color:var(--primary-color)}
+.password-toggle:hover{background:#F0F1F4;color:var(--primary-color)}
 .password-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 #teacher-header .teacher-nav{margin-right:2.75rem;flex-shrink:0}
 #teacher-header .teacher-nav button{white-space:nowrap}
@@ -239,7 +241,7 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 }
 
 /* Public student cabinet: keep contrast readable in both themes. */
-#student-public-view .student-summary-card{background:#f3eef7;color:#30213f}
+#student-public-view .student-summary-card{background:#F0F1F4;color:#30213f}
 #student-public-view .student-summary-card .student-summary-label{color:#6f617e}
 #student-public-view .student-price-card{background:#eee7f7;color:#30213f}
 #student-public-view .student-price-card .student-summary-label{color:#6f617e}
@@ -252,7 +254,7 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 :root[data-theme="dark"] #student-public-view .text-emerald-600{color:#9de0b6!important}
 
 /* Student cabinet contrast fixes */
-#student-public-view .student-theme-panel{background:#f3eef7!important;color:#30213f!important}
+#student-public-view .student-theme-panel{background:#F0F1F4!important;color:#30213f!important}
 #student-public-view .student-theme-panel .text-slate-500{color:#6f617e!important}
 :root[data-theme="dark"] #student-public-view .student-theme-panel{background:#292433!important;color:#f2eef8!important}
 :root[data-theme="dark"] #student-public-view .student-theme-panel .text-slate-500{color:#c3b8d1!important}
