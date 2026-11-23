@@ -15,6 +15,7 @@ import {ExercisePreview} from './ExercisePreview';
 import './builder.css';
 import './preview-shared.css';
 import './editor-and-role.css';
+import './preview-layout.css';
 
 type Action={kind:'section'|'exercise'|'move'|'delete'|'rename-section';id?:string};
 type Drag={kind:'section'|'exercise';id:string};
