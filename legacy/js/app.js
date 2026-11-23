@@ -1945,6 +1945,18 @@ function ensureStudentPortalLayout(){
  .pp-student-sidebar-link:hover,.pp-student-sidebar-link.is-active{background:#eee8f7}
  .pp-student-sidebar-icon{width:22px;flex:none;text-align:center;font-size:22px}
  .pp-student-sidebar.collapsed .pp-student-sidebar-label{display:none}
+ .pp-student-layout.native-layout,.pp-student-live-layout.native-layout{display:flex!important;grid-template-columns:none!important;align-items:stretch;gap:12px}
+ .pp-student-native-sidebar.native-sidebar{flex:0 0 204px;width:204px;min-width:0;position:relative;align-self:stretch}
+ .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar.native-sidebar,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar.native-sidebar{flex-basis:64px;width:64px}
+ .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer{display:none}
+ .pp-student-native-sidebar [data-student-tab]{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:10px}
+ .pp-student-native-sidebar [data-student-tab].is-active{background:#eee8f7;color:#4b287e}
+ .pp-student-native-sidebar .native-nav-icon{width:24px;height:24px;flex:none}
+ .pp-student-native-sidebar .native-nav-icon svg{width:22px;height:22px}
+ .pp-student-live-main{width:100%}
+ #student-live-material .pp-student-live-notes{min-height:0}
+ #student-live-material .pp-student-live-content{align-items:stretch}
+ @media(max-width:780px){.pp-student-native-sidebar.native-sidebar{flex-basis:64px;width:64px}.pp-student-native-sidebar .native-nav-text,.pp-student-native-sidebar .native-sidebar-label,.pp-student-native-sidebar .native-sidebar-footer{display:none}}
  #student-live-material{padding:0!important}
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#fff;border-bottom:1px solid #e9e3f1}
  #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
