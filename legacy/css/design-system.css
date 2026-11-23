@@ -43,8 +43,8 @@
 @media (min-width: 701px) {
   #teacher-app > .native-layout {
     display: grid !important;
-    grid-template-columns: 70px minmax(0, 1fr) !important;
-    gap: 12px !important;
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+    gap: var(--pp-section-gap, 14px) !important;
     width: 100% !important;
     max-width: none !important;
   }
@@ -370,8 +370,7 @@ html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view){
 /* Canonical teacher sidebar component — desktop and mobile. */
 @media(min-width:701px){
  #teacher-app > .native-workspace{width:100%!important;max-width:none!important;padding:0 12px!important;margin:0!important;min-height:0!important;height:auto!important}
- #teacher-app > .native-layout{display:grid!important;grid-template-columns:186px minmax(0,1fr)!important;gap:12px!important;align-items:start!important;margin:8px 0 0!important;padding:0 12px!important;width:100%!important;max-width:none!important;box-sizing:border-box!important}
- #teacher-app > .native-layout.sidebar-collapsed{grid-template-columns:70px minmax(0,1fr)!important}
+
  #teacher-app > .native-layout > .native-sidebar{position:sticky!important;top:12px!important;align-self:start!important;display:flex!important;flex-direction:column!important;gap:3px!important;min-height:0!important;padding:10px 4px!important;margin:0!important;background:#fff!important;border:1px solid #E1E4E8!important;border-radius:12px!important;box-shadow:none!important;overflow:visible!important}
  #teacher-app .native-sidebar-label,#teacher-app .native-sidebar-footer{display:none!important}
  #teacher-app .native-sidebar button[data-native-tab]{display:flex!important;align-items:center!important;width:100%!important;flex:0 0 auto!important;height:48px!important;min-height:48px!important;padding:10px 12px!important;gap:12px!important;border-radius:12px!important;font:500 13px/1.35 Inter,ui-sans-serif,system-ui,sans-serif!important;white-space:nowrap!important;color:#6B7280!important}
@@ -400,7 +399,6 @@ html[data-theme=dark] #teacher-app > .native-layout > .native-sidebar{background
 
 /* Final geometry contract: expanded and collapsed columns share one source. */
 @media(min-width:701px){
- #teacher-app > .native-layout:not(.sidebar-collapsed){grid-template-columns:220px minmax(0,1fr)!important}
  #teacher-app > .native-layout.sidebar-collapsed{grid-template-columns:70px minmax(0,1fr)!important}
  #teacher-app > .native-layout:not(.sidebar-collapsed) > .native-sidebar .native-nav-text{display:inline!important}
  #teacher-app > .native-layout:not(.sidebar-collapsed) > .native-sidebar button[data-native-tab]{justify-content:flex-start!important}
@@ -553,11 +551,6 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 }
 #teacher-app #dashboard-calendar>.app-card {
  margin-bottom:0!important;
-}
-@media(min-width:701px){
- #teacher-app > .native-layout {
-  gap:var(--pp-section-gap)!important;
- }
 }
 /* Canonical student finance dark-theme component rules (real DOM classes). */
 html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-stat {
