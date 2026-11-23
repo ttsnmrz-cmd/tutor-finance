@@ -424,13 +424,10 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
 /* Unified ProfiProfit light theme: neutral surfaces and gold primary actions. */
 html:not([data-theme="dark"]) #teacher-app{--bg-color:#F4F5F7;--card-bg:#FFFFFF;--text-color:#1F242D;--text-secondary:#6B7280;--primary-color:#4E2A84;--primary-hover:#3D2169;--accent-soft:#F0F1F4;--border-color:#E0E3E9;--cta-color:#D99B26}
 html:not([data-theme="dark"]) #teacher-app .native-sidebar button.is-active{background:#EAE5F2!important;color:#4E2A84!important}
-html:not([data-theme="dark"]) #teacher-app .native-sidebar,html:not([data-theme="dark"]) 
 html:not([data-theme="dark"]) #teacher-app .primary-btn,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]{background:#D99B26!important;color:#1F242D!important;border-color:#D99B26!important}
 html:not([data-theme="dark"]) #teacher-app .primary-btn:hover,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]:hover{background:#C48918!important}
 
 /* Unified brand: calmer plum instead of bright violet. */
-html:not([data-theme="dark"]) #teacher-app .native-workspace>header button[title="На главную"] span.block.text-2xl,
-html:not([data-theme="dark"]) 
 
 /* Dark mode contrast corrections for dashboard, calendar and student directory. */
 html[data-theme="dark"] #teacher-app #dashboard-cards>*{background:#30283b!important;border-color:#51445f!important;color:#f4eef9!important}
@@ -895,6 +892,25 @@ html[data-theme="dark"] #student-live-material .app-header.pp-student-live-heade
  background:transparent!important;text-shadow:none!important;
  color:var(--app-header-title)!important;
 }
+/* The teacher header is the source of the student clone: identical brand metrics. */
+#teacher-app #teacher-header.app-header{
+ border-radius:26px!important;padding:10px 14px!important;
+ margin-bottom:14px!important;min-height:70px!important;
+}
+#teacher-app #teacher-header.app-header .app-header-brand .text-2xl{
+ font-size:21px!important;font-weight:750!important;line-height:1.2!important;
+ letter-spacing:-.045em!important;color:#1f242d!important;
+ background:transparent!important;background-color:transparent!important;
+ background-image:none!important;-webkit-text-fill-color:currentColor!important;
+ text-shadow:none!important;box-shadow:none!important;
+}
+#teacher-app #teacher-header.app-header .app-header-brand .text-sm{display:none!important}
+#teacher-app .native-workspace>.native-layout{margin-top:0!important}
+@media(max-width:760px){
+ #teacher-app #teacher-header.app-header{padding:10px 12px!important;min-height:0!important}
+ #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{font-size:17px!important}
+}
+html[data-theme="dark"] #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{color:#f0eafa!important}
 /* Teacher has sidebar navigation; do not squeeze a second nav into mobile header. */
 @media(max-width:760px){
  #teacher-header.app-header .teacher-nav{display:none!important}
