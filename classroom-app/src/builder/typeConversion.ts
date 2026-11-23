@@ -2,7 +2,7 @@ import {blankLetterWord} from './letterData';
 import {blankSentence} from './sentenceData';
 import {blankColumns,blankColumnWord} from './ColumnsExercise';
 import {blankStatement} from './TrueFalseExercise';
-import {builderType,isInlineChoice,isColumns,isSentence,isTypedGap,isLetters,isGallery,blankChoiceQuestion,type BuilderExerciseType} from './choiceData';
+import {builderType,isInlineChoice,isColumns,isSentence,isTypedGap,isLetters,isGallery,isImageLabeling,blankChoiceQuestion,type BuilderExerciseType} from './choiceData';
 import type {Block} from '../planning/model';
 import {formatOf,formatPatch} from './textFormatting';
 type Backup={at:string;block:Block};
@@ -20,6 +20,7 @@ export function hasUnconvertedPairs(block:Block){return block.type==='gaps'&&!/_
 
 export function switchBlockType(block:Block,type:BuilderExerciseType):Block{
  if(type===builderType(block))return block;
+ if(isImageLabeling(block))block={...block,choiceMode:undefined} as Block;
  if(isGallery(block))block={...block,choiceMode:undefined} as Block;
  if(isTypedGap(block))block={...block,choiceMode:undefined} as Block;
  if(isLetters(block)){const {typeConversionBackups=[],...source}=block as ArchivedBlock;const content=[block.content,...block.items.map(i=>[i.expected,i.prompt].filter(Boolean).join(' — '))].filter(Boolean).join('\n');block={...block,...formatPatch(block,'content',content,carryImages(block,content)),content,items:[],choiceMode:undefined,typeConversionBackups:[...typeConversionBackups,{at:new Date().toISOString(),block:structuredClone(source)}]} as Block;}
