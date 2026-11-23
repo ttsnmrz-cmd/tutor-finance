@@ -43,7 +43,6 @@ jobs:
           assert layout.count('#student-live-material') == 1, 'Review new student-only preview rules'
           print('Teacher and student share ExercisePreview and its CSS.')
           PY
-        working-directory: classroom-app
       - name: Confirm embedded assets
         run: |
           test -s legacy/classroom-assets/classroom.js
