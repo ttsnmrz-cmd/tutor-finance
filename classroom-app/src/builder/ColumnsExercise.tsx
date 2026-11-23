@@ -23,7 +23,7 @@ export function ColumnsEditor({block,onChange}:{block:Block;onChange:(b:Block)=>
  <p className="mb-help">{ui('Name the columns and enter each word in its correct column.')}</p>
  </div>;
 }
-export function ColumnsPreview({block}:{block:Block}){
+export function ColumnsPreview({block,teacherHints=false}:{block:Block;teacherHints?:boolean}){
  const columns=(block as ColumnBlock).columns||[],words=block.items as Word[];
  const [order]=useState(()=>{const ids=words.map(w=>w.columnWordId);for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}return ids;});
  const [answers,setAnswers]=useState<Record<string,string>>({}),[selected,setSelected]=useState<string|null>(null),[checked,setChecked]=useState(false),nonce=useRef(crypto.randomUUID());
@@ -32,7 +32,7 @@ export function ColumnsPreview({block}:{block:Block}){
  function start(e:React.DragEvent,id:string){e.dataTransfer.setData('application/x-mec-column-word',JSON.stringify({nonce:nonce.current,id}));e.dataTransfer.effectAllowed='move';}
  function drop(e:React.DragEvent,column?:string){e.preventDefault();e.stopPropagation();try{const data=JSON.parse(e.dataTransfer.getData('application/x-mec-column-word'));if(data.nonce===nonce.current)place(data.id,column);}catch{}}
  function chip(word:Word){const id=word.columnWordId,placed=answers[id],result=checked?(placed===undefined?'empty':placed===word.expected?'correct':'incorrect'):undefined;
- return <button key={id} className="mb-column-token" data-word-id={id} data-result={result} aria-pressed={selected===id} draggable onDragStart={e=>start(e,id)} onClick={()=>setSelected(selected===id?null:id)}><span className="mb-column-grip" aria-hidden="true">⠿</span>{word.prompt}{checked&&placed&&<span aria-hidden="true">{result==='correct'?' ✓':' ×'}</span>}</button>;}
+ return <button key={id} className="mb-column-token" data-word-id={id} data-result={result} aria-pressed={selected===id} draggable onDragStart={e=>start(e,id)} onClick={()=>setSelected(selected===id?null:id)}><span className="mb-column-grip" aria-hidden="true">⠿</span>{word.prompt}{teacherHints&&<small className="mb-column-teacher-label">→ {columns.find(column=>column.id===word.expected)?.title||'?'}</small>}{checked&&placed&&<span aria-hidden="true">{result==='correct'?' ✓':' ×'}</span>}</button>;}
  return <div className="mb-columns-preview">
  {block.content&&<div className="mb-columns-existing"><FormattedText text={block.content} html={formatOf(block,'content',block.content)}/></div>}
  <p className="mb-help">{ui('Drag words into columns, or select a word and then a column. Select a placed word to move it again.')}</p>

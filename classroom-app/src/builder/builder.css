@@ -355,3 +355,13 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-teacher-answer-hint small{display:block;font-size:12px;font-weight:600;color:#6B7280}
 .mb-teacher-answer-hint strong{display:block;font-size:16px;line-height:1.35}
 .mb-teacher-hint-anchor:hover>.mb-teacher-answer-hint,.mb-teacher-hint-anchor:focus-within>.mb-teacher-answer-hint{display:block}
+
+/* Teacher hints: compact green answer cards without redundant captions. */
+.mb-builder .mb-teacher-answer-hint{background:#E7F7ED;border-color:#91D4A9;color:#17653A;min-width:0;width:max-content;max-width:min(360px,80vw);overflow-wrap:anywhere}
+.mb-builder .mb-teacher-answer-hint strong{color:#17653A}
+.mb-builder .mb-teacher-correct-option{outline:2px solid #26965B;outline-offset:1px;border-radius:9px}
+.mb-builder .mb-match-hint-anchor{display:block;width:100%}
+.mb-builder .mb-match-hint-anchor>.mb-match-card{width:100%}
+.mb-builder .mb-order-correct-index{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 7px;background:#E7F7ED;border:1px solid #91D4A9;border-radius:8px;color:#17653A;font-size:13px;font-weight:700}
+.mb-builder .mb-column-teacher-label{display:inline-flex;align-items:center;margin-left:9px;padding:2px 7px;background:#E7F7ED;border:1px solid #91D4A9;border-radius:6px;color:#17653A;font-size:12px;font-weight:600;white-space:normal}
+.mb-builder .mb-order-plain-input{display:block;width:100%;min-width:0;min-height:42px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
