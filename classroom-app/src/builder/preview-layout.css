@@ -118,6 +118,43 @@
  padding:10px 18px!important;min-height:48px!important;font-weight:750!important;
 }
 
+/* Compact shared lesson navigation. Progress takes the remaining space and
+   each segment shrinks with the number of exercises instead of overflowing. */
+.mb-builder.mb-student-preview .mb-preview-footer{
+ grid-template-columns:auto minmax(0,1fr) auto!important;
+ gap:clamp(8px,1.5vw,18px)!important;
+ padding:12px clamp(12px,2vw,22px)!important;
+ min-height:72px!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress{
+ min-width:0!important;width:100%!important;max-width:100%!important;
+ flex:1 1 auto!important;gap:clamp(3px,.7vw,9px)!important;
+ overflow:hidden!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress span{
+ flex:1 1 0!important;width:auto!important;min-width:0!important;
+ max-width:none!important;height:9px!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-student-previous,
+.mb-builder.mb-student-preview .mb-preview-footer>.primary{
+ width:auto!important;min-width:0!important;min-height:42px!important;
+ padding:9px 16px!important;border-radius:12px!important;
+ font-size:15px!important;line-height:1.3!important;
+ white-space:nowrap!important;
+}
+@media(max-width:700px){
+ .mb-builder.mb-student-preview .mb-preview-footer{
+  gap:7px!important;padding:10px!important;min-height:60px!important;
+ }
+ .mb-builder.mb-student-preview .mb-preview-footer .mb-student-previous,
+ .mb-builder.mb-student-preview .mb-preview-footer>.primary{
+  padding:8px 10px!important;min-height:38px!important;font-size:13px!important;
+ }
+ .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress span{
+  flex:1 1 0!important;width:auto!important;max-width:none!important;height:7px!important;
+ }
+}
+
 /* Teacher and student exercise reading rhythm; avoid excessive spacing in text blocks. */
 .mb-builder.mb-student-preview .mb-student-body,
 .mb-builder.mb-student-preview .mb-student-content,
