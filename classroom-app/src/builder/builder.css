@@ -511,3 +511,31 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 .mb-builder>.mb-structure-control>.mb-structure-toggle:hover{border-color:var(--purple)!important}
 .mb-builder>.mb-layout{margin-left:0!important}
 @media(max-width:700px){.mb-builder{padding-left:14px!important;padding-right:14px!important}}
+
+/* Editor-only spoiler marker: visible to the teacher, still concealed in Preview. */
+.mb-builder .mb-rich-input [data-spoiler="true"],
+.mb-builder .mb-gap-editable [data-spoiler="true"]{
+  background:rgba(111,77,151,.16)!important;
+  color:inherit!important;
+  border-bottom:2px dashed #79549f;
+  border-radius:4px;
+  padding:1px 4px;
+  -webkit-box-decoration-break:clone;
+  box-decoration-break:clone;
+}
+.mb-builder .mb-rich-input [data-spoiler="true"]::before,
+.mb-builder .mb-gap-editable [data-spoiler="true"]::before{
+  content:"◈";
+  color:#79549f;
+  font-size:.75em;
+  margin-right:4px;
+  user-select:none;
+  pointer-events:none;
+}
+html[data-theme="dark"] .mb-builder .mb-rich-input [data-spoiler="true"],
+html[data-theme="dark"] .mb-builder .mb-gap-editable [data-spoiler="true"]{
+  background:rgba(189,153,230,.23)!important;
+  border-bottom-color:#c7a4ed;
+}
+html[data-theme="dark"] .mb-builder .mb-rich-input [data-spoiler="true"]::before,
+html[data-theme="dark"] .mb-builder .mb-gap-editable [data-spoiler="true"]::before{color:#d8b7fa}
