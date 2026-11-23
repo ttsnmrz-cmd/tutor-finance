@@ -49,36 +49,3 @@ html[data-theme="dark"] .mb-builder .mb-gap-editable [data-spoiler="true"]{
 html[data-theme="dark"] .mb-builder .mb-rich-input [data-spoiler="true"]::before,
 html[data-theme="dark"] .mb-builder .mb-gap-editable [data-spoiler="true"]::before{color:#d8b7fa}
 
-/* Single presentation layout for teacher preview and student lesson.
-   Role differences are controlled by React, not by duplicate CSS renderers. */
-.mb-builder.mb-student-preview .mb-preview-top{display:block;margin:0 0 10px;padding:0}
-.mb-builder.mb-student-preview .mb-preview-heading-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.mb-builder.mb-student-preview .mb-preview-heading-row>h1{flex:1 1 250px;min-width:0;margin:0;font-size:24px;font-weight:750;line-height:1.25}
-.mb-builder.mb-student-preview .mb-preview-heading-row>.mb-preview-controls{flex:0 1 auto;width:auto;display:flex;align-items:center;gap:8px;margin:0}
-.mb-builder.mb-student-preview .mb-preview-workspace{display:flex;flex:1 1 auto;min-height:0}
-.mb-builder.mb-student-preview .mb-student-card{display:flex;flex-direction:column;flex:1 1 auto;min-height:calc(100dvh - 210px)}
-.mb-builder.mb-student-preview .mb-student-body{flex:1 1 auto}
-.mb-builder.mb-student-preview .mb-preview-footer{margin-top:auto;flex-shrink:0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;padding:12px 18px}
-.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress{grid-column:2;grid-row:1;display:flex;gap:6px;justify-content:center;width:180px;max-width:180px}
-.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress span{display:block;width:30px;max-width:30px;height:7px;flex:1}
-.mb-builder.mb-student-preview .mb-preview-footer .mb-student-previous{grid-column:1;grid-row:1;justify-self:start}
-.mb-builder.mb-student-preview .mb-preview-footer .primary{grid-column:3;grid-row:1;justify-self:end}
-.mb-builder.mb-student-preview .mb-choice-student-question{border:0;padding:0;margin:0 0 22px;min-width:0}
-.mb-builder.mb-student-preview .mb-choice-answer{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;background:var(--page);padding:13px 16px;margin:0 0 9px;cursor:pointer;width:100%;box-sizing:border-box}
-.mb-builder.mb-student-preview .mb-choice-answer.selected{background:var(--soft);border-color:var(--purple)}
-.mb-builder.mb-student-preview .mb-choice-answer input{appearance:auto;width:22px;height:22px;flex:none;margin:0}
-.mb-builder.mb-student-preview .mb-check-actions{display:flex;align-items:center;gap:14px;margin:20px 0 4px}
-.mb-builder.mb-student-preview .mb-check-actions button{background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:11px;padding:9px 14px;font-weight:700;width:auto}
-@media(max-width:850px){.mb-builder.mb-student-preview .mb-preview-heading-row>.mb-preview-controls{flex-wrap:wrap;justify-content:flex-start}}
-@media(max-width:620px){.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress{width:90px;max-width:90px}.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress span{width:12px;max-width:12px}}
-/* Student-only pointer stacking: tool overlay must stay above the lesson. */
-.profiprofit-student-lesson #pointerTools{z-index:160!important}
-.profiprofit-student-lesson #pointerTools select{color:#4b287e!important;background:#f4f0fa!important;border:1px solid #d9cce9!important;min-width:72px}
-.profiprofit-student-lesson #pointerTools option{color:#282032!important;background:white!important}
-.profiprofit-student-lesson .mb-preview-annotation.drawing{z-index:120!important;pointer-events:auto!important}
-.profiprofit-student-lesson #pointerToolbar{position:relative!important;z-index:170!important}
-.profiprofit-student-lesson #pointerTools{position:relative!important;z-index:171!important}
-.mb-student-preview .mb-preview-pointer{flex:0 0 auto!important;width:auto!important;min-width:0!important}
-.mb-student-preview .mb-preview-pointer #pointerToggle{width:auto!important;min-width:110px!important;max-width:180px!important;white-space:nowrap!important;display:inline-flex!important;justify-content:center!important}
-.mb-student-preview .mb-preview-controls{flex:0 0 auto!important;max-width:100%!important}
-.mb-student-preview .mb-preview-pointer #pointerTools{width:max-content!important;max-width:min(680px,calc(100vw - 32px))!important;box-sizing:border-box!important}
