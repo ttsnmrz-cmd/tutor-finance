@@ -489,3 +489,68 @@ html[data-theme=dark] #teacher-app > .native-layout > .native-sidebar{background
  #teacher-app #dashboard-calendar .native-calendar-scroll{max-width:100%!important;overflow-x:hidden!important;overflow-y:auto!important}
  #teacher-app #dashboard-calendar .native-calendar-grid{min-width:0!important;width:100%!important;max-width:100%!important}
 }
+
+/* Unified neutral light theme and shared teacher/student shell. */
+html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view){
+  --bg-color:#F5F6F8;--card-bg:#FFFFFF;--text-color:#22252D;
+  --text-secondary:#6B7280;--primary-color:#4E2A84;
+  --accent-soft:#F0F1F4;--border-color:#E1E4E8;
+}
+html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view) :is(.app-card,.native-sidebar,.native-metric-strip>*,.student-theme-panel){
+  border-color:#E1E4E8!important;
+}
+html:not([data-theme="dark"]) #teacher-app #dashboard-cards>*{
+  border-color:#E1E4E8!important;border-radius:12px!important;background:#FFFFFF!important;
+}
+html:not([data-theme="dark"]) #teacher-app :is(.native-calendar-grid,.native-calendar-body,.native-calendar-time,.native-calendar-day,.native-calendar-column){
+  background-color:#F8F9FB!important;border-color:#E1E4E8!important;
+}
+html:not([data-theme="dark"]) #teacher-app :is(.native-calendar-header,.native-calendar-day-heading){
+  background-color:#FFFFFF!important;border-color:#E1E4E8!important;
+}
+html:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-sidebar){
+  border-radius:0!important;border-color:#E1E4E8!important;
+}
+html:not([data-theme="dark"]) #teacher-app :is(#tab-dashboard,#dashboard-calendar,.app-card){
+  border-radius:12px!important;
+}
+html:not([data-theme="dark"]) #teacher-app :is(button[data-native-tab],.native-sidebar-toggle,.native-calendar-controls button){
+  border-radius:10px!important;
+}
+/* The public portal must use the same fluid page width, sidebar and neutral
+   navigation surfaces as the teacher dashboard, including before hydration. */
+html:not([data-theme="dark"]) #student-public-view:not(.hidden){
+  max-width:none!important;width:100%!important;margin:0!important;
+  padding:12px!important;background:#F5F6F8!important;
+}
+html:not([data-theme="dark"]) #student-public-view:not(.hidden)>.app-card{
+  max-width:none!important;width:100%!important;margin:0!important;
+  padding:0!important;background:transparent!important;border:0!important;
+  box-shadow:none!important;border-radius:0!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-layout.native-layout{
+  grid-template-columns:186px minmax(0,1fr)!important;
+  gap:12px!important;max-width:none!important;width:100%!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-layout.sidebar-collapsed.native-layout{
+  grid-template-columns:70px minmax(0,1fr)!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.native-sidebar{
+  border-radius:0!important;background:#FFFFFF!important;border-color:#E1E4E8!important;
+  min-height:0!important;padding:10px 4px!important;margin:0!important;
+}
+html:not([data-theme="dark"]) #student-public-view .pp-student-layout>#student-public-content{
+  min-width:0!important;width:100%!important;max-width:none!important;
+  background:#FFFFFF!important;border-radius:12px!important;
+}
+html:not([data-theme="dark"]) #student-public-view :is(.student-portal-tabs,.student-theme-panel){
+  background:#F0F1F4!important;border-color:#E1E4E8!important;border-radius:10px!important;
+}
+html:not([data-theme="dark"]) #student-public-view .student-portal-tabs button.is-active{
+  background:#FFFFFF!important;color:#4E2A84!important;
+}
+@media(max-width:780px){
+  html:not([data-theme="dark"]) #student-public-view .pp-student-layout.native-layout{
+    grid-template-columns:70px minmax(0,1fr)!important;gap:10px!important;
+  }
+}
