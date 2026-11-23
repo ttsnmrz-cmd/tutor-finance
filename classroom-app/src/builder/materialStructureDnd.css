@@ -1,0 +1,40 @@
+/* Builder structure drag controls; scoped to avoid global ProfiProfit styles. */
+.mb-builder .mb-structure-heading .mb-add-section{
+ display:grid;place-items:center;width:32px;height:32px;min-height:32px;padding:0;
+ border:1px solid var(--line);border-radius:9px;background:var(--soft);color:var(--purple);
+ font-size:23px;line-height:1;font-weight:500;flex:none;
+}
+.mb-builder .mb-structure-heading .mb-add-section:hover,
+.mb-builder .mb-structure-heading .mb-add-section:focus-visible{border-color:var(--purple);background:var(--card)}
+.mb-builder .mb-structure .mb-drag{
+ flex:0 0 18px;width:18px;min-width:18px;min-height:30px;padding:0;
+ display:grid;place-items:center;cursor:grab;touch-action:none;
+ border:0;background:transparent;color:var(--muted);opacity:.55;
+}
+.mb-builder .mb-structure .mb-drag:hover,
+.mb-builder .mb-structure .mb-drag:focus-visible{opacity:1;color:var(--purple)}
+.mb-builder .mb-structure .mb-drag:active{cursor:grabbing}
+.mb-builder .mb-structure-exercise{margin-left:12px}
+.mb-builder .mb-structure-exercise[data-drop-target="true"]{
+ outline:2px solid var(--purple);outline-offset:-1px;background:var(--soft);
+}
+.mb-builder .mb-section-row[data-drop-target="true"]{
+ outline:2px solid var(--purple);outline-offset:1px;
+}
+.mb-builder .mb-exercise-drop-end,
+.mb-builder .mb-section-drop-end{
+ border:1px dashed var(--line);border-radius:9px;color:var(--muted);
+ padding:9px 8px;margin:5px 4px 7px 30px;font-size:12px;text-align:center;
+}
+.mb-builder .mb-exercise-drop-end[data-drop-target="true"],
+.mb-builder .mb-section-drop-end[data-drop-target="true"]{
+ border-color:var(--purple);background:var(--soft);color:var(--purple);
+}
+.mb-builder .mb-section-drop-end{margin-left:4px}
+.mb-builder .mb-add-section-footer{
+ display:block;width:calc(100% - 8px);margin:8px 4px 2px;padding:9px;
+ border:1px dashed var(--line);border-radius:9px;background:transparent;
+ color:var(--purple);font-size:12px;text-align:center;
+}
+.mb-builder .mb-add-section-footer:hover,
+.mb-builder .mb-add-section-footer:focus-visible{border-color:var(--purple);background:var(--soft)}
