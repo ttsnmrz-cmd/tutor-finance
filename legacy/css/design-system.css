@@ -1,0 +1,55 @@
+/* ProfiProfit shared dashboard design system — teacher and student only.
+   Classroom editor, modals, landing and lesson exercises are intentionally excluded. */
+:root {
+  --pp-ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --pp-ui-radius-header: 26px;
+  --pp-ui-radius-panel: 24px;
+  --pp-ui-radius-card: 16px;
+  --pp-ui-radius-control: 12px;
+  --pp-ui-gap: 16px;
+}
+#teacher-app, #student-public-view.pp-student-one-page {
+  font-family: var(--pp-ui-font);
+}
+:is(#teacher-app #teacher-header.app-header, #student-public-view .app-header.student-brand-header) {
+  border-radius: var(--pp-ui-radius-header) !important;
+  margin-bottom: var(--pp-ui-gap) !important;
+}
+:is(#teacher-app #teacher-header.app-header, #student-public-view .app-header.student-brand-header)
+.app-header-brand .text-2xl {
+  font-family: var(--pp-ui-font) !important;
+}
+/* Actual production DOM: .native-layout is a DIRECT child of #teacher-app.
+   .native-workspace wraps the header only. */
+#teacher-app > .native-layout {
+  margin: 0 !important;
+  padding: 0 12px !important;
+  align-items: start !important;
+  box-sizing: border-box !important;
+}
+#teacher-app > .native-layout > .native-sidebar {
+  margin: 0 !important;
+  border-radius: var(--pp-ui-radius-card) !important;
+}
+#teacher-app #tab-dashboard {
+  border-radius: var(--pp-ui-radius-panel) !important;
+}
+#teacher-app #dashboard-cards > * {
+  border-radius: var(--pp-ui-radius-card) !important;
+}
+#teacher-app #tab-dashboard :is(.native-calendar-controls button, .native-calendar-title button) {
+  border-radius: var(--pp-ui-radius-control) !important;
+}
+@media (min-width: 701px) {
+  #teacher-app > .native-layout {
+    display: grid !important;
+    grid-template-columns: 70px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+  #teacher-app > .native-layout > #teacher-main {
+    margin: 0 !important;
+    min-width: 0 !important;
+  }
+}
