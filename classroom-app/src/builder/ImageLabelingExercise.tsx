@@ -10,7 +10,7 @@ const zoneShape=(z:LabelZone)=>z.shape||'oval';
 const clamp=(v:number)=>Math.max(0,Math.min(100,v));
 function Picture({scope,image}:{scope:string;image?:GalleryImage}){
  const [src,setSrc]=useState(''),[error,setError]=useState('');
- useEffect(()=>{let url='',active=true,revoke:(()=>void)|undefined;setSrc('');setError('');if(image)void classroomImageUrl(image,scope).then(result=>{if(!active){result.revoke?.();return;}url=result.src;revoke=result.revoke;setSrc(url);}).catch(e=>{if(active)setError((e as Error).message);});return()=>{active=false;revoke?.();};},[scope,image?.id]);
+ useEffect(()=>{let url='',active=true,revoke:(()=>void)|undefined;setSrc('');setError('');if(image)void classroomImageUrl(image,scope).then(result=>{if(!active){result.revoke?.();return;}url=result.src;revoke=result.revoke;setSrc(url);}).catch(e=>{if(active)setError(image?.storagePath?'This image requires student access to the teacher’s image storage. The lesson is connected, but image access is not yet configured.':(e as Error).message);});return()=>{active=false;revoke?.();};},[scope,image?.id]);
  return error?<p role="alert">{error}</p>:src?<img src={src} alt={image?.caption||'Labeling exercise'} draggable={false}/>:<div className="mb-image-label-empty">{image?'Loading image…':'Upload an image to start'}</div>;
 }
 export function ImageLabelingEditor({block,onChange,scope}:{block:Block;onChange:(b:Block)=>void;scope:string}){
