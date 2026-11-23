@@ -14,6 +14,7 @@ function Picture({scope,image}:{scope:string;image?:GalleryImage}){
 }
 export function ImageLabelingEditor({block,onChange,scope}:{block:Block;onChange:(b:Block)=>void;scope:string}){
  const b=data(block),zones=b.labelZones||[],input=useRef<HTMLInputElement>(null),stage=useRef<HTMLDivElement>(null),start=useRef<{x:number;y:number}|null>(null),[draft,setDraft]=useState<LabelZone|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const [newShape,setNewShape]=useState<'rectangle'|'oval'>('oval');
  const patch=(p:Partial<LabelBlock>)=>onChange({...b,...p} as Block);
  function point(e:React.PointerEvent){const rect=stage.current!.getBoundingClientRect();return {x:clamp((e.clientX-rect.left)/rect.width*100),y:clamp((e.clientY-rect.top)/rect.height*100)};}
  async function upload(file?:File){if(!file)return;setBusy(true);setError('');try{const image=await uploadClassroomImage(file);patch({labelImage:image});}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
