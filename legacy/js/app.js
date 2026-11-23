@@ -1963,27 +1963,13 @@ function showPublicLessonMaterial(data){
  layout.append(studentPortalSidebar(backTo));
  const main=document.createElement('main');main.className='pp-student-live-main';
  const back=document.createElement('button');back.textContent='← Back to dashboard';back.style.cssText='padding:8px 12px;border-radius:10px;background:#eee8f7;color:#4b287e;margin-bottom:12px';back.onclick=()=>backTo('dashboard');main.append(back);
- const tools=document.createElement('div');tools.className='pp-student-live-tools';
- const pointer=document.createElement('button');pointer.textContent='✎ Pointer';pointer.className='pp-student-sidebar-link';pointer.setAttribute('aria-pressed','false');
- const clear=document.createElement('button');clear.textContent='Clear drawing';clear.className='pp-student-sidebar-link';
- const timer=document.createElement('span');timer.textContent='Timer 00:00';const timerButton=document.createElement('button');timerButton.textContent='Start';timerButton.className='pp-student-sidebar-link';
- let seconds=0,tick=null;timerButton.onclick=()=>{if(tick){clearInterval(tick);tick=null;timerButton.textContent='Start';return;}tick=setInterval(()=>{seconds++;timer.textContent='Timer '+String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');},1000);timerButton.textContent='Pause';};
- tools.append(pointer,clear,timer,timerButton);main.append(tools);
  const columns=document.createElement('div');columns.className='pp-student-live-content';
  const drawWrap=document.createElement('div');drawWrap.className='pp-student-pointer';
  const host=document.createElement('div');drawWrap.append(host);
- const canvas=document.createElement('canvas');drawWrap.append(canvas);
- let drawing=false;function resize(){const bounds=drawWrap.getBoundingClientRect();if(!bounds.width||!bounds.height)return;const image=canvas.width?canvas.toDataURL():null;canvas.width=Math.round(bounds.width);canvas.height=Math.round(bounds.height);if(image){const img=new Image();img.onload=()=>canvas.getContext('2d').drawImage(img,0,0);img.src=image;}}
- pointer.onclick=()=>{drawWrap.classList.toggle('drawing');pointer.setAttribute('aria-pressed',String(drawWrap.classList.contains('drawing')));resize();};
- clear.onclick=()=>canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
- canvas.onpointerdown=e=>{drawing=true;canvas.setPointerCapture(e.pointerId);const rect=canvas.getBoundingClientRect(),ctx=canvas.getContext('2d');ctx.strokeStyle='#6b40a4';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(e.clientX-rect.left,e.clientY-rect.top);};
- canvas.onpointermove=e=>{if(!drawing)return;const rect=canvas.getBoundingClientRect(),ctx=canvas.getContext('2d');ctx.lineTo(e.clientX-rect.left,e.clientY-rect.top);ctx.stroke();};
- canvas.onpointerup=()=>{drawing=false;};
  const notes=document.createElement('aside');notes.className='pp-student-live-notes';const notesTitle=document.createElement('h3');notesTitle.textContent='▤ Live Notes';notesTitle.style.cssText='font-weight:700;margin-bottom:12px';
  const noteArea=document.createElement('textarea');noteArea.placeholder='Teacher notes will appear here when live sharing is enabled.';noteArea.readOnly=true;notes.append(notesTitle,noteArea);
  columns.append(drawWrap,notes);main.append(columns);layout.append(main);overlay.append(layout);
- const observer=new ResizeObserver(()=>resize());observer.observe(drawWrap);
- const cleanup=()=>{observer.disconnect();if(tick)clearInterval(tick);};back.addEventListener('click',cleanup);
+ const cleanup=()=>{};back.addEventListener('click',cleanup);
  layout.querySelectorAll('.pp-student-sidebar-link[data-student-tab]').forEach(b=>b.addEventListener('click',cleanup));
  if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan);
  else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
