@@ -12,11 +12,6 @@
 <style id="classroom-heading-cleanup">#tab-materials>.native-page-heading{display:none}#classroom-materials-root .ml-breadcrumbs:not(:has(span)){visibility:hidden}</style>
 <style id="classroom-modal-host-fix">dialog.ml-dialog[open]{position:fixed!important;inset:0!important;margin:auto!important;box-sizing:border-box!important;width:min(480px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;max-height:85dvh!important;padding:24px!important;background:#fff!important;color:#302a40!important;border:1px solid #ded8e7!important;border-radius:18px!important;box-shadow:0 24px 80px #21163144!important;overflow:auto!important;z-index:2147483647!important;transform:none!important}dialog.ml-dialog::backdrop{background:rgba(25,20,40,.52)!important}dialog.ml-dialog form{display:grid!important;gap:12px!important;margin:16px 0 0!important}dialog.ml-dialog input{display:block!important;width:100%!important;min-height:42px!important;padding:9px 12px!important;border:1px solid #d9d2e3!important;border-radius:9px!important}dialog.ml-dialog .ml-dialog-actions{display:flex!important;justify-content:flex-end!important;gap:10px!important;margin-top:12px!important}dialog.ml-dialog .ml-dialog-actions button{padding:8px 16px!important;border-radius:9px!important}</style>
 <style>.student-portal-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 24px;padding:5px;background:#f0eef5;border-radius:14px}.student-portal-tabs button{flex:1;min-width:90px;border-radius:10px;padding:10px 14px;font-weight:650;color:#615878}.student-portal-tabs button.is-active{background:#fff;color:#4b287e;box-shadow:0 1px 6px #21163118}.student-calendar-compact .calendar-day-column{min-width:0;padding:8px}.student-calendar-compact .calendar-day-heading{padding:4px}.student-calendar-compact .calendar-event-card{padding:8px;cursor:pointer}.student-calendar-compact .calendar-event-meta{display:none}.student-calendar-compact .calendar-event-title{font-size:12px}.student-calendar-compact .calendar-day-events{min-height:68px}.student-portal-panel.hidden{display:none!important}@media(max-width:680px){.student-calendar-compact{overflow-x:auto;display:flex!important}.student-calendar-compact .calendar-day-column{min-width:116px}}</style><style>
-/* Public portal branding uses the teacher's horizontal logo/title arrangement. */
-#student-public-view .student-brand-header{display:flex!important;flex-direction:row!important;align-items:center!important;gap:12px!important;padding:16px!important;margin:0 0 12px!important;border:1px solid #E1E4E8!important;border-radius:12px!important;background:#fff!important;box-shadow:none!important}
-#student-public-view .student-brand-header>img{width:64px!important;height:64px!important;flex:0 0 64px!important;object-fit:contain!important}
-#student-public-view .student-brand-title{font-size:24px!important;line-height:1.2!important;font-weight:750!important;color:#3B1764!important}
-#student-public-view .student-brand-header p{margin:3px 0 0!important;color:#818096!important}
 #student-public-view{padding-top:12px!important}
 #student-public-view .student-portal-tabs{margin-bottom:14px}
 #student-public-view #student-public-content{margin-top:10px}
@@ -39,10 +34,7 @@
 <body class="text-slate-800 min-h-screen">
 <div id="student-public-view" class="hidden max-w-3xl mx-auto p-4">
 <div class="app-card rounded-3xl p-5 md:p-6">
-<header class="student-brand-header app-card flex items-center gap-3">
-  <img src="/legacy/ProfoProfit_logo svg.svg" alt="" class="w-16 h-16 object-contain">
-  <div class="min-w-0"><div class="text-2xl font-bold student-brand-title">ProfiProfit</div><p class="text-sm text-slate-500">Lessons, students and payments</p></div>
-</header>
+<header class="student-brand-header" aria-label="ProfiProfit"></header>
 <div id="student-public-login"><p id="student-public-name" class="mb-3"></p><p id="student-public-error" class="text-sm text-red-600 mt-2"></p></div>
 <div id="student-public-content" class="hidden">
 <nav class="student-portal-tabs" aria-label="Student portal"><button type="button" class="is-active" data-student-tab="dashboard" onclick="switchPublicStudentTab('dashboard')">Dashboard</button><button type="button" data-student-tab="lessons" onclick="switchPublicStudentTab('lessons')">Lessons</button><button type="button" data-student-tab="finances" onclick="switchPublicStudentTab('finances')">Finances</button></nav>
