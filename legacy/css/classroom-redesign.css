@@ -760,3 +760,44 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
  #student-public-view .student-brand-header[data-shared-header="1"]{flex-wrap:wrap!important}
  #student-public-view .pp-student-header-actions{margin-left:auto}
 }
+
+/* Live lesson uses the same shell as the single-page student dashboard. */
+#student-live-material{background:#f4f5f7!important;padding:12px!important;box-sizing:border-box!important}
+#student-live-material .pp-student-live-header.student-brand-header{
+ width:100%!important;box-sizing:border-box!important;min-height:0!important;
+ margin:0 0 12px!important;padding:10px 18px!important;
+ border:1px solid #e0e3e9!important;border-radius:22px!important;
+ background:#fff!important;display:flex!important;align-items:center!important;
+ justify-content:space-between!important;gap:16px!important;
+}
+#student-live-material .pp-student-live-header.student-brand-header>button:first-child{
+ display:flex!important;align-items:center!important;gap:12px!important;
+ padding:0!important;background:transparent!important;border:0!important;
+ box-shadow:none!important;cursor:default!important;
+}
+#student-live-material .pp-student-live-header.student-brand-header>button:first-child img{
+ width:50px!important;height:50px!important;max-width:50px!important;object-fit:contain!important;
+}
+#student-live-material .pp-student-live-header.student-brand-header>button:first-child .text-2xl{
+ font-size:21px!important;letter-spacing:-.045em!important;line-height:1.2!important;color:#1f242d!important;
+}
+#student-live-material .pp-student-live-header.student-brand-header>button:first-child .text-sm{
+ font-size:11px!important;line-height:1.35!important;color:#6b7280!important;
+}
+#student-live-material .pp-student-header-actions{display:flex;align-items:center;gap:10px;margin-left:auto}
+#student-live-material .pp-student-header-balance{display:flex!important;align-items:center;gap:8px;padding:7px 12px!important;background:#f4f5f7!important;border-radius:12px!important}
+#student-live-material .pp-student-header-balance b{margin:0!important}
+#student-live-material .pp-student-theme-toggle{width:38px;height:38px;border:1px solid #e1e4e8;border-radius:12px;background:#f4f5f7;font-size:23px}
+#student-live-material .pp-student-return{padding:9px 12px;border:1px solid #e1e4e8;border-radius:12px;background:#fff;color:#382b4c;font-size:13px;white-space:nowrap}
+#student-live-material .pp-student-live-layout.pp-student-live-one-page{
+ display:block!important;width:100%!important;max-width:none!important;
+ margin:0!important;padding:0!important;min-height:0!important;
+}
+#student-live-material .pp-student-live-one-page .pp-student-live-main{
+ width:100%!important;min-height:calc(100vh - 135px)!important;
+ border-radius:21px!important;background:#fff!important;padding:16px!important;
+}
+@media(max-width:700px){
+ #student-live-material .pp-student-live-header.student-brand-header{flex-wrap:wrap!important}
+ #student-live-material .pp-student-header-actions{flex-wrap:wrap;justify-content:flex-end}
+}
