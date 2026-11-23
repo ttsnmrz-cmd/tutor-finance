@@ -50,5 +50,6 @@ jobs:
           git add index.html 404.html
           if ! git diff --cached --quiet; then
             git commit -m 'build: stage verified Classroom bundle'
+            git pull --rebase origin ${{ github.ref_name }}
             git push origin HEAD:${{ github.ref_name }}
           fi
