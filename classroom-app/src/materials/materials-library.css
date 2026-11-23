@@ -343,3 +343,8 @@ dialog.ml-dialog .ml-dialog-actions .primary{background:#4E2A84!important;color:
 .local-materials-preview{--brand:#4E2A84;--accent:#D99B26;--primary-color:#4E2A84;--text-color:#1F242D;--text-secondary:#6B7280;--bg-color:#F4F5F7}
 .local-materials-preview .mb-builder button.primary,.local-materials-preview .mb-student-preview button.primary{background:#D99B26;color:#1F242D;border-color:#D99B26}
 .local-materials-preview .mb-builder button.primary:hover,.local-materials-preview .mb-student-preview button.primary:hover{background:#C88917;border-color:#C88917}
+
+/* Shared ProfiProfit palette, without affecting dark mode. */
+.local-materials-preview:not([data-theme="dark"]){--page:#F4F5F7;--card:#FFFFFF;--ink:#1F242D;--muted:#6B7280;--purple:#4E2A84;--soft:#F0F1F4;--line:#E0E3E9;--gold:#D99B26;background:#F4F5F7}
+:root:not([data-theme="dark"]) .local-materials-preview .desk-nav button[aria-current="page"]{background:#EAE5F2;color:#4E2A84}
+:root:not([data-theme="dark"]) .local-materials-preview .ml-folders,:root:not([data-theme="dark"]) .local-materials-preview .mb-structure{background:#FFFFFF}
