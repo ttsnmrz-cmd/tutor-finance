@@ -21,6 +21,27 @@ jobs:
           node-version: '22'
       - run: corepack enable && corepack prepare pnpm@10.29.3 --activate
       - run: pnpm install --frozen-lockfile && pnpm build
+      - name: Verify shared teacher/student preview architecture
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          builder = Path('classroom-app/src/builder')
+          teacher = (builder / 'MaterialBuilder.tsx').read_text()
+          student = Path('classroom-app/src/embed.tsx').read_text()
+          preview = (builder / 'ExercisePreview.tsx').read_text()
+          layout = (builder / 'preview-layout.css').read_text()
+          assert "import './preview-shared.css'" in teacher
+          assert "import './preview-layout.css'" in teacher
+          assert 'ExercisePreview' in teacher and 'ExercisePreview' in student
+          assert 'studentMode' in student
+          assert 'className="mb-builder mb-student-preview"' in preview
+          for name in ('preview-shared.css', 'editor-and-role.css', 'builder.css'):
+              css = (builder / name).read_text()
+              assert '#student-live-material' not in css, f'Student-only preview override in {name}'
+              assert '.profiprofit-student-lesson' not in css, f'Student-only preview override in {name}'
+          assert layout.count('#student-live-material') == 1, 'Review new student-only preview rules'
+          print('Teacher and student share ExercisePreview and its CSS.')
+          PY
         working-directory: classroom-app
       - name: Confirm embedded assets
         run: |
