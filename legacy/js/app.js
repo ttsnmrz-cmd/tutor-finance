@@ -1996,6 +1996,24 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-menu select{border:0;background:#f2f0f5;border-radius:9px;padding:9px;color:#4b287e}
  #student-live-material .pp-student-profile-menu button{width:100%;text-align:left;margin:0;padding:13px 0;color:inherit;background:transparent;border:0}
  #student-live-material .pp-student-profile-button{display:grid;place-items:center}
+ /* Keep the student lesson aligned with the teacher's compact classroom layout. */
+ #student-live-material .pp-student-live-header{min-height:64px;padding:7px 18px}
+ #student-live-material .pp-student-live-header img{width:40px!important;height:40px!important}
+ #student-live-material .pp-student-live-layout{padding:10px;gap:10px}
+ #student-live-material .pp-student-live-main{padding:12px 16px}
+ #student-live-material .pp-student-live-content{gap:12px}
+ #student-live-material .mb-student-card{display:flex;flex-direction:column;min-height:calc(100vh - 155px)}
+ #student-live-material .mb-student-body{flex:1 1 auto}
+ #student-live-material .mb-preview-footer{margin-top:auto!important;flex-shrink:0}
+ #student-live-material .mb-student-check-row{display:flex;justify-content:flex-end;align-items:center;margin-top:auto}
+ #student-live-material .mb-student-check-row button,#student-live-material .mb-student-check{background:#eee8f7!important;color:#382064!important;border:1px solid #d9cce9!important;border-radius:10px!important;padding:10px 18px!important;font-weight:650!important}
+ #student-live-material .mb-preview-controls{margin:0 0 8px!important}
+ #student-live-material .mb-preview-heading-row{margin:0 0 8px!important}
+ #student-live-material .mb-preview-workspace{gap:8px!important}
+ #student-live-material #pointerTools select{color:#4b287e!important;background:#f4f0fa!important;border:1px solid #ded4ed!important;border-radius:8px!important;padding:8px!important;min-width:80px}
+ #student-live-material #pointerTools option{color:#282032;background:white}
+ #student-live-material #pointerTools{max-width:min(100%,680px)}
+ #student-live-material .mb-preview-timer button{display:none}
  #student-live-material{padding:0!important}
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#fff;border-bottom:1px solid #e9e3f1}
  #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
