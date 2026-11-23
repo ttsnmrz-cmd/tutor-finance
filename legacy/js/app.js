@@ -1949,6 +1949,28 @@ function syncStudentPortalHeader(){
  const subtitle=header.querySelector('.text-slate-500');
  if(subtitle)subtitle.textContent='Lessons, students and payments';
  old.replaceWith(header);
+ // Keep the balance in the shared header; the existing balance renderer updates
+ // the same #public-dashboard-balance node after it has been moved.
+ const dashboardBalance=document.getElementById('public-dashboard-balance');
+ const balanceCard=dashboardBalance?.closest('.student-theme-panel');
+ if(balanceCard){
+   balanceCard.classList.add('pp-student-header-balance');
+   const actions=document.createElement('div');
+   actions.className='pp-student-header-actions';
+   actions.append(balanceCard);
+   const theme=document.createElement('button');
+   theme.type='button';
+   theme.className='pp-student-theme-toggle';
+   theme.setAttribute('aria-label','Toggle theme');
+   theme.title='Toggle light / dark theme';
+   theme.textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾';
+   theme.addEventListener('click',()=>{
+     if(typeof toggleDarkMode==='function')toggleDarkMode();
+     theme.textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾';
+   });
+   actions.append(theme);
+   header.append(actions);
+ }
 }
 function ensureStudentPortalLayout(){
  const portal=document.getElementById('student-public-view');
