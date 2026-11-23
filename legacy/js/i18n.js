@@ -84,17 +84,19 @@
     });
     return result;
   }
+  function insideClassroom(node) { return !!(node?.nodeType === 1 ? node.closest?.('[data-classroom-root]') : node?.parentElement?.closest?.('[data-classroom-root]')); }
   function translateNode(node) {
-    if (!node || node.nodeType !== 1) return;
+    if (!node || node.nodeType !== 1 || insideClassroom(node)) return;
     const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
     const textNodes = [];
     while (walker.nextNode()) textNodes.push(walker.currentNode);
     textNodes.forEach(t => {
-      if (t.parentElement && ['SCRIPT','STYLE'].includes(t.parentElement.tagName)) return;
+      if (insideClassroom(t) || (t.parentElement && ['SCRIPT','STYLE'].includes(t.parentElement.tagName))) return;
       const next = translateText(t.nodeValue);
       if (next !== t.nodeValue) t.nodeValue = next;
     });
     node.querySelectorAll('input[placeholder],textarea[placeholder],[title],[aria-label]').forEach(el => {
+      if (insideClassroom(el)) return;
       ['placeholder','title','aria-label'].forEach(attr => {
         if (el.hasAttribute(attr)) el.setAttribute(attr, translateText(el.getAttribute(attr)));
       });
@@ -116,6 +118,7 @@
   function setLanguage(next) {
     language = next === 'en' ? 'en' : 'ru';
     localStorage.setItem(STORAGE_KEY, language);
+    window.dispatchEvent(new CustomEvent('profiprofit:language',{detail:{language}}));
     updateButtons();
     translateNode(document.body);
     if (typeof renderWeek === 'function') renderWeek();
@@ -135,13 +138,13 @@
     const observer = new MutationObserver(records => records.forEach(record => {
       if (record.type === 'childList') record.addedNodes.forEach(n => {
         if (n.nodeType === 1) translateNode(n);
-        else if (n.nodeType === 3) n.nodeValue = translateText(n.nodeValue);
+        else if (n.nodeType === 3 && !insideClassroom(n)) n.nodeValue = translateText(n.nodeValue);
       });
-      if (record.type === 'characterData') {
+      if (record.type === 'characterData' && !insideClassroom(record.target)) {
         const next = translateText(record.target.nodeValue);
         if (next !== record.target.nodeValue) record.target.nodeValue = next;
       }
-      if (record.type === 'attributes' && record.target.nodeType === 1) {
+      if (record.type === 'attributes' && record.target.nodeType === 1 && !insideClassroom(record.target)) {
         const el = record.target;
         ['placeholder','title','aria-label'].forEach(attr => {
           if (el.hasAttribute(attr)) {
