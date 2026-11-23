@@ -1980,13 +1980,16 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-menu button{width:100%;text-align:left;margin:0;padding:13px 0;color:inherit;background:transparent;border:0}
  #student-live-material .pp-student-profile-button{display:grid;place-items:center}
  /* Keep the student lesson aligned with the teacher's compact classroom layout. */
- #student-live-material .pp-student-live-header{min-height:64px;padding:7px 18px}
- #student-live-material .pp-student-live-header img{width:40px!important;height:40px!important}
+ #student-live-material .pp-student-live-header{min-height:78px!important;padding:14px 22px!important;gap:20px!important;background:#fff!important;border:1px solid #e0e3e9!important;border-radius:22px!important;box-shadow:0 12px 35px rgba(74,48,110,.055)!important;box-sizing:border-box!important}
+ #student-live-material .pp-student-live-header .pp-student-brand{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important;font-family:inherit!important;color:inherit!important;text-decoration:none!important}
+ #student-live-material .pp-student-live-header .pp-student-brand img{width:50px!important;height:50px!important;object-fit:contain!important;flex:none!important}
+ #student-live-material .pp-student-live-header .pp-student-brand .text-2xl{font-size:21px!important;font-weight:700!important;letter-spacing:-.045em!important;line-height:1.2!important;color:#1f242d!important}
+ #student-live-material .pp-student-live-header .pp-student-brand .text-sm{font-size:11px!important;font-weight:400!important;line-height:1.4!important;color:#6b7280!important}
  #student-live-material .pp-student-live-layout{padding:10px;gap:10px}
  #student-live-material .pp-student-live-main{padding:12px 16px}
  #student-live-material .pp-student-live-content{gap:12px}
  #student-live-material{padding:0!important}
- #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#fff;border-bottom:1px solid #e9e3f1}
+ #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between}
  #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
  #student-live-material .pp-student-live-main{min-width:0;flex:1}
  #student-live-material .pp-student-live-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,27%);gap:14px}
