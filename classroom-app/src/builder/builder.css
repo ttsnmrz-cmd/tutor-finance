@@ -389,3 +389,7 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder.mb-student-preview .mb-choice-student-question{padding:12px 0 8px;border-radius:16px}
 .mb-builder.mb-student-preview .mb-choice-answer.mb-teacher-correct-option{background:#E6F7EC;border-color:#90D4A7;outline:2px solid #26965B;outline-offset:0;color:#17653A}
 @container builder (max-width:620px){.mb-builder.mb-student-preview{padding:12px}.mb-builder.mb-student-preview .mb-preview-top{margin-bottom:14px}.mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding:18px 16px}}
+
+/* Prevent preview's rounded background from protruding behind the page shell. */
+.mb-builder.mb-student-preview{background:transparent!important;border-radius:0!important;padding-top:0!important}
+.mb-builder.mb-student-preview .mb-preview-top{background:transparent!important}
