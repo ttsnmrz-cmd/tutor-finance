@@ -47,6 +47,6 @@ export function ExerciseEditor({block,onChange,onSave,saveStatus,assetScope='',c
    </div>)}
    <button onClick={()=>patch({items:[...block.items,{prompt:'',...(block.type==='true_false'?{options:['True','False']}:{} )}]})}>+ {ui('Add item')}</button>
   </div>}
-  <div className="mb-editor-footer"><span role="status">{ui(saveStatus)}</span><button className="primary" aria-label={ui('Save')} onClick={onSave}>✓ {ui('Save')}</button></div>
+  
  </section>;
 }
