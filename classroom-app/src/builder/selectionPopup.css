@@ -1,0 +1,51 @@
+/* SelectionPopup is portaled to document.body, outside .mb-builder.
+   Isolate it from the host site's global form and surface styles. */
+.mb-selection-popup{
+ box-sizing:border-box;
+ background:#fffefa !important;
+ color:#393247 !important;
+ opacity:1 !important;
+ isolation:isolate;
+ border:1px solid #ded6e8;
+ border-radius:12px;
+ box-shadow:0 12px 38px #20113036;
+ font-family:inherit;
+ font-size:14px;
+ line-height:1.4;
+}
+:root[data-theme="dark"] .mb-selection-popup{
+ background:#292431 !important;
+ color:#f4eef8 !important;
+ border-color:#54465f;
+}
+.mb-selection-popup *, .mb-selection-popup *::before,.mb-selection-popup *::after{box-sizing:border-box}
+.mb-selection-popup .mb-inline-form{width:min(360px,calc(100vw - 48px));max-height:min(65dvh,520px);overflow:auto;padding:8px;font-size:14px}
+.mb-selection-popup .mb-inline-form>strong{display:block;margin:0 0 10px;font-size:16px}
+.mb-selection-popup .mb-inline-option-row{display:grid;grid-template-columns:20px minmax(0,1fr) 28px;gap:7px;align-items:center;margin:7px 0}
+.mb-selection-popup .mb-inline-option-row input[type="radio"]{
+ appearance:auto !important;width:18px !important;height:18px !important;
+ min-width:18px !important;margin:0 !important;padding:0 !important;
+ accent-color:#74539b;
+}
+.mb-selection-popup .mb-inline-option-row input:not([type="radio"]){
+ display:block;width:100% !important;min-width:0 !important;max-width:100%;
+ min-height:36px !important;margin:0 !important;padding:7px 9px !important;
+ border:1px solid #ded6e8 !important;border-radius:8px !important;
+ background:#fff !important;color:#393247 !important;
+ font:inherit !important;font-size:14px !important;
+}
+:root[data-theme="dark"] .mb-selection-popup .mb-inline-option-row input:not([type="radio"]){
+ background:#211c29 !important;color:#f4eef8 !important;border-color:#54465f !important;
+}
+.mb-selection-popup button{
+ min-height:32px !important;margin:0;padding:5px 9px !important;
+ border:0;border-radius:8px;background:transparent;
+ color:inherit;font:inherit;font-size:13px !important;cursor:pointer;
+}
+.mb-selection-popup button:hover{background:#f0eaf6}
+:root[data-theme="dark"] .mb-selection-popup button:hover{background:#40334b}
+.mb-selection-popup .mb-inline-option-row button{font-size:19px !important;padding:0 !important}
+.mb-selection-popup .mb-inline-form-actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap;margin-top:12px}
+.mb-selection-popup .mb-inline-form-actions button.primary{
+ background:#74539b !important;color:#fff !important;padding:7px 12px !important;
+}
