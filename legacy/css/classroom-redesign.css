@@ -460,3 +460,7 @@ html:not([data-theme="dark"]) #teacher-app .native-sidebar button.is-active{back
 html:not([data-theme="dark"]) #teacher-app .native-sidebar,html:not([data-theme="dark"]) #teacher-header{background:#FFFFFF!important;border-color:#E0E3E9!important}
 html:not([data-theme="dark"]) #teacher-app .primary-btn,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]{background:#D99B26!important;color:#1F242D!important;border-color:#D99B26!important}
 html:not([data-theme="dark"]) #teacher-app .primary-btn:hover,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]:hover{background:#C48918!important}
+
+/* Unified brand: calmer plum instead of bright violet. */
+html:not([data-theme="dark"]) #teacher-app .native-workspace>header button[title="На главную"] span.block.text-2xl,
+html:not([data-theme="dark"]) #teacher-header>button:first-child .text-2xl{color:#3B1764!important}
