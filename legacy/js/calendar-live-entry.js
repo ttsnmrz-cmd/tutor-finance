@@ -47,6 +47,8 @@ window.confirmCalendarLiveSession=async function(){
   const plan=select.value||null,versions=JSON.parse(picker.dataset.versions||'{}');
   const {data,error}=await supabaseClient.rpc('open_calendar_live_session',{p_calendar_lesson_id:Number(id),p_material_plan_id:plan,p_material_version_id:plan?(versions[plan]||null):null});
   if(error)throw error;
+  const started=await supabaseClient.rpc('start_calendar_live_session',{p_session_id:data});
+  if(started.error)throw started.error;
   picker.classList.add('hidden');
   const {data:session,error:sessionError}=await supabaseClient.from('live_sessions').select('material_plan_id').eq('id',data).single();
   if(sessionError)throw sessionError;
