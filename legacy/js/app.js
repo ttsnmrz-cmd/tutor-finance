@@ -1883,12 +1883,44 @@ function switchPublicStudentTab(tab){
  document.querySelectorAll('[data-student-tab]').forEach(b=>b.classList.toggle('is-active',b.dataset.studentTab===tab));
  ['dashboard','lessons','finances'].forEach(t=>document.getElementById('student-portal-'+t)?.classList.toggle('hidden',t!==tab));
 }
-function openPublicCalendarLesson(index){
+async function openPublicCalendarLesson(index){
  const l=publicStudentCalendarLessons[index];
  if(!l||['cancelled_free','cancelled_charge','rescheduled'].includes(l.status))return;
+ const live=publicStudentLiveStatuses.get(String(l.id));
+ if(!live?.has_material){window.alert('Please wait until your teacher assigns a material to this lesson.');return;}
+ if(live.status!=='active'){window.alert(live.status==='completed'?'This lesson has ended.':'Your teacher has not started this lesson yet.');return;}
  if(!window.confirm('Join this lesson?\\n'+l.date+' · '+displayTime(l.time)))return;
- window.alert('Please wait until your teacher assigns a material to this lesson.');
+ const studentId=new URLSearchParams(location.search).get('student');
+ try{
+  const {data,error}=await supabaseClient.rpc('get_public_student_lesson_material',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});
+  if(error)throw error;
+  if(!data?.plan)throw Error('Lesson material is not available.');
+  showPublicLessonMaterial(data);
+ }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
+function showPublicLessonMaterial(data){
+ let overlay=document.getElementById('student-live-material');
+ if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f8f7fb;overflow:auto;padding:24px';document.body.append(overlay);}
+ overlay.replaceChildren();
+ const wrap=document.createElement('main');wrap.style.cssText='max-width:920px;margin:auto;background:white;border-radius:18px;padding:24px;box-shadow:0 4px 24px #21163115';
+ const back=document.createElement('button');back.textContent='← Back to dashboard';back.style.cssText='padding:9px 14px;border-radius:10px;background:#eee8f7;color:#4b287e;margin-bottom:18px';back.onclick=()=>overlay.remove();wrap.append(back);
+ const title=document.createElement('h1');title.textContent=data.title||data.plan.title||'Lesson';title.style.cssText='font-size:28px;font-weight:700;margin-bottom:22px';wrap.append(title);
+ const stages=Array.isArray(data.plan.stages)?data.plan.stages:[];
+ for(const stage of stages){
+  const blocks=(data.plan.blocks||[]).filter(b=>b.stage===stage.id&&!b.hiddenFromStudent);
+  if(!blocks.length)continue;
+  const heading=document.createElement('h2');heading.textContent=stage.name||'Section';heading.style.cssText='font-size:20px;font-weight:650;margin:24px 0 12px';wrap.append(heading);
+  for(const block of blocks){
+   const card=document.createElement('section');card.style.cssText='border:1px solid #e5e0ed;border-radius:12px;padding:18px;margin-bottom:12px';
+   const name=document.createElement('h3');name.textContent=block.title||block.type;name.style.cssText='font-weight:650;font-size:17px;margin-bottom:8px';card.append(name);
+   for(const value of [block.instructions,block.content])if(value){const p=document.createElement('p');p.textContent=value;p.style.cssText='white-space:pre-wrap;margin:8px 0';card.append(p);}
+   for(const item of block.items||[]){const p=document.createElement('p');p.textContent=item.prompt||'';p.style.cssText='margin:10px 0';card.append(p);}
+   wrap.append(card);
+  }
+ }
+ overlay.append(wrap);
+}
+
 function renderPublicLessonsHistory(rows){
  const el=document.getElementById('public-lessons-history');if(!el)return;
  const past=rows.filter(l=>['conducted','completed'].includes(l.status)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
