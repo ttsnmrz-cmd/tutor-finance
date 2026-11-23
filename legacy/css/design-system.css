@@ -313,3 +313,23 @@ html:not([data-theme="dark"]) #teacher-app :is(.primary-btn,button[data-variant=
 #tab-dashboard>.grid>.app-card{min-height:200px;padding:22px!important}
 #tab-calendar>.app-card{padding:24px!important}
 #tab-students .app-card,#tab-materials .app-card{padding:22px!important}
+
+/* Shared light-theme semantic tokens, formerly declared in legacy CSS. */
+html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view){
+  --bg-color:#F5F6F8;--card-bg:#FFFFFF;--text-color:#22252D;
+  --text-secondary:#6B7280;--primary-color:#4E2A84;
+  --accent-soft:#F0F1F4;--border-color:#E1E4E8;
+}
+/* Role-independent component geometry wins over legacy theme-specific radii. */
+:is(#teacher-app #teacher-header.app-header,#student-public-view .app-header.student-brand-header){
+ border-radius:var(--pp-ui-radius-header)!important;
+}
+#teacher-app :is(#tab-dashboard,#dashboard-calendar){
+ border-radius:var(--pp-ui-radius-panel)!important;
+}
+#teacher-app #dashboard-cards>*{
+ border-radius:var(--pp-ui-radius-card)!important;
+}
+#teacher-app .native-layout>.native-sidebar{
+ border-radius:var(--pp-ui-radius-card)!important;
+}
