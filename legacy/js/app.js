@@ -1992,8 +1992,8 @@ function showPublicLessonMaterial(data){
  columns.append(drawWrap,notes);main.append(columns);layout.append(main);overlay.append(layout);
  const cleanup=()=>{};
  layout.querySelectorAll('.pp-student-native-sidebar [data-student-tab]').forEach(b=>b.addEventListener('click',cleanup));
- if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan);
- else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
+ if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);
+ else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
 }
 
 function renderPublicLessonsHistory(rows){
