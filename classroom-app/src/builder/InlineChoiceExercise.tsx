@@ -39,8 +39,29 @@ export function InlineChoiceEditor({block,onChange}:{block:Block;onChange:(b:Blo
  {form&&<SelectionPopup anchor={form.anchor} onDismiss={dismiss}><div className="mb-inline-form" role="dialog" aria-label={ui('Edit choices')}><strong>{ui('Options')}</strong>{form.options.map((option,index)=><div className="mb-inline-option-row" key={index}><input type="radio" name="inline-correct" aria-label={ui('Correct option')+' '+(index+1)} checked={form.correct===index} onChange={()=>setForm({...form,correct:index})}/><input autoFocus={index===1} aria-label={ui('Option')+' '+(index+1)} value={option} onChange={e=>setForm({...form,options:form.options.map((o,i)=>i===index?e.target.value:o)})}/><button disabled={form.options.length<=2} aria-label={ui('Delete option')+' '+(index+1)} onClick={()=>setForm({...form,options:form.options.filter((_,i)=>i!==index),correct:form.correct===index?-1:form.correct>index?form.correct-1:form.correct})}>×</button></div>)}<button onClick={()=>setForm({...form,options:[...form.options,'']})}>+ {ui('Add option')}</button>{error&&<p role="alert">{error}</p>}<div className="mb-inline-form-actions">{form.id&&<button onClick={()=>remove(form.id!)}>{ui('Remove choices')}</button>}<button className="primary" onClick={save}>{ui('Save choices')}</button></div></div></SelectionPopup>}
  </div>;
 }
+/** Shuffle only the displayed order. Stored options and answer indices stay unchanged. */
+function shuffledIndices(count:number):number[]{
+ const indices=Array.from({length:count},(_,i)=>i);
+ for(let i=indices.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [indices[i],indices[j]]=[indices[j],indices[i]];
+ }
+ return indices;
+}
 export function InlineChoicePreview({block}:{block:Block}){
- const [answers,setAnswers]=useState<Record<string,number>>({}),[checked,setChecked]=useState(false);const items=entries(block);
+ const [answers,setAnswers]=useState<Record<string,number>>({}),[checked,setChecked]=useState(false);
+ const items=entries(block);
+ // Stable while the student interacts; a new preview mount produces a new shuffle.
+ const order=useRef(new Map<string,{signature:string;indices:number[]}>());
+ const displayed=(item:InlineItem)=>{
+  const options=item.options||[];
+  const signature=JSON.stringify(options);
+  const cached=order.current.get(item.inlineChoiceId);
+  if(cached?.signature===signature)return cached.indices;
+  const indices=shuffledIndices(options.length);
+  order.current.set(item.inlineChoiceId,{signature,indices});
+  return indices;
+ };
  const ready=items.length>0&&items.every(i=>i.options?.length&&answerIndex(i)!==undefined);
- return <div className="mb-inline-preview"><div className="mb-inline-paragraph"><FormattedText text={block.content} html={formatOf(block,'content',block.content)} renderToken={id=>{const item=items.find(i=>i.inlineChoiceId===id);if(!item)return token(id);return <span className="mb-inline-group" role="group" aria-label={ui('Choose the correct option')+' '+(items.indexOf(item)+1)}>{(item.options||[]).map((o,index)=><Fragment key={index}>{index>0&&<span className="mb-inline-slash"> / </span>}<button aria-pressed={answers[id]===index} data-result={checked&&answers[id]===index?(index===answerIndex(item)?'correct':'incorrect'):undefined} onClick={()=>{setAnswers({...answers,[id]:index});setChecked(false);}}>{o}</button></Fragment>)}</span>;}}/></div><div className="mb-inline-check"><button className="primary" disabled={!ready} onClick={()=>setChecked(true)}>{ui('Check answers')}</button>{checked&&<span role="status">{items.filter(i=>answers[i.inlineChoiceId]===answerIndex(i)).length} / {items.length} {ui('correct')}</span>}</div></div>;
+ return <div className="mb-inline-preview"><div className="mb-inline-paragraph"><FormattedText text={block.content} html={formatOf(block,'content',block.content)} renderToken={id=>{const item=items.find(i=>i.inlineChoiceId===id);if(!item)return token(id);return <span className="mb-inline-group" role="group" aria-label={ui('Choose the correct option')+' '+(items.indexOf(item)+1)}>{displayed(item).map((originalIndex,position)=><Fragment key={originalIndex}>{position>0&&<span className="mb-inline-slash"> / </span>}<button aria-pressed={answers[id]===originalIndex} data-result={checked&&answers[id]===originalIndex?(originalIndex===answerIndex(item)?'correct':'incorrect'):undefined} onClick={()=>{setAnswers({...answers,[id]:originalIndex});setChecked(false);}}>{item.options?.[originalIndex]}</button></Fragment>)}</span>;}}/></div><div className="mb-inline-check"><button className="primary" disabled={!ready} onClick={()=>setChecked(true)}>{ui('Check answers')}</button>{checked&&<span role="status">{items.filter(i=>answers[i.inlineChoiceId]===answerIndex(i)).length} / {items.length} {ui('correct')}</span>}</div></div>;
 }
