@@ -30,10 +30,14 @@ export function moveExercise(plan:Plan,id:string,stage:string,before?:string):Pl
  else{for(let i=blocks.length-1;i>=0;i--)if(blocks[i].stage===stage){index=i+1;break;}}
  blocks.splice(index,0,{...block,stage});return {...plan,blocks};
 }
-export function reorderSection(plan:Plan,id:string,before:string):Plan{
- if(id===before)return plan;const section=plan.stages.find(s=>s.id===id);
- const stages=plan.stages.filter(s=>s.id!==id),index=stages.findIndex(s=>s.id===before);
- if(!section||index<0)throw Error('Invalid move destination.');stages.splice(index,0,section);return {...plan,stages};
+export function reorderSection(plan:Plan,id:string,before?:string):Plan{
+ if(id===before)return plan;
+ const section=plan.stages.find(s=>s.id===id);
+ const stages=plan.stages.filter(s=>s.id!==id);
+ const index=before?stages.findIndex(s=>s.id===before):stages.length;
+ if(!section||index<0)throw Error('Invalid move destination.');
+ stages.splice(index,0,section);
+ return {...plan,stages};
 }
 export function deleteExercise(plan:Plan,id:string):Plan{
  if(!plan.blocks.some(b=>b.id===id))throw Error('Exercise not found.');
