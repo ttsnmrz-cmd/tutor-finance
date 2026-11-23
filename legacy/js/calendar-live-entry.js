@@ -48,8 +48,17 @@ window.confirmCalendarLiveSession=async function(){
   const {data,error}=await supabaseClient.rpc('open_calendar_live_session',{p_calendar_lesson_id:Number(id),p_material_plan_id:plan,p_material_version_id:plan?(versions[plan]||null):null});
   if(error)throw error;
   picker.classList.add('hidden');
-  const notice='Сессия занятия готова (ID: '+data+'). Подключение Live Workspace — следующий этап.';
-  window.alert(notice);
+  const {data:session,error:sessionError}=await supabaseClient.from('live_sessions').select('material_plan_id').eq('id',data).single();
+  if(sessionError)throw sessionError;
+  const materialId=session?.material_plan_id||plan;
+  if(materialId){
+   sessionStorage.setItem('profiprofit:pending-live-material',JSON.stringify({sessionId:data,materialId}));
+   if(typeof switchTab==='function')switchTab('materials');
+   window.dispatchEvent(new CustomEvent('profiprofit:open-live-material',{detail:{sessionId:data,materialId}}));
+  }else{
+   status.textContent='Сессия создана. Выберите материал, чтобы открыть его в ProfiProfit.';
+   picker.classList.remove('hidden');
+  }
  }catch(e){status.textContent='Не удалось открыть сессию: '+(e.message||e);}
  finally{pending=false;confirm.disabled=false;}
 };
