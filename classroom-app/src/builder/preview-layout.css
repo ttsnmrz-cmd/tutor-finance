@@ -347,3 +347,41 @@
 .mb-builder.mb-student-preview input[type="checkbox"]:focus-visible{
  outline:2px solid #4e2a84!important;outline-offset:3px!important;
 }
+
+/* Shared heading row: title wraps; Pointer sits beside it for both roles.
+   Flatten only toolbar layout wrappers; retain their React ownership and behavior. */
+.mb-builder.mb-student-preview .mb-preview-top{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+ grid-template-rows:auto auto!important;column-gap:14px!important;row-gap:8px!important;
+ align-items:center!important;min-height:0!important;
+}
+.mb-builder.mb-student-preview .mb-preview-heading-row,
+.mb-builder.mb-student-preview .mb-preview-tools-row,
+.mb-builder.mb-student-preview .mb-preview-tools-row>.mb-preview-controls{
+ display:contents!important;
+}
+.mb-builder.mb-student-preview .mb-preview-heading-row>h1{
+ grid-column:1!important;grid-row:1!important;min-width:0!important;
+ white-space:normal!important;overflow-wrap:anywhere!important;
+ height:auto!important;min-height:0!important;align-self:center!important;
+}
+.mb-builder.mb-student-preview .mb-preview-tools-row .mb-preview-pointer{
+ grid-column:2!important;grid-row:1!important;justify-self:end!important;
+}
+.mb-builder.mb-student-preview .mb-preview-heading-row>.mb-preview-back{
+ grid-column:2!important;grid-row:2!important;justify-self:end!important;
+}
+.mb-builder.mb-student-preview .mb-preview-tools-row>.mb-teacher-hints-toggle{
+ grid-column:1!important;grid-row:2!important;justify-self:start!important;
+}
+.mb-builder.mb-student-preview .mb-preview-tools-row .mb-preview-controls>button,
+.mb-builder.mb-student-preview .mb-preview-tools-row .mb-preview-timer{
+ grid-row:2!important;
+}
+.mb-builder.mb-student-preview .mb-preview-tools-row .mb-preview-controls>button{
+ justify-self:end!important;
+}
+@media(max-width:700px){
+ .mb-builder.mb-student-preview .mb-preview-top{column-gap:8px!important}
+ .mb-builder.mb-student-preview .mb-preview-heading-row>h1{font-size:20px!important}
+}
