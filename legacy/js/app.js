@@ -1903,10 +1903,11 @@ async function openPublicCalendarLesson(index){
 function studentPortalSidebar(onNavigate){
  // Clone the actual teacher workspace navigation, rather than recreating it.
  const original=document.querySelector('#teacher-app .native-sidebar');
- const nav=original?original.cloneNode(true):document.createElement('aside');
+ if(!original)throw new Error('Teacher sidebar component is unavailable');
+ const nav=original.cloneNode(true);
  nav.className='native-sidebar pp-student-native-sidebar';
  // Same toggle icon and visual states as the teacher sidebar; only navigation targets differ.
- const teacherToggle=original?.querySelector('.native-sidebar-toggle');
+ const teacherToggle=original.querySelector('.native-sidebar-toggle');
  const studentToggle=nav.querySelector('.native-sidebar-toggle');
  if(teacherToggle&&studentToggle)studentToggle.innerHTML=teacherToggle.innerHTML;
  nav.setAttribute('aria-label','Student navigation');
@@ -1918,6 +1919,7 @@ function studentPortalSidebar(onNavigate){
  buttons.forEach((button,i)=>{
   if(!items[i]){button.remove();return;}
   const [tab,title]=items[i];button.dataset.studentTab=tab;button.removeAttribute('data-native-tab');
+  button.classList.toggle('is-active',tab==='dashboard');
   const caption=button.querySelector('.native-nav-text');if(caption)caption.textContent=title;
   button.title=title;button.onclick=()=>onNavigate(tab);
  });
@@ -1943,24 +1945,15 @@ function ensureStudentPortalLayout(){
  #student-public-view>.app-card{max-width:none!important}
  .pp-student-layout{align-items:start}
  .pp-student-layout>#student-public-content{flex:1;min-width:0}
- .pp-student-sidebar{width:174px;flex:none;background:#fff;border:1px solid #e9e3f1;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;transition:width .2s}
- .pp-student-sidebar.collapsed{width:58px}
- .pp-student-sidebar-toggle,.pp-student-sidebar-link{border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px;color:#4b287e;white-space:nowrap;text-align:left}
- .pp-student-sidebar-toggle{font-size:20px}
- .pp-student-sidebar-link:hover,.pp-student-sidebar-link.is-active{background:#eee8f7}
- .pp-student-sidebar-icon{width:22px;flex:none;text-align:center;font-size:22px}
- .pp-student-sidebar.collapsed .pp-student-sidebar-label{display:none}
-
- /* The teacher's .native-sidebar is the shared component/style source. */
- .pp-student-layout.native-layout,.pp-student-live-layout.native-layout{display:grid!important;grid-template-columns:206px minmax(0,1fr)!important;align-items:start!important;gap:22px!important}
- .pp-student-native-sidebar.native-sidebar{width:auto!important;min-width:0!important;flex:none!important;align-self:start!important}
- .pp-student-layout.sidebar-collapsed.native-layout,.pp-student-live-layout.sidebar-collapsed.native-layout{grid-template-columns:76px minmax(0,1fr)!important}
- .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer{display:none!important}
- .pp-student-native-sidebar [data-student-tab].is-active{background:#eee8f7;color:#4e2a84}
+ /* Teacher and student use the same cloned .native-sidebar component and
+    the same static stylesheet. No student-only sidebar geometry or colors. */
+ .pp-student-native-sidebar.native-sidebar{min-width:0;align-self:start}
+ .pp-student-native-sidebar [data-student-tab]{display:flex;align-items:center}
+ .pp-student-native-sidebar [data-student-tab].is-active{background:#EAE5F2;color:#4E2A84}
  .pp-student-live-main{width:100%}
  #student-live-material .pp-student-live-notes{min-height:0}
  #student-live-material .pp-student-live-content{align-items:stretch}
- @media(max-width:780px){.pp-student-layout.native-layout,.pp-student-live-layout.native-layout{grid-template-columns:76px minmax(0,1fr)!important}.pp-student-native-sidebar .native-nav-text,.pp-student-native-sidebar .native-sidebar-label,.pp-student-native-sidebar .native-sidebar-footer{display:none}}
+
  #student-live-material .pp-student-live-layout{min-height:calc(100vh - 90px)}
  #student-live-material .pp-student-live-main{display:flex;flex-direction:column;min-height:calc(100vh - 120px)}
  #student-live-material .pp-student-live-content{flex:1;min-height:calc(100vh - 155px)}
