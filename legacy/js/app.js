@@ -1905,6 +1905,10 @@ function studentPortalSidebar(onNavigate){
  const original=document.querySelector('#teacher-app .native-sidebar');
  const nav=original?original.cloneNode(true):document.createElement('aside');
  nav.className='native-sidebar pp-student-native-sidebar';
+ // Same toggle icon and visual states as the teacher sidebar; only navigation targets differ.
+ const teacherToggle=original?.querySelector('.native-sidebar-toggle');
+ const studentToggle=nav.querySelector('.native-sidebar-toggle');
+ if(teacherToggle&&studentToggle)studentToggle.innerHTML=teacherToggle.innerHTML;
  nav.setAttribute('aria-label','Student navigation');
  nav.querySelectorAll('[onclick]').forEach(el=>el.removeAttribute('onclick'));
  const label=nav.querySelector('.native-sidebar-label');if(label)label.textContent='STUDENT WORKSPACE';
@@ -1937,7 +1941,7 @@ function ensureStudentPortalLayout(){
  const style=document.createElement('style');style.id='pp-student-shell-styles';style.textContent=`
  #student-public-view{max-width:none!important;padding:12px!important}
  #student-public-view>.app-card{max-width:none!important}
- .pp-student-layout{display:flex;gap:16px;align-items:stretch}
+ .pp-student-layout{align-items:start}
  .pp-student-layout>#student-public-content{flex:1;min-width:0}
  .pp-student-sidebar{width:174px;flex:none;background:#fff;border:1px solid #e9e3f1;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;transition:width .2s}
  .pp-student-sidebar.collapsed{width:58px}
@@ -1946,18 +1950,17 @@ function ensureStudentPortalLayout(){
  .pp-student-sidebar-link:hover,.pp-student-sidebar-link.is-active{background:#eee8f7}
  .pp-student-sidebar-icon{width:22px;flex:none;text-align:center;font-size:22px}
  .pp-student-sidebar.collapsed .pp-student-sidebar-label{display:none}
- .pp-student-layout.native-layout,.pp-student-live-layout.native-layout{display:flex!important;grid-template-columns:none!important;align-items:stretch;gap:12px}
- .pp-student-native-sidebar.native-sidebar{flex:0 0 204px;width:204px;min-width:0;position:relative;align-self:stretch}
- .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar.native-sidebar,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar.native-sidebar{flex-basis:64px;width:64px}
- .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer{display:none}
- .pp-student-native-sidebar [data-student-tab]{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:10px}
- .pp-student-native-sidebar [data-student-tab].is-active{background:#eee8f7;color:#4b287e}
- .pp-student-native-sidebar .native-nav-icon{width:24px;height:24px;flex:none}
- .pp-student-native-sidebar .native-nav-icon svg{width:22px;height:22px}
+
+ /* The teacher's .native-sidebar is the shared component/style source. */
+ .pp-student-layout.native-layout,.pp-student-live-layout.native-layout{display:grid!important;grid-template-columns:206px minmax(0,1fr)!important;align-items:start!important;gap:22px!important}
+ .pp-student-native-sidebar.native-sidebar{width:auto!important;min-width:0!important;flex:none!important;align-self:start!important}
+ .pp-student-layout.sidebar-collapsed.native-layout,.pp-student-live-layout.sidebar-collapsed.native-layout{grid-template-columns:76px minmax(0,1fr)!important}
+ .pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-nav-text,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-label,.pp-student-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer,.pp-student-live-layout.sidebar-collapsed .pp-student-native-sidebar .native-sidebar-footer{display:none!important}
+ .pp-student-native-sidebar [data-student-tab].is-active{background:#eee8f7;color:#4e2a84}
  .pp-student-live-main{width:100%}
  #student-live-material .pp-student-live-notes{min-height:0}
  #student-live-material .pp-student-live-content{align-items:stretch}
- @media(max-width:780px){.pp-student-native-sidebar.native-sidebar{flex-basis:64px;width:64px}.pp-student-native-sidebar .native-nav-text,.pp-student-native-sidebar .native-sidebar-label,.pp-student-native-sidebar .native-sidebar-footer{display:none}}
+ @media(max-width:780px){.pp-student-layout.native-layout,.pp-student-live-layout.native-layout{grid-template-columns:76px minmax(0,1fr)!important}.pp-student-native-sidebar .native-nav-text,.pp-student-native-sidebar .native-sidebar-label,.pp-student-native-sidebar .native-sidebar-footer{display:none}}
  #student-live-material .pp-student-live-layout{min-height:calc(100vh - 90px)}
  #student-live-material .pp-student-live-main{display:flex;flex-direction:column;min-height:calc(100vh - 120px)}
  #student-live-material .pp-student-live-content{flex:1;min-height:calc(100vh - 155px)}
@@ -1990,8 +1993,8 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-live-content{gap:12px}
  #student-live-material{padding:0!important}
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between}
- #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
- #student-live-material .pp-student-native-sidebar.native-sidebar{border-radius:0!important;border-color:#dfe3e8!important;box-shadow:none!important}
+ #student-live-material .pp-student-live-layout{padding:14px}
+ 
  #student-live-material .pp-student-live-main{border-radius:0!important}
  #student-live-material .mb-builder.mb-student-preview .mb-student-card{border-color:#dfe3e8!important;border-radius:0!important}
  #student-live-material .mb-builder.mb-student-preview .mb-preview-notes{border-color:#dfe3e8!important;border-radius:0!important}
