@@ -2073,47 +2073,28 @@ function showPublicLessonMaterial(data){
  let overlay=document.getElementById('student-live-material');
  if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f4f5f7;overflow:auto';document.body.append(overlay);}
  overlay.replaceChildren();
- // Shared workspace header: clone the complete teacher header rather than
- // assembling a second header with student-only typography and geometry.
- const teacherHeader=document.getElementById('teacher-header');
- const header=teacherHeader ? teacherHeader.cloneNode(true) : document.createElement('header');
- header.removeAttribute('id');
- header.classList.remove('hidden');
- header.classList.add('pp-student-live-header');
- header.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
- const brand=header.querySelector('button');
- if(brand){
-  brand.removeAttribute('onclick');
-  brand.removeAttribute('title');
-  brand.onclick=()=>{};
-  brand.classList.add('pp-student-brand');
-  const tagline=brand.querySelector('span > span:last-child');
-  if(tagline)tagline.textContent='Lessons, students and payments';
+ // Reuse the SAME student dashboard header, including balance and theme toggle.
+ const sourceHeader=document.querySelector('#student-public-view .student-brand-header[data-shared-header="1"]');
+ const header=sourceHeader ? sourceHeader.cloneNode(true) : document.getElementById('teacher-header')?.cloneNode(true);
+ if(header){
+   header.removeAttribute('id');
+   header.classList.add('pp-student-live-header','student-brand-header');
+   header.dataset.sharedHeader='1';
+   header.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+   header.querySelectorAll('[onclick]').forEach(node=>node.removeAttribute('onclick'));
+   const back=document.createElement('button');
+   back.type='button';back.className='pp-student-return';
+   back.textContent='← Back to dashboard';
+   back.addEventListener('click',()=>{sessionStorage.removeItem('pp-student-live-lesson');overlay.remove();});
+   const actions=header.querySelector('.pp-student-header-actions');
+   if(actions){
+     const theme=actions.querySelector('.pp-student-theme-toggle');
+     if(theme)theme.addEventListener('click',()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();theme.textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾';});
+     actions.prepend(back);
+   }else header.append(back);
+   overlay.append(header);
  }
- const teacherActions=header.querySelector('.teacher-header-actions');
- if(teacherActions)teacherActions.remove();
- const profileWrap=document.createElement('div');profileWrap.className='pp-student-profile-wrap profile-menu-wrap relative';
- const teacherProfile=document.querySelector('#teacher-header .profile-menu-button');
- const profile=teacherProfile ? teacherProfile.cloneNode(true) : document.createElement('button');
- profile.type='button';
- profile.removeAttribute('id');
- profile.removeAttribute('onclick');
- profile.classList.add('pp-student-profile-button');
- if(!teacherProfile)profile.innerHTML='<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';
- profile.title=publicStudent?.name||'Student';
- profile.setAttribute('aria-label','Profile settings');
- const menu=document.createElement('div');menu.className='pp-student-profile-menu';menu.hidden=true;
- 
- const language=document.createElement('label');language.textContent='Language ';const select=document.createElement('select');select.innerHTML='<option value="en">English</option><option value="ru">Русский</option>';select.value=localStorage.getItem('profiprofit-language')||'en';select.onchange=()=>{localStorage.setItem('profiprofit-language',select.value);if(typeof setLanguage==='function')setLanguage(select.value);};language.append(select);menu.append(language);
- const theme=document.createElement('button');theme.type='button';theme.textContent='☾ Dark theme';theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();};menu.append(theme);
- profile.setAttribute('aria-expanded','false');
- profile.onclick=()=>{menu.hidden=!menu.hidden;profile.setAttribute('aria-expanded',String(!menu.hidden));};
- overlay.addEventListener('pointerdown',event=>{if(!profileWrap.contains(event.target)){menu.hidden=true;profile.setAttribute('aria-expanded','false');}});
- overlay.addEventListener('keydown',event=>{if(event.key==='Escape'){menu.hidden=true;profile.setAttribute('aria-expanded','false');profile.focus();}});
- profileWrap.append(profile,menu);header.append(brand,profileWrap);overlay.append(header);
- const layout=document.createElement('div');layout.className='native-layout pp-student-live-layout';restoreStudentSidebar(layout);
- const backTo=tab=>{sessionStorage.removeItem('pp-student-live-lesson');overlay.remove();switchPublicStudentTab(tab);};
- layout.append(studentPortalSidebar(backTo));
+ const layout=document.createElement('div');layout.className='pp-student-live-layout pp-student-live-one-page';
  const main=document.createElement('main');main.className='pp-student-live-main';
  const columns=document.createElement('div');columns.className='pp-student-live-content';
  const drawWrap=document.createElement('div');drawWrap.className='pp-student-pointer';
@@ -2122,7 +2103,7 @@ function showPublicLessonMaterial(data){
  const noteArea=document.createElement('textarea');noteArea.placeholder='Teacher notes will appear here when live sharing is enabled.';noteArea.readOnly=true;notes.append(notesTitle,noteArea);
  columns.append(drawWrap,notes);main.append(columns);layout.append(main);overlay.append(layout);
  const cleanup=()=>{};
- layout.querySelectorAll('.pp-student-native-sidebar [data-student-tab]').forEach(b=>b.addEventListener('click',cleanup));
+
  if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);
  else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
 }
