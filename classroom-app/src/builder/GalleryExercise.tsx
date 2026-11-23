@@ -3,13 +3,13 @@ import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import type {Block} from '../planning/model';
 import {ui} from '../i18n';
 import {FormattedText,formatOf} from './textFormatting';
-import {loadLocalImage,saveLocalImages,validateLocalImage,type GalleryImage} from './galleryStorage';
+import {classroomImageUrl,uploadClassroomImage,type GalleryImage} from './galleryStorage';
 type GalleryBlock=Block&{galleryImages?:GalleryImage[]};
 const pictures=(block:Block)=>(block as GalleryBlock).galleryImages||[];
 
 function LocalPicture({scope,image,index}:{scope:string;image:GalleryImage;index:number}){
  const [src,setSrc]=useState(''),[error,setError]=useState('');
- useEffect(()=>{let disposed=false,url='';setSrc('');setError('');void loadLocalImage(scope,image.id).then(blob=>{if(disposed)return;url=URL.createObjectURL(blob);setSrc(url);}).catch(e=>{if(!disposed)setError((e as Error).message);});return()=>{disposed=true;if(url)URL.revokeObjectURL(url);};},[scope,image.id]);
+ useEffect(()=>{let disposed=false,url='',revoke:(()=>void)|undefined;setSrc('');setError('');void classroomImageUrl(image,scope).then(result=>{if(disposed){result.revoke?.();return;}url=result.src;revoke=result.revoke;setSrc(url);}).catch(e=>{if(!disposed)setError((e as Error).message);});return()=>{disposed=true;revoke?.();};},[scope,image.id]);
  return error?<p role="alert">{ui(error)}</p>:src?<img className="mb-gallery-image" src={src} alt={image.caption||ui('Image')+' '+(index+1)}/>:<span role="status">{ui('Loading image…')}</span>;
 }
 function GalleryView({scope,images,index,setIndex}:{scope:string;images:GalleryImage[];index:number;setIndex:(n:number)=>void}){
@@ -23,13 +23,13 @@ export function GalleryEditor({block,onChange,scope}:{block:Block;onChange:(b:Bl
  const [index,setIndex]=useState(0),[upload,setUpload]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const latest=useRef(block),alive=useRef(true),inFlight=useRef(false);latest.current=block;useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
  const images=pictures(block),current=Math.min(index,Math.max(0,images.length-1)),image=images[current];
- async function add(files:File[]){if(inFlight.current||!files.length)return;setError('');if(pictures(latest.current).length+files.length>30){setError(ui('A gallery can contain up to 30 images.'));return;}inFlight.current=true;setBusy(true);try{for(const file of files)await validateLocalImage(file);const batch=files.map(file=>({entry:{id:crypto.randomUUID(),caption:'',name:file.name},blob:file}));await saveLocalImages(scope,batch);if(!alive.current)return;const before=pictures(latest.current);onChange({...latest.current,galleryImages:[...before,...batch.map(b=>b.entry)]} as Block);setIndex(before.length);setUpload(false);}catch(e){if(alive.current)setError(ui((e as Error).message));}finally{inFlight.current=false;if(alive.current)setBusy(false);}}
+ async function add(files:File[]){if(inFlight.current||!files.length)return;setError('');if(pictures(latest.current).length+files.length>30){setError(ui('A gallery can contain up to 30 images.'));return;}inFlight.current=true;setBusy(true);try{const entries=await Promise.all(files.map(uploadClassroomImage));if(!alive.current)return;const before=pictures(latest.current);onChange({...latest.current,galleryImages:[...before,...entries]} as Block);setIndex(before.length);setUpload(false);}catch(e){if(alive.current)setError(ui((e as Error).message));}finally{inFlight.current=false;if(alive.current)setBusy(false);}}
  return <div className="mb-gallery-editor">
  {block.content&&<div className="mb-columns-existing"><FormattedText text={block.content} html={formatOf(block,'content',block.content)}/></div>}
  {images.length?<GalleryView scope={scope} images={images} index={current} setIndex={setIndex}/>:<div className="mb-gallery-stage mb-gallery-empty"><button className="primary" onClick={()=>setUpload(true)}>{ui('Upload images')}</button></div>}
  {image&&<label className="mb-field">{ui('Image description (optional)')}<textarea rows={2} aria-label={ui('Image description (optional)')} value={image.caption} onChange={e=>onChange({...block,galleryImages:images.map(i=>i.id===image.id?{...i,caption:e.target.value}:i)} as Block)}/></label>}
  <div className="mb-gallery-editor-actions"><button onClick={()=>{setError('');setUpload(true);}}>+ {ui('Add images')}</button>{image&&<button onClick={()=>{if(confirm(ui('Remove this image from the gallery?'))){onChange({...block,galleryImages:images.filter(i=>i.id!==image.id)} as Block);setIndex(Math.max(0,current-1));}}}>{ui('Remove image')}</button>}</div>
- <p className="mb-help">{ui('Images stay in this browser only. JSON recovery files do not include image files.')}</p>
+ <p className="mb-help">{ui('Images are stored securely in Supabase. Previously uploaded local images still require migration.')}</p>
  {upload&&<ImageUpload busy={busy} error={error} onFiles={files=>void add(files)} onClose={()=>{if(!busy)setUpload(false);}}/>}
  </div>;
 }
