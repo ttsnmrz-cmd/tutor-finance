@@ -195,3 +195,50 @@
 .mb-builder.mb-student-preview #pointerTools .annotation-tool-icons button[aria-pressed=true]{
  background:#eee8f6!important;color:#4e2a84!important;
 }
+
+/* Keep the Pointer button intrinsic-size, even when the parent toolbar stretches. */
+.mb-builder.mb-student-preview .mb-preview-tools-row .mb-preview-controls>.mb-preview-pointer,
+.mb-builder.mb-student-preview .mb-preview-controls #pointerToolbar{
+ display:inline-flex!important;flex:0 0 auto!important;flex-grow:0!important;
+ flex-shrink:0!important;width:max-content!important;min-width:0!important;
+ max-width:max-content!important;align-self:center!important;
+}
+.mb-builder.mb-student-preview .mb-preview-controls #pointerToggle{
+ display:inline-flex!important;flex:0 0 auto!important;flex-grow:0!important;
+ width:max-content!important;min-width:0!important;max-width:none!important;
+ padding:10px 18px!important;white-space:nowrap!important;
+}
+.mb-builder.mb-student-preview .mb-preview-controls #pointerTools{
+ position:absolute!important;top:calc(100% + 8px)!important;left:0!important;
+ width:max-content!important;min-width:0!important;max-width:min(480px,90vw)!important;
+ z-index:180!important;
+}
+/* Live Notes: stretch with the exercise and always fill at least the viewport height. */
+.mb-builder.mb-student-preview .mb-preview-workspace{
+ align-items:stretch!important;min-height:max(100dvh,680px)!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{
+ min-height:max(100dvh,680px)!important;align-self:stretch!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
+ position:relative!important;top:auto!important;align-self:stretch!important;
+ min-height:max(100dvh,680px)!important;max-height:none!important;
+ height:auto!important;display:flex!important;flex-direction:column!important;
+ overflow:visible!important;
+}
+.mb-builder.mb-student-preview .mb-preview-notes .mb-rich-field{
+ flex:1 1 auto!important;display:flex!important;flex-direction:column!important;
+ min-height:0!important;
+}
+.mb-builder.mb-student-preview .mb-preview-notes .mb-rich-input{
+ flex:1 1 auto!important;min-height:calc(100dvh - 220px)!important;
+}
+@media(max-width:700px){
+ .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not([data-open=true]):not(.expanded){
+  display:none!important;
+ }
+ .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes[data-open=true]:not(.expanded){
+  position:fixed!important;top:110px!important;min-height:0!important;
+  max-height:calc(100dvh - 125px)!important;overflow:auto!important;
+ }
+}
