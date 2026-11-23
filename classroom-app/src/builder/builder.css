@@ -503,3 +503,11 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 .mb-builder:not(.mb-student-preview)>.mb-tabs>button:not(.mb-structure-toggle){padding:8px 13px!important;min-height:36px!important}
 .mb-builder:not(.mb-student-preview)>.mb-tabs>.mb-structure-toggle{margin-left:auto!important;min-height:32px!important;min-width:110px!important;padding:6px 10px!important;border-radius:9px!important}
 @media(max-width:700px){.mb-builder:not(.mb-student-preview)>.mb-top{flex-wrap:wrap!important}.mb-builder:not(.mb-student-preview)>.mb-top .mb-top-tools{width:100%;flex-direction:row!important;align-items:center!important;justify-content:space-between!important}.mb-builder:not(.mb-student-preview)>.mb-tabs>.mb-structure-toggle{margin-left:auto!important}}
+
+/* Align builder content with a safe left inset and keep tree toggle beside its panel. */
+.mb-builder{padding-left:max(20px, var(--builder-side-padding, 20px))!important;padding-right:max(20px, var(--builder-side-padding, 20px))!important;box-sizing:border-box!important}
+.mb-builder>.mb-structure-control{display:flex;justify-content:flex-start;align-items:center;margin:0 0 8px!important;min-height:32px}
+.mb-builder>.mb-structure-control>.mb-structure-toggle{margin:0!important;min-width:126px!important;min-height:32px!important;border:1px solid var(--line)!important;border-radius:9px!important;background:var(--soft)!important;color:var(--purple)!important;padding:6px 10px!important;font-size:12px!important}
+.mb-builder>.mb-structure-control>.mb-structure-toggle:hover{border-color:var(--purple)!important}
+.mb-builder>.mb-layout{margin-left:0!important}
+@media(max-width:700px){.mb-builder{padding-left:14px!important;padding-right:14px!important}}
