@@ -76,3 +76,56 @@
 @media(max-width:700px){
  #student-live-material .profiprofit-student-lesson .mb-student-body{padding:18px 16px!important}
 }
+
+/* Canonical exercise actions and navigation: shared across all exercise types and roles. */
+.mb-builder.mb-student-preview .mb-preview-footer{
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;
+ align-items:center!important;gap:12px!important;padding:16px 20px!important;
+ min-height:86px!important;box-sizing:border-box!important;border-top:1px solid var(--line)!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress{
+ grid-column:2!important;grid-row:1!important;display:flex!important;flex:0 0 auto!important;
+ align-items:center!important;justify-content:center!important;gap:10px!important;
+ width:auto!important;max-width:none!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress span{
+ display:block!important;flex:0 0 4px!important;width:4px!important;min-width:4px!important;
+ max-width:4px!important;height:16px!important;border-radius:5px!important;
+ background:#ded5e8!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress span.current{
+ background:#7953a0!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-student-previous{
+ grid-column:1!important;grid-row:1!important;justify-self:start!important;
+ background:#eee8f6!important;color:#1f242d!important;
+ border:1px solid #e1d5eb!important;border-radius:15px!important;
+ padding:12px 20px!important;min-height:52px!important;font-weight:750!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-student-previous:disabled{
+ opacity:.48!important;cursor:not-allowed!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer>.primary{
+ grid-column:3!important;grid-row:1!important;justify-self:end!important;
+ background:#cda13e!important;color:#1f242d!important;
+ border:1px solid #cda13e!important;border-radius:16px!important;
+ padding:12px 28px!important;min-width:150px!important;min-height:52px!important;
+ font-weight:750!important;box-shadow:none!important;
+}
+.mb-builder.mb-student-preview .mb-check-actions,
+.mb-builder.mb-student-preview .mb-image-label-actions{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:16px!important;width:100%!important;box-sizing:border-box!important;
+}
+.mb-builder.mb-student-preview .mb-check-actions button,
+.mb-builder.mb-student-preview .mb-image-label-reset{
+ background:#cda13e!important;color:#1f242d!important;border:1px solid #cda13e!important;
+ border-radius:14px!important;padding:10px 18px!important;min-height:48px!important;
+ font-weight:750!important;
+}
+.mb-builder.mb-student-preview .mb-check-actions button:last-of-type,
+.mb-builder.mb-student-preview .mb-image-label-check{
+ margin-left:auto!important;background:#eee8f6!important;color:#1f242d!important;
+ border:1px solid #e1d5eb!important;border-radius:14px!important;
+ padding:10px 18px!important;min-height:48px!important;font-weight:750!important;
+}
