@@ -473,7 +473,7 @@ html:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-sidebar){
    navigation surfaces as the teacher dashboard, including before hydration. */
 html:not([data-theme="dark"]) #student-public-view:not(.hidden){
   max-width:none!important;width:100%!important;margin:0!important;
-  padding:12px!important;background:#F5F6F8!important;
+  padding:0 12px 12px!important;background:#F5F6F8!important;
 }
 html:not([data-theme="dark"]) #student-public-view:not(.hidden)>.app-card{
   max-width:none!important;width:100%!important;margin:0!important;
