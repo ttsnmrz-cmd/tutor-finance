@@ -2005,8 +2005,8 @@ function showPublicLessonMaterial(data){
  if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f8f7fb;overflow:auto';document.body.append(overlay);}
  overlay.replaceChildren();
  const header=document.createElement('header');header.className='pp-student-live-header';
- const brand=document.createElement('div');brand.style.cssText='display:flex;align-items:center;gap:12px;font-weight:700;color:#4b287e;font-size:22px';
- const logo=document.createElement('img');logo.src='/legacy/ProfoProfit_logo svg.svg';logo.alt='';logo.style.cssText='width:46px;height:46px';brand.append(logo,document.createTextNode('ProfiProfit'));
+ const brand=document.createElement('div');brand.className='pp-student-brand';brand.style.cssText='display:flex;align-items:center;gap:12px;font-weight:800;color:#4e2a84;font-size:22px';
+ const logo=document.createElement('img');logo.src='/legacy/ProfoProfit_logo svg.svg';logo.alt='';logo.style.cssText='width:46px;height:46px';const brandCopy=document.createElement('div');brandCopy.style.cssText='display:flex;flex-direction:column;gap:2px';const brandTitle=document.createElement('strong');brandTitle.textContent='ProfiProfit';const brandTagline=document.createElement('small');brandTagline.textContent='Lessons, students and payments';brandTagline.style.cssText='font-size:12px;font-weight:400;color:#6b7280';brandCopy.append(brandTitle,brandTagline);brand.append(logo,brandCopy);
  const profileWrap=document.createElement('div');profileWrap.className='pp-student-profile-wrap';
  const profile=document.createElement('button');profile.type='button';profile.className='pp-student-profile-button';profile.innerHTML='<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';profile.title=publicStudent?.name||'Student';profile.setAttribute('aria-label','Profile settings');
  const menu=document.createElement('div');menu.className='pp-student-profile-menu';menu.hidden=true;
