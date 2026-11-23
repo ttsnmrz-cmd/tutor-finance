@@ -443,3 +443,12 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding:16px 20px!important}
 .mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body>h2,.mb-builder.mb-student-preview .mb-combined-element>h2{font-size:22px!important;line-height:1.25!important}
 @container builder (max-width:680px){.mb-builder.mb-student-preview .mb-preview-top{grid-template-columns:auto minmax(0,1fr)!important}.mb-builder.mb-student-preview .mb-preview-top>.mb-teacher-hints-toggle{grid-column:2;justify-self:end}.mb-builder.mb-student-preview .mb-preview-top>h1{grid-column:1/-1;grid-row:2}.mb-builder.mb-student-preview .mb-preview-top>.mb-preview-controls{grid-row:3;justify-content:flex-start!important;flex-wrap:wrap}}
+
+/* Preview dark theme: accessible contrast for image labels and teacher hints. */
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-teacher-hints-toggle{color:#ead8ff!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-teacher-hints-toggle input{accent-color:#b996e2}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-image-label-bank button{background:#41354e!important;color:#f7f0fc!important;border-color:#79658c!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-image-label-bank button[aria-pressed="true"]{background:#62487d!important;color:#fff!important;border-color:#bd99e6!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-image-label-actions .mb-image-label-check{background:#514160!important;color:#fff!important;border-color:#79658c!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-image-label-actions .mb-image-label-reset{background:#cda13e!important;color:#241b2b!important;border-color:#cda13e!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-image-label-actions .mb-image-label-score{color:#eadff4!important}
