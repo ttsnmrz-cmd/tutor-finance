@@ -658,3 +658,33 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-native-sidebar .n
 html:not([data-theme="dark"]) #student-public-view .student-portal-panel{
  background:#fff!important;border-radius:21px!important;padding:18px!important;
 }
+
+/* Shared teacher header sizing, including the student clone. */
+html:not([data-theme="dark"]) #student-public-view .student-brand-header[data-shared-header="1"]{
+ padding:14px 22px!important;min-height:0!important;border-radius:22px!important;
+ margin:0 0 12px!important;
+}
+html:not([data-theme="dark"]) #student-public-view .student-brand-header[data-shared-header="1"]>button:first-child img{
+ width:50px!important;height:50px!important;max-width:50px!important;flex:0 0 50px!important;
+}
+html:not([data-theme="dark"]) #student-public-view .student-brand-header[data-shared-header="1"]>button:first-child .text-2xl{
+ font-size:21px!important;letter-spacing:-.045em!important;line-height:1.2!important;color:#1f242d!important;
+}
+html:not([data-theme="dark"]) #student-public-view .student-brand-header[data-shared-header="1"]>button:first-child .text-sm{
+ font-size:11px!important;line-height:1.35!important;color:#6b7280!important;
+}
+/* Neutral finance cards; no patchwork grey backgrounds. */
+html:not([data-theme="dark"]) #student-public-view #student-portal-finances{
+ background:#fff!important;border-radius:20px!important;padding:22px!important;
+}
+html:not([data-theme="dark"]) #student-public-view #student-portal-finances .student-theme-panel{
+ background:#fff!important;border:1px solid #e1e4e8!important;border-radius:12px!important;
+ box-shadow:none!important;
+}
+html:not([data-theme="dark"]) #student-public-view #student-portal-finances #public-payments{
+ background:#fff!important;
+}
+html:not([data-theme="dark"]) #student-public-view .student-portal-tabs{display:none!important}
+html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-student-native-sidebar.native-sidebar{
+ border-radius:21px!important;overflow:hidden!important;padding:16px 12px!important;
+}
