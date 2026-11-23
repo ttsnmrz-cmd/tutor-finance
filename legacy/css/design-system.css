@@ -322,7 +322,7 @@ html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view){
 
 /* Teacher calendar component: consolidated from legacy CSS. */
 /* Single hour-grid calendar, matching the supplied Classroom dashboard. */
-#dashboard-calendar .native-calendar-scroll{height:min(61vh,590px);min-height:420px;overflow:auto;position:relative;background:#faf8fd;border:1px solid #eee9f3;border-radius:4px}
+#dashboard-calendar .native-calendar-scroll{height:clamp(280px,43vh,440px)!important;min-height:0!important;overflow:auto;position:relative;background:#faf8fd;border:1px solid #eee9f3;border-radius:4px}
 #dashboard-calendar .native-week-calendar{display:grid;grid-template-columns:60px repeat(7,minmax(125px,1fr));min-width:920px;position:relative}
 #dashboard-calendar .native-week-head-spacer{grid-column:1;height:66px;position:sticky;top:0;z-index:4;background:#fff}
 #dashboard-calendar .native-day{min-width:0;border-left:1px solid #e7e2ec}
@@ -365,7 +365,7 @@ html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view){
 /* Calendar panel must retain its own inner spacing; old padding:0 caused
    the heading to collide with the panel's rounded border. */
 #teacher-app #dashboard-calendar > .app-card {
- padding:20px!important;
+ padding:16px!important;
  border:1px solid var(--border-color,#E1E4E8)!important;
  border-radius:var(--pp-ui-radius-panel)!important;
  background:var(--card-bg,#fff)!important;
@@ -508,10 +508,6 @@ html[data-theme="dark"] #teacher-app #dashboard-calendar :is(.calendar-weekday,.
 #teacher-app #dashboard-cards {gap:10px!important;margin-bottom:12px!important}
 #teacher-app #dashboard-cards>* {min-height:92px!important;padding:14px 16px!important}
 #teacher-app #dashboard-cards>* :is(.text-2xl,.text-3xl) {font-size:23px!important;line-height:1.2!important}
-#teacher-app #dashboard-calendar>.app-card {padding:16px!important}
-#teacher-app #dashboard-calendar .native-calendar-scroll {
- height:clamp(280px,43vh,440px)!important;min-height:0!important;
-}
 #teacher-app #dashboard-calendar .native-calendar-scroll :is(.native-calendar-event,.native-event) {font-size:12px}
 @media(max-width:900px) {
  #teacher-app #dashboard-cards>* {min-height:88px!important;padding:12px!important}
