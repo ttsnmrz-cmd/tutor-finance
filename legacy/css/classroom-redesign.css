@@ -2,10 +2,10 @@
 :root{--bg-color:#F4F5F7;--card-bg:#fff;--text-color:#1F242D;--text-secondary:#6B7280;--primary-color:#4E2A84;--primary-hover:#3D2169;--accent-soft:#F0F1F4;--border-color:#E0E3E9}
 body{background:#F4F5F7!important;color:var(--text-color)!important}
 #teacher-app>div{max-width:1420px!important;padding:22px 26px!important}
-#teacher-header{border:1px solid #E0E3E9!important;background:rgba(255,255,255,.92)!important;box-shadow:0 12px 35px rgba(74,48,110,.055)!important;border-radius:22px!important;padding:14px 22px!important;gap:20px!important}
-#teacher-header>button:first-child img{width:50px!important;height:50px!important}
-#teacher-header>button:first-child .text-2xl{font-size:21px!important;letter-spacing:-.045em;color:#1F242D}
-#teacher-header>button:first-child .text-sm{font-size:11px!important;color:#6B7280}
+
+
+
+
 .teacher-nav{background:#F0F1F4;padding:5px;border-radius:16px;gap:3px!important}
 .teacher-nav button{background:transparent!important;color:#6B7280!important;border-radius:12px!important;font-size:13px!important;padding:10px 15px!important;white-space:nowrap}
 .teacher-nav button:hover{background:#E7E9EE!important;color:#48365e!important}
@@ -43,8 +43,8 @@ html[data-theme=dark] #teacher-header,html[data-theme=dark] #teacher-app .app-ca
 html[data-theme=dark] #teacher-app h1:where(:not(#classroom-materials-root *)),html[data-theme=dark] #teacher-app h2:where(:not(#classroom-materials-root *)),html[data-theme=dark] #teacher-app h3:where(:not(#classroom-materials-root *)){color:#f1eafa}
 html[data-theme=dark] .teacher-nav{background:#393046}
 html[data-theme=dark] .teacher-nav button.bg-indigo-600{background:#4b3c60!important;color:#f1eafa!important}
-@media(max-width:950px){#teacher-app>div{padding:12px!important}#teacher-header{flex-wrap:wrap;padding:12px!important}.teacher-header-actions{width:100%;justify-content:space-between}.teacher-nav{overflow-x:auto;max-width:calc(100vw - 100px)}.teacher-nav button{padding:9px 11px!important}#tab-dashboard .dashboard-heading{align-items:start;flex-direction:column;gap:5px}#teacher-app main>section>.app-card{padding:16px!important}}
-@media(max-width:560px){#teacher-header>button:first-child img{width:42px!important;height:42px!important}#teacher-header>button:first-child .text-2xl{font-size:19px!important}#dashboard-cards{gap:9px!important}#dashboard-cards>*{min-height:100px}#tab-dashboard>.grid>.app-card{min-height:0}}
+@media(max-width:950px){#teacher-app>div{padding:12px!important}.teacher-header-actions{width:100%;justify-content:space-between}.teacher-nav{overflow-x:auto;max-width:calc(100vw - 100px)}.teacher-nav button{padding:9px 11px!important}#tab-dashboard .dashboard-heading{align-items:start;flex-direction:column;gap:5px}#teacher-app main>section>.app-card{padding:16px!important}}
+@media(max-width:560px){#dashboard-cards{gap:9px!important}#dashboard-cards>*{min-height:100px}#tab-dashboard>.grid>.app-card{min-height:0}}
 
 /* Native Classroom-like workspace navigation. Existing switchTab handlers remain the source of truth. */
 .native-layout{display:grid;grid-template-columns:206px minmax(0,1fr);gap:22px;align-items:start}
@@ -60,7 +60,14 @@ html[data-theme=dark] .teacher-nav button.bg-indigo-600{background:#4b3c60!impor
 html[data-theme=dark] .native-sidebar{background:#30283b;border-color:#4b4059}
 html[data-theme=dark] .native-sidebar button{color:#c9bed5}
 html[data-theme=dark] .native-sidebar button.is-active{background:#4a3a5b;color:#f4e9ff}
-@media(max-width:700px){.native-layout{grid-template-columns:1fr;gap:12px}.native-sidebar{position:static;min-height:0;display:flex;flex-direction:row;align-items:center;overflow-x:auto;padding:6px 8px;border-radius:14px;gap:4px}.native-sidebar-label,.native-sidebar-footer{display:none}.native-sidebar button{flex:0 0 auto;width:auto;padding:10px 12px;white-space:nowrap}.native-sidebar button span{font-size:16px;width:17px}}
+@media(max-width:700px){
+.native-layout{grid-template-columns:60px minmax(0,1fr);gap:10px}
+.native-sidebar{position:sticky;top:12px;min-height:0;display:flex;flex-direction:column;align-items:center;overflow:visible;padding:8px 5px;border-radius:20px;gap:6px}
+.native-sidebar-label,.native-sidebar-footer,.native-sidebar .native-nav-text{display:none!important}
+.native-sidebar button[data-native-tab]{flex:0 0 auto;width:48px!important;min-width:0;padding:10px!important;justify-content:center!important;gap:0!important}
+.native-sidebar .native-nav-icon{width:22px!important;height:22px!important;flex:0 0 22px!important}
+.native-sidebar .classroom-sidebar-toggle{width:48px!important;min-width:0}
+}
 
 /* Content-area redesign: separate functional panels, not merely a new app shell. */
 .native-page-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 20px;padding:5px 2px 0}
@@ -169,7 +176,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 
 /* Align header and content directly, with compact tabs in the student list. */
 #teacher-app>.native-workspace{padding-top:12px!important}
-#teacher-header{margin-bottom:0!important}
+
 #teacher-app .native-layout{align-items:start!important}
 #tab-students .native-page-heading{margin-bottom:12px!important;padding-top:0!important}
 #tab-students .native-page-heading p{display:none!important}
@@ -284,7 +291,7 @@ dialog.mb-dialog .mb-dialog-actions,dialog.ml-dialog .ml-dialog-actions{display:
 /* Dark theme: restore readable contrast after Classroom navigation overrides. */
 html[data-theme="dark"] #teacher-app{color:#f0eafa!important}
 html[data-theme="dark"] #teacher-app .native-workspace>header,
-html[data-theme="dark"] #teacher-header{background:#30283b!important;border-color:#51435f!important;color:#f0eafa!important}
+html[data-theme="dark"] 
 html[data-theme="dark"] #teacher-app .native-workspace>header button[title="На главную"] span.block.text-2xl{color:#d5adff!important}
 html[data-theme="dark"] #teacher-app .native-workspace>header button[title="На главную"] span.block.text-sm{color:#c6b9d3!important}
 html[data-theme="dark"] #teacher-app .native-sidebar button[data-native-tab]{color:#e4d9f0!important}
@@ -417,13 +424,13 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
 /* Unified ProfiProfit light theme: neutral surfaces and gold primary actions. */
 html:not([data-theme="dark"]) #teacher-app{--bg-color:#F4F5F7;--card-bg:#FFFFFF;--text-color:#1F242D;--text-secondary:#6B7280;--primary-color:#4E2A84;--primary-hover:#3D2169;--accent-soft:#F0F1F4;--border-color:#E0E3E9;--cta-color:#D99B26}
 html:not([data-theme="dark"]) #teacher-app .native-sidebar button.is-active{background:#EAE5F2!important;color:#4E2A84!important}
-html:not([data-theme="dark"]) #teacher-app .native-sidebar,html:not([data-theme="dark"]) #teacher-header{background:#FFFFFF!important;border-color:#E0E3E9!important}
+html:not([data-theme="dark"]) #teacher-app .native-sidebar,html:not([data-theme="dark"]) 
 html:not([data-theme="dark"]) #teacher-app .primary-btn,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]{background:#D99B26!important;color:#1F242D!important;border-color:#D99B26!important}
 html:not([data-theme="dark"]) #teacher-app .primary-btn:hover,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]:hover{background:#C48918!important}
 
 /* Unified brand: calmer plum instead of bright violet. */
 html:not([data-theme="dark"]) #teacher-app .native-workspace>header button[title="На главную"] span.block.text-2xl,
-html:not([data-theme="dark"]) #teacher-header>button:first-child .text-2xl{color:#3B1764!important}
+html:not([data-theme="dark"]) 
 
 /* Dark mode contrast corrections for dashboard, calendar and student directory. */
 html[data-theme="dark"] #teacher-app #dashboard-cards>*{background:#30283b!important;border-color:#51445f!important;color:#f4eef9!important}
@@ -584,27 +591,11 @@ html:not([data-theme="dark"]) #student-public-view .student-portal-tabs button.i
 
 /* Shared shell: the student header and sidebar are cloned from teacher DOM.
    Scope to the actual shared elements, not legacy student portal cards. */
-#student-public-view .student-brand-header[data-shared-header="1"]{
- display:flex!important;flex-direction:row!important;align-items:center!important;
- justify-content:space-between!important;width:100%!important;max-width:none!important;
- min-height:0!important;margin:0 0 12px!important;padding:16px 20px!important;
- border:1px solid #e0e3e9!important;border-radius:21px!important;
- background:#fff!important;box-shadow:none!important;box-sizing:border-box!important;
-}
-#student-public-view .student-brand-header[data-shared-header="1"]>button{
- display:flex!important;align-items:center!important;gap:12px!important;
- width:auto!important;min-width:0!important;padding:0!important;margin:0!important;
- background:transparent!important;border:0!important;box-shadow:none!important;
-}
-#student-public-view .student-brand-header[data-shared-header="1"] img{
- width:64px!important;height:64px!important;max-width:64px!important;object-fit:contain!important;
-}
-#student-public-view .student-brand-header[data-shared-header="1"] .text-2xl{
- font-size:24px!important;line-height:1.2!important;font-weight:750!important;color:#3b1764!important;
-}
-#student-public-view .student-brand-header[data-shared-header="1"] .text-slate-500{
- font-size:14px!important;line-height:1.35!important;color:#818096!important;
-}
+
+
+
+
+
 #student-public-view .pp-student-native-sidebar.native-sidebar{
  display:flex!important;flex-direction:column!important;gap:5px!important;
  padding:20px 12px!important;background:#fff!important;
@@ -660,10 +651,7 @@ html:not([data-theme="dark"]) #student-public-view .student-portal-panel{
 }
 
 /* Shared teacher header sizing, including the student clone. */
-html:not([data-theme="dark"]) #student-public-view .student-brand-header[data-shared-header="1"]{
- padding:14px 22px!important;min-height:0!important;border-radius:22px!important;
- margin:0 0 12px!important;
-}
+html:not([data-theme="dark"]) 
 html:not([data-theme="dark"]) #student-public-view .student-brand-header[data-shared-header="1"]>button:first-child img{
  width:50px!important;height:50px!important;max-width:50px!important;flex:0 0 50px!important;
 }
@@ -733,10 +721,7 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 .pp-student-dialog-notes{white-space:pre-wrap;line-height:1.6}
 
 /* Compact student header: balance and theme control share the top row. */
-#student-public-view .student-brand-header[data-shared-header="1"]{
- display:flex!important;align-items:center!important;justify-content:space-between!important;
- gap:16px!important;padding:10px 18px!important;min-height:0!important;
-}
+
 #student-public-view .pp-student-header-actions{
  display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0;
 }
@@ -757,33 +742,17 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
  padding-top:16px!important;
 }
 @media(max-width:600px){
- #student-public-view .student-brand-header[data-shared-header="1"]{flex-wrap:wrap!important}
+ 
  #student-public-view .pp-student-header-actions{margin-left:auto}
 }
 
 /* Live lesson uses the same shell as the single-page student dashboard. */
 #student-live-material{background:#f4f5f7!important;padding:12px!important;box-sizing:border-box!important}
-#student-live-material .pp-student-live-header.student-brand-header{
- width:100%!important;box-sizing:border-box!important;min-height:0!important;
- margin:0 0 12px!important;padding:10px 18px!important;
- border:1px solid #e0e3e9!important;border-radius:22px!important;
- background:#fff!important;display:flex!important;align-items:center!important;
- justify-content:space-between!important;gap:16px!important;
-}
-#student-live-material .pp-student-live-header.student-brand-header>button:first-child{
- display:flex!important;align-items:center!important;gap:12px!important;
- padding:0!important;background:transparent!important;border:0!important;
- box-shadow:none!important;cursor:default!important;
-}
-#student-live-material .pp-student-live-header.student-brand-header>button:first-child img{
- width:50px!important;height:50px!important;max-width:50px!important;object-fit:contain!important;
-}
-#student-live-material .pp-student-live-header.student-brand-header>button:first-child .text-2xl{
- font-size:21px!important;letter-spacing:-.045em!important;line-height:1.2!important;color:#1f242d!important;
-}
-#student-live-material .pp-student-live-header.student-brand-header>button:first-child .text-sm{
- font-size:11px!important;line-height:1.35!important;color:#6b7280!important;
-}
+
+
+
+
+
 #student-live-material .pp-student-header-actions{display:flex;align-items:center;gap:10px;margin-left:auto}
 #student-live-material .pp-student-header-balance{display:flex!important;align-items:center;gap:8px;padding:7px 12px!important;background:#f4f5f7!important;border-radius:12px!important}
 #student-live-material .pp-student-header-balance b{margin:0!important}
@@ -798,7 +767,7 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
  border-radius:21px!important;background:#fff!important;padding:16px!important;
 }
 @media(max-width:700px){
- #student-live-material .pp-student-live-header.student-brand-header{flex-wrap:wrap!important}
+ 
  #student-live-material .pp-student-header-actions{flex-wrap:wrap;justify-content:flex-end}
 }
 
