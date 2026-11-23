@@ -376,3 +376,16 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder .mb-order-preview-grip{margin-left:auto;cursor:grab;color:#6B7280;font-size:22px;opacity:0;user-select:none}
 .mb-builder .mb-order-row:hover .mb-order-preview-grip{opacity:1}
 @media (hover:none){.mb-builder .mb-order-editor-grip,.mb-builder .mb-order-preview-grip{opacity:1}}
+
+/* Consistent rounded, padded lesson preview surfaces. Scoped to teacher preview only. */
+.mb-builder.mb-student-preview{min-width:0;padding:18px 20px 24px;border-radius:22px;background:var(--page)}
+.mb-builder.mb-student-preview .mb-preview-top{gap:12px 16px;margin:0 0 20px;padding:4px 4px 12px;min-width:0}
+.mb-builder.mb-student-preview .mb-preview-top>button:first-child{margin:0 8px 0 0;border-radius:14px;padding:10px 16px;flex-shrink:0}
+.mb-builder.mb-student-preview .mb-preview-workspace{min-width:0;gap:20px}
+.mb-builder.mb-student-preview .mb-student-card{border-radius:22px;background:var(--card);margin:0;min-width:0}
+.mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding:24px 28px}
+.mb-builder.mb-student-preview .mb-combined-element{min-width:0;padding:8px 0 20px}
+.mb-builder.mb-student-preview .mb-preview-notes{border-radius:20px}
+.mb-builder.mb-student-preview .mb-choice-student-question{padding:12px 0 8px;border-radius:16px}
+.mb-builder.mb-student-preview .mb-choice-answer.mb-teacher-correct-option{background:#E6F7EC;border-color:#90D4A7;outline:2px solid #26965B;outline-offset:0;color:#17653A}
+@container builder (max-width:620px){.mb-builder.mb-student-preview{padding:12px}.mb-builder.mb-student-preview .mb-preview-top{margin-bottom:14px}.mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding:18px 16px}}
