@@ -424,3 +424,8 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-image-label-placed{pointer-events:auto;cursor:grab;font:inherit;line-height:1.25;z-index:2}
 .mb-image-label-placed:active{cursor:grabbing}
 .mb-image-label-placed:focus-visible{outline:3px solid #7543AE;outline-offset:2px}
+
+.mb-image-label-actions{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;width:100%}
+.mb-image-label-actions .mb-image-label-reset{grid-column:1;background:#CDA13E;color:#1F242D;border-color:#CDA13E}
+.mb-image-label-actions .mb-image-label-score{grid-column:2;min-width:0;text-align:center}
+.mb-image-label-actions .mb-image-label-check{grid-column:3}
