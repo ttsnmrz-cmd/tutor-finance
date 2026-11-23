@@ -76,9 +76,6 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
   .day-circle{width:38px;height:38px}
   .status{font-size:10px;padding:3px 6px}
   .app-card{border-radius:20px}
-  header{align-items:flex-start!important;flex-direction:column!important}
-  header nav{width:100%;display:grid!important;grid-template-columns:1fr 1fr auto}
-  header nav button{padding:.65rem .7rem!important}
   .fixed.right-6{right:1rem;bottom:1rem}
   .modal-bg{align-items:flex-end!important}
   .modal-bg>.app-card{border-radius:24px 24px 0 0;max-height:92vh;overflow:auto}
@@ -103,10 +100,7 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 .password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#6b6475;background:transparent}
 .password-toggle:hover{background:#F0F1F4;color:var(--primary-color)}
 .password-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#teacher-header .teacher-nav{margin-right:2.75rem;flex-shrink:0}
-#teacher-header .teacher-nav button{white-space:nowrap}
 .fixed.right-6.bottom-6{line-height:1;align-items:center;justify-content:center}
-@media(max-width:640px){#teacher-header .teacher-nav{margin-right:0!important;padding-top:2.75rem;width:100%;grid-template-columns:1fr 1fr!important}}
 
 
 /* Modern weekday selector for recurring lessons */
@@ -158,10 +152,6 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 }
 
 /* Profile settings menu */
-#teacher-header{flex-direction:row!important;align-items:center!important}
-#teacher-header .teacher-header-actions{flex-shrink:0}
-#teacher-header .teacher-nav{margin-right:0!important;padding-top:0!important;width:auto!important;display:flex!important;grid-template-columns:none!important}
-#teacher-header .teacher-nav button{white-space:nowrap}
 .profile-menu-button{color:var(--text-color);border:1px solid var(--border-color);transition:background .15s ease,transform .15s ease}
 .profile-menu-button:hover{background:var(--accent-soft)!important;transform:translateY(-1px)}
 .profile-menu-dropdown{background:var(--card-bg);border:1px solid var(--border-color);color:var(--text-color)}
@@ -196,25 +186,6 @@ header h1,#student-public-view h1{letter-spacing:-.04em}
 :root[data-theme="dark"] #student-sort-menu,:root[data-theme="dark"] #lesson-delete-dropdown{background:var(--card-bg)!important;color:var(--text-color);border-color:var(--border-color)!important}
 :root[data-theme="dark"] .password-toggle{color:#c3b5d3}
 :root[data-theme="dark"] .password-toggle:hover{background:#30283d;color:#e3c8ff}
-@media(max-width:640px){
- #teacher-header{flex-direction:column!important;align-items:stretch!important;gap:14px!important;padding:16px!important}
- #teacher-header>div:first-child{width:100%;display:flex;align-items:center;justify-content:flex-start;gap:8px!important;padding-right:52px;box-sizing:border-box}
- #teacher-header>div:first-child img{width:40px;height:40px;flex:0 0 40px;margin:0}
- #teacher-header>div:first-child>div{min-width:0;flex:1}
- #teacher-header>div:first-child h1{font-size:1.2rem;line-height:1.35rem;white-space:nowrap}
- #teacher-header>div:first-child p{font-size:.75rem;line-height:1rem;white-space:normal;margin-top:2px}
- #teacher-header .teacher-header-actions{width:100%;display:flex;justify-content:flex-start;align-items:stretch;gap:8px}
- #teacher-header .teacher-nav{display:flex!important;flex-direction:column!important;gap:8px;width:100%;flex:1;min-width:0}
- #teacher-header .teacher-nav button{width:100%;padding:.7rem .85rem!important;font-size:14px;text-align:left;flex:initial;min-width:0}
- #teacher-header .teacher-header-actions .profile-menu-wrap{position:absolute;right:16px;top:16px;display:block;z-index:60}
- #teacher-header .profile-menu-button{width:42px;height:42px}
- #teacher-header .profile-menu-dropdown{width:min(240px,calc(100vw - 40px))}
- #teacher-header .teacher-nav button{white-space:normal}
-}
-@media(max-width:380px){
- #teacher-header .teacher-nav button{padding:.65rem .7rem!important;font-size:13px}
-}
-
 /* Dashboard cards */
 #tab-dashboard button.app-card{transition:transform .15s ease,box-shadow .15s ease}
 #tab-dashboard button.app-card:hover{box-shadow:0 8px 24px rgba(67,44,122,.09)}
