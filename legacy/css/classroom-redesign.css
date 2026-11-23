@@ -688,3 +688,46 @@ html:not([data-theme="dark"]) #student-public-view .student-portal-tabs{display:
 html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-student-native-sidebar.native-sidebar{
  border-radius:21px!important;overflow:hidden!important;padding:16px 12px!important;
 }
+
+/* Student single-page dashboard: no navigation or duplicate tab bar. */
+#student-public-view.pp-student-one-page .pp-student-native-sidebar,
+#student-public-view.pp-student-one-page .student-portal-tabs{display:none!important}
+#student-public-view.pp-student-one-page #student-public-content{
+ display:flex!important;flex-direction:column!important;gap:18px!important;
+ background:transparent!important;border:0!important;border-radius:0!important;
+ width:100%!important;max-width:none!important;padding:0!important;
+}
+#student-public-view.pp-student-one-page #student-public-content.hidden{display:none!important}
+#student-public-view.pp-student-one-page .student-portal-panel{
+ display:block!important;width:100%!important;max-width:none!important;
+ background:#fff!important;border:1px solid #e1e4e8!important;
+ border-radius:21px!important;padding:22px!important;box-shadow:none!important;
+}
+#student-public-view.pp-student-one-page .student-portal-panel.hidden{display:block!important}
+#student-public-view.pp-student-one-page #public-lessons-history,
+#student-public-view.pp-student-one-page #public-payments{
+ max-height:315px!important;overflow-y:auto!important;overscroll-behavior:contain;
+ padding-right:8px!important;
+}
+#student-public-view.pp-student-one-page .pp-student-lesson-row{
+ display:block;width:100%;padding:13px 14px;margin:0 0 6px;
+ border:1px solid #e1e4e8;border-radius:12px;text-align:left;
+ background:#fff;color:#292d36;cursor:pointer;font:inherit;
+}
+#student-public-view.pp-student-one-page .pp-student-lesson-row:hover{background:#f4f5f7}
+#student-public-view.pp-student-one-page #student-portal-finances .student-theme-panel{
+ background:#fff!important;border:1px solid #e1e4e8!important;
+}
+#student-public-view.pp-student-one-page #student-portal-finances #public-payments>div{
+ background:#fff!important;padding:10px 4px!important;
+}
+.pp-student-lesson-dialog{
+ position:fixed;inset:0;margin:auto;max-width:min(540px,calc(100vw - 32px));
+ width:100%;padding:24px;background:#fff;color:#292d36;border:1px solid #e1e4e8;
+ border-radius:20px;box-shadow:0 20px 70px #16111b30;
+}
+.pp-student-lesson-dialog::backdrop{background:#15131a80}
+.pp-student-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.pp-student-dialog-heading h2{font-size:20px;font-weight:700}
+.pp-student-dialog-heading button{font-size:28px;padding:0 8px}
+.pp-student-dialog-notes{white-space:pre-wrap;line-height:1.6}
