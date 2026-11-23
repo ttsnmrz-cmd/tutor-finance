@@ -509,3 +509,13 @@ html[data-theme="dark"] #teacher-app .native-calendar .native-timed-event:not(.i
   #teacher-app .native-layout.sidebar-collapsed .native-nav-text{display:none!important}
   #teacher-app #teacher-main{min-width:0!important}
 }
+
+/* Compact dashboard shell: remove inherited outer whitespace (desktop). */
+@media(min-width:701px){
+  #teacher-app > .native-workspace{padding-top:0!important;margin-top:0!important}
+  #teacher-app > .native-layout{padding-top:0!important;margin-top:12px!important;column-gap:12px!important;row-gap:12px!important;align-items:start!important}
+  #teacher-app > .native-layout.sidebar-collapsed{grid-template-columns:70px minmax(0,1fr)!important}
+  #teacher-app > .native-layout > .native-sidebar{top:12px!important;margin:0!important;align-self:start!important}
+  #teacher-app > .native-layout > #teacher-main{margin:0!important;min-width:0!important}
+  #teacher-app > .native-layout > #teacher-main > #tab-dashboard{margin-top:0!important}
+}
