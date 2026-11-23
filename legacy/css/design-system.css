@@ -390,3 +390,23 @@ html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view){
  gap:12px;
  flex-wrap:wrap;
 }
+
+/* Teacher navigation states: expanded rail must reserve room for labels.
+   The earlier fixed 70px grid column caused labels to overlap dashboard cards. */
+@media (min-width: 701px) {
+ #teacher-app > .native-layout:not(.sidebar-collapsed) {
+  grid-template-columns: 220px minmax(0,1fr) !important;
+ }
+ #teacher-app > .native-layout.sidebar-collapsed {
+  grid-template-columns: 70px minmax(0,1fr) !important;
+ }
+ #teacher-app > .native-layout:not(.sidebar-collapsed) > .native-sidebar .native-nav-text {
+  display: inline !important;
+ }
+ #teacher-app > .native-layout:not(.sidebar-collapsed) > .native-sidebar button[data-native-tab] {
+  justify-content: flex-start !important;
+ }
+ #teacher-app > .native-layout.sidebar-collapsed > .native-sidebar .native-nav-text {
+  display: none !important;
+ }
+}
