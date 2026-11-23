@@ -479,3 +479,22 @@ html[data-theme="dark"] #teacher-app #tab-students :is(.cw-student-row,.cw-stude
 html[data-theme="dark"] #teacher-app #tab-students :is(.cw-student-row,.cw-student-list-item,.cw-directory-row) :is(small,.text-slate-500){color:#685c76!important}
 html[data-theme="dark"] #teacher-app #tab-students :is(.cw-profile-tabs button,.cw-directory-tabs button){color:#d8c9e6!important}
 html[data-theme="dark"] #teacher-app #tab-students :is(.cw-profile-tabs button[aria-selected="true"],.cw-directory-tabs button[aria-selected="true"]){color:#d4a7ff!important}
+
+/* Dark theme: student directory rows and tabs must retain legible contrast. */
+html[data-theme="dark"] #teacher-app #tab-students :is(.cw-student-row,.cw-student-list-item,.cw-directory-row){background:#3b3248!important;color:#f4eefa!important;border-color:#645573!important}
+html[data-theme="dark"] #teacher-app #tab-students :is(.cw-student-row,.cw-student-list-item,.cw-directory-row) :is(strong,b){color:#f8f2ff!important}
+html[data-theme="dark"] #teacher-app #tab-students :is(.cw-student-row,.cw-student-list-item,.cw-directory-row) :is(small,.text-slate-500){color:#c6b8d5!important}
+html[data-theme="dark"] #teacher-app #tab-students #students-list :is(button,.cursor-pointer){color:#f4eefa!important}
+html[data-theme="dark"] #teacher-app #tab-students #students-list :is(button,.cursor-pointer) :is(.font-semibold,.font-medium){color:#f8f2ff!important}
+html[data-theme="dark"] #teacher-app #tab-students :is(.cw-profile-tabs button,.cw-directory-tabs button){color:#d8c9e6!important}
+html[data-theme="dark"] #teacher-app #tab-students :is(.cw-profile-tabs button[aria-selected=true],.cw-directory-tabs button[aria-selected=true]){color:#e7c9ff!important}
+/* Dark calendar: remove white dashboard wrapper and pale day headers. */
+html[data-theme="dark"] #teacher-app #tab-dashboard{background:#17131f!important;color:#f4eefa!important}
+html[data-theme="dark"] #teacher-app #tab-dashboard>.app-card,
+html[data-theme="dark"] #teacher-app #tab-dashboard .native-calendar{background:#30283b!important;border-color:#51445f!important}
+html[data-theme="dark"] #teacher-app .native-calendar-grid,
+html[data-theme="dark"] #teacher-app .native-calendar-day,
+html[data-theme="dark"] #teacher-app .native-calendar-time{background:#30283b!important;color:#f4eefa!important;border-color:#51445f!important}
+html[data-theme="dark"] #teacher-app .native-calendar-header{background:#30283b!important;color:#f4eefa!important}
+html[data-theme="dark"] #teacher-app .native-calendar :is(.text-slate-300,.text-slate-400,.text-slate-500,.text-slate-600){color:#c6b8d5!important}
+html[data-theme="dark"] #teacher-app .native-calendar .native-timed-event:not(.is-cancelled){background:#dce9e2!important;color:#241a31!important}
