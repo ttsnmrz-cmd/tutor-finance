@@ -554,3 +554,30 @@ html:not([data-theme="dark"]) #student-public-view .student-portal-tabs button.i
     grid-template-columns:70px minmax(0,1fr)!important;gap:10px!important;
   }
 }
+
+/* Shared teacher/student navigation typography: compact, readable, not oversized. */
+#teacher-app .native-sidebar button[data-native-tab],
+#student-public-view .pp-student-native-sidebar button[data-student-tab]{
+  font-size:15px!important;
+  font-weight:550!important;
+  line-height:1.3!important;
+  gap:10px!important;
+  padding:10px 12px!important;
+}
+#teacher-app .native-sidebar .native-nav-text,
+#student-public-view .pp-student-native-sidebar .native-nav-text{
+  font-size:15px!important;
+  font-weight:550!important;
+  line-height:1.3!important;
+}
+#teacher-app .native-sidebar .native-nav-icon,
+#student-public-view .pp-student-native-sidebar .native-nav-icon{
+  flex:0 0 22px!important;
+  width:22px!important;
+  height:22px!important;
+}
+#teacher-app .native-sidebar .native-nav-icon svg,
+#student-public-view .pp-student-native-sidebar .native-nav-icon svg{
+  width:21px!important;
+  height:21px!important;
+}
