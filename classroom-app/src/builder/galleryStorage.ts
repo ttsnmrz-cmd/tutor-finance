@@ -1,4 +1,21 @@
-export type GalleryImage={id:string;caption:string;name:string};
+import {supabase} from '../supabase';
+export type GalleryImage={id:string;caption:string;name:string;storagePath?:string};
+const BUCKET='classroom-images';
+const extension:Record<string,string>={'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','image/avif':'avif'};
+export async function uploadClassroomImage(file:File):Promise<GalleryImage>{
+ await validateLocalImage(file);
+ const {data:{user},error:authError}=await supabase.auth.getUser();
+ if(authError||!user)throw Error('Sign in before uploading images.');
+ const id=crypto.randomUUID(),path=`${user.id}/${id}.${extension[file.type]}`;
+ const {error}=await supabase.storage.from(BUCKET).upload(path,file,{contentType:file.type,upsert:false});
+ if(error)throw Error(`Image upload failed: ${error.message}`);
+ return {id,name:file.name,caption:'',storagePath:path};
+}
+export async function classroomImageUrl(image:GalleryImage,scope:string):Promise<{src:string;revoke?:()=>void}>{
+ if(image.storagePath){const {data,error}=await supabase.storage.from(BUCKET).createSignedUrl(image.storagePath,3600);if(error||!data?.signedUrl)throw Error('Unable to open image. Check your access.');return {src:data.signedUrl};}
+ const blob=await loadLocalImage(scope,image.id),src=URL.createObjectURL(blob);return {src,revoke:()=>URL.revokeObjectURL(src)};
+}
+
 const database='mec:local-preview-images:v1';
 const allowed=new Set(['image/png','image/jpeg','image/webp','image/gif','image/avif']);
 export const MAX_IMAGE_BYTES=10*1024*1024;
