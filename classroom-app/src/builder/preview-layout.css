@@ -135,3 +135,63 @@
  border:1px solid #e1d5eb!important;border-radius:14px!important;
  padding:10px 18px!important;min-height:48px!important;font-weight:750!important;
 }
+
+/* Teacher and student exercise reading rhythm; avoid excessive spacing in text blocks. */
+.mb-builder.mb-student-preview .mb-student-body,
+.mb-builder.mb-student-preview .mb-student-content,
+.mb-builder.mb-student-preview .mb-combined-element{
+ font-size:17px!important;line-height:1.55!important;
+}
+.mb-builder.mb-student-preview .mb-student-content p,
+.mb-builder.mb-student-preview .mb-combined-element p{
+ margin-block:0 12px!important;line-height:1.55!important;
+}
+.mb-builder.mb-student-preview .mb-combined-element>h2{
+ font-size:clamp(21px,1.65vw,27px)!important;line-height:1.3!important;margin:0 0 18px!important;
+}
+/* Flex preview must reserve a stable Live Notes column, regardless of exercise length. */
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{
+ flex:1 1 0%!important;min-width:0!important;width:0!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
+ flex:0 0 310px!important;width:310px!important;min-width:310px!important;
+ max-width:310px!important;box-sizing:border-box!important;align-self:flex-start!important;
+}
+.mb-builder.mb-student-preview .mb-preview-notes-heading{min-width:0!important}
+.mb-builder.mb-student-preview .mb-preview-notes-heading h2{
+ flex:0 1 auto!important;min-width:0!important;font-size:18px!important;
+}
+.mb-builder.mb-student-preview .mb-notes-format-host{min-width:0!important}
+@media(max-width:1000px){
+ .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
+  flex-basis:270px!important;width:270px!important;min-width:270px!important;max-width:270px!important;
+ }
+}
+@media(max-width:700px){
+ .mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{width:100%!important}
+ .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
+  width:calc(100vw - 20px)!important;min-width:0!important;max-width:none!important;
+ }
+}
+/* Annotation icons: override legacy global button and svg rules only inside pointer tools. */
+.mb-builder.mb-student-preview #pointerTools .annotation-tool-icons{
+ display:flex!important;flex:0 0 auto!important;align-items:center!important;gap:4px!important;
+ width:auto!important;min-width:160px!important;visibility:visible!important;opacity:1!important;
+}
+.mb-builder.mb-student-preview #pointerTools .annotation-tool-icons button{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
+ padding:6px!important;color:var(--ink,#1f242d)!important;
+ background:transparent!important;border:0!important;visibility:visible!important;opacity:1!important;
+}
+.mb-builder.mb-student-preview #pointerTools .annotation-tool-icons button svg{
+ display:block!important;width:22px!important;height:22px!important;
+ fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;
+ visibility:visible!important;opacity:1!important;
+}
+.mb-builder.mb-student-preview #pointerTools .annotation-tool-icons button[data-tool=highlighter]{
+ color:#b68a17!important;
+}
+.mb-builder.mb-student-preview #pointerTools .annotation-tool-icons button[aria-pressed=true]{
+ background:#eee8f6!important;color:#4e2a84!important;
+}
