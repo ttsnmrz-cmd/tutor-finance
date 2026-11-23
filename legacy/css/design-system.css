@@ -578,3 +578,62 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 #student-public-view.pp-student-one-page .student-calendar-day :is(.lesson-status,.status-badge) {
  max-width:100%;white-space:normal;
 }
+
+/* Consistent teacher dashboard outer rhythm, including bottom edge.
+   Keep the inner calendar scroll independent of its outer card. */
+#teacher-app {
+ --pp-page-edge:14px;
+ --pp-section-gap:14px;
+}
+#teacher-app > .native-workspace {
+ padding:var(--pp-page-edge) var(--pp-page-edge) 0!important;
+ margin:0!important;
+}
+#teacher-app #teacher-header.app-header {
+ margin:0 0 var(--pp-section-gap)!important;
+}
+#teacher-app > .native-layout {
+ margin:0!important;
+ padding:0 var(--pp-page-edge) var(--pp-page-edge)!important;
+}
+#teacher-app #teacher-main #tab-dashboard {
+ padding-bottom:0!important;
+ margin-bottom:0!important;
+}
+#teacher-app #dashboard-calendar {
+ margin-bottom:0!important;
+ padding-bottom:0!important;
+}
+#teacher-app #dashboard-calendar>.app-card {
+ margin-bottom:0!important;
+}
+@media(min-width:701px){
+ #teacher-app > .native-layout {
+  gap:var(--pp-section-gap)!important;
+ }
+}
+/* Actual finance markup uses .pp-finances-stat, not .student-finance-stat.
+   Apply dark colors directly to its labels and amounts. */
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-stat {
+ background:#3b3248!important;
+ border:1px solid #645573!important;
+ color:#f4eefa!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-stat > span {
+ color:#cbbfd8!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-stat > b,
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-stat > b * {
+ color:#f7f1fc!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-topups {
+ background:#30283b!important;
+ color:#f4eefa!important;
+ border-color:#645573!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-payments,
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-payments > * {
+ background:transparent!important;
+ color:#f4eefa!important;
+ border-color:#645573!important;
+}
