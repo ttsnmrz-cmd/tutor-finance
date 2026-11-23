@@ -2,7 +2,7 @@
 /*$vite$:1*/
 /* Shared exercise preview geometry for teacher and student modes.
    Both modes render the same .mb-student-preview React component. */
-.mb-builder.mb-student-preview .mb-student-preview,
+.mb-builder.mb-student-preview,
 .mb-builder.mb-student-preview .mb-student-card {
   display: flex;
   flex-direction: column;
