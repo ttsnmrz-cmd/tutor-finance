@@ -327,3 +327,23 @@
 .mb-builder.mb-student-preview .mb-image-label-check:hover:not(:disabled){
  background:#3d2169!important;border-color:#3d2169!important;
 }
+
+/* Consistent checkboxes in teacher hints and exercise answers. */
+.mb-builder.mb-student-preview input[type="checkbox"]{
+ appearance:none!important;-webkit-appearance:none!important;
+ display:inline-grid!important;place-content:center!important;
+ width:19px!important;height:19px!important;min-width:19px!important;
+ flex:0 0 19px!important;margin:0!important;padding:0!important;
+ border:1.5px solid #6b7280!important;border-radius:5px!important;
+ background:#fff!important;box-shadow:none!important;cursor:pointer!important;
+ vertical-align:middle!important;
+}
+.mb-builder.mb-student-preview input[type="checkbox"]::before{
+ content:""!important;width:10px!important;height:10px!important;
+ transform:scale(0)!important;transition:transform .12s ease!important;
+ background:#4e2a84!important;clip-path:polygon(14% 44%,0 62%,39% 100%,100% 18%,83% 0,37% 70%)!important;
+}
+.mb-builder.mb-student-preview input[type="checkbox"]:checked::before{transform:scale(1)!important}
+.mb-builder.mb-student-preview input[type="checkbox"]:focus-visible{
+ outline:2px solid #4e2a84!important;outline-offset:3px!important;
+}
