@@ -1876,6 +1876,7 @@ let publicStudentLessons=[];
 let publicStudentPayments=[];
 let publicStudentWeekAnchor=null;
 let publicStudentCalendarLessons=[];
+let publicStudentLiveStatuses=new Map();
 
 function switchPublicStudentTab(tab){
  if(!['dashboard','lessons','finances'].includes(tab))return;
@@ -1979,6 +1980,9 @@ async function initPublicStudent(){
     }
 
     nameEl.textContent='Ученик: '+publicStudent.name;
+    const live=await supabaseClient.rpc('get_public_student_live_status',{p_student_id:id});
+    if(!live.error&&Array.isArray(live.data))publicStudentLiveStatuses=new Map(live.data.map(x=>[String(x.calendar_lesson_id),x]));
+    else if(live.error)console.warn('Live status unavailable:',live.error.message);
     await openStudentCabinet();
 
   }catch(e){
@@ -2080,7 +2084,7 @@ async function openStudentCabinet(){
     '<span class="text-slate-400">Пополнений нет</span>';
 
   const dashboardBalance=document.getElementById('public-dashboard-balance');if(dashboardBalance)dashboardBalance.textContent=money(paid-spent);
-  const nextLesson=document.getElementById('public-next-lesson');if(nextLesson){const next=future[0];nextLesson.textContent=next?'Next lesson: '+next.date+' · '+displayTime(next.time):'No upcoming lessons scheduled.';}
+  const nextLesson=document.getElementById('public-next-lesson');if(nextLesson){const active=ls.find(l=>publicStudentLiveStatuses.get(String(l.id))?.status==='active');const next=active||future[0];nextLesson.textContent=next?(active?'🟢 Lesson in progress: ':'Next lesson: ')+next.date+' · '+displayTime(next.time):'No upcoming lessons scheduled.';}
   renderPublicLessonsHistory(ls);
   renderPublicStudentCalendar(ls);
 
