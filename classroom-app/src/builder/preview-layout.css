@@ -33,48 +33,49 @@
   width:100%!important;box-sizing:border-box!important;padding:0!important;margin:0!important;
   font:inherit!important;color:var(--ink)!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-student-card{
+/* Shared React lesson preview surfaces. Both roles use these same controls. */
+.mb-builder.mb-student-preview .mb-student-card{
   background:var(--card)!important;border:1px solid var(--line)!important;border-radius:22px!important;
   overflow:hidden!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-student-body{
+.mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{
   padding:24px 28px!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-choice-student-question{
+.mb-builder.mb-student-preview .mb-choice-student-question{
   border:0!important;padding:12px 0 8px!important;margin:0 0 16px!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-choice-answer{
+.mb-builder.mb-student-preview .mb-choice-answer{
   display:flex!important;align-items:center!important;gap:12px!important;
   width:100%!important;box-sizing:border-box!important;padding:13px 16px!important;
   margin:0 0 9px!important;background:var(--page)!important;
   border:1px solid var(--line)!important;border-radius:14px!important;
   color:var(--ink)!important;cursor:pointer!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-choice-answer input{
+.mb-builder.mb-student-preview .mb-choice-answer input{
   appearance:auto!important;width:22px!important;height:22px!important;
   flex:0 0 22px!important;margin:0!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-check-actions button{
+.mb-builder.mb-student-preview .mb-check-actions button{
   display:inline-flex!important;align-items:center!important;justify-content:center!important;
   background:var(--soft)!important;color:var(--ink)!important;
   border:1px solid var(--line)!important;border-radius:11px!important;
   padding:9px 14px!important;font-weight:700!important;width:auto!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-preview-pointer{
+.mb-builder.mb-student-preview .mb-preview-pointer{
   width:auto!important;flex:0 0 auto!important;min-width:0!important;
 }
-#student-live-material .profiprofit-student-lesson #pointerToggle{
+.mb-builder.mb-student-preview #pointerToggle{
   width:auto!important;min-width:110px!important;max-width:180px!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-preview-controls{
+.mb-builder.mb-student-preview .mb-preview-controls{
   display:flex!important;align-items:center!important;justify-content:flex-end!important;
   flex-wrap:wrap!important;gap:8px!important;width:auto!important;
 }
-#student-live-material .profiprofit-student-lesson .mb-preview-footer{
+.mb-builder.mb-student-preview .mb-preview-footer{
   margin-top:auto!important;
 }
 @media(max-width:700px){
- #student-live-material .profiprofit-student-lesson .mb-student-body{padding:18px 16px!important}
+ .mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding:18px 16px!important}
 }
 
 /* Canonical exercise actions and navigation: shared across all exercise types and roles. */
