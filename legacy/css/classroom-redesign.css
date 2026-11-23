@@ -20,8 +20,7 @@ body{background:#F4F5F7!important;color:var(--text-color)!important}
 #teacher-app .text-indigo-700{color:#4E2A84!important}
 #teacher-app .border-indigo-200{border-color:#D7DAE2!important}
 #teacher-app .bg-slate-100{background:#F0F1F4!important}
-#teacher-app button:where(:not(#classroom-materials-root *)){transition:background .16s,box-shadow .16s,transform .16s}
-#teacher-app button:where(:not(#classroom-materials-root *)):focus-visible{outline:3px solid #a98fc5;outline-offset:2px}
+
 #tab-dashboard .dashboard-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:4px 0 22px!important}
 #tab-dashboard .dashboard-greeting-kicker,#dashboard-greeting-kicker{color:#6B7280!important;font-size:12px!important}
 #dashboard-greeting-title{font-size:clamp(25px,3vw,34px)!important;font-weight:750!important;color:#1F242D!important;line-height:1.15!important;margin-top:5px}
@@ -35,7 +34,7 @@ body{background:#F4F5F7!important;color:var(--text-color)!important}
 #tab-calendar .flex.gap-2>button{border-radius:12px!important}
 #week-calendar{gap:6px!important}
 #tab-students .app-card,#tab-materials .app-card{padding:22px!important}
-#teacher-app input:not([type=checkbox]):where(:not(#classroom-materials-root *)),#teacher-app select:where(:not(#classroom-materials-root *)),#teacher-app textarea:where(:not(#classroom-materials-root *)){border-radius:12px!important;border-color:#e1d9e9!important}
+
 #teacher-app .rounded-3xl{border-radius:20px!important}
 #teacher-app .rounded-2xl{border-radius:15px!important}
 html[data-theme=dark] body{background:#211c2b!important;color:#eee8f4!important}
@@ -424,8 +423,7 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
 /* Unified ProfiProfit light theme: neutral surfaces and gold primary actions. */
 html:not([data-theme="dark"]) #teacher-app{--bg-color:#F4F5F7;--card-bg:#FFFFFF;--text-color:#1F242D;--text-secondary:#6B7280;--primary-color:#4E2A84;--primary-hover:#3D2169;--accent-soft:#F0F1F4;--border-color:#E0E3E9;--cta-color:#D99B26}
 html:not([data-theme="dark"]) #teacher-app .native-sidebar button.is-active{background:#EAE5F2!important;color:#4E2A84!important}
-html:not([data-theme="dark"]) #teacher-app .primary-btn,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]{background:#D99B26!important;color:#1F242D!important;border-color:#D99B26!important}
-html:not([data-theme="dark"]) #teacher-app .primary-btn:hover,html:not([data-theme="dark"]) #teacher-app button[data-variant="primary"]:hover{background:#C48918!important}
+
 
 /* Unified brand: calmer plum instead of bright violet. */
 
