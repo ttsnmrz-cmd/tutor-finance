@@ -271,12 +271,21 @@ html:not([data-theme="dark"]) #teacher-app :is(.primary-btn,button[data-variant=
  background:var(--pp-ui-accent-hover)!important;
 }
 
+/* Canonical dashboard summary cards: shared geometry and density. */
+#teacher-app #dashboard-cards {gap:10px!important;margin-bottom:12px!important}
+#teacher-app #dashboard-cards>* {
+ border:1px solid #E0E3E9!important;
+ border-radius:var(--pp-ui-radius-card)!important;
+ box-shadow:0 8px 28px rgba(74,50,108,.045)!important;
+ min-height:92px!important;
+ padding:14px 16px!important;
+}
 /* Teacher dashboard card primitives (migrated from legacy stylesheet).
    Keep legacy selectors and declarations until component markup is standardized. */
 #teacher-app .app-card{border:1px solid #E0E3E9!important;box-shadow:0 8px 30px rgba(69,44,104,.045)!important;background:#fff;border-radius:20px!important}
 #teacher-app main>section>.app-card{padding:24px!important}
-#dashboard-cards{gap:16px!important;margin-bottom:18px!important}
-#dashboard-cards>*{border:1px solid #E0E3E9!important;border-radius:20px!important;box-shadow:0 8px 28px rgba(74,50,108,.045)!important;min-height:120px}
+
+
 #tab-dashboard>.grid>.app-card{min-height:200px;padding:22px!important}
 #tab-calendar>.app-card{padding:24px!important}
 #tab-students .app-card,#tab-materials .app-card{padding:22px!important}
@@ -486,8 +495,8 @@ html[data-theme="dark"] #teacher-app #dashboard-calendar :is(.calendar-weekday,.
 }
 
 /* Dashboard density: reduce vertical footprint without changing lesson times. */
-#teacher-app #dashboard-cards {gap:10px!important;margin-bottom:12px!important}
-#teacher-app #dashboard-cards>* {min-height:92px!important;padding:14px 16px!important}
+
+
 #teacher-app #dashboard-cards>* :is(.text-2xl,.text-3xl) {font-size:23px!important;line-height:1.2!important}
 #teacher-app #dashboard-calendar .native-calendar-scroll :is(.native-calendar-event,.native-event) {font-size:12px}
 @media(max-width:900px) {
