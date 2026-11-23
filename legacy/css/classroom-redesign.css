@@ -259,7 +259,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 .native-layout.sidebar-collapsed .native-sidebar{padding:12px 8px!important}
 .native-layout.sidebar-collapsed .native-sidebar-label,.native-layout.sidebar-collapsed .native-sidebar-footer,.native-layout.sidebar-collapsed .native-nav-text{display:none!important}
 .native-layout.sidebar-collapsed .native-sidebar button[data-native-tab]{justify-content:center!important;padding:12px 6px!important}
-@media(max-width:700px){.native-layout.sidebar-collapsed{grid-template-columns:minmax(0,1fr)!important}}
+@media(max-width:700px){.native-layout.sidebar-collapsed{grid-template-columns:60px minmax(0,1fr)!important}}
 #groups-list .group-card{min-width:0!important}
 #groups-list .group-card>div{min-width:0!important;flex-wrap:wrap!important;gap:8px!important}
 dialog.mb-dialog[open],dialog.ml-dialog[open]{position:fixed!important;inset:0!important;margin:auto!important;width:min(520px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;max-height:85dvh!important;padding:24px!important;background:#fff!important;color:#1F242D!important;border:1px solid #E0E3E9!important;border-radius:18px!important;box-shadow:0 24px 80px #21163155!important;overflow:auto!important;transform:none!important;z-index:2147483647!important}
@@ -780,6 +780,16 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 #student-public-view.pp-student-one-page #student-portal-dashboard{padding-top:14px!important}
 @media(max-width:600px){#student-public-view .pp-student-header-actions{flex-wrap:wrap!important;justify-content:flex-end!important}}
 
+/* Teacher mobile navigation: one vertical icon rail, no horizontal scroll. */
+@media(max-width:700px){
+ #teacher-app .native-layout,
+ #teacher-app .native-layout.sidebar-collapsed{grid-template-columns:60px minmax(0,1fr)!important}
+ #teacher-app .native-sidebar{flex-direction:column!important;align-items:center!important;overflow-x:hidden!important;overflow-y:visible!important;width:60px!important;box-sizing:border-box!important;padding:8px 5px!important}
+ #teacher-app .native-sidebar button[data-native-tab]{width:48px!important;min-width:0!important;flex:0 0 auto!important;justify-content:center!important;padding:10px!important;white-space:nowrap!important}
+ #teacher-app .native-sidebar .native-nav-text{display:none!important}
+ #teacher-app .native-sidebar .native-nav-icon{margin:0!important}
+ #teacher-app .native-sidebar .classroom-sidebar-toggle{margin:0 auto 10px!important}
+}
 /* AppHeader — one geometric contract for every role and viewport.
    Theme changes only tokens (colors), never spacing, typography or layout. */
 #teacher-header.app-header,
