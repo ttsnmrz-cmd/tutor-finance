@@ -2010,10 +2010,14 @@ function showPublicLessonMaterial(data){
  const profileWrap=document.createElement('div');profileWrap.className='pp-student-profile-wrap';
  const profile=document.createElement('button');profile.type='button';profile.className='pp-student-profile-button';profile.innerHTML='<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';profile.title=publicStudent?.name||'Student';profile.setAttribute('aria-label','Profile settings');
  const menu=document.createElement('div');menu.className='pp-student-profile-menu';menu.hidden=true;
- const studentName=document.createElement('strong');studentName.textContent='Profile & settings';studentName.className='pp-student-menu-title';menu.append(studentName);
+ 
  const language=document.createElement('label');language.textContent='Language ';const select=document.createElement('select');select.innerHTML='<option value="en">English</option><option value="ru">Русский</option>';select.value=localStorage.getItem('profiprofit-language')||'en';select.onchange=()=>{localStorage.setItem('profiprofit-language',select.value);if(typeof setLanguage==='function')setLanguage(select.value);};language.append(select);menu.append(language);
  const theme=document.createElement('button');theme.type='button';theme.textContent='☾ Dark theme';theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();};menu.append(theme);
- profile.onclick=()=>{menu.hidden=!menu.hidden;};profileWrap.append(profile,menu);header.append(brand,profileWrap);overlay.append(header);
+ profile.setAttribute('aria-expanded','false');
+ profile.onclick=()=>{menu.hidden=!menu.hidden;profile.setAttribute('aria-expanded',String(!menu.hidden));};
+ overlay.addEventListener('pointerdown',event=>{if(!profileWrap.contains(event.target)){menu.hidden=true;profile.setAttribute('aria-expanded','false');}});
+ overlay.addEventListener('keydown',event=>{if(event.key==='Escape'){menu.hidden=true;profile.setAttribute('aria-expanded','false');profile.focus();}});
+ profileWrap.append(profile,menu);header.append(brand,profileWrap);overlay.append(header);
  const layout=document.createElement('div');layout.className='native-layout pp-student-live-layout';restoreStudentSidebar(layout);
  const backTo=tab=>{sessionStorage.removeItem('pp-student-live-lesson');overlay.remove();switchPublicStudentTab(tab);};
  layout.append(studentPortalSidebar(backTo));
