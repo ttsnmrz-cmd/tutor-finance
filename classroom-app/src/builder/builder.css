@@ -488,3 +488,18 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 .mb-builder.mb-student-preview .mb-preview-tools-row>.mb-teacher-hints-toggle{flex:none;margin:0!important;font-size:13px!important}
 .mb-builder.mb-student-preview .mb-preview-tools-row>.mb-preview-controls{margin:0 0 0 auto!important;width:auto!important;justify-content:flex-end!important;min-width:0}
 @media(max-width:800px){.mb-builder.mb-student-preview .mb-preview-tools-row{flex-wrap:wrap}.mb-builder.mb-student-preview .mb-preview-tools-row>.mb-preview-controls{flex-wrap:wrap}.mb-builder.mb-student-preview .mb-preview-heading-row>h1{font-size:19px!important}}
+
+/* Compact builder header: breadcrumb, title/actions, tabs in a clear hierarchy. */
+.mb-builder:not(.mb-student-preview)>.mb-breadcrumb{margin:0 0 6px!important;min-height:24px;gap:8px!important}
+.mb-builder:not(.mb-student-preview)>.mb-top{display:flex!important;align-items:center!important;gap:16px!important;margin:0 0 8px!important;padding:0!important;min-height:64px}
+.mb-builder:not(.mb-student-preview)>.mb-top .mb-title-group{gap:10px!important;min-width:0}
+.mb-builder:not(.mb-student-preview)>.mb-top .mb-title-group>svg{width:23px;height:23px}
+.mb-builder:not(.mb-student-preview)>.mb-top .mb-title-line>input{font-size:23px!important;line-height:1.2!important;padding:2px 0!important}
+.mb-builder:not(.mb-student-preview)>.mb-top .mb-title-group small{margin-top:2px!important;line-height:1.35!important}
+.mb-builder:not(.mb-student-preview)>.mb-top .mb-top-tools{gap:5px!important;align-items:flex-end!important}
+.mb-builder:not(.mb-student-preview)>.mb-top .mb-top-buttons{gap:7px!important}
+.mb-builder:not(.mb-student-preview)>.mb-top .mb-top-buttons button{min-height:36px!important}
+.mb-builder:not(.mb-student-preview)>.mb-tabs{display:flex!important;align-items:center!important;gap:6px!important;margin:0 0 12px!important;min-height:39px}
+.mb-builder:not(.mb-student-preview)>.mb-tabs>button:not(.mb-structure-toggle){padding:8px 13px!important;min-height:36px!important}
+.mb-builder:not(.mb-student-preview)>.mb-tabs>.mb-structure-toggle{margin-left:auto!important;min-height:32px!important;min-width:110px!important;padding:6px 10px!important;border-radius:9px!important}
+@media(max-width:700px){.mb-builder:not(.mb-student-preview)>.mb-top{flex-wrap:wrap!important}.mb-builder:not(.mb-student-preview)>.mb-top .mb-top-tools{width:100%;flex-direction:row!important;align-items:center!important;justify-content:space-between!important}.mb-builder:not(.mb-student-preview)>.mb-tabs>.mb-structure-toggle{margin-left:auto!important}}
