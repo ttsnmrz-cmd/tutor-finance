@@ -20,7 +20,8 @@ window.mountProfiProfitMaterials=(target,userId,client)=>{
 
 // Reuse the same interactive exercise renderer for the public student cabinet.
 // Student data is provided by the scoped public RPC, never by teacher repository access.
-(window as Window & {mountProfiProfitStudentLesson?:(target:HTMLElement,plan:Plan)=>void}).mountProfiProfitStudentLesson=(target,plan)=>{
+(window as Window & {mountProfiProfitStudentLesson?:(target:HTMLElement,plan:Plan,client:SupabaseClient)=>void}).mountProfiProfitStudentLesson=(target,plan,client)=>{
+ setProfiProfitSupabase(client);
  target.setAttribute('data-classroom-root','');
  target.classList.add('profiprofit-student-lesson');
  if(!document.getElementById('profiprofit-student-preview-styles')){
