@@ -60,7 +60,7 @@ html[data-theme=dark] .teacher-nav button.bg-indigo-600{background:#4b3c60!impor
 html[data-theme=dark] .native-sidebar{background:#30283b;border-color:#4b4059}
 html[data-theme=dark] .native-sidebar button{color:#c9bed5}
 html[data-theme=dark] .native-sidebar button.is-active{background:#4a3a5b;color:#f4e9ff}
-@media(max-width:950px){.native-layout{grid-template-columns:1fr;gap:12px}.native-sidebar{position:static;min-height:0;display:flex;flex-direction:row;align-items:center;overflow-x:auto;padding:6px 8px;border-radius:14px;gap:4px}.native-sidebar-label,.native-sidebar-footer{display:none}.native-sidebar button{flex:0 0 auto;width:auto;padding:10px 12px;white-space:nowrap}.native-sidebar button span{font-size:16px;width:17px}}
+@media(max-width:700px){.native-layout{grid-template-columns:1fr;gap:12px}.native-sidebar{position:static;min-height:0;display:flex;flex-direction:row;align-items:center;overflow-x:auto;padding:6px 8px;border-radius:14px;gap:4px}.native-sidebar-label,.native-sidebar-footer{display:none}.native-sidebar button{flex:0 0 auto;width:auto;padding:10px 12px;white-space:nowrap}.native-sidebar button span{font-size:16px;width:17px}}
 
 /* Content-area redesign: separate functional panels, not merely a new app shell. */
 .native-page-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 20px;padding:5px 2px 0}
@@ -245,14 +245,14 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 #teacher-app .native-layout{margin-top:-32px}
 #tab-materials .native-page-heading{margin-bottom:12px;padding-top:0}
 #tab-materials>.app-card{padding-top:16px!important}
-@media(max-width:950px){#teacher-app .native-layout{margin-top:-12px}}
+@media(max-width:700px){#teacher-app .native-layout{margin-top:0}}
 
 .native-sidebar-toggle{display:flex!important;justify-content:center!important;width:34px!important;height:34px!important;padding:4px!important;margin:0 0 10px auto!important;background:#F0F1F4!important;border-radius:10px!important}
 .native-layout.sidebar-collapsed{grid-template-columns:72px minmax(0,1fr)!important}
 .native-layout.sidebar-collapsed .native-sidebar{padding:12px 8px!important}
 .native-layout.sidebar-collapsed .native-sidebar-label,.native-layout.sidebar-collapsed .native-sidebar-footer,.native-layout.sidebar-collapsed .native-nav-text{display:none!important}
 .native-layout.sidebar-collapsed .native-sidebar button[data-native-tab]{justify-content:center!important;padding:12px 6px!important}
-@media(max-width:950px){.native-layout.sidebar-collapsed{grid-template-columns:minmax(0,1fr)!important}}
+@media(max-width:700px){.native-layout.sidebar-collapsed{grid-template-columns:minmax(0,1fr)!important}}
 #groups-list .group-card{min-width:0!important}
 #groups-list .group-card>div{min-width:0!important;flex-wrap:wrap!important;gap:8px!important}
 dialog.mb-dialog[open],dialog.ml-dialog[open]{position:fixed!important;inset:0!important;margin:auto!important;width:min(520px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;max-height:85dvh!important;padding:24px!important;background:#fff!important;color:#1F242D!important;border:1px solid #E0E3E9!important;border-radius:18px!important;box-shadow:0 24px 80px #21163155!important;overflow:auto!important;transform:none!important;z-index:2147483647!important}
@@ -498,3 +498,14 @@ html[data-theme="dark"] #teacher-app .native-calendar-time{background:#30283b!im
 html[data-theme="dark"] #teacher-app .native-calendar-header{background:#30283b!important;color:#f4eefa!important}
 html[data-theme="dark"] #teacher-app .native-calendar :is(.text-slate-300,.text-slate-400,.text-slate-500,.text-slate-600){color:#c6b8d5!important}
 html[data-theme="dark"] #teacher-app .native-calendar .native-timed-event:not(.is-cancelled){background:#dce9e2!important;color:#241a31!important}
+
+/* Keep the navigation beside content on tablet/compact desktop widths. */
+@media (min-width:701px) and (max-width:950px){
+  #teacher-app .native-layout{display:grid!important;grid-template-columns:186px minmax(0,1fr)!important;gap:12px!important;margin-top:0!important;align-items:start!important}
+  #teacher-app .native-layout.sidebar-collapsed{grid-template-columns:70px minmax(0,1fr)!important}
+  #teacher-app .native-sidebar{position:sticky!important;top:12px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;overflow:visible!important;min-height:calc(100dvh - 170px)!important;padding:12px 8px!important;gap:5px!important}
+  #teacher-app .native-sidebar button[data-native-tab]{width:100%!important;flex:0 0 auto!important}
+  #teacher-app .native-layout.sidebar-collapsed .native-sidebar button[data-native-tab]{justify-content:center!important;padding:11px 6px!important}
+  #teacher-app .native-layout.sidebar-collapsed .native-nav-text{display:none!important}
+  #teacher-app #teacher-main{min-width:0!important}
+}
