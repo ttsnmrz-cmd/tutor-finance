@@ -1879,6 +1879,7 @@ let publicStudentCalendarLessons=[];
 let publicStudentLiveStatuses=new Map();
 
 function switchPublicStudentTab(tab){
+ ensureStudentPortalLayout();
  if(!['dashboard','lessons','finances'].includes(tab))return;
  document.querySelectorAll('[data-student-tab]').forEach(b=>b.classList.toggle('is-active',b.dataset.studentTab===tab));
  ['dashboard','lessons','finances'].forEach(t=>document.getElementById('student-portal-'+t)?.classList.toggle('hidden',t!==tab));
@@ -1898,15 +1899,94 @@ async function openPublicCalendarLesson(index){
   showPublicLessonMaterial(data);
  }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
+function studentPortalSidebar(onNavigate){
+ const nav=document.createElement('aside');nav.className='pp-student-sidebar';
+ const collapsed=localStorage.getItem('pp-student-sidebar-collapsed')==='true';
+ if(collapsed)nav.classList.add('collapsed');
+ const toggle=document.createElement('button');toggle.type='button';toggle.className='pp-student-sidebar-toggle';toggle.textContent='☰';toggle.title='Collapse or expand menu';toggle.setAttribute('aria-label','Collapse or expand menu');
+ toggle.onclick=()=>{nav.classList.toggle('collapsed');localStorage.setItem('pp-student-sidebar-collapsed',String(nav.classList.contains('collapsed')));};
+ nav.append(toggle);
+ for(const [tab,icon,label] of [['dashboard','⌂','Dashboard'],['lessons','▤','Lessons'],['finances','▣','Payments']]){
+  const button=document.createElement('button');button.type='button';button.className='pp-student-sidebar-link';button.title=label;button.dataset.studentTab=tab;
+  const glyph=document.createElement('span');glyph.textContent=icon;glyph.className='pp-student-sidebar-icon';
+  const text=document.createElement('span');text.textContent=label;text.className='pp-student-sidebar-label';
+  button.append(glyph,text);button.onclick=()=>onNavigate(tab);nav.append(button);
+ }
+ return nav;
+}
+function ensureStudentPortalLayout(){
+ const portal=document.getElementById('student-public-view');
+ if(!portal||portal.querySelector('.pp-student-layout'))return;
+ const content=portal.querySelector('#student-public-content');
+ if(!content)return;
+ const layout=document.createElement('div');layout.className='pp-student-layout';
+ const sidebar=studentPortalSidebar(tab=>switchPublicStudentTab(tab));
+ content.parentNode.insertBefore(layout,content);layout.append(sidebar,content);
+ const oldTabs=content.querySelector('.student-portal-tabs');if(oldTabs)oldTabs.classList.add('hidden');
+ const style=document.createElement('style');style.id='pp-student-shell-styles';style.textContent=`
+ #student-public-view{max-width:none!important;padding:12px!important}
+ #student-public-view>.app-card{max-width:none!important}
+ .pp-student-layout{display:flex;gap:16px;align-items:stretch}
+ .pp-student-layout>#student-public-content{flex:1;min-width:0}
+ .pp-student-sidebar{width:174px;flex:none;background:#fff;border:1px solid #e9e3f1;border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;transition:width .2s}
+ .pp-student-sidebar.collapsed{width:58px}
+ .pp-student-sidebar-toggle,.pp-student-sidebar-link{border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px;color:#4b287e;white-space:nowrap;text-align:left}
+ .pp-student-sidebar-toggle{font-size:20px}
+ .pp-student-sidebar-link:hover,.pp-student-sidebar-link.is-active{background:#eee8f7}
+ .pp-student-sidebar-icon{width:22px;flex:none;text-align:center;font-size:22px}
+ .pp-student-sidebar.collapsed .pp-student-sidebar-label{display:none}
+ #student-live-material{padding:0!important}
+ #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#fff;border-bottom:1px solid #e9e3f1}
+ #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
+ #student-live-material .pp-student-live-main{min-width:0;flex:1}
+ #student-live-material .pp-student-live-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,27%);gap:14px}
+ #student-live-material .pp-student-live-notes{background:#fff;border:1px solid #e9e3f1;border-radius:16px;padding:14px}
+ #student-live-material .pp-student-live-notes textarea{width:100%;min-height:340px;background:#f8f7fb;border-radius:10px;padding:12px;resize:vertical}
+ #student-live-material .pp-student-live-tools{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+ #student-live-material .pp-student-pointer{position:relative}
+ #student-live-material .pp-student-pointer canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;z-index:2;pointer-events:none}
+ #student-live-material .pp-student-pointer.drawing canvas{pointer-events:auto;cursor:crosshair}
+ @media(max-width:780px){#student-live-material .pp-student-live-content{grid-template-columns:1fr}.pp-student-sidebar{width:58px}.pp-student-sidebar-label{display:none}}
+ `;document.head.append(style);
+}
 function showPublicLessonMaterial(data){
+ ensureStudentPortalLayout();
  let overlay=document.getElementById('student-live-material');
- if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f8f7fb;overflow:auto;padding:18px';document.body.append(overlay);}
+ if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f8f7fb;overflow:auto';document.body.append(overlay);}
  overlay.replaceChildren();
- const wrap=document.createElement('main');wrap.style.cssText='max-width:1120px;margin:auto;background:white;border-radius:16px;padding:18px';
- const back=document.createElement('button');back.textContent='← Back to dashboard';back.style.cssText='padding:9px 14px;border-radius:10px;background:#eee8f7;color:#4b287e;margin-bottom:14px';back.onclick=()=>overlay.remove();wrap.append(back);
- const host=document.createElement('div');wrap.append(host);overlay.append(wrap);
+ const header=document.createElement('header');header.className='pp-student-live-header';
+ const brand=document.createElement('div');brand.style.cssText='display:flex;align-items:center;gap:12px;font-weight:700;color:#4b287e;font-size:22px';
+ const logo=document.createElement('img');logo.src='/legacy/ProfoProfit_logo svg.svg';logo.alt='';logo.style.cssText='width:46px;height:46px';brand.append(logo,document.createTextNode('ProfiProfit'));
+ const profile=document.createElement('span');profile.textContent=publicStudent?.name||'Student';header.append(brand,profile);overlay.append(header);
+ const layout=document.createElement('div');layout.className='pp-student-live-layout';
+ const backTo=tab=>{overlay.remove();switchPublicStudentTab(tab);};
+ layout.append(studentPortalSidebar(backTo));
+ const main=document.createElement('main');main.className='pp-student-live-main';
+ const back=document.createElement('button');back.textContent='← Back to dashboard';back.style.cssText='padding:8px 12px;border-radius:10px;background:#eee8f7;color:#4b287e;margin-bottom:12px';back.onclick=()=>backTo('dashboard');main.append(back);
+ const tools=document.createElement('div');tools.className='pp-student-live-tools';
+ const pointer=document.createElement('button');pointer.textContent='✎ Pointer';pointer.className='pp-student-sidebar-link';pointer.setAttribute('aria-pressed','false');
+ const clear=document.createElement('button');clear.textContent='Clear drawing';clear.className='pp-student-sidebar-link';
+ const timer=document.createElement('span');timer.textContent='Timer 00:00';const timerButton=document.createElement('button');timerButton.textContent='Start';timerButton.className='pp-student-sidebar-link';
+ let seconds=0,tick=null;timerButton.onclick=()=>{if(tick){clearInterval(tick);tick=null;timerButton.textContent='Start';return;}tick=setInterval(()=>{seconds++;timer.textContent='Timer '+String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');},1000);timerButton.textContent='Pause';};
+ tools.append(pointer,clear,timer,timerButton);main.append(tools);
+ const columns=document.createElement('div');columns.className='pp-student-live-content';
+ const drawWrap=document.createElement('div');drawWrap.className='pp-student-pointer';
+ const host=document.createElement('div');drawWrap.append(host);
+ const canvas=document.createElement('canvas');drawWrap.append(canvas);
+ let drawing=false;function resize(){const bounds=drawWrap.getBoundingClientRect();if(!bounds.width||!bounds.height)return;const image=canvas.width?canvas.toDataURL():null;canvas.width=Math.round(bounds.width);canvas.height=Math.round(bounds.height);if(image){const img=new Image();img.onload=()=>canvas.getContext('2d').drawImage(img,0,0);img.src=image;}}
+ pointer.onclick=()=>{drawWrap.classList.toggle('drawing');pointer.setAttribute('aria-pressed',String(drawWrap.classList.contains('drawing')));resize();};
+ clear.onclick=()=>canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+ canvas.onpointerdown=e=>{drawing=true;canvas.setPointerCapture(e.pointerId);const rect=canvas.getBoundingClientRect(),ctx=canvas.getContext('2d');ctx.strokeStyle='#6b40a4';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(e.clientX-rect.left,e.clientY-rect.top);};
+ canvas.onpointermove=e=>{if(!drawing)return;const rect=canvas.getBoundingClientRect(),ctx=canvas.getContext('2d');ctx.lineTo(e.clientX-rect.left,e.clientY-rect.top);ctx.stroke();};
+ canvas.onpointerup=()=>{drawing=false;};
+ const notes=document.createElement('aside');notes.className='pp-student-live-notes';const notesTitle=document.createElement('h3');notesTitle.textContent='▤ Live Notes';notesTitle.style.cssText='font-weight:700;margin-bottom:12px';
+ const noteArea=document.createElement('textarea');noteArea.placeholder='Teacher notes will appear here when live sharing is enabled.';noteArea.readOnly=true;notes.append(notesTitle,noteArea);
+ columns.append(drawWrap,notes);main.append(columns);layout.append(main);overlay.append(layout);
+ const observer=new ResizeObserver(()=>resize());observer.observe(drawWrap);
+ const cleanup=()=>{observer.disconnect();if(tick)clearInterval(tick);};back.addEventListener('click',cleanup);
+ layout.querySelectorAll('.pp-student-sidebar-link[data-student-tab]').forEach(b=>b.addEventListener('click',cleanup));
  if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan);
- else {host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
+ else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
 }
 
 function renderPublicLessonsHistory(rows){
