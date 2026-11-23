@@ -550,13 +550,7 @@ html[data-theme="dark"] #teacher-app #dashboard-calendar :is(.calendar-weekday,.
  #teacher-app #dashboard-cards>* {min-height:88px!important;padding:12px!important}
  #teacher-app #dashboard-calendar .native-calendar-scroll {height:38vh!important;min-height:270px!important}
 }
-/* Student dark mode: text contrast on nested finance statistics and payment rows. */
-html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances :is(.student-theme-panel,.student-finance-card,.student-finance-stat,#public-payments,#public-payments *,#public-finance-summary) {
- background-color:transparent!important;color:#f4eefa!important;
-}
-html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances :is(.student-theme-panel,.student-finance-card,.student-finance-stat) {
- background-color:#3b3248!important;border-color:#645573!important;
-}
+/* Finance text utilities: keep Tailwind overrides scoped to student finance. */
 html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances :is(.text-gray-900,.text-gray-800,.text-slate-900,.text-slate-800,.text-slate-700,.text-gray-700,.text-black) {
  color:#f4eefa!important;
 }
@@ -612,8 +606,7 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
   gap:var(--pp-section-gap)!important;
  }
 }
-/* Actual finance markup uses .pp-finances-stat, not .student-finance-stat.
-   Apply dark colors directly to its labels and amounts. */
+/* Canonical student finance dark-theme component rules (real DOM classes). */
 html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances .pp-finances-stat {
  background:#3b3248!important;
  border:1px solid #645573!important;
