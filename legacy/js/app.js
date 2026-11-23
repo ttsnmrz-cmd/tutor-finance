@@ -1931,9 +1931,30 @@ function restoreStudentSidebar(layout){
  if(localStorage.getItem('pp-student-sidebar-collapsed')==='1')layout.classList.add('sidebar-collapsed');
 }
 
+function syncStudentPortalHeader(){
+ // The student portal uses the actual teacher header DOM, not a second brand implementation.
+ const portal=document.getElementById('student-public-view');
+ const original=document.getElementById('teacher-header');
+ const old=portal?.querySelector('.student-brand-header');
+ if(!portal||!original||!old||old.dataset.sharedHeader==='1')return;
+ const header=original.cloneNode(true);
+ header.removeAttribute('id');
+ header.classList.add('student-brand-header');
+ header.dataset.sharedHeader='1';
+ header.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+ header.querySelectorAll('[onclick]').forEach(node=>node.removeAttribute('onclick'));
+ header.querySelector('.teacher-header-actions')?.remove();
+ const brand=header.querySelector('button');
+ if(brand){brand.onclick=null;brand.type='button';brand.setAttribute('aria-label','ProfiProfit');brand.style.cursor='default';}
+ const subtitle=header.querySelector('.text-slate-500');
+ if(subtitle)subtitle.textContent='Lessons, students and payments';
+ old.replaceWith(header);
+}
 function ensureStudentPortalLayout(){
  const portal=document.getElementById('student-public-view');
- if(!portal||portal.querySelector('.pp-student-layout'))return;
+ if(!portal)return;
+ syncStudentPortalHeader();
+ if(portal.querySelector('.pp-student-layout'))return;
  const content=portal.querySelector('#student-public-content');
  if(!content)return;
  const layout=document.createElement('div');layout.className='native-layout pp-student-layout';restoreStudentSidebar(layout);
