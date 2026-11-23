@@ -1969,6 +1969,16 @@ function syncStudentPortalHeader(){
      theme.textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾';
    });
    actions.append(theme);
+   // Move the existing student name node (not a duplicate) to the far right.
+   // The dashboard renderer can continue updating #public-student-title.
+   const studentTitle=document.getElementById('public-student-title');
+   const greeting=studentTitle?.parentElement;
+   if(greeting){
+     greeting.classList.add('pp-student-header-greeting');
+     const tagline=greeting.querySelector('p');
+     if(tagline)tagline.remove();
+     actions.append(greeting);
+   }
    header.append(actions);
  }
 }
