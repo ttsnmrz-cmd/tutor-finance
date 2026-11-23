@@ -26,12 +26,10 @@
 .mb-builder.mb-student-preview .mb-preview-pointer{flex:0 0 auto!important;width:auto!important;min-width:0!important}
 .mb-builder.mb-student-preview .mb-preview-pointer #pointerToggle{width:auto!important;min-width:110px!important;max-width:180px!important;white-space:nowrap!important;display:inline-flex!important;justify-content:center!important}
 
-/* Shared lesson design: identical exercise controls on the teacher and public student pages.
-   Scope to the embedded React preview, not the student dashboard or payment pages. */
+/* Student embed owns only its outer dimensions; lesson colors and controls
+   come from the same preview rules as the teacher view. */
 #student-live-material .profiprofit-student-lesson .mb-builder.mb-student-preview{
-  --page:#f8f7fb;--card:#fff;--ink:#1f242d;--line:#e4dcef;--soft:#f2edf8;--purple:#4e2a84;
   width:100%!important;box-sizing:border-box!important;padding:0!important;margin:0!important;
-  font:inherit!important;color:var(--ink)!important;
 }
 /* Shared React lesson preview surfaces. Both roles use these same controls. */
 .mb-builder.mb-student-preview .mb-student-card{
