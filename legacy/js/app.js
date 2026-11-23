@@ -1999,6 +1999,30 @@ function ensureStudentPortalLayout(){
  @media(max-width:780px){#student-live-material .pp-student-live-content{grid-template-columns:1fr}.pp-student-sidebar{width:58px}.pp-student-sidebar-label{display:none}}
  `;document.head.append(style);
 }
+// The public student dashboard is rendered before its first tab click.
+// Initialize the shared teacher-style shell as soon as the portal becomes visible.
+function initializePublicStudentShell(){
+ const portal=document.getElementById('student-public-view');
+ const content=document.getElementById('student-public-content');
+ if(!portal||!content||portal.classList.contains('hidden')||content.classList.contains('hidden'))return false;
+ ensureStudentPortalLayout();
+ return !!portal.querySelector('.pp-student-layout');
+}
+function watchPublicStudentShell(){
+ const portal=document.getElementById('student-public-view');
+ if(!portal)return;
+ if(initializePublicStudentShell())return;
+ const observer=new MutationObserver(()=>{
+  if(initializePublicStudentShell())observer.disconnect();
+ });
+ observer.observe(portal,{attributes:true,attributeFilter:['class'],subtree:true});
+}
+if(document.readyState==='loading'){
+ document.addEventListener('DOMContentLoaded',watchPublicStudentShell,{once:true});
+}else{
+ watchPublicStudentShell();
+}
+
 function showPublicLessonMaterial(data){
  ensureStudentPortalLayout();
  let overlay=document.getElementById('student-live-material');
