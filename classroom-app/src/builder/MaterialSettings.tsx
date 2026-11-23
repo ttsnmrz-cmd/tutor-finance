@@ -23,6 +23,5 @@ export function MaterialSettings({plan,onChange,notesKey,onSave,saveStatus}:{pla
  </div></section>
  <section className="mb-settings-section"><h2>{ui('Topics & Tags')}</h2><Tags label={ui('Grammar tags')} values={parse(plan.grammar)} options={suggestions.grammar} onChange={values=>patch({grammar:values.join('\n')})}/><Tags label={ui('Vocabulary tags')} values={parse(plan.vocabulary)} options={suggestions.vocabulary} onChange={values=>patch({vocabulary:values.join('\n')})}/><Tags label={ui('Topic tags')} values={(plan as Topics).topicTags||[]} options={suggestions.topic} onChange={topicTags=>patch({topicTags})}/></section>
  <section className="mb-settings-section"><h2>{ui('Teacher Notes')}</h2><p className="mb-help">{ui('Private preparation notes for this material. These are not Live Notes.')}</p><textarea aria-label={ui('Teacher Notes')} className="mb-teacher-prep-notes" rows={4} value={notes} onChange={e=>{setNotes(e.target.value);saveNotes(e.target.value);}}/>{error&&<p role="alert">{error}</p>}</section>
- <div className="mb-editor-footer"><span role="status">{ui(saveStatus)}{error?' · '+ui('Teacher notes not saved'):''}</span><button className="primary" onClick={()=>{if(notes!==lastSaved.current)saveNotes(notes);onSave();}}>✓ {ui('Save')}</button></div>
  </section>;
 }
