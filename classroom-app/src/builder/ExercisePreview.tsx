@@ -46,10 +46,10 @@ export function ExercisePresentation({block,assetScope='',teacherHints=true}:{bl
  if(block.type==='video')return <MediaPreview key={block.id} block={block} scope={assetScope}/>;
  if(isGallery(block))return <GalleryPreview key={block.id} block={block} scope={assetScope}/>;
  if(isTypedGap(block))return <TypedGapPreview key={block.id} block={block} teacherHints={teacherHints}/>;
- if(isLetters(block))return <LettersPreview key={block.id} block={block} teacherHints={teacherHints}/>;
- if(isSentence(block))return <SentencePreview key={block.id} block={block} teacherHints={teacherHints}/>;
+ if(isLetters(block))return <LettersPreview key={block.id} block={block}/>;
+ if(isSentence(block))return <SentencePreview key={block.id} block={block}/>;
  if(isColumns(block))return <ColumnsPreview key={block.id} block={block} teacherHints={teacherHints}/>;
- if(isInlineChoice(block))return <InlineChoicePreview key={block.id} block={block} teacherHints={teacherHints}/>;
+ if(isInlineChoice(block))return <InlineChoicePreview key={block.id} block={block}/>;
  if(block.type==='true_false')return <TrueFalsePreview key={block.id} block={block} teacherHints={teacherHints}/>;
  if(isMultipleChoice(block))return <MultipleChoicePreview key={block.id} block={block} teacherHints={teacherHints}/>;
  if(block.type==='matching')return <MatchingPreview key={block.id} block={block} teacherHints={teacherHints}/>;
