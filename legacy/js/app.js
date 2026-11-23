@@ -1983,11 +1983,8 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-menu button{width:100%;text-align:left;margin:0;padding:13px 0;color:inherit;background:transparent;border:0}
  #student-live-material .pp-student-profile-button{display:grid;place-items:center}
  /* Keep the student lesson aligned with the teacher's compact classroom layout. */
- #student-live-material .pp-student-live-header{min-height:78px!important;padding:14px 22px!important;gap:20px!important;background:#fff!important;border:1px solid #e0e3e9!important;border-radius:0!important;box-shadow:none!important;box-sizing:border-box!important}
- #student-live-material .pp-student-live-header .pp-student-brand{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important;font-family:inherit!important;color:inherit!important;text-decoration:none!important}
- #student-live-material .pp-student-live-header .pp-student-brand img{width:50px!important;height:50px!important;object-fit:contain!important;flex:none!important}
- #student-live-material .pp-student-live-header .pp-student-brand .text-2xl{font-size:21px!important;font-weight:700!important;letter-spacing:-.045em!important;line-height:1.2!important;color:#1f242d!important}
- #student-live-material .pp-student-live-header .pp-student-brand .text-sm{font-size:11px!important;font-weight:400!important;line-height:1.4!important;color:#6b7280!important}
+ /* Header uses the exact teacher DOM and its existing classes. */
+ #student-live-material .pp-student-live-header{width:100%;box-sizing:border-box;margin:0!important;border-radius:0!important}
  #student-live-material .pp-student-live-layout{padding:10px;gap:10px}
  #student-live-material .pp-student-live-main{padding:12px 16px}
  #student-live-material .pp-student-live-content{gap:12px}
@@ -2014,25 +2011,35 @@ function showPublicLessonMaterial(data){
  let overlay=document.getElementById('student-live-material');
  if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f4f5f7;overflow:auto';document.body.append(overlay);}
  overlay.replaceChildren();
- const header=document.createElement('header');header.className='pp-student-live-header';
-
- // Reuse the actual teacher header brand DOM and Tailwind classes instead of
- // maintaining a separate, visually divergent student copy.
- const teacherBrand=document.querySelector('#teacher-header > button');
- const brand=teacherBrand ? teacherBrand.cloneNode(true) : document.createElement('button');
- brand.type='button';
- brand.removeAttribute('onclick');
- brand.onclick=()=>{};
- brand.classList.add('pp-student-brand');
- brand.setAttribute('aria-label','ProfiProfit');
- if(!teacherBrand){
-  brand.className='pp-student-brand flex items-center gap-3 min-w-0 text-left rounded-xl';
-  brand.innerHTML='<img src="/legacy/ProfoProfit_logo svg.svg" alt="ProfiProfit" class="w-16 h-16 object-contain rounded-xl"><span><span class="block text-2xl font-bold">ProfiProfit</span><span class="block text-sm text-slate-500">Lessons, students and payments</span></span>';
+ // Shared workspace header: clone the complete teacher header rather than
+ // assembling a second header with student-only typography and geometry.
+ const teacherHeader=document.getElementById('teacher-header');
+ const header=teacherHeader ? teacherHeader.cloneNode(true) : document.createElement('header');
+ header.removeAttribute('id');
+ header.classList.remove('hidden');
+ header.classList.add('pp-student-live-header');
+ header.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+ const brand=header.querySelector('button');
+ if(brand){
+  brand.removeAttribute('onclick');
+  brand.removeAttribute('title');
+  brand.onclick=()=>{};
+  brand.classList.add('pp-student-brand');
+  const tagline=brand.querySelector('span > span:last-child');
+  if(tagline)tagline.textContent='Lessons, students and payments';
  }
- const tagline=brand.querySelector('span > span:last-child');
- if(tagline)tagline.textContent='Lessons, students and payments';
- const profileWrap=document.createElement('div');profileWrap.className='pp-student-profile-wrap';
- const profile=document.createElement('button');profile.type='button';profile.className='pp-student-profile-button';profile.innerHTML='<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';profile.title=publicStudent?.name||'Student';profile.setAttribute('aria-label','Profile settings');
+ const teacherActions=header.querySelector('.teacher-header-actions');
+ if(teacherActions)teacherActions.remove();
+ const profileWrap=document.createElement('div');profileWrap.className='pp-student-profile-wrap profile-menu-wrap relative';
+ const teacherProfile=document.querySelector('#teacher-header .profile-menu-button');
+ const profile=teacherProfile ? teacherProfile.cloneNode(true) : document.createElement('button');
+ profile.type='button';
+ profile.removeAttribute('id');
+ profile.removeAttribute('onclick');
+ profile.classList.add('pp-student-profile-button');
+ if(!teacherProfile)profile.innerHTML='<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';
+ profile.title=publicStudent?.name||'Student';
+ profile.setAttribute('aria-label','Profile settings');
  const menu=document.createElement('div');menu.className='pp-student-profile-menu';menu.hidden=true;
  
  const language=document.createElement('label');language.textContent='Language ';const select=document.createElement('select');select.innerHTML='<option value="en">English</option><option value="ru">Русский</option>';select.value=localStorage.getItem('profiprofit-language')||'en';select.onchange=()=>{localStorage.setItem('profiprofit-language',select.value);if(typeof setLanguage==='function')setLanguage(select.value);};language.append(select);menu.append(language);
