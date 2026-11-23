@@ -1,6 +1,6 @@
 /* Shared preview: one layout for both roles, no student-specific overrides. */
 .mb-builder.mb-student-preview{display:flex!important;flex-direction:column!important;min-width:0}
-.mb-builder.mb-student-preview .mb-preview-top{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;margin:0 0 10px!important;padding:0!important}
+.mb-builder.mb-student-preview .mb-preview-top{align-items:stretch!important;margin-top:0!important;margin-left:0!important;margin-right:0!important}
 .mb-builder.mb-student-preview .mb-preview-heading-row{display:flex!important;align-items:center!important;gap:12px!important;width:100%!important;min-width:0}
 .mb-builder.mb-student-preview .mb-preview-heading-row>h1{flex:1 1 auto!important;min-width:0!important;margin:0!important;font-size:22px!important;line-height:1.25!important}
 .mb-builder.mb-student-preview .mb-preview-back{margin-left:auto!important;flex:none}
