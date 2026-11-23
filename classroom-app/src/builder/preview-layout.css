@@ -246,13 +246,9 @@
  --page:#f4f5f7;--card:#fff;--ink:#1f242d;--muted:#6b7280;
  --purple:#4e2a84;--gold:#d99b26;
 }
+/* Header sizing is defined in the shared two-row layout below. */
 .mb-builder.mb-student-preview .mb-preview-top{
- display:flex!important;flex-direction:column!important;justify-content:center!important;
- gap:8px!important;min-height:104px!important;margin:0 0 12px!important;
- box-sizing:border-box!important;
-}
-.mb-builder.mb-student-preview .mb-preview-heading-row{
- min-height:44px!important;align-items:center!important;
+ justify-content:center!important;box-sizing:border-box!important;
 }
 .mb-builder.mb-student-preview .mb-preview-heading-row>h1{
  display:flex!important;align-items:center!important;min-height:44px!important;
