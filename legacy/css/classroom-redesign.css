@@ -898,9 +898,16 @@ html[data-theme="dark"] #student-live-material .app-header.pp-student-live-heade
   font-size:13px!important;max-width:74px!important;overflow:hidden!important;
   text-overflow:ellipsis!important;
  }
- #student-live-material .app-header .pp-student-return{display:none!important}
+ #student-live-material .app-header .pp-student-return{font-size:0!important;padding:8px!important;min-width:34px!important}
+ #student-live-material .app-header .pp-student-return::before{content:'←';font-size:18px!important}
 }
 @media(max-width:420px){
  #student-public-view .app-header .pp-student-header-greeting,
  #student-live-material .app-header .pp-student-header-greeting{display:none!important}
+}
+
+/* Teacher has sidebar navigation; do not squeeze a second nav into mobile header. */
+@media(max-width:760px){
+ #teacher-header.app-header .teacher-nav{display:none!important}
+ #teacher-header.app-header .profile-menu-wrap{flex:0 0 auto!important}
 }
