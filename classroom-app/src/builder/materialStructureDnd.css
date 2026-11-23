@@ -38,3 +38,9 @@
 }
 .mb-builder .mb-add-section-footer:hover,
 .mb-builder .mb-add-section-footer:focus-visible{border-color:var(--purple);background:var(--soft)}
+
+/* Hidden exercises remain fully editable for the teacher. */
+.mb-builder .mb-structure-exercise.mb-hidden-exercise{opacity:.53}
+.mb-builder .mb-structure-exercise.mb-hidden-exercise.active{opacity:.72}
+.mb-builder .mb-hidden-eye{display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px;font-size:13px;color:var(--muted)}
+.mb-builder .mb-structure-exercise.mb-hidden-exercise .mb-select-exercise{color:var(--muted)}
