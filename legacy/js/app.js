@@ -1943,6 +1943,8 @@ function prepareAppHeader(header,role){
  if(actions)actions.classList.add('app-header-actions');
  return header;
 }
+/* Initialize the teacher's shared header even when no student portal is opened. */
+document.addEventListener('DOMContentLoaded',()=>prepareAppHeader(document.getElementById('teacher-header'),'teacher'));
 function createAppHeader(role){
  const teacher=document.getElementById('teacher-header');
  if(!teacher)return null;
