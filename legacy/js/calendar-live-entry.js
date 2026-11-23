@@ -53,6 +53,8 @@ window.confirmCalendarLiveSession=async function(){
   const materialId=session?.material_plan_id||plan;
   if(materialId){
    sessionStorage.setItem('profiprofit:pending-live-material',JSON.stringify({sessionId:data,materialId}));
+   if(typeof closeLessonModal==='function')closeLessonModal();
+   else document.getElementById('lesson-modal')?.classList.add('hidden');
    if(typeof switchTab==='function')switchTab('materials');
    window.dispatchEvent(new CustomEvent('profiprofit:open-live-material',{detail:{sessionId:data,materialId}}));
   }else{
