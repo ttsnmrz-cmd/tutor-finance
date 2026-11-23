@@ -810,3 +810,97 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 #student-public-view.pp-student-one-page #student-portal-dashboard>.flex:first-child:empty{display:none!important}
 #student-public-view.pp-student-one-page #student-portal-dashboard{padding-top:14px!important}
 @media(max-width:600px){#student-public-view .pp-student-header-actions{flex-wrap:wrap!important;justify-content:flex-end!important}}
+
+/* AppHeader — one geometric contract for every role and viewport.
+   Theme changes only tokens (colors), never spacing, typography or layout. */
+#teacher-header.app-header,
+#student-public-view .app-header.student-brand-header,
+#student-live-material .app-header.pp-student-live-header{
+ --app-header-surface:#fff;--app-header-border:#e0e3e9;
+ --app-header-title:#1f242d;--app-header-subtitle:#6b7280;
+ display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+ align-items:center!important;justify-content:space-between!important;
+ gap:14px!important;box-sizing:border-box!important;width:100%!important;
+ min-height:0!important;margin:0 0 14px!important;padding:12px 20px!important;
+ border:1px solid var(--app-header-border)!important;border-radius:22px!important;
+ background:var(--app-header-surface)!important;box-shadow:none!important;
+}
+#teacher-header.app-header>.app-header-brand,
+#student-public-view .app-header>.app-header-brand,
+#student-live-material .app-header>.app-header-brand{
+ display:flex!important;align-items:center!important;flex:0 1 auto!important;
+ min-width:0!important;gap:12px!important;margin:0!important;padding:0!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ text-align:left!important;
+}
+#teacher-header.app-header>.app-header-brand img,
+#student-public-view .app-header>.app-header-brand img,
+#student-live-material .app-header>.app-header-brand img{
+ width:50px!important;height:50px!important;max-width:50px!important;
+ flex:0 0 50px!important;object-fit:contain!important;
+}
+#teacher-header.app-header>.app-header-brand .text-2xl,
+#student-public-view .app-header>.app-header-brand .text-2xl,
+#student-live-material .app-header>.app-header-brand .text-2xl{
+ font-size:21px!important;line-height:1.2!important;font-weight:750!important;
+ letter-spacing:-.045em!important;color:var(--app-header-title)!important;
+}
+#teacher-header.app-header>.app-header-brand .text-sm,
+#student-public-view .app-header>.app-header-brand .text-sm,
+#student-live-material .app-header>.app-header-brand .text-sm{
+ font-size:11px!important;line-height:1.35!important;
+ color:var(--app-header-subtitle)!important;
+}
+#teacher-header.app-header>.app-header-actions,
+#student-public-view .app-header>.app-header-actions,
+#student-live-material .app-header>.app-header-actions{
+ display:flex!important;align-items:center!important;justify-content:flex-end!important;
+ flex:0 0 auto!important;min-width:0!important;gap:10px!important;
+ margin-left:auto!important;flex-wrap:nowrap!important;
+}
+html[data-theme="dark"] #teacher-header.app-header,
+html[data-theme="dark"] #student-public-view .app-header.student-brand-header,
+html[data-theme="dark"] #student-live-material .app-header.pp-student-live-header{
+ --app-header-surface:#30283b;--app-header-border:#51435f;
+ --app-header-title:#f0eafa;--app-header-subtitle:#c6b9d3;
+}
+@media(max-width:760px){
+ #teacher-header.app-header,
+ #student-public-view .app-header.student-brand-header,
+ #student-live-material .app-header.pp-student-live-header{
+  flex-wrap:nowrap!important;padding:10px 12px!important;gap:8px!important;
+ }
+ #teacher-header.app-header>.app-header-brand,
+ #student-public-view .app-header>.app-header-brand,
+ #student-live-material .app-header>.app-header-brand{gap:8px!important}
+ #teacher-header.app-header>.app-header-brand img,
+ #student-public-view .app-header>.app-header-brand img,
+ #student-live-material .app-header>.app-header-brand img{
+  width:38px!important;height:38px!important;max-width:38px!important;flex-basis:38px!important;
+ }
+ #teacher-header.app-header>.app-header-brand .text-2xl,
+ #student-public-view .app-header>.app-header-brand .text-2xl,
+ #student-live-material .app-header>.app-header-brand .text-2xl{font-size:17px!important}
+ #teacher-header.app-header>.app-header-brand .text-sm,
+ #student-public-view .app-header>.app-header-brand .text-sm,
+ #student-live-material .app-header>.app-header-brand .text-sm{display:none!important}
+ #teacher-header.app-header>.app-header-actions,
+ #student-public-view .app-header>.app-header-actions,
+ #student-live-material .app-header>.app-header-actions{gap:6px!important}
+ #student-public-view .app-header .pp-student-header-balance,
+ #student-live-material .app-header .pp-student-header-balance{
+  padding:6px 8px!important;gap:5px!important;
+ }
+ #student-public-view .app-header .pp-student-header-balance .text-xs,
+ #student-live-material .app-header .pp-student-header-balance .text-xs{display:none!important}
+ #student-public-view .app-header .pp-student-header-greeting #public-student-title,
+ #student-live-material .app-header .pp-student-header-greeting #public-student-title{
+  font-size:13px!important;max-width:74px!important;overflow:hidden!important;
+  text-overflow:ellipsis!important;
+ }
+ #student-live-material .app-header .pp-student-return{display:none!important}
+}
+@media(max-width:420px){
+ #student-public-view .app-header .pp-student-header-greeting,
+ #student-live-material .app-header .pp-student-header-greeting{display:none!important}
+}
