@@ -554,3 +554,6 @@ html[data-theme="dark"] .mb-builder .mb-gap-editable [data-spoiler="true"]::befo
 .profiprofit-student-lesson #pointerTools option{color:#282032!important;background:white!important}
 .profiprofit-student-lesson .mb-preview-annotation.drawing{z-index:120!important;pointer-events:auto!important}
 @media(max-width:850px){.profiprofit-student-lesson .mb-preview-heading-row>.mb-preview-controls{flex-wrap:wrap!important;justify-content:flex-start!important}}
+
+.profiprofit-student-lesson #pointerToolbar{position:relative!important;z-index:170!important}
+.profiprofit-student-lesson #pointerTools{position:relative!important;z-index:171!important}
