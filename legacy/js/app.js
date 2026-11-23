@@ -2019,7 +2019,7 @@ async function openStudentCabinet(){
 
   const future=ls
     .filter(
-      l=>l.status==='pending'&&(
+      l=>['pending','scheduled'].includes(l.status)&&(
         l.date>today||
         (
           l.date===today&&
