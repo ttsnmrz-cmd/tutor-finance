@@ -1931,23 +1931,43 @@ function restoreStudentSidebar(layout){
  if(localStorage.getItem('pp-student-sidebar-collapsed')==='1')layout.classList.add('sidebar-collapsed');
 }
 
+/* One shared AppHeader DOM contract for teacher, student dashboard and live lesson.
+   Role-specific actions live inside .app-header-actions; geometry is CSS-only. */
+function prepareAppHeader(header,role){
+ if(!header)return null;
+ header.classList.add('app-header');
+ header.dataset.appHeaderRole=role;
+ const brand=header.querySelector(':scope > button:first-child');
+ if(brand)brand.classList.add('app-header-brand');
+ const actions=header.querySelector(':scope > .teacher-header-actions, :scope > .pp-student-header-actions');
+ if(actions)actions.classList.add('app-header-actions');
+ return header;
+}
+function createAppHeader(role){
+ const teacher=document.getElementById('teacher-header');
+ if(!teacher)return null;
+ prepareAppHeader(teacher,'teacher');
+ if(role==='teacher')return teacher;
+ const header=teacher.cloneNode(true);
+ header.removeAttribute('id');
+ header.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+ header.querySelectorAll('[onclick]').forEach(el=>el.removeAttribute('onclick'));
+ header.querySelector('.teacher-header-actions')?.remove();
+ const brand=header.querySelector(':scope > button:first-child');
+ if(brand){brand.onclick=null;brand.removeAttribute('title');brand.style.cursor='default';}
+ const subtitle=brand?.querySelector('.text-slate-500');
+ if(subtitle)subtitle.textContent='Lessons, students and payments';
+ return prepareAppHeader(header,role);
+}
 function syncStudentPortalHeader(){
  // The student portal uses the actual teacher header DOM, not a second brand implementation.
  const portal=document.getElementById('student-public-view');
- const original=document.getElementById('teacher-header');
  const old=portal?.querySelector('.student-brand-header');
- if(!portal||!original||!old||old.dataset.sharedHeader==='1')return;
- const header=original.cloneNode(true);
- header.removeAttribute('id');
+ if(!portal||!old||old.dataset.sharedHeader==='1')return;
+ const header=createAppHeader('student');
+ if(!header)return;
  header.classList.add('student-brand-header');
  header.dataset.sharedHeader='1';
- header.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
- header.querySelectorAll('[onclick]').forEach(node=>node.removeAttribute('onclick'));
- header.querySelector('.teacher-header-actions')?.remove();
- const brand=header.querySelector('button');
- if(brand){brand.onclick=null;brand.type='button';brand.setAttribute('aria-label','ProfiProfit');brand.style.cursor='default';}
- const subtitle=header.querySelector('.text-slate-500');
- if(subtitle)subtitle.textContent='Lessons, students and payments';
  old.replaceWith(header);
  // Keep the balance in the shared header; the existing balance renderer updates
  // the same #public-dashboard-balance node after it has been moved.
@@ -1956,7 +1976,7 @@ function syncStudentPortalHeader(){
  if(balanceCard){
    balanceCard.classList.add('pp-student-header-balance');
    const actions=document.createElement('div');
-   actions.className='pp-student-header-actions';
+   actions.className='pp-student-header-actions app-header-actions';
    actions.append(balanceCard);
    const theme=document.createElement('button');
    theme.type='button';
@@ -2084,8 +2104,9 @@ function showPublicLessonMaterial(data){
  if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f4f5f7;overflow:auto';document.body.append(overlay);}
  overlay.replaceChildren();
  // Reuse the SAME student dashboard header, including balance and theme toggle.
- const sourceHeader=document.querySelector('#student-public-view .student-brand-header[data-shared-header="1"]');
- const header=sourceHeader ? sourceHeader.cloneNode(true) : document.getElementById('teacher-header')?.cloneNode(true);
+ const sourceHeader=document.querySelector('#student-public-view .app-header[data-shared-header="1"]');
+ const header=sourceHeader ? sourceHeader.cloneNode(true) : createAppHeader('student');
+ prepareAppHeader(header,'student');
  if(header){
    header.removeAttribute('id');
    header.classList.add('pp-student-live-header','student-brand-header');
