@@ -45,9 +45,22 @@
 </section>
 <section id="student-portal-lessons" class="student-portal-panel"><h2 class="text-xl font-bold mb-2">Lessons & notes</h2><p class="text-sm text-slate-500 mb-4">Your lesson history and notes from your teacher.</p><div id="public-lessons-history" class="space-y-2"></div></section>
 <section id="student-portal-finances" class="student-portal-panel">
-<div class="flex items-start justify-between gap-3 mb-4"><div><h2 class="text-xl font-bold">Finances</h2><p class="text-sm text-slate-500">Payments and lesson charges</p></div><div class="shrink-0 text-right rounded-xl student-theme-panel px-3 py-2"><div class="text-xs text-slate-500">Lesson price</div><b id="public-student-meta" class="text-sm whitespace-nowrap"></b></div></div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm mb-4"><div class="rounded-xl student-theme-panel p-3"><div class="text-xs text-slate-500">Payments received</div><b id="public-paid" class="block mt-1"></b></div><div class="rounded-xl student-theme-panel p-3"><div class="text-xs text-slate-500">Amount charged</div><b id="public-spent" class="block mt-1"></b></div><div class="rounded-xl student-theme-panel p-3"><div class="text-xs text-slate-500">Balance</div><b id="public-balance" class="block mt-1"></b></div></div>
-<div class="mb-4"><div class="inline-flex items-center gap-2 rounded-xl student-theme-panel px-3 py-2 text-sm"><span class="text-slate-500">Lessons completed</span><b id="public-conducted"></b></div></div><h3 class="font-bold mb-1">Top-ups</h3><div id="public-payments" class="space-y-1 text-sm"></div>
+<div class="pp-finances-heading"><div><h2 class="text-xl font-bold">Finances</h2><p class="text-sm text-slate-500">Payments and lesson charges</p></div></div>
+<div class="pp-finances-grid">
+  <div class="pp-finances-column">
+    <div class="pp-finances-stat student-theme-panel"><span>Payments received</span><b id="public-paid"></b></div>
+    <div class="pp-finances-stat student-theme-panel"><span>Amount charged</span><b id="public-spent"></b></div>
+  </div>
+  <div class="pp-finances-column">
+    <div class="pp-finances-stat student-theme-panel"><span>Balance</span><b id="public-balance"></b></div>
+    <div class="pp-finances-stat student-theme-panel"><span>Lessons completed</span><b id="public-conducted"></b></div>
+    <div class="pp-finances-stat student-theme-panel"><span>Lesson price</span><b id="public-student-meta"></b></div>
+  </div>
+  <div class="pp-finances-topups">
+    <h3 class="font-bold">Top-ups</h3>
+    <div id="public-payments" class="pp-finances-payments text-sm"></div>
+  </div>
+</div>
 </section>
 </div></div></div>
 <dialog id="pp-student-lesson-dialog" class="pp-student-lesson-dialog" onclick="if(event.target===this)this.close()">
