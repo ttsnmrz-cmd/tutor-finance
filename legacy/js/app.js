@@ -1896,7 +1896,8 @@ async function openPublicCalendarLesson(index){
   const {data,error}=await supabaseClient.rpc('get_public_student_lesson_material',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});
   if(error)throw error;
   if(!data?.plan)throw Error('Lesson material is not available.');
-  showPublicLessonMaterial(data);
+  sessionStorage.setItem('pp-student-live-lesson',JSON.stringify({studentId,lessonId:Number(l.id)}));
+ showPublicLessonMaterial(data);
  }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
 function studentPortalSidebar(onNavigate){
@@ -2009,7 +2010,7 @@ function showPublicLessonMaterial(data){
  const theme=document.createElement('button');theme.type='button';theme.textContent='◐ Toggle theme';theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();};menu.append(theme);
  profile.onclick=()=>{menu.hidden=!menu.hidden;};profileWrap.append(profile,menu);header.append(brand,profileWrap);overlay.append(header);
  const layout=document.createElement('div');layout.className='native-layout pp-student-live-layout';restoreStudentSidebar(layout);
- const backTo=tab=>{overlay.remove();switchPublicStudentTab(tab);};
+ const backTo=tab=>{sessionStorage.removeItem('pp-student-live-lesson');overlay.remove();switchPublicStudentTab(tab);};
  layout.append(studentPortalSidebar(backTo));
  const main=document.createElement('main');main.className='pp-student-live-main';
  const columns=document.createElement('div');columns.className='pp-student-live-content';
@@ -2119,6 +2120,20 @@ async function initPublicStudent(){
     if(!live.error&&Array.isArray(live.data))publicStudentLiveStatuses=new Map(live.data.map(x=>[String(x.calendar_lesson_id),x]));
     else if(live.error)console.warn('Live status unavailable:',live.error.message);
     await openStudentCabinet();
+    // Restore an active lesson after a refresh, without requiring the student
+    // to return to the dashboard or confirm joining again.
+    try{
+      const saved=JSON.parse(sessionStorage.getItem('pp-student-live-lesson')||'null');
+      if(saved?.studentId===id&&Number.isSafeInteger(saved.lessonId)){
+        const liveRow=publicStudentLiveStatuses.get(String(saved.lessonId));
+        if(liveRow?.status==='active'&&liveRow.has_material){
+          const resumed=await supabaseClient.rpc('get_public_student_lesson_material',{p_student_id:id,p_calendar_lesson_id:saved.lessonId});
+          if(!resumed.error&&resumed.data?.plan)showPublicLessonMaterial(resumed.data);
+          else sessionStorage.removeItem('pp-student-live-lesson');
+        }else sessionStorage.removeItem('pp-student-live-lesson');
+      }
+    }catch(e){console.warn('Could not restore student lesson:',e);}
+
 
   }catch(e){
     console.error('Public cabinet error:',e);
