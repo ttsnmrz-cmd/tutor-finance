@@ -1980,6 +1980,22 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-menu select{padding:5px}
  #student-live-material .mb-combined-element h2{font-weight:700;line-height:1.3}
  #student-live-material .mb-student-text h1,#student-live-material .mb-student-text h2,#student-live-material .mb-student-text h3{font-weight:700}
+ #student-live-material .pp-student-live-main{background:#fff;border-radius:18px;padding:18px}
+ #student-live-material .pp-student-pointer{background:#fff;border-radius:14px}
+ #student-live-material .mb-builder,#student-live-material .mb-preview-workspace,#student-live-material .mb-student-card,#student-live-material .mb-student-body,#student-live-material .mb-preview-top{background:#fff!important}
+ #student-live-material .mb-preview-heading-row h1{font-family:inherit!important;font-weight:750!important;font-size:24px!important;letter-spacing:-.025em;line-height:1.3}
+ #student-live-material .mb-preview-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+ #student-live-material #pointerToolbar{position:relative;z-index:10}
+ #student-live-material #pointerTools:not([hidden]){display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #e4dcef;border-radius:12px;padding:8px;box-shadow:0 4px 18px #27153516}
+ #student-live-material #pointerTools button{color:#4b287e!important;background:#f4f0fa!important;border:1px solid #ded4ed!important;border-radius:8px!important;padding:8px 12px!important;opacity:1!important}
+ #student-live-material .mb-preview-pointer button,#student-live-material .mb-preview-pointer svg{color:#4b287e}
+ #student-live-material .mb-preview-annotation{pointer-events:none}
+ #student-live-material .pp-student-profile-menu{min-width:240px;padding:18px;border-radius:18px;font-size:15px}
+ #student-live-material .pp-student-menu-title{display:block;color:#746e84;font-size:14px;font-weight:600;margin-bottom:18px}
+ #student-live-material .pp-student-profile-menu label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:12px 0}
+ #student-live-material .pp-student-profile-menu select{border:0;background:#f2f0f5;border-radius:9px;padding:9px;color:#4b287e}
+ #student-live-material .pp-student-profile-menu button{width:100%;text-align:left;margin:0;padding:13px 0;color:inherit;background:transparent;border:0}
+ #student-live-material .pp-student-profile-button{display:grid;place-items:center}
  #student-live-material{padding:0!important}
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#fff;border-bottom:1px solid #e9e3f1}
  #student-live-material .pp-student-live-layout{display:flex;gap:14px;padding:14px}
@@ -2003,11 +2019,11 @@ function showPublicLessonMaterial(data){
  const brand=document.createElement('div');brand.style.cssText='display:flex;align-items:center;gap:12px;font-weight:700;color:#4b287e;font-size:22px';
  const logo=document.createElement('img');logo.src='/legacy/ProfoProfit_logo svg.svg';logo.alt='';logo.style.cssText='width:46px;height:46px';brand.append(logo,document.createTextNode('ProfiProfit'));
  const profileWrap=document.createElement('div');profileWrap.className='pp-student-profile-wrap';
- const profile=document.createElement('button');profile.type='button';profile.className='pp-student-profile-button';profile.textContent='♙';profile.title=publicStudent?.name||'Student';profile.setAttribute('aria-label','Profile settings');
+ const profile=document.createElement('button');profile.type='button';profile.className='pp-student-profile-button';profile.innerHTML='<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';profile.title=publicStudent?.name||'Student';profile.setAttribute('aria-label','Profile settings');
  const menu=document.createElement('div');menu.className='pp-student-profile-menu';menu.hidden=true;
- const studentName=document.createElement('strong');studentName.textContent=publicStudent?.name||'Student';menu.append(studentName);
+ const studentName=document.createElement('strong');studentName.textContent='Profile & settings';studentName.className='pp-student-menu-title';menu.append(studentName);
  const language=document.createElement('label');language.textContent='Language ';const select=document.createElement('select');select.innerHTML='<option value="en">English</option><option value="ru">Русский</option>';select.value=localStorage.getItem('profiprofit-language')||'en';select.onchange=()=>{localStorage.setItem('profiprofit-language',select.value);if(typeof setLanguage==='function')setLanguage(select.value);};language.append(select);menu.append(language);
- const theme=document.createElement('button');theme.type='button';theme.textContent='◐ Toggle theme';theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();};menu.append(theme);
+ const theme=document.createElement('button');theme.type='button';theme.textContent='☾ Dark theme';theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();};menu.append(theme);
  profile.onclick=()=>{menu.hidden=!menu.hidden;};profileWrap.append(profile,menu);header.append(brand,profileWrap);overlay.append(header);
  const layout=document.createElement('div');layout.className='native-layout pp-student-live-layout';restoreStudentSidebar(layout);
  const backTo=tab=>{sessionStorage.removeItem('pp-student-live-lesson');overlay.remove();switchPublicStudentTab(tab);};
