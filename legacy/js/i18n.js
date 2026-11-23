@@ -132,7 +132,7 @@
   window.setLanguage = setLanguage;
   window.toggleLanguage = () => setLanguage(language === 'ru' ? 'en' : 'ru');
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-language-toggle]').forEach(el => el.addEventListener('click', window.toggleLanguage));
+    document.addEventListener('click', event => { const toggle = event.target.closest?.('[data-language-toggle]'); if (!toggle) return; event.preventDefault(); window.toggleLanguage(); });
     updateButtons();
     translateNode(document.body);
     const observer = new MutationObserver(records => records.forEach(record => {
