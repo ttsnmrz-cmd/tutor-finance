@@ -1877,6 +1877,24 @@ let publicStudentPayments=[];
 let publicStudentWeekAnchor=null;
 let publicStudentCalendarLessons=[];
 
+function switchPublicStudentTab(tab){
+ if(!['dashboard','lessons','finances'].includes(tab))return;
+ document.querySelectorAll('[data-student-tab]').forEach(b=>b.classList.toggle('is-active',b.dataset.studentTab===tab));
+ ['dashboard','lessons','finances'].forEach(t=>document.getElementById('student-portal-'+t)?.classList.toggle('hidden',t!==tab));
+}
+function openPublicCalendarLesson(index){
+ const l=publicStudentCalendarLessons[index];
+ if(!l||['cancelled_free','cancelled_charge','rescheduled'].includes(l.status))return;
+ if(!window.confirm('Join this lesson?\\n'+l.date+' · '+displayTime(l.time)))return;
+ window.alert('Please wait until your teacher assigns a material to this lesson.');
+}
+function renderPublicLessonsHistory(rows){
+ const el=document.getElementById('public-lessons-history');if(!el)return;
+ const past=rows.filter(l=>['conducted','completed'].includes(l.status)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+ el.replaceChildren();
+ if(!past.length){el.textContent='No completed lessons yet.';return;}
+ past.forEach(l=>{const card=document.createElement('div');card.className='rounded-xl student-theme-panel p-3';card.textContent=l.date+' · '+displayTime(l.time)+' — Notes will appear when your teacher shares them.';el.append(card);});
+}
 function changePublicStudentWeek(offset){
   if(!publicStudentWeekAnchor)return;
   publicStudentWeekAnchor.setDate(publicStudentWeekAnchor.getDate()+offset*7);
@@ -1906,7 +1924,7 @@ function renderPublicStudentCalendar(lessonRows){
     const dayLessons=calendarLessons.filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
     return `<section class="calendar-day-column ${key===today?'is-today':''}">
       <div class="calendar-day-heading"><span class="calendar-weekday">${d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')}</span><span class="calendar-day-number">${d.getDate()}</span></div>
-      <div class="calendar-day-events">${dayLessons.length?dayLessons.map(l=>`<div class="calendar-event-card">
+      <div class="calendar-day-events">${dayLessons.length?dayLessons.map(l=>`<div class="calendar-event-card" role="button" tabindex="0" onclick="openPublicCalendarLesson(${calendarLessons.indexOf(l)})">
         <span class="calendar-event-time">${esc(displayTime(l.time))}</span>
         <span class="calendar-event-title ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">${esc(l.student||'Занятие')}</span>
         <span class="calendar-event-meta">${l.duration||60} мин</span>
@@ -2061,6 +2079,9 @@ async function openStudentCabinet(){
       .join('')||
     '<span class="text-slate-400">Пополнений нет</span>';
 
+  const dashboardBalance=document.getElementById('public-dashboard-balance');if(dashboardBalance)dashboardBalance.textContent=money(paid-spent);
+  const nextLesson=document.getElementById('public-next-lesson');if(nextLesson){const next=future[0];nextLesson.textContent=next?'Next lesson: '+next.date+' · '+displayTime(next.time):'No upcoming lessons scheduled.';}
+  renderPublicLessonsHistory(ls);
   renderPublicStudentCalendar(ls);
 
 
