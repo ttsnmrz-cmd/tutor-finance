@@ -536,3 +536,45 @@ html[data-theme="dark"] #teacher-app #dashboard-calendar .native-day:nth-child(e
 html[data-theme="dark"] #teacher-app #dashboard-calendar :is(.calendar-weekday,.calendar-day-number,.native-time-axis span) {
  color:#d8c9e6!important;
 }
+
+/* Dashboard density: reduce vertical footprint without changing lesson times. */
+#teacher-app #dashboard-cards {gap:10px!important;margin-bottom:12px!important}
+#teacher-app #dashboard-cards>* {min-height:92px!important;padding:14px 16px!important}
+#teacher-app #dashboard-cards>* :is(.text-2xl,.text-3xl) {font-size:23px!important;line-height:1.2!important}
+#teacher-app #dashboard-calendar>.app-card {padding:16px!important}
+#teacher-app #dashboard-calendar .native-calendar-scroll {
+ height:clamp(280px,43vh,440px)!important;min-height:0!important;
+}
+#teacher-app #dashboard-calendar .native-calendar-scroll :is(.native-calendar-event,.native-event) {font-size:12px}
+@media(max-width:900px) {
+ #teacher-app #dashboard-cards>* {min-height:88px!important;padding:12px!important}
+ #teacher-app #dashboard-calendar .native-calendar-scroll {height:38vh!important;min-height:270px!important}
+}
+/* Student dark mode: text contrast on nested finance statistics and payment rows. */
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances :is(.student-theme-panel,.student-finance-card,.student-finance-stat,#public-payments,#public-payments *,#public-finance-summary) {
+ background-color:transparent!important;color:#f4eefa!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances :is(.student-theme-panel,.student-finance-card,.student-finance-stat) {
+ background-color:#3b3248!important;border-color:#645573!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances :is(.text-gray-900,.text-gray-800,.text-slate-900,.text-slate-800,.text-slate-700,.text-gray-700,.text-black) {
+ color:#f4eefa!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances :is(.text-gray-500,.text-gray-600,.text-slate-500,.text-slate-600) {
+ color:#c8bcd5!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances #public-payments :is(li,div,span,p) {
+ color:inherit;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances #public-payments :is(li,div) {
+ border-color:#645573!important;
+}
+/* Student lesson status pills must not clip at the bottom of calendar cards. */
+#student-public-view.pp-student-one-page .pp-student-calendar-day,
+#student-public-view.pp-student-one-page .student-calendar-day {
+ min-height:116px!important;height:auto!important;overflow:visible!important;
+}
+#student-public-view.pp-student-one-page .pp-student-calendar-day :is(.lesson-status,.status-badge),
+#student-public-view.pp-student-one-page .student-calendar-day :is(.lesson-status,.status-badge) {
+ max-width:100%;white-space:normal;
+}
