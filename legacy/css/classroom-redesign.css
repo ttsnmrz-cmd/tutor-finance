@@ -498,7 +498,7 @@ html:not([data-theme="dark"]) :is(#teacher-app,#student-public-view) :is(.app-ca
   border-color:#E1E4E8!important;
 }
 html:not([data-theme="dark"]) #teacher-app #dashboard-cards>*{
-  border-color:#E1E4E8!important;border-radius:12px!important;background:#FFFFFF!important;
+  border-color:#E1E4E8!important;background:#FFFFFF!important;
 }
 html:not([data-theme="dark"]) #teacher-app :is(.native-calendar-grid,.native-calendar-body,.native-calendar-time,.native-calendar-day,.native-calendar-column){
   background-color:#F8F9FB!important;border-color:#E1E4E8!important;
@@ -507,13 +507,7 @@ html:not([data-theme="dark"]) #teacher-app :is(.native-calendar-header,.native-c
   background-color:#FFFFFF!important;border-color:#E1E4E8!important;
 }
 html:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-sidebar){
-  border-radius:12px!important;border-color:#E1E4E8!important;
-}
-html:not([data-theme="dark"]) #teacher-app :is(#tab-dashboard,#dashboard-calendar,.app-card){
-  border-radius:12px!important;
-}
-html:not([data-theme="dark"]) #teacher-app :is(button[data-native-tab],.native-sidebar-toggle,.native-calendar-controls button){
-  border-radius:10px!important;
+  border-color:#E1E4E8!important;
 }
 /* The public portal must use the same fluid page width, sidebar and neutral
    navigation surfaces as the teacher dashboard, including before hydration. */
