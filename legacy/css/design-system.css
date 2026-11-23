@@ -185,7 +185,6 @@ html[data-theme="dark"] #student-live-material .app-header.pp-student-live-heade
  text-shadow:none!important;box-shadow:none!important;
 }
 #teacher-app #teacher-header.app-header .app-header-brand .text-sm{display:none!important}
-#teacher-app .native-workspace>.native-layout{margin-top:0!important}
 @media(max-width:760px){
  #teacher-app #teacher-header.app-header{padding:10px 12px!important;min-height:0!important}
  #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{font-size:17px!important}
@@ -204,26 +203,8 @@ html[data-theme="dark"] #teacher-app #teacher-header.app-header .app-header-bran
  border-radius:var(--pp-radius-shell)!important;
  margin-bottom:var(--pp-shell-gap)!important;
 }
-/* The layout is nested in .native-workspace, not directly in #teacher-app. */
-#teacher-app>.native-workspace>.native-layout{
- margin:0!important;padding:0!important;
- align-items:start!important;
-}
 #teacher-app>.native-workspace>#teacher-header.app-header{
  margin-top:0!important;
-}
-/* Apply the same visual hierarchy without changing student layout or behavior. */
-#teacher-app #tab-dashboard{
- border-radius:var(--pp-radius-panel)!important;
-}
-#teacher-app #dashboard-cards>*{
- border-radius:var(--pp-radius-card)!important;
-}
-#teacher-app .native-workspace>.native-layout>.native-sidebar{
- border-radius:var(--pp-radius-card)!important;
-}
-#teacher-app #tab-dashboard :is(.native-calendar-controls button,.native-calendar-title button){
- border-radius:var(--pp-radius-control)!important;
 }
 /* Shared student dashboard finance component (migrated without selector changes). */
 /* Student finances: compact 3-column layout, with top-ups in the third column. */
