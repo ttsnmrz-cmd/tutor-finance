@@ -50,7 +50,7 @@ export function exerciseLabel(b:Block):string{
  if(isLetters(b))return 'Build a Word';
  if(isSentence(b))return 'Build a Sentence';
  if(isColumns(b))return 'Sort into Columns';
- if(isInlineChoice(b))return 'Choose the Correct Option';
+ if(isInlineChoice(b))return 'Inline Choice';
  if(isMultipleChoice(b))return 'Multiple Choice';
  if(b.type==='gaps'){
   const bank=b.items.length>0&&b.items.every(i=>!!i.options?.length)&&((b.content.match(/_{2,}/g)||[]).length===b.items.length||!b.content.trim()&&b.items.every(i=>(i.prompt.match(/_{2,}/g)||[]).length===1));
