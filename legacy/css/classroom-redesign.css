@@ -426,24 +426,6 @@ html[data-theme="dark"] #teacher-app .native-calendar .native-timed-event:not(.i
 
 
 /* Canonical desktop shell: one layout definition for teacher pages. */
-@media(min-width:701px){
- #teacher-app > .native-workspace{width:100%!important;max-width:none!important;padding:0 12px!important;margin:0!important;min-height:0!important;height:auto!important}
- #teacher-app > .native-layout{display:grid!important;grid-template-columns:186px minmax(0,1fr)!important;gap:12px!important;align-items:start!important;margin:8px 0 0!important;padding:0 12px!important;width:100%!important;max-width:none!important;box-sizing:border-box!important}
- #teacher-app > .native-layout.sidebar-collapsed{grid-template-columns:70px minmax(0,1fr)!important}
- #teacher-app > .native-layout > .native-sidebar{position:sticky!important;top:12px!important;align-self:start!important;display:flex!important;flex-direction:column!important;gap:3px!important;min-height:0!important;padding:10px 4px!important;margin:0!important;background:#fff!important;border:1px solid #E1E4E8!important;border-radius:12px!important;box-shadow:none!important;overflow:visible!important}
- #teacher-app .native-sidebar-label,#teacher-app .native-sidebar-footer{display:none!important}
- #teacher-app .native-sidebar button[data-native-tab]{display:flex!important;align-items:center!important;width:100%!important;flex:0 0 auto!important;height:48px!important;min-height:48px!important;padding:10px 12px!important;gap:12px!important;border-radius:12px!important;font:500 13px/1.35 Inter,ui-sans-serif,system-ui,sans-serif!important;white-space:nowrap!important;color:#6B7280!important}
- #teacher-app .native-sidebar button[data-native-tab].is-active{background:#EAE5F2!important;color:#4E2A84!important}
- #teacher-app .native-sidebar .native-nav-icon,#teacher-app .native-sidebar .native-nav-icon svg{width:21px!important;height:21px!important;flex:0 0 21px!important}
- #teacher-app .native-layout.sidebar-collapsed .native-sidebar button[data-native-tab]{justify-content:center!important;padding:10px 6px!important}
- #teacher-app .native-layout.sidebar-collapsed .native-nav-text{display:none!important}
- #teacher-app .native-sidebar .classroom-sidebar-toggle{border:0!important;background:transparent!important;box-shadow:none!important;color:#1F242D!important;border-radius:8px!important}
- #teacher-app .native-sidebar .classroom-sidebar-toggle svg{width:22px!important;height:22px!important}
- #teacher-app .native-layout.sidebar-collapsed .classroom-sidebar-toggle svg{transform:rotate(180deg)!important}
- #teacher-app > .native-layout > #teacher-main{margin:0!important;min-width:0!important;max-width:none!important}
-}
-html[data-theme=dark] #teacher-app > .native-layout > .native-sidebar{background:#30283b!important}
-
 /* Dashboard width containment: prevent inner calendar from expanding the page. */
 @media(min-width:701px){
  #teacher-app > .native-layout > #teacher-main,#teacher-app #tab-dashboard,#teacher-app #dashboard-calendar{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
@@ -714,16 +696,6 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 #student-public-view.pp-student-one-page #student-portal-dashboard{padding-top:14px!important}
 
 
-/* Teacher mobile navigation: one vertical icon rail, no horizontal scroll. */
-@media(max-width:700px){
- #teacher-app .native-layout,
- #teacher-app .native-layout.sidebar-collapsed{grid-template-columns:60px minmax(0,1fr)!important}
- #teacher-app .native-sidebar{flex-direction:column!important;align-items:center!important;overflow-x:hidden!important;overflow-y:visible!important;width:60px!important;box-sizing:border-box!important;padding:8px 5px!important}
- #teacher-app .native-sidebar button[data-native-tab]{width:48px!important;min-width:0!important;flex:0 0 auto!important;justify-content:center!important;padding:10px!important;white-space:nowrap!important}
- #teacher-app .native-sidebar .native-nav-text{display:none!important}
- #teacher-app .native-sidebar .native-nav-icon{margin:0!important}
- #teacher-app .native-sidebar .classroom-sidebar-toggle{margin:0 auto 10px!important}
-}
 /* Teacher has sidebar navigation; do not squeeze a second nav into mobile header. */
 @media(max-width:760px){
  #teacher-header.app-header .teacher-nav{display:none!important}
