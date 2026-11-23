@@ -11,8 +11,8 @@ body{background:#F4F5F7!important;color:var(--text-color)!important}
 .teacher-nav button:hover{background:#E7E9EE!important;color:#48365e!important}
 .teacher-nav button.bg-indigo-600,.teacher-nav button[aria-current="page"]{background:#fff!important;color:#4E2A84!important;box-shadow:0 2px 10px rgba(66,42,91,.11)!important}
 #profile-menu-button{background:#F0F1F4!important;color:#4E2A84!important;border-radius:14px!important}
-#teacher-app .app-card{border:1px solid #E0E3E9!important;box-shadow:0 8px 30px rgba(69,44,104,.045)!important;background:#fff;border-radius:20px!important}
-#teacher-app main>section>.app-card{padding:24px!important}
+
+
 #teacher-app h1:where(:not(#classroom-materials-root *)),#teacher-app h2:where(:not(#classroom-materials-root *)),#teacher-app h3:where(:not(#classroom-materials-root *)){color:#1F242D;letter-spacing:-.025em}
 #teacher-app .text-slate-500,#teacher-app .text-slate-400{color:#6B7280!important}
 #teacher-app .bg-indigo-600,#teacher-app button.bg-indigo-600,#teacher-app .primary-btn{background:#4E2A84!important;color:white!important}
@@ -26,14 +26,14 @@ body{background:#F4F5F7!important;color:var(--text-color)!important}
 #dashboard-greeting-title{font-size:clamp(25px,3vw,34px)!important;font-weight:750!important;color:#1F242D!important;line-height:1.15!important;margin-top:5px}
 #tab-dashboard .dashboard-heading>div:last-child h2{display:none}
 #dashboard-date{font-size:13px!important;color:#6B7280!important}
-#dashboard-cards{gap:16px!important;margin-bottom:18px!important}
-#dashboard-cards>*{border:1px solid #E0E3E9!important;border-radius:20px!important;box-shadow:0 8px 28px rgba(74,50,108,.045)!important;min-height:120px}
+
+
 #tab-dashboard>.grid{gap:18px!important}
-#tab-dashboard>.grid>.app-card{min-height:200px;padding:22px!important}
-#tab-calendar>.app-card{padding:24px!important}
+
+
 #tab-calendar .flex.gap-2>button{border-radius:12px!important}
 #week-calendar{gap:6px!important}
-#tab-students .app-card,#tab-materials .app-card{padding:22px!important}
+
 
 #teacher-app .rounded-3xl{border-radius:20px!important}
 #teacher-app .rounded-2xl{border-radius:15px!important}
