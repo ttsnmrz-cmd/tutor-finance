@@ -539,3 +539,18 @@ html[data-theme="dark"] .mb-builder .mb-gap-editable [data-spoiler="true"]{
 }
 html[data-theme="dark"] .mb-builder .mb-rich-input [data-spoiler="true"]::before,
 html[data-theme="dark"] .mb-builder .mb-gap-editable [data-spoiler="true"]::before{color:#d8b7fa}
+
+/* Shared student Classroom: same header structure and anchored navigation as teacher preview. */
+.profiprofit-student-lesson .mb-preview-top{display:block!important;margin:0 0 10px!important;padding:0!important}
+.profiprofit-student-lesson .mb-preview-heading-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;flex-wrap:wrap!important}
+.profiprofit-student-lesson .mb-preview-heading-row>h1{flex:1 1 250px!important;margin:0!important;font-size:24px!important;font-weight:750!important;line-height:1.25!important}
+.profiprofit-student-lesson .mb-preview-heading-row>.mb-preview-controls{flex:0 1 auto!important;width:auto!important;display:flex!important;align-items:center!important;gap:8px!important;margin:0!important}
+.profiprofit-student-lesson .mb-preview-workspace{display:flex!important;flex:1 1 auto!important;min-height:0!important}
+.profiprofit-student-lesson .mb-student-card{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;min-height:calc(100dvh - 210px)!important}
+.profiprofit-student-lesson .mb-student-body{flex:1 1 auto!important}
+.profiprofit-student-lesson .mb-preview-footer{margin-top:auto!important;flex-shrink:0!important}
+.profiprofit-student-lesson #pointerTools{z-index:160!important}
+.profiprofit-student-lesson #pointerTools select{color:#4b287e!important;background:#f4f0fa!important;border:1px solid #d9cce9!important;min-width:72px}
+.profiprofit-student-lesson #pointerTools option{color:#282032!important;background:white!important}
+.profiprofit-student-lesson .mb-preview-annotation.drawing{z-index:120!important;pointer-events:auto!important}
+@media(max-width:850px){.profiprofit-student-lesson .mb-preview-heading-row>.mb-preview-controls{flex-wrap:wrap!important;justify-content:flex-start!important}}
