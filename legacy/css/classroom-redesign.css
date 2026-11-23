@@ -801,3 +801,12 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
  #student-live-material .pp-student-live-header.student-brand-header{flex-wrap:wrap!important}
  #student-live-material .pp-student-header-actions{flex-wrap:wrap;justify-content:flex-end}
 }
+
+/* Student compact header: name at far right, stale live-status banner hidden. */
+#student-public-view.pp-student-one-page #public-next-lesson{display:none!important}
+#student-public-view .pp-student-header-actions{display:flex!important;align-items:center!important;gap:12px!important;margin-left:auto!important}
+#student-public-view .pp-student-header-greeting{display:flex!important;align-items:center!important;justify-content:flex-end!important;min-width:0!important;margin-left:8px!important}
+#student-public-view .pp-student-header-greeting #public-student-title{font-size:17px!important;line-height:1.2!important;font-weight:700!important;white-space:nowrap!important;margin:0!important}
+#student-public-view.pp-student-one-page #student-portal-dashboard>.flex:first-child:empty{display:none!important}
+#student-public-view.pp-student-one-page #student-portal-dashboard{padding-top:14px!important}
+@media(max-width:600px){#student-public-view .pp-student-header-actions{flex-wrap:wrap!important;justify-content:flex-end!important}}
