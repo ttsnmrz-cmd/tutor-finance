@@ -20,7 +20,8 @@ jobs:
         with:
           node-version: '22'
       - run: corepack enable && corepack prepare pnpm@10.29.3 --activate
-      - run: pnpm install --frozen-lockfile && pnpm build
+      - name: Install and build Classroom
+        run: cd classroom-app && pnpm install --frozen-lockfile && pnpm build
       - name: Verify shared teacher/student preview architecture
         run: |
           python3 - <<'PY'
