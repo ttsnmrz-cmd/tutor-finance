@@ -1900,6 +1900,28 @@ async function openPublicCalendarLesson(index){
  showPublicLessonMaterial(data,studentId,Number(l.id));
  }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
+function updatePublicJoinButton(){
+ const header=document.querySelector('#student-public-view .pp-student-header-actions');
+ if(!header)return;
+ let button=header.querySelector('.pp-student-join');
+ if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join';header.prepend(button);}
+ const candidates=publicStudentCalendarLessons.filter(l=>!['cancelled_free','cancelled_charge','rescheduled'].includes(l.status)&&publicStudentLiveStatuses.get(String(l.id))?.status==='active'&&publicStudentLiveStatuses.get(String(l.id))?.has_material);
+ const lesson=candidates[0];
+ button.hidden=!lesson;
+ button.textContent=window.getLanguage?.()==='en'?'Join lesson →':'Перейти на занятие →';
+ button.onclick=async()=>{if(!lesson||button.disabled)return;button.disabled=true;try{await openPublicCalendarLesson(publicStudentCalendarLessons.indexOf(lesson));}finally{button.disabled=false;}};
+}
+let publicJoinPolling=false;
+function startPublicJoinPolling(studentId){
+ if(publicJoinPolling)return;publicJoinPolling=true;
+ async function refresh(){
+  try{const {data,error}=await supabaseClient.rpc('get_public_student_live_status',{p_student_id:studentId});
+   if(!error&&Array.isArray(data)){const next=new Map(data.map(x=>[String(x.calendar_lesson_id),x]));const changed=JSON.stringify([...next])!==JSON.stringify([...publicStudentLiveStatuses]);publicStudentLiveStatuses=next;if(changed)renderPublicStudentCalendar();updatePublicJoinButton();}
+  }catch(e){console.warn('Live lesson status refresh failed',e);}
+  finally{setTimeout(refresh,3000);}
+ }
+ setTimeout(refresh,3000);
+}
 function studentPortalSidebar(onNavigate){
  // Clone the actual teacher workspace navigation, rather than recreating it.
  const original=document.querySelector('#teacher-app .native-sidebar');
@@ -2114,6 +2136,7 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  prepareAppHeader(header,'student');
  if(header){
    header.querySelectorAll(':scope > button:not(.app-header-brand)').forEach(node=>node.remove());
+   header.querySelector('.pp-student-join')?.remove();
    header.removeAttribute('id');
    header.classList.add('pp-student-live-header','student-brand-header');
    header.dataset.sharedHeader='1';
@@ -2432,6 +2455,8 @@ async function openStudentCabinet(){
   const nextLesson=document.getElementById('public-next-lesson');if(nextLesson){const active=ls.find(l=>publicStudentLiveStatuses.get(String(l.id))?.status==='active');const next=active||future[0];nextLesson.textContent=next?(active?'🟢 Lesson in progress: ':'Next lesson: ')+next.date+' · '+displayTime(next.time):'No upcoming lessons scheduled.';}
   renderPublicLessonsHistory(ls);
   renderPublicStudentCalendar(ls);
+  updatePublicJoinButton();
+  startPublicJoinPolling(new URLSearchParams(location.search).get('student'));
 
 
 
