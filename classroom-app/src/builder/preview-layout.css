@@ -464,3 +464,21 @@
 /* Live lesson navigation state. */
 .mb-preview-controls>button.is-following{border-color:#4e2a84!important;background:#f2ecfb!important;color:#4e2a84!important}
 .mb-preview-controls>button.mb-bring-here{border-color:#d99b26!important;background:#fff8e7!important;color:#1f242d!important;font-weight:700!important}
+
+
+/* Quick lesson fillers. */
+.mb-preview-controls>.mb-fillers-toggle.active{background:#f2ecfb!important;border-color:#4e2a84!important;color:#4e2a84!important}
+.mb-filler-card{width:100%!important}
+.mb-fillers{padding:24px;min-height:420px;box-sizing:border-box}
+.mb-fillers header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.mb-fillers header h2{margin:3px 0 0;font-size:24px;color:#1f242d}
+.mb-filler-kicker,.mb-filler-label{color:#6b7280;font-weight:700;font-size:14px}
+.mb-fillers nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.mb-fillers nav button.active{background:#4e2a84!important;border-color:#4e2a84!important;color:#f4f5f7!important}
+.mb-filler-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;min-height:240px;padding:28px;border:1px solid #dfe3e8;border-radius:18px;background:#f4f5f7}
+.mb-filler-stage>p{margin:0!important;max-width:720px;font-size:clamp(22px,3vw,34px)!important;line-height:1.35!important;color:#1f242d}
+.mb-filler-die{font-size:72px;line-height:1;color:#4e2a84}
+.mb-filler-choice{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;font-size:clamp(20px,2.4vw,30px)}
+.mb-filler-choice strong{padding:14px 18px;border:1px solid #dfe3e8;border-radius:14px;background:#fff}
+.mb-filler-next{display:block;margin:18px auto 0!important;background:#d99b26!important;border-color:#d99b26!important;color:#1f242d!important;font-weight:750!important}
+@media(max-width:700px){.mb-fillers{padding:16px}.mb-fillers header{flex-direction:column}.mb-filler-stage{padding:20px;min-height:210px}}
