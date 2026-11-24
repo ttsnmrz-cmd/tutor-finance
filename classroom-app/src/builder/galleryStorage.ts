@@ -2,12 +2,33 @@ import {supabase} from '../supabase';
 export type GalleryImage={id:string;caption:string;name:string;storagePath?:string};
 const BUCKET='classroom-images';
 const extension:Record<string,string>={'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','image/avif':'avif'};
+// Preserve small print and transparency; never replace an original with a larger file.
+async function optimizeClassroomImage(file:File):Promise<File>{
+ // GIF and AVIF may be animated; WebP may also contain animation.
+ if(file.type!=='image/png'&&file.type!=='image/jpeg')return file;
+ const url=URL.createObjectURL(file);
+ try{
+  const image=new Image();
+  await new Promise<void>((resolve,reject)=>{image.onload=()=>resolve();image.onerror=()=>reject(Error('Image decode failed'));image.src=url;});
+  const scale=Math.min(1,3200/Math.max(image.naturalWidth,image.naturalHeight));
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
+  canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+  const ctx=canvas.getContext('2d');if(!ctx)return file;
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(image,0,0,canvas.width,canvas.height);
+  const blob=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve,'image/webp',0.94));
+  if(!blob||blob.type!=='image/webp'||blob.size>=file.size)return file;
+  return new File([blob],file.name.replace(/\.[^.]+$/,'')+'.webp',{type:blob.type,lastModified:file.lastModified});
+ }catch{return file;}finally{URL.revokeObjectURL(url);}
+}
 export async function uploadClassroomImage(file:File):Promise<GalleryImage>{
  await validateLocalImage(file);
+ const optimized=await optimizeClassroomImage(file);
  const {data:{user},error:authError}=await supabase.auth.getUser();
  if(authError||!user)throw Error('Sign in before uploading images.');
- const id=crypto.randomUUID(),path=`${user.id}/${id}.${extension[file.type]}`;
- const {error}=await supabase.storage.from(BUCKET).upload(path,file,{contentType:file.type,upsert:false});
+ const id=crypto.randomUUID(),path=`${user.id}/${id}.${extension[optimized.type]}`;
+ const {error}=await supabase.storage.from(BUCKET).upload(path,optimized,{contentType:optimized.type,upsert:false});
  if(error)throw Error(`Image upload failed: ${error.message}`);
  return {id,name:file.name,caption:'',storagePath:path};
 }
