@@ -17,7 +17,7 @@ export class DraftController{
   this.state={body:structuredClone(row.body),revision:row.revision,status:'saved',error:'',savedAt:row.updated_at,recovered:false,conflict:false};
   try{const raw=this.storage.getItem(this.recoveryKey);if(raw){const r=JSON.parse(raw) as Recovery;if(r.schema!==1||r.id!==row.id||!isPlan(r.body))throw Error('Invalid recovery copy.');
    if(JSON.stringify(r.body)!==JSON.stringify(row.body)){this.state.body=r.body;this.state.revision=r.baseRevision;this.sequence=1;this.state.recovered=true;
-    if(r.baseRevision!==row.revision){this.state.status='error';this.state.conflict=true;this.state.error='This draft changed in another tab. Your recovery copy is kept.';}
+    if(r.baseRevision!==row.revision){this.state.status='error';this.state.conflict=true;this.state.error='The saved revision has changed. Your recovery copy is kept.';}
     else this.state.status='pending';
    }
   }}catch{this.state.status='error';this.state.error='Recovery could not be read. The saved draft is unchanged.';}
@@ -27,7 +27,7 @@ export class DraftController{
  private notify(patch:Partial<DraftState>={}){this.state={...this.state,...patch};for(const l of this.listeners)l();}
  private recover(){try{const r:Recovery={schema:1,id:this.row.id,baseRevision:this.state.revision,body:this.state.body,at:new Date().toISOString()};this.storage.setItem(this.recoveryKey,JSON.stringify(r));this.recoverySafe=true;return true;}catch{this.recoverySafe=false;return false;}}
  update(body:Plan){this.sequence++;this.state={...this.state,body:structuredClone(body)};const safe=this.recover();this.notify({status:this.state.conflict?'error':'pending',error:this.state.conflict?this.state.error:safe?'':'Recovery storage is unavailable. Keep this page open.'});
-  clearTimeout(this.timer);if(!this.state.conflict)this.timer=setTimeout(()=>void this.flush(),this.delay);
+  clearTimeout(this.timer);
  }
  get dirty(){return this.sequence!==this.savedSequence;}
  get hasRecovery(){return this.recoverySafe;}
@@ -53,12 +53,12 @@ export class DraftController{
    }
    this.notify({status:'saved',error:'',recovered:false});return true;
   }catch(e){let conflict=false;try{const rows=await this.repository.library();const current=rows.drafts.find(r=>r.id===this.row.id);conflict=!current||current.revision!==this.state.revision;}catch{}
-   this.recover();this.notify({status:'error',error:conflict?'This draft changed in another tab. Your recovery copy is kept.':(e as Error).message,conflict});return false;
+   this.recover();this.notify({status:'error',error:conflict?'The saved revision has changed. Your recovery copy is kept.':(e as Error).message,conflict});return false;
   }
  }
  async refreshExternal(){
   try{const data=await this.repository.library(),r=data.drafts.find(r=>r.id===this.row.id);if(!r)throw Error('The saved draft is no longer available.');
-   if(r.revision!==this.state.revision){if(this.dirty){this.recover();this.notify({status:'error',error:'This draft changed in another tab. Your recovery copy is kept.',conflict:true});}
+   if(r.revision!==this.state.revision){if(this.dirty){this.recover();this.notify({status:'error',error:'The saved revision has changed. Your recovery copy is kept.',conflict:true});}
     else this.notify({body:structuredClone(r.body),revision:r.revision,savedAt:r.updated_at,status:'saved'});}
   }catch(e){this.notify({status:'error',error:(e as Error).message});}
  }
