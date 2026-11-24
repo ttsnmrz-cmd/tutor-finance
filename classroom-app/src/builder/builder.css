@@ -412,3 +412,10 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-choice-option-row>input[type=checkbox]{width:16px!important;height:16px!important;margin:0!important}
 .mb-choice-add-option{min-height:30px!important;padding:4px 10px!important;margin-left:29px!important;font-size:11px!important}
 .mb-choice-add-question{min-height:30px!important;padding:4px 10px!important;font-size:11px!important}
+
+
+/* Lesson-stage picker for an initially empty material. */
+.mb-section-presets{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:4px 0 12px}
+.mb-section-presets button{min-height:38px;padding:8px 10px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:12px;font-weight:650}
+.mb-section-presets button:hover,.mb-section-presets button.selected{border-color:#7250a8;background:#f2ecfb;color:#4e2a84}
+@media(max-width:520px){.mb-section-presets{grid-template-columns:1fr}}
