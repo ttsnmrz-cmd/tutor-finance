@@ -78,7 +78,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
    </div>
    <div className="mb-preview-tools-row">
     {!studentMode&&<label className="mb-teacher-hints-toggle"><input type="checkbox" checked={teacherHints} onChange={e=>setTeacherHints(e.target.checked)}/> {ui('Teacher Hints')}</label>}
-    <PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} onNotes={()=>setNotesOpen(true)}/>
+    <PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} liveSessionId={liveSessionId} onNotes={()=>setNotesOpen(true)}/>
    </div>
   </div><div className="mb-preview-workspace">
   {block?<article id="activity" className="mb-student-card" key={block.id}><div className="mb-student-body">{steps[safeIndex].map(element=><section className="mb-combined-element" key={element.id} data-preview-element={element.id}>{!studentMode&&element.teacherNote?.trim()&&<aside className="mb-preview-teacher-note" aria-label={ui('Teacher note')}><strong>{ui('Teacher note')} · {ui('Visible only to teacher')}</strong><p>{element.teacherNote}</p></aside>}<h2>{element.title}</h2><ExercisePresentation block={element} assetScope={assetScope} teacherHints={teacherHints}/></section>)}</div>
