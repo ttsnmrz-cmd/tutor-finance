@@ -74,7 +74,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  const [studentNavOpen,setStudentNavOpen]=useState(false),[followEnabled,setFollowEnabled]=useState(false),[studentExercise,setStudentExercise]=useState<string|null>(null),[fillerOpen,setFillerOpen]=useState(false),[fillerState,setFillerState]=useState<FillerState>(initialFillerState);
  const [index,setIndex]=useState(()=>{if(studentMode){try{const saved=sessionStorage.getItem(scopeKey+':exercise');const found=steps.findIndex(group=>group.some(b=>b.id===saved));if(found>=0)return found;}catch{}}return Math.max(0,steps.findIndex(group=>group.some(b=>b.id===selected)));});
  const safeIndex=Math.min(index,Math.max(0,steps.length-1)),block=steps[safeIndex]?.[0],stage=block?plan.stages.find(s=>s.id===block.stage):undefined;
- const [liveAnswers,setLiveAnswers]=useState(true),[remoteAnswers,setRemoteAnswers]=useState<Record<string,unknown>>({});
+ const [remoteAnswers,setRemoteAnswers]=useState<Record<string,unknown>>({});
  const navChannel=useRef<ReturnType<typeof supabase.channel>|null>(null),followRef=useRef(false);
  const sendAnswer=useCallback((key:string,value:unknown)=>{setRemoteAnswers(old=>({...old,[key]:value}));if(navChannel.current)void navChannel.current.send({type:'broadcast',event:'lesson-navigation',payload:{type:'live-answer',key,value}});},[]);
  useEffect(()=>{followRef.current=followEnabled;},[followEnabled]);
@@ -85,7 +85,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  useEffect(()=>{if(!studentMode&&fillerOpen&&fillerState.kind==='memory')syncFiller(true,fillerState);},[fillerState,fillerOpen,followEnabled,studentMode]);
  function toggleFiller(){const next=!fillerOpen;setFillerOpen(next);syncFiller(next);}
  const studentAway=!studentMode&&!!studentExercise&&studentExercise!==block?.id;
- return <LiveAnswerContext.Provider value={{student:studentMode,enabled:!!liveSessionId&&(studentMode||liveAnswers),values:remoteAnswers,send:sendAnswer}}><section className="mb-builder mb-student-preview" aria-label={ui('Student preview')}>
+ return <LiveAnswerContext.Provider value={{student:studentMode,enabled:!!liveSessionId,values:remoteAnswers,send:sendAnswer}}><section className="mb-builder mb-student-preview" aria-label={ui('Student preview')}>
   <div className="mb-preview-top">
    <div className="mb-preview-heading-row">
     <h1>{plan.title}{stage&&<><span className="mb-preview-crumb-separator" aria-hidden="true">›</span><span className="mb-preview-section-crumb">{stage.name}</span></>}</h1>
@@ -93,7 +93,6 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
    </div>
    <div className="mb-preview-tools-row">
     {!studentMode&&<label className="mb-teacher-hints-toggle"><input type="checkbox" checked={teacherHints} onChange={e=>setTeacherHints(e.target.checked)}/> {ui('Teacher Hints')}</label>}
-    {!studentMode&&liveSessionId&&<label className="mb-teacher-hints-toggle"><input type="checkbox" checked={liveAnswers} onChange={e=>setLiveAnswers(e.target.checked)}/> Live Answers</label>}
     <PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} liveSessionId={liveSessionId} onNotes={()=>setNotesOpen(true)} followEnabled={followEnabled} studentAway={studentAway} onToggleFollow={()=>{const next=!followEnabled;setFollowEnabled(next);if(next)bringStudentHere();}} onBringHere={bringStudentHere} onFillers={toggleFiller} fillersOpen={fillerOpen}/>
    </div>
   </div><div className="mb-preview-workspace">
