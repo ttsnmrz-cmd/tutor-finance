@@ -13,13 +13,18 @@ async function renderNativeLessonNotes(student){
   const user=await supabaseClient.auth.getUser();
   if(!root.isConnected)return;
   if(!user.data?.user){root.textContent='Sign in to view notes';return;}
-  const ids=new Set();
-  for(let i=0;i<past.length;i+=100){const result=await supabaseClient.from('calendar_live_notes').select('lesson_id,plain').eq('teacher_id',user.data.user.id).in('lesson_id',past.slice(i,i+100).map(l=>l.id));if(!root.isConnected)return;if(result.error){root.textContent='Could not load notes';return;}for(const row of result.data||[])if(String(row.plain||'').trim())ids.add(String(row.lesson_id));}
-  const lessonsForStudent=past.filter(l=>ids.has(String(l.id))).sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
-  if(!lessonsForStudent.length){root.innerHTML='<p class="native-history-empty">No past lessons with notes.</p>';return;}
+  const ids=new Map();
+  for(let i=0;i<past.length;i+=100){const result=await supabaseClient.from('calendar_live_notes').select('lesson_id,plain,title').eq('teacher_id',user.data.user.id).in('lesson_id',past.slice(i,i+100).map(l=>l.id));if(!root.isConnected)return;if(result.error){root.textContent='Could not load notes';return;}for(const row of result.data||[])if(String(row.plain||'').trim())ids.set(String(row.lesson_id),row);}
+  const lessonsForStudent=past.sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
+  if(!lessonsForStudent.length){root.innerHTML='<p class="native-history-empty">No past lessons.</p>';return;}
   const choices=lessonsForStudent.map(l=>'<option value="'+nativeNotesEscape(l.id)+'">'+nativeNotesEscape(l.date+' · '+(l.time||'')+' · '+(l.comment||'Lesson'))+'</option>').join('');
   root.innerHTML='<div class="native-notes-toolbar"><label for="native-note-lesson">Lesson</label><select id="native-note-lesson">'+choices+'</select><span id="native-note-status" role="status"></span></div><label class="native-note-label" for="native-note-editor">Live Notes</label><textarea id="native-note-editor" rows="12" placeholder="Write lesson notes here…"></textarea><div class="native-notes-footer"><span>Notes are linked to the selected lesson.</span><button type="button" id="native-note-save">Save notes</button></div>';
   const select=root.querySelector('#native-note-lesson'),editor=root.querySelector('#native-note-editor'),status=root.querySelector('#native-note-status');
+  const layout=document.createElement('div');layout.className='pp-history-split';
+  for(const title of ['Lessons','Notes']){const col=document.createElement('section'),heading=document.createElement('h3'),list=document.createElement('div');heading.textContent=title;list.className='pp-history-list';col.append(heading,list);layout.append(col);
+    for(const l of lessonsForStudent){const note=ids.get(String(l.id));if(title==='Notes'&&!note)continue;const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=l.date+' · '+(l.time||'')+(title==='Lessons'&&note?' ▤':'');if(title==='Notes'){const excerpt=document.createElement('small');excerpt.textContent=String(note.plain).slice(0,140);button.append(excerpt);}button.onclick=()=>{select.value=String(l.id);select.dispatchEvent(new Event('change'));};list.append(button);}
+    if(!list.children.length)list.textContent='No notes yet.';
+  }root.prepend(layout);
   nativeLiveNotesState.studentId=String(student.id);
   nativeLiveNotesState.teacherId=user.data.user.id;
   async function load(){
