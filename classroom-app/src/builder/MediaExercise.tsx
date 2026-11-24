@@ -1,10 +1,31 @@
-import {useEffect,useLayoutEffect,useRef,useState} from 'react';
+import {LiveAnswerContext,LiveAnswerBlock} from './liveAnswers';
+import {useContext,useEffect,useLayoutEffect,useRef,useState} from 'react';
 import type {Block} from '../planning/model';
 import {ui} from '../i18n';
 import {uploadMedia,mediaUrl,youtubeId,mediaLink,type MediaEntry,type MediaLink,type YoutubeEntry} from './mediaStorage';
 type MediaBlock=Block&{mediaFiles?:MediaEntry[];mediaLinks?:YoutubeEntry[];externalMedia?:MediaLink[];legacyMediaCaption?:string};
-function Player({kind,src,label}:{kind:'audio'|'video';src:string;label:string}){return kind==='video'?<video controls preload="metadata" playsInline src={src} aria-label={label}/>:<audio controls preload="metadata" src={src} aria-label={label}/>;}
-function StoredMedia({scope,entry}:{scope:string;entry:MediaEntry}){const [url,setUrl]=useState(''),[error,setError]=useState('');useEffect(()=>{let stopped=false,revoke:(()=>void)|undefined;void mediaUrl(entry,scope).then(result=>{if(stopped){result.revoke?.();return;}revoke=result.revoke;setUrl(result.src);}).catch(e=>{if(!stopped)setError(ui((e as Error).message));});return()=>{stopped=true;revoke?.();};},[scope,entry.id,entry.storagePath]);return error?<p role="alert">{error}</p>:url?<Player kind={entry.kind} src={url} label={entry.caption||ui(entry.kind==='video'?'Video':'Audio')}/>:<span role="status">{ui('Loading media…')}</span>;}
+type Playback={paused:boolean;position:number;rate:number;at:number};
+function Player({kind,src,label,syncId}:{kind:'audio'|'video';src:string;label:string;syncId?:string}){
+ const context=useContext(LiveAnswerContext),block=useContext(LiveAnswerBlock);
+ const key=block+':media:'+syncId;
+ const enabled=!!(context?.enabled&&syncId);
+ const remote=enabled?context?.values[key] as Playback|undefined:undefined;
+ const player=useRef<HTMLMediaElement|null>(null),applied=useRef<Playback|undefined>(undefined),suppress=useRef(0),[blocked,setBlocked]=useState(false);
+ function publish(){const el=player.current;if(!enabled||!el||Date.now()<suppress.current)return;const next={paused:el.paused,position:el.currentTime,rate:el.playbackRate,at:Date.now()};applied.current=next;context?.send(key,next);}
+ function apply(state:Playback){const el=player.current;if(!el||el.readyState===0)return;
+   if(!Number.isFinite(state.position)||!Number.isFinite(state.rate)||state.rate<=0||!Number.isFinite(state.at))return;
+   suppress.current=Date.now()+700;
+   const position=Math.max(0,state.position+(state.paused?0:Math.max(0,Date.now()-state.at)/1000*state.rate));
+   if(Math.abs(el.currentTime-position)>.45)el.currentTime=Math.min(position,Number.isFinite(el.duration)?el.duration:position);
+   if(el.playbackRate!==state.rate)el.playbackRate=state.rate;
+   if(state.paused){el.pause();setBlocked(false);}else if(el.paused){void el.play().then(()=>setBlocked(false)).catch(()=>setBlocked(true));}
+ }
+ useEffect(()=>{if(!remote||remote===applied.current)return;applied.current=remote;apply(remote);},[remote,src]);
+ useEffect(()=>{if(!enabled||!remote||remote.paused||blocked)return;const id=setInterval(()=>{const el=player.current;if(el&&!el.paused&&Math.abs(el.currentTime-(remote.position+Math.max(0,Date.now()-remote.at)/1000*remote.rate))>1.2)apply(remote);},3000);return()=>clearInterval(id);},[enabled,remote,blocked]);
+ const props={controls:true,preload:'metadata',src,'aria-label':label,onPlay:publish,onPause:publish,onSeeked:publish,onRateChange:publish,onEnded:publish,onLoadedMetadata:()=>{if(remote)apply(remote);}};
+ return <>{kind==='video'?<video {...props} playsInline ref={el=>{player.current=el;}}/>:<audio {...props} ref={el=>{player.current=el;}}/>}{blocked&&<button type="button" onClick={()=>{if(remote)apply(remote);}}>{ui('Enable synchronized playback')}</button>}</>;
+}
+function StoredMedia({scope,entry}:{scope:string;entry:MediaEntry}){const [url,setUrl]=useState(''),[error,setError]=useState('');useEffect(()=>{let stopped=false,revoke:(()=>void)|undefined;void mediaUrl(entry,scope).then(result=>{if(stopped){result.revoke?.();return;}revoke=result.revoke;setUrl(result.src);}).catch(e=>{if(!stopped)setError(ui((e as Error).message));});return()=>{stopped=true;revoke?.();};},[scope,entry.id,entry.storagePath]);return error?<p role="alert">{error}</p>:url?<Player syncId={entry.id} kind={entry.kind} src={url} label={entry.caption||ui(entry.kind==='video'?'Video':'Audio')}/>:<span role="status">{ui('Loading media…')}</span>;}
 function Youtube({entry}:{entry:YoutubeEntry}){const [loaded,setLoaded]=useState(false),thumb='https://i.ytimg.com/vi/'+entry.videoId+'/hqdefault.jpg';return <div className="mb-youtube">{loaded?<iframe src={'https://www.youtube-nocookie.com/embed/'+entry.videoId+'?autoplay=1'} title={entry.caption||'YouTube video'} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" sandbox="allow-scripts allow-same-origin allow-presentation" allowFullScreen/>:<button type="button" className="mb-youtube-poster" onClick={()=>setLoaded(true)} aria-label={ui('Play YouTube video')}><img src={thumb} alt=""/><span aria-hidden="true">▶</span></button>}</div>;}
 function youtubeLinks(block:Block){const own=(block as MediaBlock).mediaLinks||[],legacy=youtubeId(block.content);return legacy?[{id:'legacy',videoId:legacy,caption:(block as MediaBlock).legacyMediaCaption||''},...own]:own;}
 export function MediaEditor({block,onChange,scope}:{block:Block;onChange:(b:Block)=>void;scope:string}){
