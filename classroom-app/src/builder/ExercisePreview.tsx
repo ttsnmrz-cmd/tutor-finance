@@ -11,7 +11,7 @@ import {TrueFalsePreview} from './TrueFalseExercise';
 import {MultipleChoicePreview} from './MultipleChoiceExercise';
 import {isMultipleChoice,isInlineChoice,isColumns,isSentence,isTypedGap,isLetters,isGallery,isImageLabeling} from './choiceData';
 import {MatchingPreview} from './MatchingExercise';
-import {LiveAnswerContext} from './liveAnswers';
+import {LiveAnswerContext,useLiveAnswer} from './liveAnswers';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import type {Block,Plan} from '../planning/model';
 import {PreviewControls,PreviewNotes} from './PreviewWorkspaceTools';
@@ -34,7 +34,7 @@ export function previewWordBank(block:Block):string[]{
 /** Temporary interaction in local preview only; no session or persisted answers. */
 export function ExercisePresentation({block,assetScope='',teacherHints=true}:{block:Block;assetScope?:string;teacherHints?:boolean}){
  const mode=exerciseLabel(block),words=previewWordBank(block);
- const [placements,setPlacements]=useState<Record<number,number>>({}),[selectedWord,setSelectedWord]=useState<number|null>(null),[checked,setChecked]=useState(false);
+ const [placements,setPlacements]=useLiveAnswer<Record<number,number>>(block.id+':placements',{}),[selectedWord,setSelectedWord]=useLiveAnswer<number|null>(block.id+':selected',null),[checked,setChecked]=useLiveAnswer(block.id+':checked',false);
  const nonce=useRef(crypto.randomUUID()),touch=useRef<number|null>(null);
  const gaps=block.content.split(/_{2,}/g);
  const total=gaps.length>1?gaps.length-1:block.items.reduce((n,i)=>n+Math.max(1,(i.prompt.match(/_{2,}/g)||[]).length),0);
