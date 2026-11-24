@@ -7,17 +7,20 @@ function nativeNotesEscape(value){return String(value??'').replace(/[&<>"']/g,ch
 async function renderNativeLessonNotes(student){
   const root=document.getElementById('native-live-notes');
   if(!root||!student)return;
-  const lessonsForStudent=studentStats(student).ls.slice().sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
-  if(!lessonsForStudent.length){root.innerHTML='<p class="native-history-empty">Нет занятий для заметок.</p>';return;}
-  const today=localISO(new Date());
-  const latestCompleted=lessonsForStudent.find(l=>String(l.date||'')<=today&&['conducted','completed','cancelled_charge','cancelled_free'].includes(String(l.status||'').toLowerCase()));
+  const now=new Date(),today=localISO(now),clock=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const past=studentStats(student).ls.filter(l=>l.date&&(String(l.date)<today||(String(l.date)===today&&String(l.time||'00:00').slice(0,5)<=clock)));
+  root.textContent='Loading notes…';
+  const user=await supabaseClient.auth.getUser();
+  if(!root.isConnected)return;
+  if(!user.data?.user){root.textContent='Sign in to view notes';return;}
+  const ids=new Set();
+  for(let i=0;i<past.length;i+=100){const result=await supabaseClient.from('calendar_live_notes').select('lesson_id,plain').eq('teacher_id',user.data.user.id).in('lesson_id',past.slice(i,i+100).map(l=>l.id));if(!root.isConnected)return;if(result.error){root.textContent='Could not load notes';return;}for(const row of result.data||[])if(String(row.plain||'').trim())ids.add(String(row.lesson_id));}
+  const lessonsForStudent=past.filter(l=>ids.has(String(l.id))).sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
+  if(!lessonsForStudent.length){root.innerHTML='<p class="native-history-empty">No past lessons with notes.</p>';return;}
   const choices=lessonsForStudent.map(l=>'<option value="'+nativeNotesEscape(l.id)+'">'+nativeNotesEscape(l.date+' · '+(l.time||'')+' · '+(l.comment||'Lesson'))+'</option>').join('');
   root.innerHTML='<div class="native-notes-toolbar"><label for="native-note-lesson">Lesson</label><select id="native-note-lesson">'+choices+'</select><span id="native-note-status" role="status"></span></div><label class="native-note-label" for="native-note-editor">Live Notes</label><textarea id="native-note-editor" rows="12" placeholder="Write lesson notes here…"></textarea><div class="native-notes-footer"><span>Notes are linked to the selected lesson.</span><button type="button" id="native-note-save">Save notes</button></div>';
   const select=root.querySelector('#native-note-lesson'),editor=root.querySelector('#native-note-editor'),status=root.querySelector('#native-note-status');
-  if(latestCompleted)select.value=String(latestCompleted.id);
   nativeLiveNotesState.studentId=String(student.id);
-  const user=await supabaseClient.auth.getUser();
-  if(!user.data?.user){status.textContent='Sign in to save notes';editor.disabled=true;return;}
   nativeLiveNotesState.teacherId=user.data.user.id;
   async function load(){
     if(nativeLiveNotesState.saveTimer){clearTimeout(nativeLiveNotesState.saveTimer);nativeLiveNotesState.saveTimer=null;}
