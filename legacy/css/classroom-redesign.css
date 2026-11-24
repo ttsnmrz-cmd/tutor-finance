@@ -706,3 +706,7 @@ html[data-theme="dark"] #student-live-material :is(.pp-student-header-balance,.p
 #teacher-app #teacher-main{padding-bottom:0!important;margin-bottom:0!important;align-self:start!important}
 #teacher-app #tab-materials:has(.mb-student-preview)>.app-card,#teacher-app #classroom-materials-root:has(.mb-student-preview),#teacher-app .ml-builder-host:has(.mb-student-preview){min-height:0!important;height:auto!important;padding-bottom:0!important;margin-bottom:0!important}
 #student-live-material .pp-student-live-one-page .pp-student-live-main{min-height:0!important}
+
+/* Builder and preview share the same content-sized outer shell. */
+#teacher-app #tab-materials:has(.ml-builder-host),#teacher-app #tab-materials:has(.ml-builder-host)>.app-card,#teacher-app #classroom-materials-root:has(.ml-builder-host),#teacher-app #classroom-materials-root .ml-builder-host,#teacher-app #classroom-materials-root .ml-preview:has(.ml-builder-host),#teacher-app #classroom-materials-root .ml-layout:has(.ml-builder-host){min-height:0!important;height:auto!important;padding-bottom:0!important;margin-bottom:0!important}
+#teacher-app #classroom-materials-root .ml-builder-host .mb-builder{min-height:0!important;height:auto!important;margin-bottom:0!important;padding-bottom:12px!important}
