@@ -2217,13 +2217,13 @@ async function renderPublicLessonsHistory(rows){
  const lessons=makeColumn('Lessons'),notes=makeColumn('Notes');el.replaceChildren(layout);
  const cards=new Map();
  function label(l){return l.date+' · '+displayTime(l.time);}
- function open(l,value){const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;dialog.querySelector('[data-lesson-heading]').textContent=label(l);renderSharedLessonNotes(dialog.querySelector('[data-lesson-notes]'),value);if(!dialog.open)dialog.showModal();}
+ function open(l,value){const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;dialog.querySelector('[data-lesson-heading]').textContent=(value?.title&&value.title!=='Live Notes'?value.title+' · ':'')+label(l);renderSharedLessonNotes(dialog.querySelector('[data-lesson-notes]'),value);if(!dialog.open)dialog.showModal();}
  function card(l){const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=label(l);return button;}
  for(const l of past){const button=card(l);cards.set(l.id,button);lessons.append(button);button.onclick=async()=>{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});if(!error)open(l,data);};}
  if(!past.length){lessons.textContent='No completed lessons yet.';notes.textContent='No notes yet.';return;}
  notes.textContent='Loading notes…';let found=0,failed=false;
  for(let i=0;i<past.length;i+=8){const batch=await Promise.all(past.slice(i,i+8).map(async l=>{try{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});return {l,data,error};}catch(error){return {l,error};}}));if(!layout.isConnected)return;
- for(const {l,data,error} of batch){if(error){failed=true;continue;}const plain=String(data?.plain||'').trim();if(!plain)continue;if(!found++)notes.replaceChildren();const mark=document.createElement('span');mark.textContent=' ▤';mark.title='Has notes';cards.get(l.id)?.append(mark);const button=card(l);const excerpt=document.createElement('small');excerpt.textContent=plain.slice(0,140)+(plain.length>140?'…':'');button.append(excerpt);button.onclick=()=>open(l,data);notes.append(button);}
+ for(const {l,data,error} of batch){if(error){failed=true;continue;}const plain=String(data?.plain||'').trim();if(!plain)continue;if(!found++)notes.replaceChildren();const mark=document.createElement('span');mark.textContent=' ▤';mark.title='Has notes';cards.get(l.id)?.append(mark);const button=card(l);if(data?.title&&data.title!=='Live Notes'){const heading=document.createElement('strong');heading.className='pp-note-title';heading.textContent=data.title;button.prepend(heading);}const excerpt=document.createElement('small');excerpt.textContent=plain.slice(0,140)+(plain.length>140?'…':'');button.append(excerpt);button.onclick=()=>open(l,data);notes.append(button);}
  }
  if(!found)notes.textContent=failed?'Could not load all notes.':'No notes yet.';
 }
