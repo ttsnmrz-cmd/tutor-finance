@@ -491,3 +491,23 @@
 .mb-builder.mb-student-preview .mb-preview-progress>button::after{content:'';position:absolute;inset:-8px 0;}
 .mb-builder.mb-student-preview .mb-preview-progress>button:hover,.mb-builder.mb-student-preview .mb-preview-progress>button:focus-visible{outline:2px solid #4e2a84!important;outline-offset:3px;}
 .mb-builder.mb-student-preview .mb-preview-progress>button[aria-current=step]{outline:1px solid #4e2a84;outline-offset:2px;}
+
+
+/* Shared preview palette in dark mode, for both teacher and student. */
+html[data-theme="dark"] .mb-builder.mb-student-preview{
+ --page:#30283b;--card:#2d2637;--soft:#393044;--line:#655673;
+ --ink:#f0eafa;--muted:#c8bbd5;--purple:#c5a6ef;--gold:#d99b26;
+ color:var(--ink)!important;color-scheme:dark;
+}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-workspace>:is(.mb-student-card,.mb-preview-notes),
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-notes{
+ background:var(--card)!important;border-color:var(--line)!important;color:var(--ink)!important;
+}
+html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-rich-input,.mb-gallery-stage,.mb-preview-gap,.mb-word-bank){
+ background:var(--page)!important;border-color:var(--line)!important;color:var(--ink)!important;
+}
+html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-preview-instruction,.mb-student-instruction,.mb-preview-section-crumb,.mb-preview-crumb-separator){color:var(--muted)!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-heading-row>h1{color:var(--purple)!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-preview-footer,.mb-combined-element+.mb-combined-element){border-top-color:var(--line)!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-filler-stage,.mb-filler-choice strong){background:var(--soft)!important;border-color:var(--line)!important;color:var(--ink)!important}
+html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-fillers header h2,.mb-filler-stage>p,.mb-filler-label,.mb-filler-kicker){color:var(--ink)!important}
