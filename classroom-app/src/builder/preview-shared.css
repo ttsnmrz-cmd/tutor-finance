@@ -150,3 +150,12 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 .mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-after::after{bottom:-6px}
 .mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-before{box-shadow:0 -8px 16px rgba(78,42,132,.08)}
 .mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-after{box-shadow:0 8px 16px rgba(78,42,132,.08)}
+
+
+/* Checked True/False feedback must override generic selected-button violet styling. */
+.mb-builder.mb-student-preview .mb-tf-preview .mb-tf-buttons button[data-result="correct"]{
+ background:#e6f7ec!important;border:2px solid #26965b!important;color:#17653a!important;box-shadow:none!important;
+}
+.mb-builder.mb-student-preview .mb-tf-preview .mb-tf-buttons button[data-result="incorrect"]{
+ background:#fdecec!important;border:2px solid #d45656!important;color:#9a2929!important;box-shadow:none!important;
+}
