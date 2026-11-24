@@ -1890,7 +1890,7 @@ async function openPublicCalendarLesson(index){
  const live=publicStudentLiveStatuses.get(String(l.id));
  if(!live?.has_material){window.alert('Please wait until your teacher assigns a material to this lesson.');return;}
  if(live.status!=='active'){window.alert(live.status==='completed'?'This lesson has ended.':'Your teacher has not started this lesson yet.');return;}
- if(!window.confirm('Join this lesson?\\n'+l.date+' · '+displayTime(l.time)))return;
+
  const studentId=new URLSearchParams(location.search).get('student');
  try{
   const {data,error}=await supabaseClient.rpc('get_public_student_lesson_material',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});
