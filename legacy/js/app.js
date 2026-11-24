@@ -2105,6 +2105,8 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  ensureStudentPortalLayout();
  let overlay=document.getElementById('student-live-material');
  if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f4f5f7;overflow:auto';document.body.append(overlay);}
+ overlay._classroomCleanup?.();
+ overlay._classroomCleanup=null;
  overlay.replaceChildren();
  // Reuse the SAME student dashboard header, including balance and theme toggle.
  const sourceHeader=document.querySelector('#student-public-view .app-header[data-shared-header="1"]');
@@ -2120,7 +2122,7 @@ function showPublicLessonMaterial(data,studentId,lessonId){
    const back=document.createElement('button');
    back.type='button';back.className='pp-student-return';
    back.textContent='← Back to dashboard';
-   back.addEventListener('click',()=>{sessionStorage.removeItem('pp-student-live-lesson');overlay.remove();});
+   back.addEventListener('click',()=>{sessionStorage.removeItem('pp-student-live-lesson');overlay._classroomCleanup?.();overlay.remove();});
    const actions=header.querySelector('.pp-student-header-actions');
    if(actions){
      const theme=actions.querySelector('.pp-student-theme-toggle');
@@ -2155,8 +2157,28 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  }
  void refreshNotes();
 
- if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient,data.session_id);
- else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient,data.session_id);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
+ let materialSignature=JSON.stringify([data.session_id,data.plan]);
+ function mountMaterial(next){
+   overlay._classroomCleanup?.();
+   overlay._classroomCleanup=window.mountProfiProfitStudentLesson(host,next.plan,supabaseClient,next.session_id);
+ }
+ if(typeof window.mountProfiProfitStudentLesson==='function')mountMaterial(data);
+ else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!host.isConnected){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);mountMaterial(data);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
+ async function refreshMaterial(){
+   if(!host.isConnected)return;
+   try{
+     const {data:next,error}=await supabaseClient.rpc('get_public_student_lesson_material',{p_student_id:studentId,p_calendar_lesson_id:lessonId});
+     if(!host.isConnected||error||!next?.plan||typeof window.mountProfiProfitStudentLesson!=='function')return;
+     const signature=JSON.stringify([next.session_id,next.plan]);
+     if(signature!==materialSignature){
+       sessionStorage.removeItem('student:'+next.session_id+':exercise');
+       mountMaterial(next);
+       materialSignature=signature;
+     }
+   }catch(e){console.warn('Live material refresh failed',e);}
+   finally{if(host.isConnected)setTimeout(refreshMaterial,1500);}
+ }
+ setTimeout(refreshMaterial,1500);
 }
 
 function renderSharedLessonNotes(richNotes,value){
