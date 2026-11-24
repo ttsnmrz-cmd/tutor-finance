@@ -459,3 +459,8 @@
 @media(max-width:700px){
  .mb-builder.mb-student-preview .mb-preview-instruction{font-size:15px!important;margin-bottom:8px!important}
 }
+
+
+/* Live lesson navigation state. */
+.mb-preview-controls>button.is-following{border-color:#4e2a84!important;background:#f2ecfb!important;color:#4e2a84!important}
+.mb-preview-controls>button.mb-bring-here{border-color:#d99b26!important;background:#fff8e7!important;color:#1f242d!important;font-weight:700!important}
