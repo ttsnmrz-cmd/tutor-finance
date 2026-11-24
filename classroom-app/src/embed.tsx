@@ -20,10 +20,10 @@ window.mountProfiProfitMaterials=(target,userId,client)=>{
 
 // Reuse the same interactive exercise renderer for the public student cabinet.
 // Student data is provided by the scoped public RPC, never by teacher repository access.
-(window as Window & {mountProfiProfitStudentLesson?:(target:HTMLElement,plan:Plan,client:SupabaseClient)=>void}).mountProfiProfitStudentLesson=(target,plan,client)=>{
+(window as Window & {mountProfiProfitStudentLesson?:(target:HTMLElement,plan:Plan,client:SupabaseClient,liveSessionId?:string)=>void}).mountProfiProfitStudentLesson=(target,plan,client,liveSessionId)=>{
  setProfiProfitSupabase(client);
  target.setAttribute('data-classroom-root','');
  target.classList.add('profiprofit-student-lesson');
  const root=createRoot(target);
- root.render(<React.StrictMode><ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'student:'+crypto.randomUUID()} studentMode/></React.StrictMode>);
+ root.render(<React.StrictMode><ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'student:'+(liveSessionId||crypto.randomUUID())} studentMode liveSessionId={liveSessionId}/></React.StrictMode>);
 };
