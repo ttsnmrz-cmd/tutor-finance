@@ -13,15 +13,17 @@ const dice=[
 ];
 const pick=<T,>(items:T[],old?:T)=>{const pool=items.length>1?items.filter(x=>x!==old):items;return pool[Math.floor(Math.random()*pool.length)]||items[0];};
 
-export function FillersPanel({studentMode=false,onClose}:{studentMode?:boolean;onClose?:()=>void}){
- const [kind,setKind]=useState<FillerKind>('dice'),[question,setQuestion]=useState(questions[0]),[would,setWould]=useState(woulds[0]),[roll,setRoll]=useState(0);
- const next=()=>{if(kind==='dice')setRoll(Math.floor(Math.random()*6));else if(kind==='would')setWould(old=>pick(woulds,old));else setQuestion(old=>pick(questions,old));};
+export type FillerState={kind:FillerKind;question:string;would:string[];roll:number};
+export const initialFillerState: FillerState={kind:'dice',question:questions[0],would:woulds[0],roll:0};
+export function FillersPanel({studentMode=false,onClose,state,onState}:{studentMode?:boolean;onClose?:()=>void;state?:FillerState;onState?:(state:FillerState)=>void}){
+ const [local,setLocal]=useState<FillerState>(initialFillerState);const current=state||local,kind=current.kind,question=current.question,would=current.would,roll=current.roll;const update=(next:FillerState)=>{setLocal(next);onState?.(next);};
+ const next=()=>{if(kind==='dice')update({...current,roll:Math.floor(Math.random()*6)});else if(kind==='would')update({...current,would:pick(woulds,current.would)});else update({...current,question:pick(questions,current.question)});};
  return <section className="mb-fillers" aria-label={ui('Fillers')}>
   <header><div><span className="mb-filler-kicker">🎲 {ui('Fillers')}</span><h2>{ui('Quick activity')}</h2></div>{!studentMode&&onClose&&<button type="button" onClick={onClose}>← {ui('Back to lesson')}</button>}</header>
   {!studentMode&&<nav aria-label={ui('Choose a filler')}>
-   <button className={kind==='dice'?'active':''} onClick={()=>setKind('dice')}>🎲 {ui('Dice Challenge')}</button>
-   <button className={kind==='would'?'active':''} onClick={()=>setKind('would')}>↔ {ui('Would You Rather?')}</button>
-   <button className={kind==='question'?'active':''} onClick={()=>setKind('question')}>💬 {ui('Random Question')}</button>
+   <button className={kind==='dice'?'active':''} onClick={()=>update({...current,kind:'dice'})}>🎲 {ui('Dice Challenge')}</button>
+   <button className={kind==='would'?'active':''} onClick={()=>update({...current,kind:'would'})}>↔ {ui('Would You Rather?')}</button>
+   <button className={kind==='question'?'active':''} onClick={()=>update({...current,kind:'question'})}>💬 {ui('Random Question')}</button>
   </nav>}
   <div className="mb-filler-stage">
    {kind==='dice'&&<><div className="mb-filler-die" aria-label={(roll+1).toString()}>{['⚀','⚁','⚂','⚃','⚄','⚅'][roll]}</div><p>{dice[roll]}</p></>}
