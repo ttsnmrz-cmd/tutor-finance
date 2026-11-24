@@ -57,6 +57,23 @@ html[data-theme="dark"] #teacher-app .native-layout.pp-mobile-open>.native-sideb
 #teacher-app .pp-mobile-open>.native-sidebar button[data-native-tab]{width:100%!important;justify-content:flex-start!important;gap:12px!important}
 #teacher-app .pp-mobile-open>.native-sidebar .native-sidebar-toggle{display:none!important}
 }
+</style><style>
+@media(max-width:768px){
+#teacher-app #tab-students,#teacher-app #tab-students .native-students-grid,#teacher-app #native-student-detail,#teacher-app #tab-students .native-students-panel{min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+#teacher-app #tab-students .native-students-grid{grid-template-columns:minmax(0,1fr)!important}
+#teacher-app #native-student-detail{padding:14px!important}
+#teacher-app #native-student-detail .native-detail-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px!important;width:100%!important;min-width:0!important}
+#teacher-app #native-student-detail .native-detail-tabs button{min-width:0!important;width:100%!important;padding:10px 4px!important;white-space:normal!important;font-size:13px!important;overflow-wrap:anywhere}
+#teacher-app #native-student-detail .native-student-stats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+#teacher-app #native-student-detail .native-student-stats>div{min-width:0!important;padding:10px!important}
+#teacher-app #native-student-detail .native-student-stats strong{font-size:clamp(14px,4vw,18px)!important;overflow-wrap:anywhere;white-space:normal!important}
+#teacher-app #native-student-detail :is(.native-detail-body,.native-history-scroll,.native-overview-section,.native-student-identity){min-width:0!important;max-width:100%!important}
+#teacher-app #native-student-detail :is(.native-section-heading,.native-lesson-filters,.native-selected-heading){flex-wrap:wrap!important;gap:8px!important}
+#teacher-app #native-student-detail .native-lesson-filters select{min-width:0!important;max-width:100%!important;flex:1 1 120px!important}
+#teacher-app #native-student-detail .native-history-row{grid-template-columns:repeat(2,minmax(0,1fr))!important;min-width:0!important;width:100%!important;gap:6px!important}
+#teacher-app #native-student-detail .native-history-row>*{min-width:0!important;white-space:normal!important;overflow-wrap:anywhere}
+#teacher-app #native-student-detail .native-student-identity h2{overflow-wrap:anywhere}
+}
 </style></head>
 <body class="text-slate-800 min-h-screen">
 <div id="student-public-view" class="hidden max-w-3xl mx-auto p-4">
