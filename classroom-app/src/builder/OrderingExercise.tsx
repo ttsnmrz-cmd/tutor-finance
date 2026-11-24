@@ -1,9 +1,10 @@
+import {useLiveAnswer} from './liveAnswers';
 import {useState} from 'react';
 import type {Block} from '../planning/model';
 import {FormattedText,formatOf} from './textFormatting';
 import {ui} from '../i18n';
 export function OrderingPreview({block,teacherHints=false}:{block:Block;teacherHints?:boolean}){
- const [order,setOrder]=useState(()=>{const a=block.items.map((_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}if(a.length>1&&a.every((v,i)=>v===i))[a[0],a[1]]=[a[1],a[0]];return a;}),[checked,setChecked]=useState(false),[dropAt,setDropAt]=useState<{index:number;after:boolean}|null>(null);
+ const [order,setOrder]=useLiveAnswer(block.id+':order',()=>{const a=block.items.map((_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}if(a.length>1&&a.every((v,i)=>v===i))[a[0],a[1]]=[a[1],a[0]];return a;}),[checked,setChecked]=useLiveAnswer(block.id+':checked',false),[dropAt,setDropAt]=useState<{index:number;after:boolean}|null>(null);
  function move(index:number,delta:number){const to=index+delta;if(to<0||to>=order.length)return;const a=[...order];[a[index],a[to]]=[a[to],a[index]];setOrder(a);setChecked(false);}
  function reorder(from:number,target:number,after=false){if(!Number.isInteger(from)||from<0||from>=order.length||target<0||target>=order.length)return;let to=target+(after?1:0);const next=[...order];const [item]=next.splice(from,1);if(from<to)to--;if(to===from)return;next.splice(to,0,item);setOrder(next);setChecked(false);}
  const correct=order.every((v,i)=>block.items[v].prompt===block.items[i].prompt);
