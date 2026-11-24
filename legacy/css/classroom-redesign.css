@@ -695,3 +695,7 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 html[data-theme="dark"] #student-live-material{background:#211c29!important;color:#f0eafa!important}
 html[data-theme="dark"] #student-live-material .pp-student-live-one-page .pp-student-live-main{background:#2d2637!important;color:#f0eafa!important}
 html[data-theme="dark"] #student-live-material :is(.pp-student-header-balance,.pp-student-return,.pp-student-theme-toggle){background:#393044!important;color:#f0eafa!important;border-color:#655673!important}
+
+/* The public landing page shares the outer teacher shell; never expose its private layout while landing is visible. */
+#teacher-app:has(#landing-page:not(.hidden)) :is(.native-layout,#teacher-header,#teacher-main){display:none!important}
+#teacher-app #teacher-main.hidden{display:none!important}
