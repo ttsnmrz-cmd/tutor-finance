@@ -325,7 +325,7 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
 
 /* Fill the available screen with the preview while letting long exercises grow. */
 #teacher-app:not(.hidden):has(.mb-student-preview) {
-  min-height: 100dvh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -347,7 +347,7 @@ html[data-theme="dark"] #teacher-app .native-sidebar .classroom-sidebar-toggle{c
   align-self: stretch;
 }
 #classroom-materials-root .ml-builder-host:has(.mb-student-preview) {
-  padding-block: 8px 12px;
+  padding-block: 8px 0;
 }
 /* Unified ProfiProfit light theme: neutral surfaces and gold primary actions. */
 html:not([data-theme="dark"]) #teacher-app{--bg-color:#F4F5F7;--card-bg:#FFFFFF;--text-color:#1F242D;--text-secondary:#6B7280;--primary-color:#4E2A84;--primary-hover:#3D2169;--accent-soft:#F0F1F4;--border-color:#E0E3E9;--cta-color:#D99B26}
@@ -699,3 +699,10 @@ html[data-theme="dark"] #student-live-material :is(.pp-student-header-balance,.p
 /* The public landing page shares the outer teacher shell; never expose its private layout while landing is visible. */
 #teacher-app:has(#landing-page:not(.hidden)) :is(.native-layout,#teacher-header,#teacher-main){display:none!important}
 #teacher-app #teacher-main.hidden{display:none!important}
+
+/* Shared workspace: content determines document height, not viewport-sized nested shells. */
+#teacher-app:not(.hidden),#teacher-app .native-layout,#teacher-app #teacher-main{min-height:0!important;height:auto!important}
+#teacher-app .native-layout{padding-bottom:12px!important;margin-bottom:0!important;flex:0 0 auto!important}
+#teacher-app #teacher-main{padding-bottom:0!important;margin-bottom:0!important;align-self:start!important}
+#teacher-app #tab-materials:has(.mb-student-preview)>.app-card,#teacher-app #classroom-materials-root:has(.mb-student-preview),#teacher-app .ml-builder-host:has(.mb-student-preview){min-height:0!important;height:auto!important;padding-bottom:0!important;margin-bottom:0!important}
+#student-live-material .pp-student-live-one-page .pp-student-live-main{min-height:0!important}
