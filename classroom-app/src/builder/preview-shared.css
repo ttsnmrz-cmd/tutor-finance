@@ -166,3 +166,9 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 
 /* Neutral True/False buttons in both embedded lesson views. */
 .mb-builder.mb-student-preview .mb-tf-preview .mb-tf-buttons button:not([data-result]):not(.mb-teacher-tf-correct){border:1px solid #b9bec8!important;border-radius:12px!important;background:transparent!important;min-width:64px;min-height:40px;}
+
+/* Public live classroom: keep the entire workspace on the dark palette, including fillers. */
+html[data-theme="dark"] #student-live-material .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-preview-heading-row,.mb-preview-tools-row,.mb-preview-workspace){background:#2d2637!important;color:#f0eafa!important}
+html[data-theme="dark"] #student-live-material .mb-builder.mb-student-preview :is(.mb-preview-notes,.mb-student-card,.mb-preview-footer){background:#2d2637!important;color:#f0eafa!important;border-color:#574967!important}
+html[data-theme="dark"] #student-live-material .mb-builder.mb-student-preview .mb-preview-notes :is(textarea,[contenteditable],.mb-notes-content){background:#393044!important;color:#f0eafa!important;border-color:#655673!important}
+html[data-theme="dark"] #student-live-material .mb-builder.mb-student-preview .mb-preview-notes > div{background:#393044!important;color:#f0eafa!important;border-color:#655673!important}
