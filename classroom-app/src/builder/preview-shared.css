@@ -115,3 +115,9 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-preview-timer{background:#382e44!important;color:#f4ecfa!important;border-color:#655572!important;box-shadow:0 7px 18px rgba(0,0,0,.24)!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-controls>.mb-mark-completed:disabled{background:#382e44!important;color:#f4ecfa!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#pointerToggle[aria-pressed="true"]){background:#6c5189!important}
+
+/* IPA-safe font fallback for lesson content. Keep UI typography unchanged while ensuring
+   phonetic symbols render in builder, teacher preview and student preview. */
+:is(.mb-builder,.mb-student-preview,.live-shell) :is(.mb-rich-input,.mb-student-content,.mb-student-instruction,.mb-student-items,.mb-combined-element,.mb-preview-text,.mb-gallery,.mb-media,.live-exercise,.live-notes){
+  font-family:Arial,"Segoe UI","Noto Sans","DejaVu Sans","Lucida Sans Unicode",sans-serif;
+}
