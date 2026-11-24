@@ -341,3 +341,21 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder .mb-preview-teacher-note{white-space:pre-wrap}
 .mb-builder .mb-preview-teacher-note p{margin:8px 0 0;font-size:14px;line-height:1.5}
 
+
+
+/* Media authoring: one compact add surface instead of three disconnected controls. */
+.mb-media-editor{margin-top:10px}
+.mb-media-add{display:block;border:1px solid var(--line);border-radius:14px;background:var(--page);padding:14px}
+.mb-media-add-heading{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+.mb-media-add-heading strong{font-size:14px}
+.mb-media-add-heading span{font-size:11px;color:var(--muted)}
+.mb-media-add-row{display:flex;align-items:center;gap:8px;min-width:0}
+.mb-media-add-row>input{flex:1;min-width:140px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:13px}
+.mb-media-or{font-size:11px;color:var(--muted);flex:none}
+.mb-builder .mb-media-upload-button,.mb-builder .mb-media-link-button{flex:none}
+.mb-youtube{width:min(100%,720px)}
+.mb-youtube-poster{position:relative!important;display:block!important;width:100%!important;aspect-ratio:16/9!important;min-height:0!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:11px!important;background:#14121a!important}
+.mb-youtube-poster img{display:block;width:100%;height:100%;object-fit:cover}
+.mb-youtube-poster span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:58px;height:42px;padding-left:4px;border-radius:12px;background:#4e2a84e8;color:#fff;font-size:20px;box-shadow:0 6px 20px #0005}
+.mb-youtube-poster:hover span{transform:translate(-50%,-50%) scale(1.06)}
+@container builder (max-width:620px){.mb-media-add-row{flex-wrap:wrap}.mb-media-add-row>input{order:3;flex-basis:calc(100% - 58px)}.mb-media-link-button{order:4}.mb-media-or{display:none}}
