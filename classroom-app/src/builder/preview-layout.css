@@ -408,3 +408,25 @@
   justify-content:flex-start!important;
  }
 }
+
+
+/* Short exercises size to their content. Live Notes may remain tall independently. */
+.mb-builder.mb-student-preview .mb-preview-workspace{
+ min-height:0!important;
+ align-items:flex-start!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{
+ min-height:0!important;
+ height:auto!important;
+ align-self:flex-start!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
+ min-height:var(--lesson-viewport-height)!important;
+ align-self:flex-start!important;
+}
+.mb-builder.mb-student-preview .mb-student-body{
+ flex:0 0 auto!important;
+}
+.mb-builder.mb-student-preview .mb-preview-footer{
+ margin-top:0!important;
+}
