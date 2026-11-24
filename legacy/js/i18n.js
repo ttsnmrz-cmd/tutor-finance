@@ -2,6 +2,7 @@
   const STORAGE_KEY = 'profiprofit-language';
   const dictionaries = {
     en: {
+      'Основные данные':'General','Часовой пояс ученика':'Student time zone','Минск (Europe/Minsk)':'Minsk (Europe/Minsk)','Рига (Europe/Riga)':'Riga (Europe/Riga)','Варшава (Europe/Warsaw)':'Warsaw (Europe/Warsaw)','Вильнюс (Europe/Vilnius)':'Vilnius (Europe/Vilnius)','Берлин (Europe/Berlin)':'Berlin (Europe/Berlin)','Лондон (Europe/London)':'London (Europe/London)','Нью-Йорк (America/New_York)':'New York (America/New_York)','Лос-Анджелес (America/Los_Angeles)':'Los Angeles (America/Los_Angeles)','Telegram-уведомления':'Telegram notifications','Telegram не подключён':'Telegram not connected','Telegram подключён':'Telegram connected','Скопировать ссылку для подключения Telegram':'Copy Telegram connection link','Отправь ссылку ученику. Он должен открыть её и нажать Start в боте.':'Send the link to the student. They should open it and press Start in the bot.','Напоминать за 1 час':'Remind 1 hour before','Напоминать за 10 минут':'Remind 10 minutes before','Сообщать о переносах и отменах':'Notify about rescheduling and cancellations','Сообщать об оплатах':'Notify about payments','Сообщать о низком балансе':'Notify about low balance',
       'Личный кабинет':'Student Portal','Ваши занятия и баланс':'Your lessons and balance',
       'Внесено':'Payments received','Списано':'Amount charged','Баланс':'Balance',
       'Проведенных занятий':'Lessons completed','Стоимость занятия':'Lesson price',
