@@ -679,3 +679,7 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 .pp-student-settings-menu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:inherit;cursor:pointer;}
 .pp-student-settings-menu button:hover,.pp-student-settings-menu button:focus-visible{background:#eee8f7;color:#4e2a84;}
 [data-theme="dark"] .pp-student-settings-menu{background:#252630;color:#f4f5f7;border-color:#454653;}
+
+.profile-menu-dropdown .profile-menu-item>svg{width:20px;height:20px;flex-shrink:0;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:#737987;}
+.profile-menu-dropdown .profile-menu-item:hover>svg{color:#4e2a84;}
+[data-theme="dark"] .profile-menu-dropdown .profile-menu-item>svg{color:#a5a9b5;}
