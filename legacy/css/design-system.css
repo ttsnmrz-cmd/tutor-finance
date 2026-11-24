@@ -176,27 +176,7 @@ html[data-theme="dark"] #student-live-material .app-header.pp-student-live-heade
  background:transparent!important;text-shadow:none!important;
  color:var(--app-header-title)!important;
 }
-/* The teacher header is the source of the student clone: identical brand metrics. */
-#teacher-app #teacher-header.app-header{
- border-radius:26px!important;padding:10px 14px!important;
- margin-bottom:14px!important;min-height:70px!important;
-}
-#teacher-app #teacher-header.app-header .app-header-brand .text-2xl{
- font-size:21px!important;font-weight:750!important;line-height:1.2!important;
- letter-spacing:-.045em!important;color:#1f242d!important;
- background:transparent!important;background-color:transparent!important;
- background-image:none!important;-webkit-text-fill-color:currentColor!important;
- text-shadow:none!important;box-shadow:none!important;
-}
-#teacher-app #teacher-header.app-header .app-header-brand .text-sm{display:none!important}
-@media(max-width:760px){
- #teacher-app #teacher-header.app-header{padding:10px 12px!important;min-height:0!important}
- #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{font-size:17px!important}
-}
-html[data-theme="dark"] #teacher-app #teacher-header.app-header .app-header-brand .text-2xl{color:#f0eafa!important}
-#teacher-app>.native-workspace>#teacher-header.app-header{
- margin-top:0!important;
-}
+/* Shared header geometry is defined above for both roles. */
 /* Shared student dashboard finance component (migrated without selector changes). */
 /* Student finances: compact 3-column layout, with top-ups in the third column. */
 #student-public-view .pp-finances-heading{margin-bottom:14px}
@@ -572,3 +552,10 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
  color:var(--pp-dark-text)!important;
  border-color:var(--pp-dark-border-raised)!important;
 }
+
+/* Shared outer spacing and branding, independent of role. */
+#student-live-material{box-sizing:border-box!important;padding:14px!important}
+#student-public-view{padding:14px!important}
+:is(#teacher-header.app-header,#student-public-view .app-header.student-brand-header,#student-live-material .app-header.pp-student-live-header){border-radius:26px!important;min-height:74px!important;padding:12px 14px!important}
+:is(#teacher-header.app-header,#student-public-view .app-header.student-brand-header,#student-live-material .app-header.pp-student-live-header) .app-header-brand .text-sm{display:block!important}
+@media(max-width:768px){:is(#teacher-header.app-header,#student-public-view .app-header.student-brand-header,#student-live-material .app-header.pp-student-live-header){min-height:0!important;padding:10px 12px!important}:is(#teacher-header.app-header,#student-public-view .app-header.student-brand-header,#student-live-material .app-header.pp-student-live-header) .app-header-brand .text-sm{display:none!important}}
