@@ -1,3 +1,4 @@
+import {useLiveAnswer} from './liveAnswers';
 import {useLayoutEffect,useRef,useState} from 'react';
 import type {Block} from '../planning/model';
 import {ui} from '../i18n';
@@ -12,7 +13,7 @@ function shuffled(ids:number[]){const next=[...ids];for(let i=next.length-1;i>0;
 export function MatchingPreview({block,teacherHints=false}:{block:Block;teacherHints?:boolean}){
  const valid=block.items.map((item,id)=>({item,id})).filter(({item})=>item.prompt.trim()&&item.expected?.trim());
  const [order]=useState(()=>{const ids=valid.map(p=>p.id),left=shuffled(ids);let right=shuffled(ids);if(right.length>1&&right.every((id,i)=>id===left[i]))right=[...right.slice(1),right[0]];return {left,right};});
- const [selected,setSelected]=useState<number|null>(null),[matches,setMatches]=useState<Record<number,number>>({}),[checked,setChecked]=useState(false);
+ const [selected,setSelected]=useLiveAnswer<number|null>(block.id+':selected',null),[matches,setMatches]=useLiveAnswer<Record<number,number>>(block.id+':answers',{}),[checked,setChecked]=useLiveAnswer(block.id+':checked',false);
  const norm=(text:string)=>text.normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase();
  const correct=(id:number)=>matches[id]!==undefined&&norm(block.items[matches[id]]?.expected||'')===norm(block.items[id].expected||'');
  const score=valid.reduce((n,{id})=>n+(correct(id)?1:0),0);
