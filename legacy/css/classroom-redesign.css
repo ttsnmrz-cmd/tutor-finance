@@ -647,3 +647,11 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 #student-modal .student-settings-fields input:focus,#student-modal .student-settings-fields select:focus{outline:2px solid #8c70b7;outline-offset:1px}
 #student-modal .student-settings-footer{display:flex;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid #d9d0e5}
 #student-modal .student-settings-cancel{border:1px solid #d9d0e5;border-radius:9px;padding:8px 16px;color:inherit}
+
+#add-modal #add-form>div{display:grid;gap:12px}
+#add-modal #add-form>div>*{margin-top:0!important}
+#add-modal #add-form label{display:block}
+#add-modal #add-form input,#add-modal #add-form select{box-sizing:border-box;border:1px solid #bcb0d0!important;border-radius:9px!important;min-height:42px;background:transparent;color:inherit}
+#add-modal #add-form input:focus,#add-modal #add-form select:focus{outline:2px solid #8c70b7;outline-offset:1px}
+#add-modal #add-form button.primary-btn{margin-top:4px!important}
+#add-modal #add-form button:disabled{opacity:.45;cursor:not-allowed}
