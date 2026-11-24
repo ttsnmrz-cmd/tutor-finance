@@ -1,3 +1,4 @@
+import {useLiveAnswer} from './liveAnswers';
 import {TextImageTools} from './inlineImages';
 import {useEffect,useLayoutEffect,useRef,useState,Fragment} from 'react';
 import type {Block,Item} from '../planning/model';
@@ -49,7 +50,7 @@ function shuffledIndices(count:number):number[]{
  return indices;
 }
 export function InlineChoicePreview({block,teacherHints=false}:{block:Block;teacherHints?:boolean}){
- const [answers,setAnswers]=useState<Record<string,number>>({}),[checked,setChecked]=useState(false);
+ const [answers,setAnswers]=useLiveAnswer<Record<string,number>>(block.id+':answers',{}),[checked,setChecked]=useLiveAnswer(block.id+':checked',false);
  const items=entries(block);
  // Stable while the student interacts; a new preview mount produces a new shuffle.
  const order=useRef(new Map<string,{signature:string;indices:number[]}>());
