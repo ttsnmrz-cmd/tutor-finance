@@ -2155,8 +2155,8 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  }
  void refreshNotes();
 
- if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);
- else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
+ if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient,data.session_id);
+ else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient,data.session_id);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
 }
 
 function renderSharedLessonNotes(richNotes,value){
