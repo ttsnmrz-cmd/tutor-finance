@@ -28,3 +28,14 @@ $$;
 revoke all on function public.get_public_calendar_notes(uuid,bigint) from public;
 grant execute on function public.get_public_calendar_notes(uuid,bigint) to anon,authenticated;
 notify pgrst,'reload schema';
+
+create or replace function public.get_teacher_calendar_session_notes(p_session_id uuid)
+returns jsonb language sql stable security definer set search_path='' as $$
+ select jsonb_build_object('plain',n.plain,'html',n.html)
+ from public.live_sessions s
+ join public.calendar_live_notes n on n.teacher_id=s.teacher_id and n.lesson_id=s.calendar_lesson_id
+ where s.id=p_session_id and s.teacher_id=auth.uid();
+$$;
+revoke all on function public.get_teacher_calendar_session_notes(uuid) from public;
+grant execute on function public.get_teacher_calendar_session_notes(uuid) to authenticated;
+notify pgrst,'reload schema';
