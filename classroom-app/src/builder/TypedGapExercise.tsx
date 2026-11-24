@@ -1,10 +1,11 @@
+import {useLiveAnswer} from './liveAnswers';
 import {useState} from 'react';
 import type {Block} from '../planning/model';
 import {ui} from '../i18n';
 import {FormattedText,formatOf} from './textFormatting';
 
 export function TypedGapPreview({block,teacherHints=false}:{block:Block;teacherHints?:boolean}){
- const [answers,setAnswers]=useState<Record<number,string>>({}),[checked,setChecked]=useState(false);
+ const [answers,setAnswers]=useLiveAnswer<Record<number,string>>(block.id+':answers',{}),[checked,setChecked]=useLiveAnswer(block.id+':checked',false);
  const count=(block.content.match(/_{2,}/g)||[]).length;
  const ready=count>0&&count===block.items.length&&block.items.every(i=>!!i.expected?.trim()&&!i.options?.length);
  const normalize=(s:string)=>s.normalize('NFC').trim().replace(/\s+/g,' ').toLocaleLowerCase();
