@@ -161,7 +161,6 @@ function createLessonFromCalendarSlot(event,track){
   const rect=track.getBoundingClientRect();
   const minutes=Math.max(7*60,Math.min(22*60+30,Math.round(((event.clientY-rect.top)/72*60+7*60)/30)*30));
   selectedDate=date;
-  openNewLessonForDate(date);
   const time=String(Math.floor(minutes/60)).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
-  requestAnimationFrame(()=>{const input=document.querySelector('#lesson-time, [name="time"], #time');if(input&&input instanceof HTMLInputElement){input.value=time;input.dispatchEvent(new Event('change',{bubbles:true}));}});
+  openNewLessonForDate(date,time);
 }
