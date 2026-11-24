@@ -31,7 +31,22 @@
 #student-public-view .pp-student-layout>#student-public-content{min-width:0!important;width:100%!important}
 @media(max-width:780px){#student-public-view .pp-student-layout.native-layout{grid-template-columns:76px minmax(0,1fr)!important}}
 </style><link rel="stylesheet" href="/legacy/css/design-system.css?v=20261124-finance-clean15">
-</head>
+<style>
+#pp-mobile-menu{display:none}
+@media(max-width:768px){
+#teacher-app #pp-mobile-menu{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 40px;width:40px;height:40px;border-radius:12px;background:transparent;color:inherit}
+#teacher-app #teacher-header{gap:8px!important}
+#teacher-app #teacher-header>button:nth-child(2){margin-right:auto;gap:6px!important}
+#teacher-app #teacher-header>button:nth-child(2) img{width:40px!important;height:40px!important}
+#teacher-app .native-layout,#teacher-app .native-layout.sidebar-collapsed{display:block!important;grid-template-columns:minmax(0,1fr)!important}
+#teacher-app .native-layout>.native-sidebar{display:none!important}
+#teacher-app .native-layout.pp-mobile-open>.native-sidebar{display:flex!important;position:fixed!important;top:90px!important;left:12px!important;bottom:auto!important;width:min(280px,calc(100vw - 24px))!important;max-height:calc(100dvh - 110px);overflow:auto;z-index:500!important;flex-direction:column!important;padding:12px!important;background:var(--card,#fff);box-shadow:0 12px 40px #0003}
+html[data-theme="dark"] #teacher-app .native-layout.pp-mobile-open>.native-sidebar,body.dark #teacher-app .native-layout.pp-mobile-open>.native-sidebar{background:var(--card,#292633)}
+#teacher-app .pp-mobile-open>.native-sidebar .native-nav-text{display:inline!important;visibility:visible!important;opacity:1!important}
+#teacher-app .pp-mobile-open>.native-sidebar button[data-native-tab]{width:100%!important;justify-content:flex-start!important;gap:12px!important}
+#teacher-app .pp-mobile-open>.native-sidebar .native-sidebar-toggle{display:none!important}
+}
+</style></head>
 <body class="text-slate-800 min-h-screen">
 <div id="student-public-view" class="hidden max-w-3xl mx-auto p-4">
 <div class="app-card rounded-3xl p-5 md:p-6">
@@ -70,7 +85,7 @@
 </dialog>
 
 <div id="teacher-app" class="hidden"><div class="max-w-5xl mx-auto p-4 md:p-6 native-workspace">
-<header id="teacher-header" class="app-card rounded-3xl p-4 mb-5 flex justify-between items-center gap-3 relative">
+<header id="teacher-header" class="app-card rounded-3xl p-4 mb-5 flex justify-between items-center gap-3 relative"><button type="button" id="pp-mobile-menu" aria-label="Меню / Menu" aria-expanded="false" onclick="ppMobileMenu()" ><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <button type="button" onclick="switchTab('dashboard')" title="На главную" aria-label="На главную" class="flex items-center gap-3 min-w-0 text-left rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"><img src="/legacy/ProfoProfit_logo svg.svg" alt="ProfiProfit" class="w-16 h-16 object-contain rounded-xl"><span><span class="block text-2xl font-bold">ProfiProfit</span><span class="block text-sm text-slate-500">Занятия, ученики и оплаты</span></span></button>
 <div class="teacher-header-actions flex items-center gap-3"><nav class="flex gap-2 teacher-nav"><button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold">Главная</button><button id="nav-calendar" onclick="switchTab('calendar')" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold">Календарь</button><button id="nav-students" onclick="switchTab('students')" class="px-4 py-2 rounded-xl bg-slate-100 font-semibold">Ученики</button><button id="nav-materials" onclick="switchTab('materials')" class="px-4 py-2 rounded-xl bg-slate-100 font-semibold">Материалы</button><button id="nav-admin" onclick="switchTab('admin')" class="hidden px-4 py-2 rounded-xl bg-slate-100 font-semibold">Админ</button></nav>
 <div class="profile-menu-wrap relative"><button id="profile-menu-button" type="button" onclick="toggleProfileMenu()" class="profile-menu-button w-11 h-11 rounded-2xl bg-slate-100 flex items-center justify-center" aria-label="Профиль" title="Профиль" aria-haspopup="true" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button>
@@ -244,5 +259,9 @@
 <script src="/legacy/js/calendar-live-entry.js?v=20261123-live2"></script>
 <script src="/legacy/js/i18n.js?v=20261013-1"></script>
 <!-- pages-trigger: routed-app-fix-20261122 -->
-<script>function toggleNativeSidebar(){const layout=document.querySelector('.native-layout');if(!layout)return;layout.classList.toggle('sidebar-collapsed');try{localStorage.setItem('pp-sidebar-collapsed',layout.classList.contains('sidebar-collapsed')?'1':'0')}catch(e){}}try{if(localStorage.getItem('pp-sidebar-collapsed')==='1')document.querySelector('.native-layout')?.classList.add('sidebar-collapsed')}catch(e){}</script></body></html>
+<script>function toggleNativeSidebar(){const layout=document.querySelector('.native-layout');if(!layout)return;layout.classList.toggle('sidebar-collapsed');try{localStorage.setItem('pp-sidebar-collapsed',layout.classList.contains('sidebar-collapsed')?'1':'0')}catch(e){}}try{if(localStorage.getItem('pp-sidebar-collapsed')==='1')document.querySelector('.native-layout')?.classList.add('sidebar-collapsed')}catch(e){}</script><script>
+function ppMobileMenu(force){const layout=document.querySelector('#teacher-app .native-layout'),button=document.getElementById('pp-mobile-menu');if(!layout||!button)return;const open=typeof force==='boolean'?force:!layout.classList.contains('pp-mobile-open');layout.classList.toggle('pp-mobile-open',open);button.setAttribute('aria-expanded',String(open));}
+document.addEventListener('click',e=>{if(!(e.target instanceof Element))return;if(e.target.closest('#teacher-app .native-sidebar [data-native-tab]')||!e.target.closest('#pp-mobile-menu,#teacher-app .native-sidebar'))ppMobileMenu(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')ppMobileMenu(false);});
+</script></body></html>
 
