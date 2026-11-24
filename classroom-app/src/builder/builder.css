@@ -373,3 +373,13 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-breadcrumb{margin-bottom:6px}
 .mb-title-group small{margin-top:1px}
 @container builder (max-width:620px){.mb-builder-toolbar{align-items:flex-start;flex-wrap:wrap}.mb-builder-toolbar .mb-tabs{margin-left:auto}.mb-top{flex-wrap:nowrap}.mb-top-tools{width:auto}.mb-top-buttons{width:auto}.mb-top-buttons>button{flex:none}}
+
+
+/* Final compact builder header: title row + one action row, then content. */
+.mb-top{min-height:0;margin-bottom:0}
+.mb-builder-toolbar{min-height:36px;margin:4px 0 8px;padding:4px 0 7px}
+.mb-builder-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-left:auto}
+.mb-builder-actions>button,.mb-builder-actions>.mb-menu-wrap>button{min-height:30px;padding:5px 10px;border-radius:9px;font-size:11px}
+.mb-builder-actions>.mb-menu-wrap{display:flex}
+.mb-builder-actions .mb-structure-toggle{min-width:0}
+@container builder (max-width:620px){.mb-builder-toolbar{flex-wrap:wrap}.mb-builder-actions{width:100%;justify-content:flex-end}.mb-builder-actions>button,.mb-builder-actions>.mb-menu-wrap>button{padding-inline:8px}}
