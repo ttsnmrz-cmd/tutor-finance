@@ -15,6 +15,7 @@ export interface MaterialsRepository extends StudioRepository {
  createFolder(title:string,parent:string|null):Promise<void>;
  renameFolder(id:string,title:string):Promise<void>;
  moveFolder(id:string,parent:string|null):Promise<void>;
+ deleteMaterial(id:string):Promise<void>;
  moveMaterial(id:string,parent:string|null):Promise<void>;
  createDraft(title:string,parent:string|null):Promise<LibraryPlan>;
 }
