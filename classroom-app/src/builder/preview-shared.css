@@ -136,3 +136,17 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 .mb-builder .mb-tf-preview .mb-tf-buttons button[data-result="incorrect"]{
  background:#fdecec!important;border-color:#d45656!important;color:#9a2929!important;
 }
+
+
+/* Ordering DnD: visible left grip and exact insertion marker. */
+.mb-builder .mb-order-row{position:relative}
+.mb-builder .mb-order-preview-grip{order:-10;margin:0 8px 0 0!important;flex:0 0 auto;opacity:1!important;cursor:grab;color:#6b7280;font-size:22px;line-height:1;user-select:none}
+.mb-builder .mb-order-preview-grip:active{cursor:grabbing}
+.mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-before::before,
+.mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-after::after{
+ content:"";position:absolute;z-index:8;left:8px;right:8px;height:3px;border-radius:4px;background:#4e2a84;pointer-events:none;
+}
+.mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-before::before{top:-6px}
+.mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-after::after{bottom:-6px}
+.mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-before{box-shadow:0 -8px 16px rgba(78,42,132,.08)}
+.mb-builder :is(.mb-order-row,.mb-order-editor-item).mb-drop-after{box-shadow:0 8px 16px rgba(78,42,132,.08)}
