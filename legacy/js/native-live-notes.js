@@ -22,7 +22,7 @@ async function renderNativeLessonNotes(student){
   const select=root.querySelector('#native-note-lesson'),editor=root.querySelector('#native-note-editor'),status=root.querySelector('#native-note-status');
   const layout=document.createElement('div');layout.className='pp-history-split';
   for(const title of ['Lessons','Notes']){const col=document.createElement('section'),heading=document.createElement('h3'),list=document.createElement('div');heading.textContent=title;list.className='pp-history-list';col.append(heading,list);layout.append(col);
-    for(const l of lessonsForStudent){const note=ids.get(String(l.id));if(title==='Notes'&&!note)continue;const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=l.date+' · '+(l.time||'')+(title==='Lessons'&&note?' ▤':'');if(title==='Notes'){const excerpt=document.createElement('small');excerpt.textContent=String(note.plain).slice(0,140);button.append(excerpt);}button.onclick=()=>{select.value=String(l.id);select.dispatchEvent(new Event('change'));};list.append(button);}
+    for(const l of lessonsForStudent){const note=ids.get(String(l.id));if(title==='Notes'&&!note)continue;const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=l.date+' · '+(l.time||'')+(title==='Lessons'&&note?' ▤':'');if(title==='Notes'){if(note.title&&note.title!=='Live Notes'){const heading=document.createElement('strong');heading.className='pp-note-title';heading.textContent=note.title;button.prepend(heading);}const excerpt=document.createElement('small');excerpt.textContent=String(note.plain).slice(0,140);button.append(excerpt);}button.onclick=()=>{select.value=String(l.id);select.dispatchEvent(new Event('change'));};list.append(button);}
     if(!list.children.length)list.textContent='No notes yet.';
   }root.prepend(layout);
   nativeLiveNotesState.studentId=String(student.id);
@@ -43,7 +43,7 @@ async function renderNativeLessonNotes(student){
     const plain=editor.value;
     if(!plain.trim()){status.textContent='Empty notes are not saved';nativeLiveNotesState.dirty=false;return;}
     status.textContent='Saving…';
-    const title=student.name+' · '+(lessonsForStudent.find(l=>String(l.id)===lessonId)?.date||'Lesson');
+    const title=ids.get(String(lessonId))?.title||'Live Notes';
     const response=await supabaseClient.from('calendar_live_notes').upsert({teacher_id:teacherId,lesson_id:lessonId,title,plain,html:nativeNotesEscape(plain).replace(/\n/g,'<br>'),updated_at:new Date().toISOString()},{onConflict:'teacher_id,lesson_id'});
     if(nativeLiveNotesState.lessonId!==lessonId||!root.isConnected)return;
     status.textContent=response.error?'Save failed: '+response.error.message:'Saved';
