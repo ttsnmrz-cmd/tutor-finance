@@ -1151,7 +1151,7 @@ function showAddForm(type){
 
       <input id="add-student-email" type="email" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Email (необязательно)">
 
-      <input id="add-student-telegram" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Telegram (если хотите, чтобы ученик получал автоматические уведомления)">
+      <input id="add-student-telegram" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Telegram username (необязательно)">
 
       <label class="text-sm font-semibold">Группа
         <select id="add-student-group" class="soft-input mt-1 w-full rounded-xl px-3 py-2">
@@ -1182,13 +1182,13 @@ function showAddForm(type){
     fillStudentSelects();
 
     c.innerHTML=`<div class="space-y-3">
-      <select id="add-payment-student" class="soft-input w-full rounded-xl px-3 py-2"></select>
+      <select id="add-payment-student" required aria-label="Выберите ученика" onchange="document.getElementById('add-payment-submit').disabled=!this.value" class="soft-input w-full rounded-xl px-3 py-2"></select>
 
       <input id="add-payment-amount" type="number" step="0.01" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Сумма">
 
       <input id="add-payment-date" type="date" value="${localISO(new Date())}" class="soft-input w-full rounded-xl px-3 py-2">
 
-      <button onclick="addPayment()" class="primary-btn w-full rounded-xl py-2 font-semibold">
+      <button id="add-payment-submit" disabled onclick="addPayment()" class="primary-btn w-full rounded-xl py-2 font-semibold">
         Внести платеж
       </button>
     </div>`;
@@ -1564,6 +1564,7 @@ async function saveStudentPayment(){
 async function addPayment(){
   try{
     const studentValue=document.getElementById('add-payment-student').value;
+    if(!studentValue)return showError(new Error(getLanguage()==='en'?'Select a student':'Выберите ученика'));
     const s=students.find(x=>String(x.id)===String(studentValue.replace(/^student:/,'')));
 
     const amount=Number(
