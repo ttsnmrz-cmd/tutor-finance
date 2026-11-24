@@ -383,3 +383,10 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder-actions>.mb-menu-wrap{display:flex}
 .mb-builder-actions .mb-structure-toggle{min-width:0}
 @container builder (max-width:620px){.mb-builder-toolbar{flex-wrap:wrap}.mb-builder-actions{width:100%;justify-content:flex-end}.mb-builder-actions>button,.mb-builder-actions>.mb-menu-wrap>button{padding-inline:8px}}
+
+
+/* Builder toolbar: navigation controls belong on the left; no overflow menu. */
+.mb-builder-toolbar{justify-content:flex-start}
+.mb-builder-toolbar .mb-builder-actions{margin-left:0;justify-content:flex-start;width:auto}
+.mb-builder-toolbar .mb-save-state{margin-left:6px;padding-left:10px;border-left:1px solid var(--line)}
+@container builder (max-width:620px){.mb-builder-toolbar .mb-builder-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}.mb-builder-toolbar .mb-save-state{margin-left:2px}}
