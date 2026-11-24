@@ -1897,7 +1897,7 @@ async function openPublicCalendarLesson(index){
   if(error)throw error;
   if(!data?.plan)throw Error('Lesson material is not available.');
   sessionStorage.setItem('pp-student-live-lesson',JSON.stringify({studentId,lessonId:Number(l.id)}));
- showPublicLessonMaterial(data);
+ showPublicLessonMaterial(data,studentId,Number(l.id));
  }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
 function studentPortalSidebar(onNavigate){
@@ -2101,7 +2101,7 @@ if(document.readyState==='loading'){
  watchPublicStudentShell();
 }
 
-function showPublicLessonMaterial(data){
+function showPublicLessonMaterial(data,studentId,lessonId){
  ensureStudentPortalLayout();
  let overlay=document.getElementById('student-live-material');
  if(!overlay){overlay=document.createElement('div');overlay.id='student-live-material';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#f4f5f7;overflow:auto';document.body.append(overlay);}
@@ -2137,7 +2137,39 @@ function showPublicLessonMaterial(data){
  const notes=document.createElement('aside');notes.className='pp-student-live-notes';const notesTitle=document.createElement('h3');notesTitle.textContent='▤ Live Notes';notesTitle.style.cssText='font-weight:700;margin-bottom:12px';
  const noteArea=document.createElement('textarea');noteArea.placeholder='Teacher notes will appear here when live sharing is enabled.';noteArea.readOnly=true;notes.append(notesTitle,noteArea);
  columns.append(drawWrap,notes);main.append(columns);layout.append(main);overlay.append(layout);
- const cleanup=()=>{};
+ const richNotes=document.createElement('div');
+ richNotes.className='pp-student-notes-content';
+ richNotes.style.cssText='flex:1;min-height:340px;background:#f4f5f7;border-radius:10px;padding:12px;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap';
+ richNotes.textContent=noteArea.placeholder;
+ noteArea.replaceWith(richNotes);
+ let previousNotes=null;
+ function renderNotes(value){
+   const html=String(value?.html||'');
+   if(!html){richNotes.textContent=value?.plain||'No teacher notes yet.';return;}
+   const doc=new DOMParser().parseFromString(html,'text/html');
+   const allowed=new Set(['B','STRONG','U','I','EM','UL','OL','LI','P','DIV','BR','SPAN','S','STRIKE']);
+   function copy(node,parent){
+     if(node.nodeType===3){parent.append(document.createTextNode(node.textContent));return;}
+     if(node.nodeType!==1||['SCRIPT','STYLE','IFRAME','OBJECT'].includes(node.tagName))return;
+     const target=allowed.has(node.tagName)?document.createElement(node.tagName.toLowerCase()):parent;
+     if(target!==parent)parent.append(target);
+     for(const child of node.childNodes)copy(child,target);
+   }
+   const fragment=document.createDocumentFragment();
+   for(const child of doc.body.childNodes)copy(child,fragment);
+   richNotes.replaceChildren(fragment);
+ }
+ async function refreshNotes(){
+   if(!richNotes.isConnected)return;
+   try{
+     const response=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:lessonId});
+     if(!richNotes.isConnected)return;
+     if(response.error){if(previousNotes===null)richNotes.textContent='Could not load teacher notes. Retrying…';}
+     else{const next=JSON.stringify(response.data);if(next!==previousNotes){previousNotes=next;renderNotes(response.data);}}
+   }catch{if(previousNotes===null&&richNotes.isConnected)richNotes.textContent='Could not load teacher notes. Retrying…';}
+   finally{if(richNotes.isConnected)setTimeout(refreshNotes,1500);}
+ }
+ void refreshNotes();
 
  if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);
  else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
@@ -2246,7 +2278,7 @@ async function initPublicStudent(){
         const liveRow=publicStudentLiveStatuses.get(String(saved.lessonId));
         if(liveRow?.status==='active'&&liveRow.has_material){
           const resumed=await supabaseClient.rpc('get_public_student_lesson_material',{p_student_id:id,p_calendar_lesson_id:saved.lessonId});
-          if(!resumed.error&&resumed.data?.plan)showPublicLessonMaterial(resumed.data);
+          if(!resumed.error&&resumed.data?.plan)showPublicLessonMaterial(resumed.data,id,saved.lessonId);
           else sessionStorage.removeItem('pp-student-live-lesson');
         }else sessionStorage.removeItem('pp-student-live-lesson');
       }
