@@ -36,7 +36,7 @@ export function GalleryEditor({block,onChange,scope}:{block:Block;onChange:(b:Bl
 export function ImageUpload({busy,error,onFiles,onClose}:{busy:boolean;error:string;onFiles:(files:File[])=>void;onClose:()=>void}){
  const dialog=useRef<HTMLDialogElement>(null),input=useRef<HTMLInputElement>(null);
  useLayoutEffect(()=>{dialog.current?.showModal();},[]);
- return createPortal(<dialog ref={dialog} className="mb-image-upload" onMouseDown={e=>e.stopPropagation()} onCancel={e=>{e.preventDefault();if(!busy)onClose();}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(!busy)onFiles(Array.from(e.dataTransfer.files));}} onPaste={e=>{const files=Array.from(e.clipboardData.files);if(files.length){e.preventDefault();if(!busy)onFiles(files);}}}>
+ return createPortal(<dialog ref={dialog} className="mb-dialog mb-image-upload" onMouseDown={e=>e.stopPropagation()} onCancel={e=>{e.preventDefault();if(!busy)onClose();}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(!busy)onFiles(Array.from(e.dataTransfer.files));}} onPaste={e=>{const files=Array.from(e.clipboardData.files);if(files.length){e.preventDefault();if(!busy)onFiles(files);}}}>
  <div className="mb-image-upload-heading"><h2>{ui('Add images')}</h2><button disabled={busy} aria-label={ui('Close')} onClick={onClose}>×</button></div>
  <span className="mb-image-upload-tab">{ui('Upload your own')}</span>
  <input ref={input} type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" multiple hidden aria-label={ui('Choose image files')} disabled={busy} onChange={e=>{const files=Array.from(e.target.files||[]);e.target.value='';onFiles(files);}}/>
