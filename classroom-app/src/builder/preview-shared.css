@@ -121,3 +121,18 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 :is(.mb-builder,.mb-student-preview,.live-shell) :is(.mb-rich-input,.mb-student-content,.mb-student-instruction,.mb-student-items,.mb-combined-element,.mb-preview-text,.mb-gallery,.mb-media,.live-exercise,.live-notes){
   font-family:Arial,"Segoe UI","Noto Sans","DejaVu Sans","Lucida Sans Unicode",sans-serif;
 }
+
+
+/* True/False: teacher hint mirrors inline gaps; result colors appear only after Check. */
+.mb-builder .mb-tf-preview .mb-tf-statement{align-items:baseline}
+.mb-builder .mb-tf-preview .mb-tf-number{font:inherit!important;font-size:inherit!important;font-weight:400!important;color:#6b7280!important;line-height:inherit!important}
+.mb-builder .mb-tf-preview .mb-tf-buttons button.mb-teacher-tf-correct{
+ background:var(--card)!important;color:var(--ink)!important;
+ border:2px dashed #26965b!important;box-shadow:none!important;
+}
+.mb-builder .mb-tf-preview .mb-tf-buttons button[data-result="correct"]{
+ background:#e6f7ec!important;border-color:#26965b!important;color:#17653a!important;
+}
+.mb-builder .mb-tf-preview .mb-tf-buttons button[data-result="incorrect"]{
+ background:#fdecec!important;border-color:#d45656!important;color:#9a2929!important;
+}
