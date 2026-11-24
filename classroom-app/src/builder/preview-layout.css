@@ -518,3 +518,9 @@ html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-fillers header h2
 .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){min-height:0!important;height:clamp(260px,calc(100dvh - 360px),620px)!important;max-height:none!important;overflow:hidden!important}
 .mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-field{min-height:0!important;overflow:hidden!important}
 .mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-input{min-height:0!important;height:auto!important;overflow-y:auto!important}
+
+/* Compact notes heading and bounded editor, shared by both lesson roles. */
+.mb-builder.mb-student-preview .mb-preview-notes .mb-preview-notes-heading{position:static!important;display:flex!important;flex-wrap:wrap!important;gap:4px!important;padding:8px 10px!important;margin:-16px -16px 0!important;flex-shrink:0!important}
+.mb-builder.mb-student-preview .mb-preview-notes .mb-preview-notes-heading h2{font-size:14px!important;line-height:1.25!important;letter-spacing:0!important;flex:1 1 100%!important;white-space:normal!important;color:var(--ink)!important}
+.mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-field{flex:1 1 0!important;margin:8px 0!important;min-height:0!important}
+.mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-input{flex:1 1 0!important;min-height:0!important;max-height:100%!important;box-sizing:border-box!important;overflow:auto!important}
