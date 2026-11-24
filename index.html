@@ -106,6 +106,16 @@ html[data-theme="dark"] #teacher-app .native-layout.pp-mobile-open>.native-sideb
 #teacher-app #tab-settings .flex.justify-between{flex-wrap:wrap!important}
 #teacher-app #tab-settings :is(p,span,label,h2,h3,li){overflow-wrap:anywhere}
 }
+</style><style>
+#lesson-modal .soft-input{border:1px solid #b9b5c4!important;background:#f8f7fa!important;box-sizing:border-box;min-width:0}
+html[data-theme="dark"] #lesson-modal .soft-input{border-color:#746b84!important;background:#373143!important;color:#f5f1fa!important}
+#lesson-modal #lesson-date-display{display:flex!important;flex-wrap:nowrap!important;gap:5px!important;white-space:nowrap!important;padding-inline:8px!important}
+#lesson-modal #lesson-date-label{white-space:nowrap!important;overflow-wrap:normal!important;font-size:14px}
+#lesson-modal .lesson-time-fields{display:flex;align-items:center;gap:6px}
+#lesson-modal .lesson-time-fields select{width:76px!important;flex:none!important}
+#lesson-modal #edit-duration{width:72px!important;flex:none!important}
+#lesson-modal #edit-price{display:block;width:120px!important}
+@media(max-width:380px){#lesson-modal #lesson-date-picker-wrap{grid-column:1/-1}#lesson-modal #lesson-date-display{max-width:180px}}
 </style></head>
 <body class="text-slate-800 min-h-screen">
 <div id="student-public-view" class="hidden max-w-3xl mx-auto p-4">
@@ -233,7 +243,7 @@ html[data-theme="dark"] #teacher-app .native-layout.pp-mobile-open>.native-sideb
 <div class="flex items-center justify-between gap-2"><h2 id="lesson-modal-title" class="text-xl font-bold">Новое занятие</h2><div class="flex items-center gap-2"><button id="calendar-live-open" type="button" onclick="openCalendarLivePicker()" class="hidden shrink-0 rounded-xl border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-700">▶ Перейти к занятию</button><button onclick="closeLessonModal()" class="text-2xl text-slate-400" aria-label="Закрыть">×</button></div></div><input type="hidden" id="edit-id">
 <label class="text-sm font-semibold">Ученик / группа<select id="edit-student" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label>
 <div class="grid grid-cols-2 gap-3"><div class="text-sm font-semibold relative" id="lesson-date-picker-wrap"><label for="lesson-date-display">Дата</label><input id="edit-date" type="hidden"><button type="button" id="lesson-date-display" onclick="toggleLessonDatePicker()" class="soft-input mt-1 w-full rounded-xl px-3 py-2 text-left flex items-center justify-between font-normal"><span id="lesson-date-label">Выберите дату</span><span aria-hidden="true">▦</span></button><div id="lesson-date-picker" class="hidden lesson-date-picker"><div class="lesson-date-picker-head"><button type="button" onclick="changeLessonDateMonth(-1)">‹</button><strong id="lesson-date-month"></strong><button type="button" onclick="changeLessonDateMonth(1)">›</button></div><div id="lesson-date-weekdays" class="lesson-date-weekdays"></div><div id="lesson-date-days" class="lesson-date-days"></div><div class="lesson-date-picker-foot"><button type="button" onclick="selectLessonDateToday()" id="lesson-date-today">Сегодня</button><button type="button" onclick="closeLessonDatePicker()" id="lesson-date-close">Готово</button></div></div></div><label class="text-sm font-semibold">Длительность<div class="mt-1 flex items-center gap-2"><input id="edit-duration" type="number" min="1" step="1" value="60" class="soft-input w-full rounded-xl px-3 py-2"><span class="text-sm text-slate-500 shrink-0">минут</span></div></label></div>
-<div><label class="text-sm font-semibold">Время</label><div class="grid grid-cols-2 gap-2 mt-1"><select id="edit-hour" class="soft-input rounded-xl px-3 py-2"></select><select id="edit-minute" class="soft-input rounded-xl px-3 py-2"></select></div></div>
+<div><label class="text-sm font-semibold">Время</label><div class="lesson-time-fields mt-1"><select id="edit-hour" class="soft-input rounded-xl px-3 py-2"></select><span aria-hidden="true">:</span><select id="edit-minute" class="soft-input rounded-xl px-3 py-2"></select></div></div>
 <label class="text-sm font-semibold">Стоимость<input id="edit-price" type="number" min="0" step="0.01" value="40" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></label><div id="group-price-breakdown" class="hidden -mt-2 text-xs text-slate-500"></div><div id="group-charge-exceptions" class="hidden mt-3"><div class="text-sm font-semibold mb-1">Списывать за это занятие</div><div id="group-charge-exceptions-list" class="divide-y"></div></div>
 <label class="text-sm font-semibold">Статус<select id="edit-status" class="soft-input mt-1 w-full rounded-xl px-3 py-2"></select></label><label class="text-sm font-semibold">Комментарий <span class="text-slate-400 font-normal">(необязательно)</span><textarea id="edit-comment" rows="2" class="soft-input mt-1 w-full rounded-xl px-3 py-2 resize-y" placeholder="Например: пробный урок — бесплатно"></textarea></label>
 <div id="recurring-box" class="rounded-2xl bg-indigo-50 p-3 space-y-3"><label class="flex items-center gap-2 text-sm font-semibold"><input id="edit-recurring" type="checkbox" onchange="toggleRecurring()"> Повторять еженедельно</label><div id="recurring-days" class="hidden grid grid-cols-4 sm:grid-cols-7 gap-2 text-xs"><label><input type="checkbox" value="1" class="rec-day"> Пн</label><label><input type="checkbox" value="2" class="rec-day"> Вт</label><label><input type="checkbox" value="3" class="rec-day"> Ср</label><label><input type="checkbox" value="4" class="rec-day"> Чт</label><label><input type="checkbox" value="5" class="rec-day"> Пт</label><label><input type="checkbox" value="6" class="rec-day"> Сб</label><label><input type="checkbox" value="0" class="rec-day"> Вс</label></div></div>
@@ -314,8 +324,8 @@ html[data-theme="dark"] #teacher-app .native-layout.pp-mobile-open>.native-sideb
 <script src="/legacy/js/app.js?v=20261124-header-init"></script>
 <link rel="stylesheet" href="/legacy/classroom-assets/classroom.css?v=cf2339cf2a7d"><script defer src="/legacy/classroom-assets/classroom.js?v=cf2339cf2a7d" onload="if(typeof loadIntegratedMaterials==='function' && (location.pathname==='/materials' || !document.getElementById('tab-materials')?.classList.contains('hidden')))loadIntegratedMaterials()"></script>
 <script src="/legacy/js/native-materials.js?v=1"></script>
-<script src="/legacy/js/lessons.js?v=20261112-student-id1"></script>
-<script src="/legacy/js/calendar.js?v=20261122-charge2"></script>
+<script src="/legacy/js/lessons.js?v=20261124-slot"></script>
+<script src="/legacy/js/calendar.js?v=20261124-slot"></script>
 <script src="/legacy/js/calendar-live-entry.js?v=20261123-live2"></script>
 <script src="/legacy/js/i18n.js?v=20261013-1"></script>
 <!-- pages-trigger: routed-app-fix-20261122 -->
