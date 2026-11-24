@@ -12,10 +12,10 @@ function LocalPicture({scope,image,index}:{scope:string;image:GalleryImage;index
  useEffect(()=>{let disposed=false,url='',revoke:(()=>void)|undefined;setSrc('');setError('');void classroomImageUrl(image,scope).then(result=>{if(disposed){result.revoke?.();return;}url=result.src;revoke=result.revoke;setSrc(url);}).catch(e=>{if(!disposed)setError((e as Error).message);});return()=>{disposed=true;revoke?.();};},[scope,image.id]);
  return error?<p role="alert">{ui(error)}</p>:src?<img className="mb-gallery-image" src={src} alt={image.caption||ui('Image')+' '+(index+1)}/>:<span role="status">{ui('Loading image…')}</span>;
 }
-function GalleryView({scope,images,index,setIndex}:{scope:string;images:GalleryImage[];index:number;setIndex:(n:number)=>void}){
- const current=Math.min(index,Math.max(0,images.length-1)),image=images[current];
- return <div className="mb-gallery-view" onKeyDown={e=>{if(e.key==='ArrowLeft'&&current>0){e.preventDefault();setIndex(current-1);}if(e.key==='ArrowRight'&&current<images.length-1){e.preventDefault();setIndex(current+1);}}}>
- <div className="mb-gallery-stage">{image?<LocalPicture key={image.id} scope={scope} image={image} index={current}/>:<span>{ui('Add your first image')}</span>}</div>
+function GalleryView({scope,images,index,setIndex,expandable=false}:{scope:string;images:GalleryImage[];index:number;setIndex:(n:number)=>void;expandable?:boolean}){
+ const current=Math.min(index,Math.max(0,images.length-1)),image=images[current],[expanded,setExpanded]=useState(false);
+ return <div className={'mb-gallery-view'+(expanded?' is-expanded':'')} onKeyDown={e=>{if(e.key==='ArrowLeft'&&current>0){e.preventDefault();setIndex(current-1);}if(e.key==='ArrowRight'&&current<images.length-1){e.preventDefault();setIndex(current+1);}}}>
+ <div className="mb-gallery-stage">{image?<LocalPicture key={image.id} scope={scope} image={image} index={current}/>:<span>{ui('Add your first image')}</span>}{image&&expandable&&<button type="button" className="mb-gallery-expand" aria-pressed={expanded} aria-label={ui(expanded?'Fit image':'Expand image')} title={ui(expanded?'Fit image':'Expand image')} onClick={()=>setExpanded(v=>!v)}>{expanded?'↙':'↗'}</button>}</div>
  {images.length>0&&<div className="mb-gallery-navigation"><button aria-label={ui('Previous image')} disabled={current===0} onClick={()=>setIndex(current-1)}>‹</button><span role="status">{current+1} / {images.length}</span><button aria-label={ui('Next image')} disabled={current===images.length-1} onClick={()=>setIndex(current+1)}>›</button></div>}
  </div>;
 }
@@ -47,5 +47,5 @@ export function ImageUpload({busy,error,onFiles,onClose}:{busy:boolean;error:str
 }
 export function GalleryPreview({block,scope}:{block:Block;scope:string}){
  const [index,setIndex]=useState(0),images=pictures(block),current=Math.min(index,Math.max(0,images.length-1));
- return <div className="mb-gallery-preview">{block.content&&<div className="mb-columns-existing"><FormattedText text={block.content} html={formatOf(block,'content',block.content)}/></div>}<GalleryView scope={scope} images={images} index={current} setIndex={setIndex}/>{images[current]?.caption&&<p className="mb-gallery-caption">{images[current].caption}</p>}</div>;
+ return <div className="mb-gallery-preview">{block.content&&<div className="mb-columns-existing"><FormattedText text={block.content} html={formatOf(block,'content',block.content)}/></div>}<GalleryView scope={scope} images={images} index={current} setIndex={setIndex} expandable/>{images[current]?.caption&&<p className="mb-gallery-caption">{images[current].caption}</p>}</div>;
 }
