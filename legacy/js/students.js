@@ -588,7 +588,7 @@ function nativeStudentLessonRows(s,limit=Infinity,applyFilters=true){
     if(nativeLessonStatusFilter!=='all'&&l.status!==nativeLessonStatusFilter)return false;
     return true;
   });
-    return filtered.slice(0,limit).map(l=>'<button type="button" data-lesson-id="'+esc(l.id)+'" class="native-history-row" onclick="openEditLesson(\''+esc(l.id)+'\')"><span>'+esc(l.date)+' · '+esc(displayTime(l.time||''))+'</span><span>'+esc(l.comment||'—')+'</span><span class="native-history-status">'+esc(studentLessonStatusText(l,s))+'</span><strong>'+money(l.group_id?Number(lessonMembers.find(m=>String(m.lesson_id)===String(l.id)&&String(m.student_id)===String(s.id))?.price??s.price??0):Number(l.price||0))+'</strong></button>').join('')||'<p class="native-history-empty">Занятий нет</p>';
+    return filtered.slice(0,limit).map(l=>'<button type="button" data-lesson-id="'+esc(l.id)+'" class="native-history-row" onclick="openEditLesson(\''+esc(l.id)+'\')"><span>'+esc(l.date)+' · '+esc(displayTime(l.time||''))+'</span><span>'+esc(l.comment||'—')+'</span><span class="native-history-status '+esc(studentLessonStatusClass(l,s))+'">'+esc(studentLessonStatusText(l,s))+'</span><strong>'+money(l.group_id?Number(lessonMembers.find(m=>String(m.lesson_id)===String(l.id)&&String(m.student_id)===String(s.id))?.price??s.price??0):Number(l.price||0))+'</strong></button>').join('')||'<p class="native-history-empty">Занятий нет</p>';
 }
 function nativeStudentPaymentRows(s,limit=Infinity){
   const items=payments.filter(p=>String(p.student_id||'')===String(s.id)).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
