@@ -159,3 +159,7 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-pointer:has(#
 .mb-builder.mb-student-preview .mb-tf-preview .mb-tf-buttons button[data-result="incorrect"]{
  background:#fdecec!important;border:2px solid #d45656!important;color:#9a2929!important;box-shadow:none!important;
 }
+
+/* Compact inline choices: keep answer chips aligned with sentence text. */
+.mb-builder.mb-student-preview .mb-inline-preview .mb-inline-group button,
+.mb-builder .mb-inline-preview .mb-inline-group button{display:inline!important;min-height:0!important;height:auto!important;padding:2px 6px!important;line-height:1.25!important;vertical-align:baseline!important;border-radius:6px!important;margin:0!important;font-size:inherit!important;max-width:100%;white-space:normal!important}
