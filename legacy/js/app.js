@@ -2152,7 +2152,17 @@ function showPublicLessonMaterial(data,studentId,lessonId){
      if(node.nodeType===3){parent.append(document.createTextNode(node.textContent));return;}
      if(node.nodeType!==1||['SCRIPT','STYLE','IFRAME','OBJECT'].includes(node.tagName))return;
      const target=allowed.has(node.tagName)?document.createElement(node.tagName.toLowerCase()):parent;
-     if(target!==parent)parent.append(target);
+     if(target!==parent){
+       if(node.tagName==='UL'||node.tagName==='OL'){
+         target.style.setProperty('list-style-type',node.tagName==='UL'?'disc':'decimal','important');
+         target.style.setProperty('padding-inline-start','1.5em','important');
+       }
+       if(node.tagName==='LI'){
+         target.style.setProperty('display','list-item','important');
+         target.style.setProperty('list-style-type','inherit','important');
+       }
+       parent.append(target);
+     }
      for(const child of node.childNodes)copy(child,target);
    }
    const fragment=document.createDocumentFragment();
