@@ -637,3 +637,13 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
  #teacher-header.app-header .profile-menu-wrap{flex:0 0 auto!important}
 }
 
+
+#student-modal .student-settings-tabs{display:flex;gap:6px;border-bottom:1px solid #d9d0e5;padding-bottom:8px}
+#student-modal .student-settings-tabs button{flex:1;padding:9px 12px;border-radius:8px;border:1px solid #d9d0e5;color:inherit}
+#student-modal .student-settings-tabs button[aria-pressed=true]{background:#4e2a84;color:white;border-color:#4e2a84}
+#student-modal .student-settings-fields:not(.hidden){display:grid;gap:10px}
+#student-modal .student-settings-fields label{display:block}
+#student-modal .student-settings-fields input,#student-modal .student-settings-fields select{border:1px solid #bcb0d0!important;border-radius:9px!important;min-height:40px;background:transparent;color:inherit}
+#student-modal .student-settings-fields input:focus,#student-modal .student-settings-fields select:focus{outline:2px solid #8c70b7;outline-offset:1px}
+#student-modal .student-settings-footer{display:flex;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid #d9d0e5}
+#student-modal .student-settings-cancel{border:1px solid #d9d0e5;border-radius:9px;padding:8px 16px;color:inherit}
