@@ -511,3 +511,10 @@ html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-heading-row>h
 html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-preview-footer,.mb-combined-element+.mb-combined-element){border-top-color:var(--line)!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-filler-stage,.mb-filler-choice strong){background:var(--soft)!important;border-color:var(--line)!important;color:var(--ink)!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-fillers header h2,.mb-filler-stage>p,.mb-filler-label,.mb-filler-kicker){color:var(--ink)!important}
+
+/* Keep short previews compact; notes scroll independently instead of stretching the page. */
+.mb-builder.mb-student-preview{height:auto!important;min-height:0!important}
+.mb-builder.mb-student-preview .mb-preview-workspace{flex:0 0 auto!important;min-height:0!important;height:auto!important}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){min-height:0!important;height:clamp(260px,calc(100dvh - 360px),620px)!important;max-height:none!important;overflow:hidden!important}
+.mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-field{min-height:0!important;overflow:hidden!important}
+.mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-input{min-height:0!important;height:auto!important;overflow-y:auto!important}
