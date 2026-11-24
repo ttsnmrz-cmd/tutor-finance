@@ -390,3 +390,8 @@ dialog.ml-dialog .ml-dialog-actions .primary{background:#4E2A84!important;color:
 [data-theme="dark"] .ml-tree-row.active .ml-outline-icon{color:#c5afea;}
 
 .ml-recent{margin-bottom:18px}.ml-recent h2{font-size:16px;margin:0 0 10px}.ml-recent>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}.ml-recent button{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #d9dce3;border-radius:12px;padding:10px;background:transparent;color:inherit;min-width:0;cursor:pointer}.ml-recent button span{min-width:0}.ml-recent strong,.ml-recent small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ml-recent small{opacity:.7;margin-top:4px}.ml-recent button:hover{border-color:#7655a5}
+
+/* Keep folder navigation available even at the root and with the tree collapsed. */
+.ml-preview .ml-topline .ml-breadcrumbs{display:flex!important;visibility:visible!important;min-height:34px!important;align-items:center;flex-wrap:wrap}
+.ml-preview.ml-tree-collapsed .ml-topline{padding-left:0!important;min-height:36px!important}
+.ml-preview.ml-tree-collapsed .ml-topline .ml-panel-toggle{position:static!important;display:inline-flex!important;align-items:center;justify-content:center;flex-shrink:0;margin-right:8px;color:var(--purple);background:var(--soft);cursor:pointer}
