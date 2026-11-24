@@ -434,3 +434,7 @@ dialog.mb-image-upload .mb-image-upload-tab{margin:0 0 12px}
 .mb-gallery-preview .mb-gallery-view.is-expanded .mb-gallery-stage{height:min(72dvh,760px);min-height:520px;padding:8px}
 .mb-gallery-preview .mb-gallery-view.is-expanded .mb-gallery-image{max-height:100%;max-width:100%}
 @container builder (max-width:620px){.mb-gallery-preview .mb-gallery-view.is-expanded .mb-gallery-stage{height:65dvh;min-height:360px}}
+
+
+/* Mode switch is part of the material title row: never allocate a separate line for it. */
+.mb-top>.mb-mode-switch{margin-left:auto;align-self:flex-start;flex:none;min-width:92px}
