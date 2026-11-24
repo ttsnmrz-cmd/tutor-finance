@@ -694,6 +694,7 @@ async function openStudentEdit(id){
     linkButton.classList.toggle('opacity-50',!s.telegram_link_token);
   }
 
+  switchStudentSettingsTab('general');
   showModal('student-modal');
 }
 
@@ -1630,3 +1631,5 @@ async function addPayment(){
     showError(e);
   }
 }
+
+function switchStudentSettingsTab(tab){const modal=document.getElementById('student-modal');if(!modal)return;for(const name of ['general','telegram']){document.getElementById('student-settings-'+name)?.classList.toggle('hidden',name!==tab);modal.querySelector('[data-student-settings-tab="'+name+'"]')?.setAttribute('aria-pressed',String(name===tab));}}
