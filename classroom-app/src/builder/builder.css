@@ -419,3 +419,18 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-section-presets button{min-height:38px;padding:8px 10px;text-align:left;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:12px;font-weight:650}
 .mb-section-presets button:hover,.mb-section-presets button.selected{border-color:#7250a8;background:#f2ecfb;color:#4e2a84}
 @media(max-width:520px){.mb-section-presets{grid-template-columns:1fr}}
+
+
+/* Image upload dialog must be viewport-centered; it is portalled to body, not builder layout. */
+dialog.mb-image-upload{position:fixed!important;inset:0!important;margin:auto!important;box-sizing:border-box!important;width:min(620px,calc(100vw - 32px))!important;max-width:620px!important;max-height:min(90dvh,720px)!important;padding:18px!important;overflow:auto!important}
+dialog.mb-image-upload>*{box-sizing:border-box;max-width:100%}
+dialog.mb-image-upload .mb-image-dropzone{width:100%!important;min-height:190px!important;margin:0!important;padding:20px!important;white-space:normal!important}
+dialog.mb-image-upload .mb-image-upload-heading{width:100%;margin:0 0 12px}
+dialog.mb-image-upload .mb-image-upload-tab{margin:0 0 12px}
+
+/* Gallery preview expands inside the exercise column, keeping Pointer and Live Notes available. */
+.mb-gallery-stage{position:relative}
+.mb-gallery-expand{position:absolute!important;right:10px;top:10px;z-index:4;width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;border:1px solid var(--line)!important;border-radius:10px!important;background:color-mix(in srgb,var(--card) 92%,transparent)!important;box-shadow:0 3px 12px #17132220;font-size:18px!important}
+.mb-gallery-preview .mb-gallery-view.is-expanded .mb-gallery-stage{height:min(72dvh,760px);min-height:520px;padding:8px}
+.mb-gallery-preview .mb-gallery-view.is-expanded .mb-gallery-image{max-height:100%;max-width:100%}
+@container builder (max-width:620px){.mb-gallery-preview .mb-gallery-view.is-expanded .mb-gallery-stage{height:65dvh;min-height:360px}}
