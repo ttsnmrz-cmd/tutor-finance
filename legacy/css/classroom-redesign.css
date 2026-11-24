@@ -666,3 +666,8 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 @media(max-width:600px){.pp-history-split{grid-template-columns:1fr;}}
 
 .pp-history-list .pp-note-title{display:block;font-weight:700;margin-bottom:4px;overflow-wrap:anywhere;}
+
+#student-public-view .pp-student-join{background:#4e2a84!important;color:white!important;border:1px solid #4e2a84!important;border-radius:12px;padding:12px 20px;font-weight:700;min-height:44px;cursor:pointer;white-space:nowrap;}
+#student-public-view .pp-student-join[hidden]{display:none!important;}
+#student-public-view .pp-student-join:disabled{opacity:.6;cursor:wait;}
+@media(max-width:600px){#student-public-view .pp-student-join{white-space:normal;padding:10px 12px;}}
