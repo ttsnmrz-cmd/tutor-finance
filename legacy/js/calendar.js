@@ -88,6 +88,29 @@ function renderWeek(){
     c.parentNode.insertBefore(scroller,c);
     scroller.appendChild(c);
   }
+  if(!scroller.dataset.adaptiveHeight){
+    scroller.dataset.adaptiveHeight='1';
+    const fit=()=>{
+      if(!scroller.isConnected||!scroller.getClientRects().length)return;
+      const viewport=window.visualViewport;
+      const bottom=viewport?viewport.offsetTop+viewport.height:window.innerHeight;
+      const top=scroller.getBoundingClientRect().top+window.scrollY;
+      const available=bottom-top-48;
+      scroller.style.setProperty('height',Math.max(5*72+48,Math.floor(available))+'px','important');
+      scroller.style.setProperty('min-height','0','important');
+    };
+    window.addEventListener('resize',fit);
+    window.visualViewport?.addEventListener('resize',fit);
+    if(typeof ResizeObserver!=='undefined'){
+      const observer=new ResizeObserver(fit);
+      const cards=document.getElementById('dashboard-cards');
+      const header=document.getElementById('teacher-header');
+      if(cards)observer.observe(cards);
+      if(header)observer.observe(header);
+      observer.observe(scroller);
+    }
+    requestAnimationFrame(fit);
+  }
   const oldAxis=scroller.querySelector('.native-time-axis');
   if(oldAxis)oldAxis.remove();
   scroller.insertAdjacentHTML('afterbegin',axis);
