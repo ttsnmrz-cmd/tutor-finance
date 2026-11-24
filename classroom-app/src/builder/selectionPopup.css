@@ -49,3 +49,8 @@
 .mb-selection-popup .mb-inline-form-actions button.primary{
  background:#74539b !important;color:#fff !important;padding:7px 12px !important;
 }
+
+
+.mb-selection-popup .mb-preview-selection-actions{display:flex;align-items:center;gap:4px;padding:5px}
+.mb-selection-popup .mb-preview-selection-actions button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:36px!important;min-height:34px!important;padding:5px 8px!important;font-weight:650}
+.mb-selection-popup .mb-preview-selection-actions button:first-child{font-size:16px!important}
