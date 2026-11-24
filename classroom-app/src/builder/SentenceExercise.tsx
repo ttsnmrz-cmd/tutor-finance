@@ -1,3 +1,4 @@
+import {useLiveAnswer} from './liveAnswers';
 import {useRef,useState,useLayoutEffect} from 'react';
 import type {Block} from '../planning/model';
 import {ui} from '../i18n';
@@ -35,7 +36,7 @@ export function SentenceEditor({block,onChange}:{block:Block;onChange:(b:Block)=
  </div>;
 }
 export function SentencePreview({block,variant='sentence'}:{block:Block;variant?:'sentence'|'letters'}){
- const items=block.items as SentenceItem[],nonce=useRef(crypto.randomUUID()),[shuffled]=useState(()=>Object.fromEntries(items.map(i=>[i.sentenceId,shuffledTiles(i.sentenceTiles)]))),[answers,setAnswers]=useState<Record<string,(string|null)[]>>({}),[selected,setSelected]=useState<{sentence:string;tile:string}|null>(null),[checked,setChecked]=useState(false);
+ const items=block.items as SentenceItem[],nonce=useRef(crypto.randomUUID()),[shuffled]=useState(()=>Object.fromEntries(items.map(i=>[i.sentenceId,shuffledTiles(i.sentenceTiles)]))),[answers,setAnswers]=useLiveAnswer<Record<string,(string|null)[]>>(block.id+':answers',{}),[selected,setSelected]=useState<{sentence:string;tile:string}|null>(null),[checked,setChecked]=useLiveAnswer(block.id+':checked',false);
  function slots(item:SentenceItem){return answers[item.sentenceId]||item.sentenceTiles.map(()=>null);}
  function place(item:SentenceItem,id:string,index?:number){if(!item.sentenceTiles.some(t=>t.id===id)||index!==undefined&&(index<0||index>=item.sentenceTiles.length))return;setAnswers(old=>{const next=[...(old[item.sentenceId]||item.sentenceTiles.map(()=>null))],from=next.indexOf(id);if(index===undefined){if(from>=0)next[from]=null;}else{const other=next[index];if(from>=0)next[from]=other;next[index]=id;}return {...old,[item.sentenceId]:next};});setSelected(null);setChecked(false);}
  function start(e:React.DragEvent,item:SentenceItem,id:string){e.dataTransfer.setData('application/x-mec-sentence-tile',JSON.stringify({nonce:nonce.current,sentence:item.sentenceId,tile:id}));e.dataTransfer.effectAllowed='move';}
