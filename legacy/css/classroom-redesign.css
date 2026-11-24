@@ -167,7 +167,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 .native-section-heading>button:not(.native-add-button){font-size:12px;font-weight:700;color:#70528d}
 .native-history-row{display:grid;grid-template-columns:minmax(145px,1.2fr) minmax(65px,1fr) minmax(110px,.8fr) auto;align-items:center;gap:10px;width:100%;padding:13px 12px;border:1px solid #eee7f5;background:#f8f5fc;border-radius:12px;text-align:left;font-size:12px;margin-bottom:8px;color:#5b4e67}
 .native-history-row strong{color:#332642;text-align:right;white-space:nowrap}
-.native-history-status{border-radius:18px;background:#eeeaf4;padding:5px 8px;justify-self:start}
+.native-history-status{border-radius:18px;padding:5px 8px;justify-self:start}
 .native-history-empty{padding:25px;text-align:center;color:#95899d}
 .native-history-scroll{max-height:min(58vh,560px);overflow-y:auto;padding-right:5px}
 .native-lesson-filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
