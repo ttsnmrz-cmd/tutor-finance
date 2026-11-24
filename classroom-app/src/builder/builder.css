@@ -390,3 +390,25 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-builder-toolbar .mb-builder-actions{margin-left:0;justify-content:flex-start;width:auto}
 .mb-builder-toolbar .mb-save-state{margin-left:6px;padding-left:10px;border-left:1px solid var(--line)}
 @container builder (max-width:620px){.mb-builder-toolbar .mb-builder-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}.mb-builder-toolbar .mb-save-state{margin-left:2px}}
+
+
+/* Dense exercise authoring. Student/teacher Preview styles are intentionally untouched. */
+.mb-editor{padding:12px 14px}
+.mb-editor-heading{gap:10px;margin-bottom:8px}
+.mb-editor-heading h2{margin:0;flex:1}
+.mb-editor-heading h2 input{min-height:38px!important;padding:7px 12px!important;font-size:17px!important;line-height:1.2!important;font-weight:700!important;border-radius:10px!important}
+.mb-editor-heading>select{min-height:38px;padding:7px 10px;font-size:12px}
+.mb-teacher-note-editor{margin:6px 0}
+.mb-teacher-note-add{min-height:28px!important;padding:4px 6px!important;font-size:11px!important}
+.mb-join-previous{margin:6px 0 10px;gap:6px;font-size:11px}
+.mb-choice-editor{display:grid;gap:8px}
+.mb-choice-question{padding:10px 12px!important;border-radius:12px!important}
+.mb-choice-question-heading{display:grid!important;grid-template-columns:22px minmax(0,1fr) 24px!important;gap:7px!important;align-items:center!important;margin:0 0 7px!important}
+.mb-choice-question-heading>span{font-size:11px}
+.mb-choice-question-heading input,.mb-choice-option-row input[type=text]{min-height:34px!important;padding:6px 10px!important;font-size:13px!important;border-radius:9px!important}
+.mb-choice-question-heading>button,.mb-choice-option-row>button{width:24px!important;height:28px!important;min-height:28px!important;padding:0!important}
+.mb-choice-option-list{display:grid!important;gap:5px!important;margin:0 0 7px 29px!important}
+.mb-choice-option-row{display:grid!important;grid-template-columns:22px minmax(0,1fr) 24px!important;gap:7px!important;align-items:center!important}
+.mb-choice-option-row>input[type=checkbox]{width:16px!important;height:16px!important;margin:0!important}
+.mb-choice-add-option{min-height:30px!important;padding:4px 10px!important;margin-left:29px!important;font-size:11px!important}
+.mb-choice-add-question{min-height:30px!important;padding:4px 10px!important;font-size:11px!important}
