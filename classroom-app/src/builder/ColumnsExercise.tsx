@@ -1,3 +1,4 @@
+import {useLiveAnswer} from './liveAnswers';
 import {useRef,useState} from 'react';
 import type {Block,Item} from '../planning/model';
 import {ui} from '../i18n';
@@ -26,7 +27,7 @@ export function ColumnsEditor({block,onChange}:{block:Block;onChange:(b:Block)=>
 export function ColumnsPreview({block,teacherHints=false}:{block:Block;teacherHints?:boolean}){
  const columns=(block as ColumnBlock).columns||[],words=block.items as Word[];
  const [order]=useState(()=>{const ids=words.map(w=>w.columnWordId);for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}return ids;});
- const [answers,setAnswers]=useState<Record<string,string>>({}),[selected,setSelected]=useState<string|null>(null),[checked,setChecked]=useState(false),nonce=useRef(crypto.randomUUID());
+ const [answers,setAnswers]=useLiveAnswer<Record<string,string>>(block.id+':answers',{}),[selected,setSelected]=useLiveAnswer<string|null>(block.id+':selected',null),[checked,setChecked]=useLiveAnswer(block.id+':checked',false),nonce=useRef(crypto.randomUUID());
  const ready=columns.length>=2&&columns.every(c=>!!c.title.trim())&&words.length>0&&words.every(w=>!!w.prompt.trim()&&columns.some(c=>c.id===w.expected));
  function place(id:string,column?:string){if(!words.some(w=>w.columnWordId===id)||column&&!columns.some(c=>c.id===column))return;setAnswers(old=>{const next={...old};if(column)next[id]=column;else delete next[id];return next;});setChecked(false);setSelected(null);}
  function start(e:React.DragEvent,id:string){e.dataTransfer.setData('application/x-mec-column-word',JSON.stringify({nonce:nonce.current,id}));e.dataTransfer.effectAllowed='move';}
