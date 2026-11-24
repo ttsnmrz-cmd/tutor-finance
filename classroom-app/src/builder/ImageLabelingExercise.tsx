@@ -1,3 +1,4 @@
+import {useLiveAnswer} from './liveAnswers';
 import {ui} from '../i18n';
 import {useEffect,useRef,useState} from 'react';
 import type {Block} from '../planning/model';
@@ -33,7 +34,7 @@ export function ImageLabelingEditor({block,onChange,scope}:{block:Block;onChange
 }
 export function ImageLabelingPreview({block,scope,teacherHints=false}:{block:Block;scope:string;teacherHints?:boolean}){
  const b=data(block),zones=b.labelZones||[],words=[...zones.map(z=>z.answer.trim()).filter(Boolean),...(b.labelDistractors||[]).map(s=>s.trim()).filter(Boolean)];
- const [order]=useState(()=>words.map((_,i)=>i).sort(()=>Math.random()-.5)),[placed,setPlaced]=useState<Record<number,{x:number;y:number;zone:string|null}>>({}),[selected,setSelected]=useState<number|null>(null),[checked,setChecked]=useState(false),stage=useRef<HTMLDivElement>(null);
+ const [order]=useState(()=>words.map((_,i)=>i).sort(()=>Math.random()-.5)),[placed,setPlaced]=useLiveAnswer<Record<number,{x:number;y:number;zone:string|null}>>(block.id+':placements',{}),[selected,setSelected]=useLiveAnswer<number|null>(block.id+':selected',null),[checked,setChecked]=useLiveAnswer(block.id+':checked',false),stage=useRef<HTMLDivElement>(null);
  function drop(e:React.DragEvent){e.preventDefault();const raw=e.dataTransfer.getData('application/x-image-label-word');const index=Number(raw);if(!raw||!Number.isInteger(index)||index<0||index>=words.length)return;place(index,e.clientX,e.clientY);}
  function place(index:number,cx:number,cy:number){const rect=stage.current!.getBoundingClientRect(),x=clamp((cx-rect.left)/rect.width*100),y=clamp((cy-rect.top)/rect.height*100);const zone=zones.find(z=>{if(zoneShape(z)==='rectangle')return x>=z.x&&x<=z.x+z.w&&y>=z.y&&y<=z.y+z.h;const rx=z.w/2,ry=z.h/2;if(!rx||!ry)return false;return ((x-z.x-rx)/rx)**2+((y-z.y-ry)/ry)**2<=1;});setPlaced(old=>({...old,[index]:{x,y,zone:zone?.id||null}}));setChecked(false);setSelected(null);}
  function returnToBank(index:number){setPlaced(old=>{const next={...old};delete next[index];return next;});setChecked(false);setSelected(null);}
