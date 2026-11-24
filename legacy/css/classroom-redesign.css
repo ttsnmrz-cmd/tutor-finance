@@ -683,3 +683,10 @@ html:not([data-theme="dark"]) #student-public-view .pp-student-layout>.pp-studen
 .profile-menu-dropdown .profile-menu-item>svg{width:20px;height:20px;flex-shrink:0;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:#737987;}
 .profile-menu-dropdown .profile-menu-item:hover>svg{color:#4e2a84;}
 [data-theme="dark"] .profile-menu-dropdown .profile-menu-item>svg{color:#a5a9b5;}
+
+/* Student top-ups: inherit the finance panel surface in dark mode. */
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances #public-payments,
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances #public-payments>div{
+ background:transparent!important;color:inherit!important;border-color:#554b65!important;
+}
+html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances #public-payments>div>b{color:#a8dfb2!important}
