@@ -1937,7 +1937,7 @@ function prepareAppHeader(header,role){
  if(!header)return null;
  header.classList.add('app-header');
  header.dataset.appHeaderRole=role;
- const brand=header.querySelector(':scope > button:first-child');
+ const brand=header.querySelector(':scope > button:not(#pp-mobile-menu):not([data-mobile-menu])');
  if(brand)brand.classList.add('app-header-brand');
  const actions=header.querySelector(':scope > .teacher-header-actions, :scope > .pp-student-header-actions');
  if(actions)actions.classList.add('app-header-actions');
@@ -1951,11 +1951,12 @@ function createAppHeader(role){
  prepareAppHeader(teacher,'teacher');
  if(role==='teacher')return teacher;
  const header=teacher.cloneNode(true);
+ header.querySelector('#pp-mobile-menu')?.remove();
  header.removeAttribute('id');
  header.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
  header.querySelectorAll('[onclick]').forEach(el=>el.removeAttribute('onclick'));
  header.querySelector('.teacher-header-actions')?.remove();
- const brand=header.querySelector(':scope > button:first-child');
+ const brand=header.querySelector(':scope > button:not(#pp-mobile-menu):not([data-mobile-menu])');
  if(brand){brand.onclick=null;brand.removeAttribute('title');brand.style.cursor='default';}
  const subtitle=brand?.querySelector('.text-slate-500');
  if(subtitle)subtitle.textContent='Lessons, students and payments';
