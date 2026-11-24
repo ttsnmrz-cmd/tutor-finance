@@ -234,14 +234,14 @@
 }
 /* Live Notes: stretch with the exercise and always fill at least the viewport height. */
 .mb-builder.mb-student-preview .mb-preview-workspace{
- align-items:stretch!important;min-height:max(100dvh,680px)!important;
+ align-items:stretch!important;min-height:0!important;
 }
 .mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{
- min-height:max(100dvh,680px)!important;align-self:stretch!important;
+ min-height:0!important;align-self:stretch!important;
 }
 .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
  position:relative!important;top:auto!important;align-self:stretch!important;
- min-height:max(100dvh,680px)!important;max-height:none!important;
+ min-height:0!important;max-height:none!important;
  height:auto!important;display:flex!important;flex-direction:column!important;
  overflow:visible!important;
 }
@@ -302,13 +302,13 @@
  min-height:0!important;
 }
 .mb-builder.mb-student-preview .mb-preview-workspace{
- min-height:var(--lesson-viewport-height)!important;
+ min-height:0!important;
 }
 .mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{
- min-height:var(--lesson-viewport-height)!important;
+ min-height:0!important;
 }
 .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
- min-height:var(--lesson-viewport-height)!important;
+ min-height:0!important;
 }
 .mb-builder.mb-student-preview .mb-preview-notes .mb-rich-input{
  min-height:180px!important;
@@ -421,7 +421,7 @@
  align-self:flex-start!important;
 }
 .mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){
- min-height:var(--lesson-viewport-height)!important;
+ min-height:0!important;
  align-self:flex-start!important;
 }
 .mb-builder.mb-student-preview .mb-student-body{
@@ -515,7 +515,7 @@ html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-fillers header h2
 /* Keep short previews compact; notes scroll independently instead of stretching the page. */
 .mb-builder.mb-student-preview{height:auto!important;min-height:0!important}
 .mb-builder.mb-student-preview .mb-preview-workspace{flex:0 0 auto!important;min-height:0!important;height:auto!important}
-.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){min-height:0!important;height:clamp(260px,calc(100dvh - 360px),620px)!important;max-height:none!important;overflow:hidden!important}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){min-height:0!important;height:auto!important;max-height:none!important;overflow:hidden!important}
 .mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-field{min-height:0!important;overflow:hidden!important}
 .mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-input{min-height:0!important;height:auto!important;overflow-y:auto!important}
 
@@ -524,3 +524,9 @@ html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-fillers header h2
 .mb-builder.mb-student-preview .mb-preview-notes .mb-preview-notes-heading h2{font-size:14px!important;line-height:1.25!important;letter-spacing:0!important;flex:1 1 100%!important;white-space:normal!important;color:var(--ink)!important}
 .mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-field{flex:1 1 0!important;margin:8px 0!important;min-height:0!important}
 .mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-input{flex:1 1 0!important;min-height:0!important;max-height:100%!important;box-sizing:border-box!important;overflow:auto!important}
+
+/* Exercise determines row height; notes fill the same row without contributing intrinsic height. */
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{min-height:0!important}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-preview-notes:not(.expanded){align-self:stretch!important;height:auto!important;min-height:0!important}
+.mb-builder.mb-student-preview .mb-preview-notes:not(.expanded) .mb-rich-field{height:0!important;flex:1 1 0!important}
+.mb-builder.mb-student-preview{padding-bottom:0!important;margin-bottom:0!important}
