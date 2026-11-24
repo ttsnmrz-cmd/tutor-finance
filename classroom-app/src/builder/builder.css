@@ -359,3 +359,17 @@ body.local-materials-preview:has(.mb-student-preview) .card.account{overflow:cli
 .mb-youtube-poster span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;place-items:center;width:58px;height:42px;padding-left:4px;border-radius:12px;background:#4e2a84e8;color:#fff;font-size:20px;box-shadow:0 6px 20px #0005}
 .mb-youtube-poster:hover span{transform:translate(-50%,-50%) scale(1.06)}
 @container builder (max-width:620px){.mb-media-add-row{flex-wrap:wrap}.mb-media-add-row>input{order:3;flex-basis:calc(100% - 58px)}.mb-media-link-button{order:4}.mb-media-or{display:none}}
+
+
+/* Compact builder chrome: keep actions close to content and remove the tall empty header band. */
+.mb-top{margin-bottom:6px;align-items:flex-start}
+.mb-top-tools{flex-direction:row;align-items:center;gap:8px;padding-top:1px}
+.mb-builder-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px;margin:2px 0 10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.mb-builder-toolbar .mb-tabs{margin:0;border:0;gap:5px;flex-wrap:nowrap}
+.mb-builder-toolbar .mb-tabs button{min-height:30px;padding:5px 10px;border-radius:9px;border:1px solid transparent;font-size:11px}
+.mb-builder-toolbar .mb-tabs>.mb-structure-toggle{min-width:0;border-color:var(--line);padding:5px 10px}
+.mb-builder-toolbar .mb-tabs button[aria-pressed=true]{border-color:var(--line);background:var(--soft)}
+.mb-builder-toolbar .mb-save-state{margin:0;white-space:nowrap}
+.mb-breadcrumb{margin-bottom:6px}
+.mb-title-group small{margin-top:1px}
+@container builder (max-width:620px){.mb-builder-toolbar{align-items:flex-start;flex-wrap:wrap}.mb-builder-toolbar .mb-tabs{margin-left:auto}.mb-top{flex-wrap:nowrap}.mb-top-tools{width:auto}.mb-top-buttons{width:auto}.mb-top-buttons>button{flex:none}}
