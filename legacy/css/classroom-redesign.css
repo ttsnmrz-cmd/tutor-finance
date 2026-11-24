@@ -690,3 +690,8 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
  background:transparent!important;color:inherit!important;border-color:#554b65!important;
 }
 html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal-finances #public-payments>div>b{color:#a8dfb2!important}
+
+
+html[data-theme="dark"] #student-live-material{background:#211c29!important;color:#f0eafa!important}
+html[data-theme="dark"] #student-live-material .pp-student-live-one-page .pp-student-live-main{background:#2d2637!important;color:#f0eafa!important}
+html[data-theme="dark"] #student-live-material :is(.pp-student-header-balance,.pp-student-return,.pp-student-theme-toggle){background:#393044!important;color:#f0eafa!important;border-color:#655673!important}
