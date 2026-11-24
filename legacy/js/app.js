@@ -532,6 +532,9 @@ function getTabFromPath(){
   return entry?.[0]==='calendar'?'dashboard':entry?.[0]||'dashboard';
 }
 function switchTab(t,options={}){
+  if(t==='materials' && options.history!==false && !document.getElementById('tab-materials')?.classList.contains('hidden')){
+    if(!window.dispatchEvent(new Event('profiprofit:return-material-library',{cancelable:true})))return;
+  }
   if(t!=='materials' && !document.getElementById('tab-materials')?.classList.contains('hidden')){
     window.dispatchEvent(new Event('profiprofit:leave-materials'));
   }
