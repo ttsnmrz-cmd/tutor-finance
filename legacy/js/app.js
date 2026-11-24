@@ -2208,12 +2208,24 @@ function renderSharedLessonNotes(richNotes,value){
    richNotes.replaceChildren(fragment);
  }
 
-function renderPublicLessonsHistory(rows){
+async function renderPublicLessonsHistory(rows){
  const el=document.getElementById('public-lessons-history');if(!el)return;
- const past=Array.from(new Map(rows.filter(l=>['conducted','completed'].includes(l.status)).map(l=>[String(l.id),l])).values()).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
- el.replaceChildren();
- if(!past.length){el.textContent='No completed lessons yet.';return;}
- past.forEach(l=>{const card=document.createElement('button');card.type='button';card.className='pp-student-lesson-row';card.textContent=l.date+' · '+displayTime(l.time);card.addEventListener('click',async()=>{const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;const target=dialog.querySelector('[data-lesson-notes]');const request=crypto.randomUUID();target.dataset.request=request;dialog.querySelector('[data-lesson-heading]').textContent=l.date+' · '+displayTime(l.time);target.textContent='Loading notes…';dialog.showModal();try{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:new URLSearchParams(location.search).get('student'),p_calendar_lesson_id:Number(l.id)});if(target.dataset.request!==request||!dialog.open)return;if(error)throw error;renderSharedLessonNotes(target,data);}catch{if(target.dataset.request===request&&dialog.open)target.textContent='Could not load notes. Please try again.';}});el.append(card);});
+ const past=Array.from(new Map(rows.filter(l=>['conducted','completed'].includes(l.status)).map(l=>[String(l.id),l])).values()).sort((a,b)=>(b.date+' '+b.time).localeCompare(a.date+' '+a.time));
+ const studentId=new URLSearchParams(location.search).get('student');
+ const layout=document.createElement('div');layout.className='pp-history-split';
+ const makeColumn=title=>{const col=document.createElement('section'),heading=document.createElement('h3'),list=document.createElement('div');heading.textContent=title;list.className='pp-history-list';col.append(heading,list);layout.append(col);return list;};
+ const lessons=makeColumn('Lessons'),notes=makeColumn('Notes');el.replaceChildren(layout);
+ const cards=new Map();
+ function label(l){return l.date+' · '+displayTime(l.time);}
+ function open(l,value){const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;dialog.querySelector('[data-lesson-heading]').textContent=label(l);renderSharedLessonNotes(dialog.querySelector('[data-lesson-notes]'),value);if(!dialog.open)dialog.showModal();}
+ function card(l){const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=label(l);return button;}
+ for(const l of past){const button=card(l);cards.set(l.id,button);lessons.append(button);button.onclick=async()=>{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});if(!error)open(l,data);};}
+ if(!past.length){lessons.textContent='No completed lessons yet.';notes.textContent='No notes yet.';return;}
+ notes.textContent='Loading notes…';let found=0,failed=false;
+ for(let i=0;i<past.length;i+=8){const batch=await Promise.all(past.slice(i,i+8).map(async l=>{try{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});return {l,data,error};}catch(error){return {l,error};}}));if(!layout.isConnected)return;
+ for(const {l,data,error} of batch){if(error){failed=true;continue;}const plain=String(data?.plain||'').trim();if(!plain)continue;if(!found++)notes.replaceChildren();const mark=document.createElement('span');mark.textContent=' ▤';mark.title='Has notes';cards.get(l.id)?.append(mark);const button=card(l);const excerpt=document.createElement('small');excerpt.textContent=plain.slice(0,140)+(plain.length>140?'…':'');button.append(excerpt);button.onclick=()=>open(l,data);notes.append(button);}
+ }
+ if(!found)notes.textContent=failed?'Could not load all notes.':'No notes yet.';
 }
 function changePublicStudentWeek(offset){
   if(!publicStudentWeekAnchor)return;
