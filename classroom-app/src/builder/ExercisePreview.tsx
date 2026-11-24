@@ -1,3 +1,4 @@
+import {VocabularyListPreview} from './VocabularyListExercise';
 import {MediaPreview} from './MediaExercise';
 import {OrderingPreview} from './OrderingExercise';
 import {ImageLabelingPreview} from './ImageLabelingExercise';
@@ -9,7 +10,7 @@ import {ColumnsPreview} from './ColumnsExercise';
 import {InlineChoicePreview} from './InlineChoiceExercise';
 import {TrueFalsePreview} from './TrueFalseExercise';
 import {MultipleChoicePreview} from './MultipleChoiceExercise';
-import {isMultipleChoice,isInlineChoice,isColumns,isSentence,isTypedGap,isLetters,isGallery,isImageLabeling} from './choiceData';
+import {isVocabularyList,isMultipleChoice,isInlineChoice,isColumns,isSentence,isTypedGap,isLetters,isGallery,isImageLabeling} from './choiceData';
 import {MatchingPreview} from './MatchingExercise';
 import {LiveAnswerContext,LiveAnswerBlock,useLiveAnswer} from './liveAnswers';
 import {useCallback,useEffect,useRef,useState} from 'react';
@@ -48,6 +49,7 @@ export function ExercisePresentation({block,assetScope='',teacherHints=true}:{bl
  let fallbackIndex=0;
  const sentence=(text:string)=>text.split(/_{2,}/g).map((part,i)=><span key={i}>{i>0&&slot(fallbackIndex++)}{part}</span>);
  if(block.type==='video')return <MediaPreview key={block.id} block={block} scope={assetScope}/>;
+ if(isVocabularyList(block))return <VocabularyListPreview key={block.id} block={block}/>;
  if(isImageLabeling(block))return <ImageLabelingPreview key={block.id} block={block} scope={assetScope} teacherHints={teacherHints}/>;
  if(isGallery(block))return <GalleryPreview key={block.id} block={block} scope={assetScope}/>;
  if(isTypedGap(block))return <TypedGapPreview key={block.id} block={block} teacherHints={teacherHints}/>;
