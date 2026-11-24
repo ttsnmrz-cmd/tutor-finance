@@ -1937,7 +1937,7 @@ function prepareAppHeader(header,role){
  if(!header)return null;
  header.classList.add('app-header');
  header.dataset.appHeaderRole=role;
- const brand=header.querySelector(':scope > button:not(#pp-mobile-menu):not([data-mobile-menu])');
+ const brand=header.querySelector(':scope > .app-header-brand, :scope > button:not(#pp-mobile-menu):not([data-mobile-menu])');
  if(brand)brand.classList.add('app-header-brand');
  const actions=header.querySelector(':scope > .teacher-header-actions, :scope > .pp-student-header-actions');
  if(actions)actions.classList.add('app-header-actions');
@@ -2019,7 +2019,7 @@ function ensureStudentPortalLayout(){
  portal.classList.add('pp-student-one-page');
  if(document.getElementById('pp-student-shell-styles'))return;
  const style=document.createElement('style');style.id='pp-student-shell-styles';style.textContent=`
- #student-public-view{max-width:none!important;padding:12px!important}
+ #student-public-view{max-width:none!important}
  #student-public-view>.app-card{max-width:none!important}
  .pp-student-layout{align-items:start}
  .pp-student-layout>#student-public-content{flex:1;min-width:0}
@@ -2055,11 +2055,11 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-button{display:grid;place-items:center}
  /* Keep the student lesson aligned with the teacher's compact classroom layout. */
  /* Header uses the exact teacher DOM and its existing classes. */
- #student-live-material .pp-student-live-header{width:100%;box-sizing:border-box;margin:0!important;border-radius:0!important}
+ 
  #student-live-material .pp-student-live-layout{padding:10px;gap:10px}
  #student-live-material .pp-student-live-main{padding:12px 16px}
  #student-live-material .pp-student-live-content{gap:12px}
- #student-live-material{padding:0!important}
+ 
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between}
  #student-live-material .pp-student-live-layout{padding:14px}
  
@@ -2111,6 +2111,7 @@ function showPublicLessonMaterial(data){
  const header=sourceHeader ? sourceHeader.cloneNode(true) : createAppHeader('student');
  prepareAppHeader(header,'student');
  if(header){
+   header.querySelectorAll(':scope > button:not(.app-header-brand)').forEach(node=>node.remove());
    header.removeAttribute('id');
    header.classList.add('pp-student-live-header','student-brand-header');
    header.dataset.sharedHeader='1';
