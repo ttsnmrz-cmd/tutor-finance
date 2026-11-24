@@ -73,7 +73,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  return <section className="mb-builder mb-student-preview" aria-label={ui('Student preview')}>
   <div className="mb-preview-top">
    <div className="mb-preview-heading-row">
-    <h1>{plan.title}</h1>
+    <h1>{plan.title}{block&&<><span className="mb-preview-crumb-separator" aria-hidden="true">›</span><span className="mb-preview-exercise-crumb">{block.title}</span></>}</h1>
     {!studentMode&&<button className="mb-preview-back" onClick={onBack}>✎ {ui('Builder')}</button>}
    </div>
    <div className="mb-preview-tools-row">
@@ -81,7 +81,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
     <PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} liveSessionId={liveSessionId} onNotes={()=>setNotesOpen(true)}/>
    </div>
   </div><div className="mb-preview-workspace">
-  {block?<article id="activity" className="mb-student-card" key={block.id}><div className="mb-student-body">{steps[safeIndex].map(element=><section className="mb-combined-element" key={element.id} data-preview-element={element.id}>{!studentMode&&element.teacherNote?.trim()&&<aside className="mb-preview-teacher-note" aria-label={ui('Teacher note')}><strong>{ui('Teacher note')} · {ui('Visible only to teacher')}</strong><p>{element.teacherNote}</p></aside>}<h2>{element.title}</h2><ExercisePresentation block={element} assetScope={assetScope} teacherHints={teacherHints}/></section>)}</div>
+  {block?<article id="activity" className="mb-student-card" key={block.id}><div className="mb-student-body">{steps[safeIndex].map(element=><section className="mb-combined-element" key={element.id} data-preview-element={element.id}>{!studentMode&&element.teacherNote?.trim()&&<aside className="mb-preview-teacher-note" aria-label={ui('Teacher note')}><strong>{ui('Teacher note')} · {ui('Visible only to teacher')}</strong><p>{element.teacherNote}</p></aside>}{steps[safeIndex].length>1&&element.id!==block.id&&<h2>{element.title}</h2>}<ExercisePresentation block={element} assetScope={assetScope} teacherHints={teacherHints}/></section>)}</div>
   <div className="mb-preview-footer"><button className="mb-student-previous" disabled={safeIndex===0} onClick={()=>setIndex(safeIndex-1)}>‹ {ui('Previous')}</button><div className="mb-preview-progress" aria-label={`${safeIndex+1} / ${steps.length}`}>{steps.map((group,i)=><span key={group[0].id} className={i<=safeIndex?'current':''}/>)}</div><button className="primary" disabled={safeIndex===steps.length-1} onClick={()=>setIndex(safeIndex+1)}>{ui('Next')} ›</button></div></article>:<p>{ui('Choose an exercise or add your first one. No planning form is required.')}</p>}
  {!studentMode&&<PreviewNotes key={liveSessionId||scopeKey} liveSessionId={liveSessionId} scopeKey={scopeKey} open={notesOpen} onClose={()=>setNotesOpen(false)}/>}</div></section>;
 }
