@@ -1984,6 +1984,20 @@ function createAppHeader(role){
  if(subtitle)subtitle.textContent='Lessons, students and payments';
  return prepareAppHeader(header,role);
 }
+function installStudentProfileMenu(actions){
+ actions.querySelectorAll('.pp-student-settings,.pp-student-theme-toggle').forEach(n=>n.remove());
+ const wrap=document.createElement('div');wrap.className='pp-student-settings';
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='pp-student-settings-trigger';trigger.setAttribute('aria-label','Profile settings');trigger.setAttribute('aria-expanded','false');
+ trigger.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>';
+ const menu=document.createElement('div');menu.className='pp-student-settings-menu';menu.hidden=true;
+ const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');};
+ function refresh(){const en=window.getLanguage?.()==='en',dark=document.documentElement.dataset.theme==='dark';menu.replaceChildren();
+ for(const [lang,label] of [['ru','Русский'],['en','English']]){const b=document.createElement('button');b.type='button';b.textContent=label+(lang===(en?'en':'ru')?' ✓':'');b.onclick=()=>{window.setLanguage?.(lang);close();location.reload();};menu.append(b);}
+ const theme=document.createElement('button');theme.type='button';theme.textContent=dark?(en?'☀ Light theme':'☀ Светлая тема'):(en?'☾ Dark theme':'☾ Тёмная тема');theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();refresh();close();};menu.append(theme);}
+ trigger.onclick=()=>{if(!menu.hidden){close();return;}refresh();menu.hidden=false;trigger.setAttribute('aria-expanded','true');};
+ wrap.addEventListener('focusout',e=>{if(!wrap.contains(e.relatedTarget))close();});wrap.addEventListener('keydown',e=>{if(e.key==='Escape'){close();trigger.focus();}});
+ wrap.append(trigger,menu);actions.append(wrap);
+}
 function syncStudentPortalHeader(){
  // The student portal uses the actual teacher header DOM, not a second brand implementation.
  const portal=document.getElementById('student-public-view');
@@ -2003,17 +2017,6 @@ function syncStudentPortalHeader(){
    const actions=document.createElement('div');
    actions.className='pp-student-header-actions app-header-actions';
    actions.append(balanceCard);
-   const theme=document.createElement('button');
-   theme.type='button';
-   theme.className='pp-student-theme-toggle';
-   theme.setAttribute('aria-label','Toggle theme');
-   theme.title='Toggle light / dark theme';
-   theme.textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾';
-   theme.addEventListener('click',()=>{
-     if(typeof toggleDarkMode==='function')toggleDarkMode();
-     theme.textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾';
-   });
-   actions.append(theme);
    // Move the existing student name node (not a duplicate) to the far right.
    // The dashboard renderer can continue updating #public-student-title.
    const studentTitle=document.getElementById('public-student-title');
@@ -2025,6 +2028,7 @@ function syncStudentPortalHeader(){
      actions.append(greeting);
    }
    header.append(actions);
+   installStudentProfileMenu(actions);
  }
 }
 function ensureStudentPortalLayout(){
@@ -2148,8 +2152,7 @@ function showPublicLessonMaterial(data,studentId,lessonId){
    back.addEventListener('click',()=>{sessionStorage.removeItem('pp-student-live-lesson');overlay._classroomCleanup?.();overlay.remove();});
    const actions=header.querySelector('.pp-student-header-actions');
    if(actions){
-     const theme=actions.querySelector('.pp-student-theme-toggle');
-     if(theme)theme.addEventListener('click',()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();theme.textContent=document.documentElement.dataset.theme==='dark'?'☀':'☾';});
+     installStudentProfileMenu(actions);
      actions.prepend(back);
    }else header.append(back);
    overlay.append(header);
