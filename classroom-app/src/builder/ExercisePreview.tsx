@@ -17,6 +17,7 @@ import {PreviewControls,PreviewNotes} from './PreviewWorkspaceTools';
 import {ui} from '../i18n';
 import {FormattedText,formatOf} from './textFormatting';
 import {exerciseLabel} from './commands';
+import {supabase} from '../supabase';
 
 // Presentation hints only. Typed answers and drag/drop retain their existing formats.
 export function previewWordBank(block:Block):string[]{
@@ -68,8 +69,15 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  const ordered=[...plan.stages.flatMap(s=>plan.blocks.filter(b=>b.stage===s.id&&!b.hiddenFromStudent)),...plan.blocks.filter(b=>!b.hiddenFromStudent&&!plan.stages.some(s=>s.id===b.stage))];
  const steps:Block[][]=[];ordered.forEach(b=>{const last=steps[steps.length-1];if((b as Block&{joinPrevious?:boolean}).joinPrevious&&last?.[last.length-1].stage===b.stage)last.push(b);else steps.push([b]);});
  const [notesOpen,setNotesOpen]=useState(false),[teacherHints,setTeacherHints]=useState(!studentMode);
- const [studentNavOpen,setStudentNavOpen]=useState(false);
- const [index,setIndex]=useState(()=>{if(studentMode){try{const saved=sessionStorage.getItem(scopeKey+':exercise');const found=steps.findIndex(group=>group.some(b=>b.id===saved));if(found>=0)return found;}catch{}}return Math.max(0,steps.findIndex(group=>group.some(b=>b.id===selected)));});useEffect(()=>{if(studentMode&&steps[index]?.[0]){try{sessionStorage.setItem(scopeKey+':exercise',steps[index][0].id);}catch{}}},[index,studentMode,scopeKey,steps.length]);const safeIndex=Math.min(index,Math.max(0,steps.length-1)),block=steps[safeIndex]?.[0],stage=block?plan.stages.find(s=>s.id===block.stage):undefined;
+ const [studentNavOpen,setStudentNavOpen]=useState(false),[followEnabled,setFollowEnabled]=useState(false),[studentExercise,setStudentExercise]=useState<string|null>(null);
+ const [index,setIndex]=useState(()=>{if(studentMode){try{const saved=sessionStorage.getItem(scopeKey+':exercise');const found=steps.findIndex(group=>group.some(b=>b.id===saved));if(found>=0)return found;}catch{}}return Math.max(0,steps.findIndex(group=>group.some(b=>b.id===selected)));});
+ const safeIndex=Math.min(index,Math.max(0,steps.length-1)),block=steps[safeIndex]?.[0],stage=block?plan.stages.find(s=>s.id===block.stage):undefined;
+ const navChannel=useRef<ReturnType<typeof supabase.channel>|null>(null),followRef=useRef(false);
+ useEffect(()=>{followRef.current=followEnabled;},[followEnabled]);
+ useEffect(()=>{if(!liveSessionId)return;const channel=supabase.channel('classroom-follow:'+liveSessionId,{config:{broadcast:{self:false}}});navChannel.current=channel;channel.on('broadcast',{event:'lesson-navigation'},({payload})=>{if(!payload)return;if(studentMode&&payload.type==='teacher-position'&&payload.exerciseId&&payload.force!==false){const next=steps.findIndex(group=>group.some(b=>b.id===payload.exerciseId));if(next>=0)setIndex(next);}else if(!studentMode&&payload.type==='student-position'&&payload.exerciseId)setStudentExercise(payload.exerciseId);}).subscribe(()=>{if(studentMode&&steps[safeIndex]?.[0])void channel.send({type:'broadcast',event:'lesson-navigation',payload:{type:'student-position',exerciseId:steps[safeIndex][0].id}});});return()=>{navChannel.current=null;void supabase.removeChannel(channel);};},[liveSessionId,studentMode,steps.length]);
+ useEffect(()=>{const exerciseId=steps[safeIndex]?.[0]?.id;if(!exerciseId)return;if(studentMode){try{sessionStorage.setItem(scopeKey+':exercise',exerciseId);}catch{}if(navChannel.current)void navChannel.current.send({type:'broadcast',event:'lesson-navigation',payload:{type:'student-position',exerciseId}});}else if(followEnabled&&navChannel.current){void navChannel.current.send({type:'broadcast',event:'lesson-navigation',payload:{type:'teacher-position',exerciseId,force:true}});}},[safeIndex,studentMode,scopeKey,steps.length,followEnabled]);
+ function bringStudentHere(){const exerciseId=steps[safeIndex]?.[0]?.id;if(!exerciseId||!navChannel.current)return;void navChannel.current.send({type:'broadcast',event:'lesson-navigation',payload:{type:'teacher-position',exerciseId,force:true}});}
+ const studentAway=!studentMode&&!!studentExercise&&studentExercise!==block?.id;
  return <section className="mb-builder mb-student-preview" aria-label={ui('Student preview')}>
   <div className="mb-preview-top">
    <div className="mb-preview-heading-row">
@@ -78,7 +86,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
    </div>
    <div className="mb-preview-tools-row">
     {!studentMode&&<label className="mb-teacher-hints-toggle"><input type="checkbox" checked={teacherHints} onChange={e=>setTeacherHints(e.target.checked)}/> {ui('Teacher Hints')}</label>}
-    <PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} liveSessionId={liveSessionId} onNotes={()=>setNotesOpen(true)}/>
+    <PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} liveSessionId={liveSessionId} onNotes={()=>setNotesOpen(true)} followEnabled={followEnabled} studentAway={studentAway} onToggleFollow={()=>{const next=!followEnabled;setFollowEnabled(next);if(next)bringStudentHere();}} onBringHere={bringStudentHere}/>
    </div>
   </div><div className="mb-preview-workspace">
   {block?<article id="activity" className="mb-student-card" key={block.id}><div className="mb-student-body">{steps[safeIndex].map(element=><section className="mb-combined-element" key={element.id} data-preview-element={element.id}>{!studentMode&&element.teacherNote?.trim()&&<aside className="mb-preview-teacher-note" aria-label={ui('Teacher note')}><strong>{ui('Teacher note')} · {ui('Visible only to teacher')}</strong><p>{element.teacherNote}</p></aside>}<h2 className="mb-preview-instruction">{element.title}</h2><ExercisePresentation block={element} assetScope={assetScope} teacherHints={teacherHints}/></section>)}</div>
