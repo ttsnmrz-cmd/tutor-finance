@@ -2,7 +2,7 @@ import {blankLetterWord} from './letterData';
 import {blankSentence} from './sentenceData';
 import {blankColumns,blankColumnWord} from './ColumnsExercise';
 import {blankStatement} from './TrueFalseExercise';
-import {builderType,isInlineChoice,isColumns,isSentence,isTypedGap,isLetters,isGallery,isImageLabeling,blankChoiceQuestion,type BuilderExerciseType} from './choiceData';
+import {isVocabularyList,builderType,isInlineChoice,isColumns,isSentence,isTypedGap,isLetters,isGallery,isImageLabeling,blankChoiceQuestion,type BuilderExerciseType} from './choiceData';
 import type {Block} from '../planning/model';
 import {formatOf,formatPatch} from './textFormatting';
 type Backup={at:string;block:Block};
@@ -20,6 +20,7 @@ export function hasUnconvertedPairs(block:Block){return block.type==='gaps'&&!/_
 
 export function switchBlockType(block:Block,type:BuilderExerciseType):Block{
  if(type===builderType(block))return block;
+ if(isVocabularyList(block))block={...block,choiceMode:undefined} as Block;
  if(isImageLabeling(block))block={...block,choiceMode:undefined} as Block;
  if(isGallery(block))block={...block,choiceMode:undefined} as Block;
  if(isTypedGap(block))block={...block,choiceMode:undefined} as Block;
@@ -27,6 +28,7 @@ export function switchBlockType(block:Block,type:BuilderExerciseType):Block{
  if(isSentence(block)){const {typeConversionBackups=[],...source}=block as ArchivedBlock;const content=[block.content,...block.items.map(i=>i.prompt)].filter(Boolean).join('\n');block={...block,...formatPatch(block,'content',content,escapeText(content)),content,items:[],choiceMode:undefined,typeConversionBackups:[...typeConversionBackups,{at:new Date().toISOString(),block:structuredClone(source)}]} as Block;}
  if(isColumns(block)){const {typeConversionBackups=[],...source}=block as ArchivedBlock;const cols=(block as Block&{columns:{id:string;title:string}[]}).columns||[];const list=cols.map(c=>c.title+'\n'+block.items.filter(i=>i.expected===c.id).map(i=>'- '+i.prompt).join('\n')).join('\n\n');const content=[block.content,list].filter(Boolean).join('\n\n');block={...block,...formatPatch(block,'content',content,escapeText(content)),content,items:[],choiceMode:undefined,typeConversionBackups:[...typeConversionBackups,{at:new Date().toISOString(),block:structuredClone(source)}]} as Block;}
  if(isInlineChoice(block)){const original=structuredClone(block),items=block.items as (Block['items'][number]&{inlineChoiceId?:string})[];const replace=(value:string,html=false)=>value.replace(/⟦choice:([a-f0-9-]+)⟧/g,(_,id)=>{const item=items.find(i=>i.inlineChoiceId===id),text=item?[(item.options||[]).join(' / ')].join(''):'';return html?escapeText(text):text;});const content=replace(block.content),html=replace(formatOf(block,'content',block.content)||escapeText(block.content),true);block={...block,...formatPatch(block,'content',content,html),content,items:[],choiceMode:undefined,typeConversionBackups:[...((block as ArchivedBlock).typeConversionBackups||[]),{at:new Date().toISOString(),block:original}]} as Block;}
+ if(type==='vocabulary_list')return {...block,type:'text',choiceMode:'vocabulary_list',wordsPerColumn:5} as Block;
  if(type==='image_labeling'){const {typeConversionBackups=[],...source}=block as ArchivedBlock;return {...block,type:'text',choiceMode:'image_labeling',labelZones:[],labelDistractors:[],items:[],typeConversionBackups:[...typeConversionBackups,{at:new Date().toISOString(),block:structuredClone(source)}]} as Block;}
  if(type==='gallery'){const {typeConversionBackups=[],...source}=block as ArchivedBlock;const flattened=block.items.length?matchingToGapText(block):block;return {...flattened,type:'text',choiceMode:'gallery',galleryImages:(block as Block&{galleryImages?:unknown[]}).galleryImages||[],items:[],typeConversionBackups:[...typeConversionBackups,{at:new Date().toISOString(),block:structuredClone(source)}]} as Block;}
  if(type==='typed_gap'){const next=switchBlockType(block,'gaps');return {...next,choiceMode:'typed'} as Block;}
