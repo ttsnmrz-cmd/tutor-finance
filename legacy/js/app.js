@@ -2143,7 +2143,23 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  richNotes.textContent=noteArea.placeholder;
  noteArea.replaceWith(richNotes);
  let previousNotes=null;
- function renderNotes(value){
+ async function refreshNotes(){
+   if(!richNotes.isConnected)return;
+   try{
+     const response=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:lessonId});
+     if(!richNotes.isConnected)return;
+     if(response.error){if(previousNotes===null)richNotes.textContent='Could not load teacher notes. Retrying…';}
+     else{const next=JSON.stringify(response.data);if(next!==previousNotes){previousNotes=next;renderSharedLessonNotes(richNotes,response.data);}}
+   }catch{if(previousNotes===null&&richNotes.isConnected)richNotes.textContent='Could not load teacher notes. Retrying…';}
+   finally{if(richNotes.isConnected)setTimeout(refreshNotes,1500);}
+ }
+ void refreshNotes();
+
+ if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);
+ else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
+}
+
+function renderSharedLessonNotes(richNotes,value){
    const html=String(value?.html||'');
    if(!html){richNotes.textContent=value?.plain||'No teacher notes yet.';return;}
    const doc=new DOMParser().parseFromString(html,'text/html');
@@ -2169,28 +2185,13 @@ function showPublicLessonMaterial(data,studentId,lessonId){
    for(const child of doc.body.childNodes)copy(child,fragment);
    richNotes.replaceChildren(fragment);
  }
- async function refreshNotes(){
-   if(!richNotes.isConnected)return;
-   try{
-     const response=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:lessonId});
-     if(!richNotes.isConnected)return;
-     if(response.error){if(previousNotes===null)richNotes.textContent='Could not load teacher notes. Retrying…';}
-     else{const next=JSON.stringify(response.data);if(next!==previousNotes){previousNotes=next;renderNotes(response.data);}}
-   }catch{if(previousNotes===null&&richNotes.isConnected)richNotes.textContent='Could not load teacher notes. Retrying…';}
-   finally{if(richNotes.isConnected)setTimeout(refreshNotes,1500);}
- }
- void refreshNotes();
-
- if(typeof window.mountProfiProfitStudentLesson==='function')window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);
- else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!document.body.contains(host)){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);window.mountProfiProfitStudentLesson(host,data.plan,supabaseClient);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
-}
 
 function renderPublicLessonsHistory(rows){
  const el=document.getElementById('public-lessons-history');if(!el)return;
- const past=rows.filter(l=>['conducted','completed'].includes(l.status)).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+ const past=Array.from(new Map(rows.filter(l=>['conducted','completed'].includes(l.status)).map(l=>[String(l.id),l])).values()).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
  el.replaceChildren();
  if(!past.length){el.textContent='No completed lessons yet.';return;}
- past.forEach(l=>{const card=document.createElement('button');card.type='button';card.className='pp-student-lesson-row';card.textContent=l.date+' · '+displayTime(l.time);card.addEventListener('click',()=>{const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;dialog.querySelector('[data-lesson-heading]').textContent=l.date+' · '+displayTime(l.time);dialog.querySelector('[data-lesson-notes]').textContent=l.notes||l.teacher_notes||'No teacher notes have been shared for this lesson yet.';dialog.showModal();});el.append(card);});
+ past.forEach(l=>{const card=document.createElement('button');card.type='button';card.className='pp-student-lesson-row';card.textContent=l.date+' · '+displayTime(l.time);card.addEventListener('click',async()=>{const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;const target=dialog.querySelector('[data-lesson-notes]');const request=crypto.randomUUID();target.dataset.request=request;dialog.querySelector('[data-lesson-heading]').textContent=l.date+' · '+displayTime(l.time);target.textContent='Loading notes…';dialog.showModal();try{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:new URLSearchParams(location.search).get('student'),p_calendar_lesson_id:Number(l.id)});if(target.dataset.request!==request||!dialog.open)return;if(error)throw error;renderSharedLessonNotes(target,data);}catch{if(target.dataset.request===request&&dialog.open)target.textContent='Could not load notes. Please try again.';}});el.append(card);});
 }
 function changePublicStudentWeek(offset){
   if(!publicStudentWeekAnchor)return;
