@@ -672,6 +672,7 @@ async function openStudentEdit(id){
   document.getElementById('student-edit-id').value=id;
   document.getElementById('student-edit-name').value=s.name;
   document.getElementById('student-edit-email').value=s.email||'';
+  document.getElementById('student-edit-meet').value=s.google_meet_url||'';
   document.getElementById('student-edit-telegram').value=s.telegram||'';
   document.getElementById('student-edit-price').value=
     String(s.price??40);
@@ -736,6 +737,8 @@ async function saveStudent(){
 
     if(!s||!name)return;
 
+    const google_meet_url=document.getElementById('student-edit-meet').value.trim()||null;
+    if(google_meet_url&&!/^https:\/\/meet\.google\.com\/[a-zA-Z0-9_-]+(?:\?[^\s#]*)?$/.test(google_meet_url)){switchStudentSettingsTab('general');alert(document.documentElement.lang==='en'?'Enter a valid Google Meet link.':'Введите корректную ссылку Google Meet.');return;}
     const oldPrice=Number(s.price??40);
     const priceChanged=Number.isFinite(price)&&price!==oldPrice;
     const updateFuturePrices=priceChanged&&confirm(
@@ -770,6 +773,7 @@ async function saveStudent(){
           price,
           email,
           telegram,
+          google_meet_url,
           telegram_notify_1h,
           telegram_notify_10m,
           telegram_notify_changes,
