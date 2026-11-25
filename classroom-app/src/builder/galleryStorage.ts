@@ -33,6 +33,12 @@ export async function uploadClassroomImage(file:File):Promise<GalleryImage>{
  return {id,name:file.name,caption:'',storagePath:path};
 }
 export async function classroomImageUrl(image:GalleryImage,scope:string):Promise<{src:string;revoke?:()=>void}>{
+ if(image.storagePath&&scope.startsWith('public-image:')){
+ const context=JSON.parse(scope.slice('public-image:'.length));
+ const {data,error}=await supabase.functions.invoke('student-material-image',{body:{...context,path:image.storagePath}});
+ if(error||!data?.signedUrl)throw Error('Unable to open image. Check your access.');
+ return {src:data.signedUrl};
+ }
  if(image.storagePath){const {data,error}=await supabase.storage.from(BUCKET).createSignedUrl(image.storagePath,3600);if(error||!data?.signedUrl)throw Error('Unable to open image. Check your access.');return {src:data.signedUrl};}
  const blob=await loadLocalImage(scope,image.id),src=URL.createObjectURL(blob);return {src,revoke:()=>URL.revokeObjectURL(src)};
 }
