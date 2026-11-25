@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
       if (!ids.length) continue;
       const { data: students, error: studentsError } = await db
         .from("students")
-        .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived,price")
+        .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived,price,google_meet_url")
         .in("id", ids)
         .eq("teacher_id", lesson.teacher_id)
         .eq("archived", false);
@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
       } else {
         const { data, error } = await db
           .from("students")
-          .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived,price")
+          .select("id,name,telegram_chat_id,telegram_notify_1h,telegram_notify_10m,timezone,archived,price,google_meet_url")
           .eq("id", lesson.student_id)
           .eq("teacher_id", lesson.teacher_id)
           .eq("archived", false);
@@ -247,10 +247,11 @@ Deno.serve(async (req) => {
       const enabled = type === "1h" ? student.telegram_notify_1h : student.telegram_notify_10m;
       if (!enabled || !student.telegram_chat_id) { skipped++; continue; }
 
-      const text = reminderText(type, start, student.timezone || timezone);
+      const meet = typeof student.google_meet_url === 'string' && /^https:\/\/meet\.google\.com\/[a-zA-Z0-9_-]+(?:\?[^\s#]*)?$/.test(student.google_meet_url) ? student.google_meet_url : '';
+      const text = reminderText(type, start, student.timezone || timezone) + (type === '10m' && meet ? `\n\nGoogle Meet: ${meet}` : '');
       if (!deliveryEnabled) {
         dryRun++;
-        console.log("DRY RUN reminder", { lesson_id: lesson.id, student_id: student.id, type, text });
+        console.log("DRY RUN reminder", { lesson_id: lesson.id, student_id: student.id, type });
         continue;
       }
 
