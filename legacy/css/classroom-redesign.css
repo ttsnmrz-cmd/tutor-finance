@@ -750,3 +750,7 @@ dialog.app-card .student-theme-panel{border:1px solid var(--border-color);border
 #student-live-material[data-mode="homework"] .pp-homework-submit:disabled{opacity:.55;cursor:wait}
 #student-live-material[data-mode="homework"] .pp-homework-submit[hidden]{display:none!important}
 #student-live-material[data-mode="homework"] .mb-student-card{border-color:var(--border-color)!important;border-radius:12px!important}
+
+#public-week-calendar .calendar-day-column{min-height:132px!important;padding-bottom:12px!important}
+#public-week-calendar .calendar-event-card{cursor:default!important;min-height:64px!important;padding-block:9px!important}
+#public-week-calendar{padding-bottom:0!important;align-items:stretch}
