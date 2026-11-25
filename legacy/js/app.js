@@ -2241,7 +2241,14 @@ async function renderPublicLessonsHistory(rows){
  const layout=document.createElement('div');layout.className='pp-history-split';
  const makeColumn=title=>{const col=document.createElement('section'),heading=document.createElement('h3'),list=document.createElement('div');heading.textContent=title;list.className='pp-history-list';col.append(heading,list);layout.append(col);return list;};
  const lessons=makeColumn('Lessons'),notes=makeColumn('Notes');el.replaceChildren(layout);
- const cards=new Map();
+ const cards=new Map(),withNotes=new Set();
+ const filterLabel=document.createElement('label');filterLabel.style.cssText='display:flex;align-items:center;gap:8px;margin:8px 0 12px;font-size:13px;cursor:pointer';
+ const filter=document.createElement('input');filter.type='checkbox';filter.style.cssText='width:16px!important;height:16px!important;min-height:0!important;flex:none;accent-color:#70509e';filter.disabled=true;
+ const tr=(en,ru)=>document.documentElement.lang==='ru'?ru:en;
+ filterLabel.append(filter,document.createTextNode(tr('Only lessons with notes','Только занятия с заметками')));lessons.before(filterLabel);
+ const empty=document.createElement('p');empty.textContent=tr('No lessons with notes','Нет занятий с заметками');empty.style.display='none';lessons.append(empty);
+ function applyNotesFilter(){for(const [id,button] of cards)button.style.display=filter.checked&&!withNotes.has(String(id))?'none':'';empty.style.display=filter.checked&&!withNotes.size?'':'none';}
+ filter.onchange=applyNotesFilter;
  function label(l){return historyDateLabel(l.date);}
  function open(l,value){const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;dialog.querySelector('[data-lesson-heading]').textContent=(historyMaterialTitle(value?.title)?historyMaterialTitle(value.title)+' · ':'')+label(l);renderSharedLessonNotes(dialog.querySelector('[data-lesson-notes]'),value);if(!dialog.open)dialog.showModal();}
  function card(l){const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=label(l);return button;}
@@ -2249,9 +2256,10 @@ async function renderPublicLessonsHistory(rows){
  if(!past.length){lessons.textContent='No completed lessons yet.';notes.textContent='No notes yet.';return;}
  notes.textContent='Loading notes…';let found=0,failed=false;
  for(let i=0;i<past.length;i+=8){const batch=await Promise.all(past.slice(i,i+8).map(async l=>{try{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});return {l,data,error};}catch(error){return {l,error};}}));if(!layout.isConnected)return;
- for(const {l,data,error} of batch){if(error){failed=true;continue;}const plain=String(data?.plain||'').trim();if(!plain)continue;if(!found++)notes.replaceChildren();const mark=document.createElement('span');mark.textContent=' ▤';mark.title='Has notes';cards.get(l.id)?.append(mark);const button=card(l);if(historyMaterialTitle(data?.title)){const heading=document.createElement('strong');heading.className='pp-note-title';heading.textContent=historyMaterialTitle(data.title);button.prepend(heading);}const excerpt=document.createElement('small');excerpt.textContent=plain.slice(0,140)+(plain.length>140?'…':'');button.append(excerpt);button.onclick=()=>open(l,data);notes.append(button);}
+ for(const {l,data,error} of batch){if(error){failed=true;continue;}const plain=String(data?.plain||'').trim();if(!plain)continue;withNotes.add(String(l.id));if(!found++)notes.replaceChildren();const mark=document.createElement('span');mark.textContent=' ▤';mark.title='Has notes';cards.get(l.id)?.append(mark);const button=card(l);if(historyMaterialTitle(data?.title)){const heading=document.createElement('strong');heading.className='pp-note-title';heading.textContent=historyMaterialTitle(data.title);button.prepend(heading);}const excerpt=document.createElement('small');excerpt.textContent=plain.slice(0,140)+(plain.length>140?'…':'');button.append(excerpt);button.onclick=()=>open(l,data);notes.append(button);}
  }
- if(!found)notes.textContent=failed?'Could not load all notes.':'No notes yet.';
+ filter.disabled=failed;applyNotesFilter();
+ if(!found)notes.textContent=failed?tr('Could not load all notes.','Не удалось загрузить все заметки.'):tr('No notes yet.','Пока нет заметок.');
 }
 function changePublicStudentWeek(offset){
   if(!publicStudentWeekAnchor)return;
