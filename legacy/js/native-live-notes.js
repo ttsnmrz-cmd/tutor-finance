@@ -15,8 +15,8 @@ async function renderNativeLessonNotes(student){
   if(!user.data?.user){root.textContent='Sign in to view notes';return;}
   const ids=new Map();
   for(let i=0;i<past.length;i+=100){const result=await supabaseClient.from('calendar_live_notes').select('lesson_id,plain,title').eq('teacher_id',user.data.user.id).in('lesson_id',past.slice(i,i+100).map(l=>l.id));if(!root.isConnected)return;if(result.error){root.textContent='Could not load notes';return;}for(const row of result.data||[])if(String(row.plain||'').trim())ids.set(String(row.lesson_id),row);}
-  const lessonsForStudent=past.sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
-  if(!lessonsForStudent.length){root.innerHTML='<p class="native-history-empty">No past lessons.</p>';return;}
+  const lessonsForStudent=past.filter(l=>ids.has(String(l.id))).sort((a,b)=>(String(b.date||'')+' '+String(b.time||'')).localeCompare(String(a.date||'')+' '+String(a.time||'')));
+  if(!lessonsForStudent.length){root.textContent=document.documentElement.lang==='ru'?'Пока нет заметок к занятиям.':'No lesson notes yet.';return;}
   root.replaceChildren();
   const layout=document.createElement('div');layout.className='pp-history-split';
   const ru=document.documentElement.lang==='ru';
