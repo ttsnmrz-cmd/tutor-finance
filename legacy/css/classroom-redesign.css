@@ -788,3 +788,15 @@ html[data-theme="dark"] dialog.pp-homework-assign-dialog :is(select,textarea,inp
  #student-public-view .pp-student-header-actions{flex:1 1 100%!important;justify-content:space-between!important}
  #student-public-view .pp-student-quick-actions .pp-student-join{flex:1 1 140px}
 }
+
+/* Student settings: clear selected tab and Telegram connection action. */
+#student-modal .student-settings-tabs button{font-weight:600!important;background:transparent!important;color:#51465f!important;border:1px solid #cfc5dc!important}
+#student-modal .student-settings-tabs button[aria-pressed="true"]{background:#4e2a84!important;color:#fff!important;border-color:#4e2a84!important;box-shadow:inset 0 -3px 0 #d8c4f4!important}
+#student-modal #student-telegram-link-button{background:#4e2a84!important;color:#fff!important;border:1px solid #4e2a84!important;font-weight:600!important;padding:10px 12px!important}
+#student-modal #student-telegram-link-button:not(:disabled):hover{background:#623b99!important}
+html[data-theme="dark"] #student-modal .student-settings-tabs button{background:#24202e!important;color:#d7cfe2!important;border-color:#51465f!important}
+html[data-theme="dark"] #student-modal .student-settings-tabs button[aria-pressed="true"]{background:#70509e!important;color:#fff!important;border-color:#c8a9f0!important;box-shadow:inset 0 -3px 0 #d8c4f4!important}
+html[data-theme="dark"] #student-modal #student-telegram-link-button{background:#70509e!important;color:#fff!important;border-color:#a88acb!important}
+html[data-theme="dark"] #student-modal #student-telegram-link-button:not(:disabled):hover{background:#805eb0!important}
+#student-modal #student-telegram-link-button:disabled{opacity:.55!important;cursor:not-allowed!important}
+#student-modal :is(.student-settings-tabs button,#student-telegram-link-button):focus-visible{outline:2px solid #a88acb!important;outline-offset:3px}
