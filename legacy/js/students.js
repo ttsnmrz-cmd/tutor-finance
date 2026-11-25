@@ -1644,8 +1644,9 @@ async function renderNativeHomework(studentId){
  try{
   const rows=await db('/homework_assignments?select=id,title,status,assigned_at,due_date,instructions&student_id=eq.'+encodeURIComponent(studentId)+'&order=assigned_at.desc',{headers});
   if(!panel.isConnected)return;
-  panel.innerHTML='<div class="native-section-heading"><h3>'+tr('Homework','Домашняя работа')+'</h3><button type="button" class="native-add-button" data-assign>+ '+tr('Assign homework','Назначить')+'</button></div><div class="native-history-scroll">'+(rows.map(r=>'<div class="native-history-row"><strong>'+esc(r.title)+'</strong><span>'+esc(String(r.assigned_at).slice(0,10))+'</span><span>'+esc(r.due_date||'—')+'</span><span>'+esc(({assigned:tr('Assigned','Назначено'),in_progress:tr('In progress','В процессе'),submitted:tr('Submitted','Сдано'),reviewed:tr('Reviewed','Проверено'),returned:tr('Returned','На исправлении')})[r.status]||r.status)+'</span></div>').join('')||'<p class="native-history-empty">'+tr('No homework assigned','Нет домашних заданий')+'</p>')+'</div>';
+  panel.innerHTML='<div class="native-section-heading"><h3>'+tr('Homework','Домашняя работа')+'</h3><button type="button" class="native-add-button" data-assign>+ '+tr('Assign homework','Назначить')+'</button></div><div class="native-history-scroll">'+(rows.map(r=>'<button type="button" data-homework-id="'+esc(r.id)+'" class="native-history-row"><strong>'+esc(r.title)+'</strong><span>'+esc(String(r.assigned_at).slice(0,10))+'</span><span>'+esc(r.due_date||'—')+'</span><span>'+esc(({assigned:tr('Assigned','Назначено'),in_progress:tr('In progress','В процессе'),submitted:tr('Submitted','Сдано'),reviewed:tr('Reviewed','Проверено'),returned:tr('Returned','На исправлении')})[r.status]||r.status)+'</span></button>').join('')||'<p class="native-history-empty">'+tr('No homework assigned','Нет домашних заданий')+'</p>')+'</div>';
   panel.querySelector('[data-assign]').onclick=()=>openNativeHomeworkAssign(studentId);
+  panel.querySelectorAll('[data-homework-id]').forEach(b=>b.onclick=()=>openNativeHomeworkReview(studentId,b.dataset.homeworkId));
  }catch(e){if(panel.isConnected)panel.textContent=String(e.message||e);}
 }
 async function openNativeHomeworkAssign(studentId){
@@ -1663,4 +1664,37 @@ async function openNativeHomeworkAssign(studentId){
  select.onchange=()=>{submit.disabled=!select.value;};
  }catch(e){status.textContent=String(e.message||e);}
  form.onsubmit=async e=>{e.preventDefault();if(!select.value||submit.disabled)return;submit.disabled=true;try{const [plan,section]=JSON.parse(select.value);await db('/rpc/assign_homework',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({p_student_id:studentId,p_plan_id:plan,p_section_id:section,p_due_date:form.elements.due.value||null,p_instructions:form.elements.comment.value})});d.close();if(String(nativeSelectedStudentId)===String(studentId)&&nativeStudentDetailTab==='homework')renderNativeHomework(studentId);}catch(err){status.textContent=String(err.message||err);submit.disabled=false;}};
+}
+
+async function openNativeHomeworkReview(studentId,assignmentId){
+ const tr=(en,ru)=>window.getLanguage?.()==='en'?en:ru;
+ const d=document.createElement('dialog');d.className='app-card';d.style.width='min(1100px,94vw)';
+ const title=document.createElement('h2');title.textContent=tr('Homework review','Проверка домашней работы');
+ const close=document.createElement('button');close.type='button';close.className='pp-student-return';close.textContent=tr('Close','Закрыть');close.onclick=()=>d.close();
+ const host=document.createElement('div');host.textContent=tr('Loading…','Загрузка…');
+ const feedback=document.createElement('textarea');feedback.placeholder=tr('Teacher feedback','Комментарий преподавателя');
+ const status=document.createElement('p');status.setAttribute('role','status');
+ const actions=document.createElement('div');actions.style.cssText='display:flex;gap:12px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap';
+ const accept=document.createElement('button'),sendBack=document.createElement('button');
+ for(const b of [accept,sendBack]){b.type='button';b.className='native-add-button';b.disabled=true;}
+ accept.textContent=tr('Mark as reviewed','Принять работу');sendBack.textContent=tr('Return for correction','Вернуть на исправление');
+ actions.append(sendBack,accept);d.append(title,close,host,feedback,status,actions);document.body.append(d);
+ let cleanup;d.addEventListener('close',()=>{cleanup?.();d.remove();},{once:true});d.showModal();
+ try{
+  const rows=await db('/homework_assignments?select=id,title,status,material_snapshot,answers,teacher_feedback&student_id=eq.'+encodeURIComponent(studentId)+'&id=eq.'+encodeURIComponent(assignmentId),{headers});
+  const row=rows?.[0];if(!row)throw Error(tr('Homework not found','Задание не найдено'));if(!d.isConnected)return;
+  title.textContent=row.title+' · '+tr('Homework review','Проверка домашней работы');
+  feedback.value=row.teacher_feedback||'';feedback.readOnly=row.status!=='submitted';
+  accept.disabled=sendBack.disabled=row.status!=='submitted';
+  const plan={...row.material_snapshot,stages:row.material_snapshot.stages.map(s=>({...s,homework:false}))};
+  let attempts=0;
+  function mount(){if(!host.isConnected)return;if(typeof window.mountProfiProfitHomework==='function'){host.replaceChildren();cleanup=window.mountProfiProfitHomework(host,plan,supabaseClient,{id:'review:'+row.id,answers:row.answers||{},readOnly:true,onChange:()=>{}});}else if(++attempts<30)setTimeout(mount,300);else host.textContent=tr('Classroom unavailable','Редактор недоступен');}
+  mount();
+  async function review(returned){
+   accept.disabled=sendBack.disabled=true;
+   try{await db('/rpc/review_homework',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({p_assignment_id:row.id,p_feedback:feedback.value,p_return:returned})});d.close();if(String(nativeSelectedStudentId)===String(studentId)&&nativeStudentDetailTab==='homework')void renderNativeHomework(studentId);}
+   catch(e){status.textContent=String(e.message||e);accept.disabled=sendBack.disabled=false;}
+  }
+  accept.onclick=()=>review(false);sendBack.onclick=()=>review(true);
+ }catch(e){host.textContent=String(e.message||e);}
 }
