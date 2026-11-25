@@ -6,12 +6,12 @@ import {isVocabularyList,isMultipleChoice,isInlineChoice,isColumns,isSentence,is
 import type {Block,Plan,Stage} from '../planning/model';
 
 export function addSection(plan:Plan,name:string):{plan:Plan;section:Stage}{
- const section:Stage={id:crypto.randomUUID(),name,purpose:'',minutes:0,notes:'',reflection:false,homework:false};
+ const section:Stage={id:crypto.randomUUID(),name,purpose:'',minutes:0,notes:'',reflection:false,homework:name.trim().toLowerCase()==='homework'};
  return {plan:{...plan,stages:[...plan.stages,section]},section};
 }
 export function addExercise(plan:Plan,stage:string,type:BuilderExerciseType,title:string):{plan:Plan;block:Block}{
  if(!plan.stages.some(s=>s.id===stage))throw Error('Choose an existing section.');
- const block:Block={id:crypto.randomUUID(),stage,type:type==='vocabulary_list'?'text':type==='image_labeling'?'text':type==='gallery'?'text':type==='typed_gap'?'gaps':type==='letters'?'ranking':type==='sentence'?'ranking':type==='columns'?'text':type==='inline_choice'?'text':type==='multiple_choice'?'questions':type,...(type==='vocabulary_list'?{choiceMode:'vocabulary_list',vocabularyWords:[],wordsPerColumn:5}:type==='image_labeling'?{choiceMode:'image_labeling',labelZones:[],labelDistractors:[]}:type==='gallery'?{choiceMode:'gallery',galleryImages:[]}:type==='typed_gap'?{choiceMode:'typed'}:type==='letters'?{choiceMode:'letters'}:type==='sentence'?{choiceMode:'sentence'}:type==='columns'?{choiceMode:'columns',columns:blankColumns()}:type==='inline_choice'?{choiceMode:'inline'}:type==='multiple_choice'?{choiceMode:'single'}:{}),title,instructions:'',content:'',items:type==='letters'?[blankLetterWord()]:type==='sentence'?[blankSentence()]:type==='matching'?[{prompt:'',expected:''}]:type==='multiple_choice'?[blankChoiceQuestion()]:type==='true_false'?[blankStatement()]:[],objectives:[],role:'practice',scope:'lesson',minutes:0};
+ const block:Block={id:crypto.randomUUID(),stage,type:type==='vocabulary_list'?'text':type==='image_labeling'?'text':type==='gallery'?'text':type==='typed_gap'?'gaps':type==='letters'?'ranking':type==='sentence'?'ranking':type==='columns'?'text':type==='inline_choice'?'text':type==='multiple_choice'?'questions':type,...(type==='vocabulary_list'?{choiceMode:'vocabulary_list',vocabularyWords:[],wordsPerColumn:5}:type==='image_labeling'?{choiceMode:'image_labeling',labelZones:[],labelDistractors:[]}:type==='gallery'?{choiceMode:'gallery',galleryImages:[]}:type==='typed_gap'?{choiceMode:'typed'}:type==='letters'?{choiceMode:'letters'}:type==='sentence'?{choiceMode:'sentence'}:type==='columns'?{choiceMode:'columns',columns:blankColumns()}:type==='inline_choice'?{choiceMode:'inline'}:type==='multiple_choice'?{choiceMode:'single'}:{}),title,instructions:'',content:'',items:type==='letters'?[blankLetterWord()]:type==='sentence'?[blankSentence()]:type==='matching'?[{prompt:'',expected:''}]:type==='multiple_choice'?[blankChoiceQuestion()]:type==='true_false'?[blankStatement()]:[],objectives:[],role:'practice',scope:plan.stages.find(s=>s.id===stage)?.homework?'homework':'lesson',minutes:0};
  if(type==='columns')block.items=[blankColumnWord((block as Block&{columns:{id:string}[]}).columns[0].id)];
  return {plan:{...plan,blocks:[...plan.blocks,block]},block};
 }
@@ -28,7 +28,7 @@ export function moveExercise(plan:Plan,id:string,stage:string,before?:string):Pl
  let index=blocks.length;
  if(before){index=blocks.findIndex(b=>b.id===before&&b.stage===stage);if(index<0)throw Error('Invalid move destination.');}
  else{for(let i=blocks.length-1;i>=0;i--)if(blocks[i].stage===stage){index=i+1;break;}}
- blocks.splice(index,0,{...block,stage});return {...plan,blocks};
+ blocks.splice(index,0,{...block,stage,scope:plan.stages.find(s=>s.id===stage)?.homework?'homework':'lesson'});return {...plan,blocks};
 }
 export function reorderSection(plan:Plan,id:string,before?:string):Plan{
  if(id===before)return plan;
