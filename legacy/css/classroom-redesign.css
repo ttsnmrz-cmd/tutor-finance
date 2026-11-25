@@ -710,3 +710,35 @@ html[data-theme="dark"] #student-live-material :is(.pp-student-header-balance,.p
 /* Builder and preview share the same content-sized outer shell. */
 #teacher-app #tab-materials:has(.ml-builder-host),#teacher-app #tab-materials:has(.ml-builder-host)>.app-card,#teacher-app #classroom-materials-root:has(.ml-builder-host),#teacher-app #classroom-materials-root .ml-builder-host,#teacher-app #classroom-materials-root .ml-preview:has(.ml-builder-host),#teacher-app #classroom-materials-root .ml-layout:has(.ml-builder-host){min-height:0!important;height:auto!important;padding-bottom:0!important;margin-bottom:0!important}
 #teacher-app #classroom-materials-root .ml-builder-host .mb-builder{min-height:0!important;height:auto!important;margin-bottom:0!important;padding-bottom:12px!important}
+
+
+/* Shared native cards and dialogs use the active application theme. */
+#tab-students .native-student-row,
+#tab-students .native-student-stats>div,
+#tab-students .native-history-row{background:var(--card-bg)!important;color:var(--text-color)!important;border-color:var(--border-color)!important}
+#tab-students .native-student-row.is-selected,
+#tab-students .native-student-row>.flex:hover{background:var(--accent-soft)!important}
+#tab-students .native-student-row.is-selected{border-color:var(--primary-color)!important}
+#tab-students .native-student-stats strong,
+#tab-students .native-history-row strong{color:var(--text-color)!important}
+#tab-students .native-student-stats span,
+#tab-students .native-detail-tabs button{color:var(--text-secondary)!important}
+#tab-students .native-detail-tabs button.is-active,
+#tab-students .native-section-heading button{color:var(--primary-color)!important}
+html[data-theme="dark"] #tab-students .native-detail-tabs button,
+html[data-theme="dark"] #tab-students .native-student-stats span{color:#c6bbd5!important}
+html[data-theme="dark"] #tab-students .native-detail-tabs button.is-active,
+html[data-theme="dark"] #tab-students .native-section-heading button{color:#d2b8ff!important}
+dialog.app-card[open]{position:fixed!important;inset:0!important;margin:auto!important;max-width:calc(100vw - 32px)!important;max-height:85dvh!important;height:fit-content!important;padding:24px!important;border:1px solid var(--border-color)!important;border-radius:18px!important;background:var(--card-bg)!important;color:var(--text-color)!important;overflow:auto!important;box-shadow:0 24px 80px #21163155!important}
+dialog.app-card::backdrop{background:rgba(25,20,40,.52)}
+dialog.app-card h2,dialog.app-card h3{font-weight:700;margin-bottom:8px}
+dialog.app-card label{display:grid;gap:6px}
+dialog.app-card :is(input,select,textarea){box-sizing:border-box;width:100%;min-height:42px;padding:9px 12px!important;border:1px solid var(--border-color)!important;border-radius:9px!important;background:var(--accent-soft)!important;color:var(--text-color)!important}
+dialog.app-card select option{background:var(--card-bg);color:var(--text-color)}
+html[data-theme="dark"] dialog.app-card{color-scheme:dark}
+dialog.app-card textarea{min-height:80px}
+dialog.app-card :is(.pp-student-join,.pp-student-return,[data-cancel]){padding:9px 14px;border:1px solid var(--border-color);border-radius:10px;font-weight:600;background:var(--accent-soft);color:var(--text-color)}
+dialog.app-card .pp-student-join{background:var(--primary-color);color:white}
+dialog.app-card .student-theme-panel{border:1px solid var(--border-color);border-radius:12px;background:var(--accent-soft);display:grid;gap:8px}
+#student-live-material[data-mode="homework"] .pp-student-live-main{background:var(--bg-color)!important;color:var(--text-color)!important;min-height:calc(100dvh - 100px)!important}
+#student-live-material[data-mode="homework"] .profiprofit-student-lesson{background:transparent!important}
