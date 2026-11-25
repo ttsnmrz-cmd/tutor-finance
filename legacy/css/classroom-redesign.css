@@ -804,3 +804,6 @@ html[data-theme="dark"] #student-modal #student-telegram-link-button:not(:disabl
 #teacher-header .pp-teacher-greeting{font-size:15px;font-weight:600;color:inherit;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-inline-end:8px}
 #teacher-header [data-platform-admin-entry][hidden]{display:none!important}
 @media(max-width:768px){#teacher-header .pp-teacher-greeting{max-width:130px;font-size:13px;margin-inline-end:0}}
+
+html[data-theme="dark"] #teacher-app .native-detail-tabs button.is-active{color:#fff!important;border-bottom:3px solid #e4d5ff!important;box-shadow:inset 0 -2px 0 #e4d5ff!important}
+html[data-theme="dark"] #teacher-app .native-detail-tabs button:not(.is-active){border-bottom-color:transparent!important;color:#b9afc7!important}
