@@ -450,6 +450,6 @@ dialog.mb-image-upload .mb-image-upload-tab{margin:0 0 12px}
 .mb-builder .mb-typed-gap-text input{margin-left:4px!important;margin-right:4px!important}
 
 /* Restore list markers removed by host resets in authored and rendered text. */
-.mb-builder :is(.mb-inline-editable,.mb-inline-paragraph,.mb-rich-input,.mb-gap-editable) ol{list-style:decimal outside!important;padding-inline-start:1.8em!important}
-.mb-builder :is(.mb-inline-editable,.mb-inline-paragraph,.mb-rich-input,.mb-gap-editable) ul{list-style:disc outside!important;padding-inline-start:1.8em!important}
-.mb-builder :is(.mb-inline-editable,.mb-inline-paragraph,.mb-rich-input,.mb-gap-editable) li{display:list-item!important;list-style:inherit!important}
+.mb-builder :is(.mb-inline-editable,.mb-inline-paragraph,.mb-rich-input,.mb-gap-editable,.mb-typed-gap-text,.mb-student-content) ol{list-style:decimal outside!important;padding-inline-start:1.8em!important}
+.mb-builder :is(.mb-inline-editable,.mb-inline-paragraph,.mb-rich-input,.mb-gap-editable,.mb-typed-gap-text,.mb-student-content) ul{list-style:disc outside!important;padding-inline-start:1.8em!important}
+.mb-builder :is(.mb-inline-editable,.mb-inline-paragraph,.mb-rich-input,.mb-gap-editable,.mb-typed-gap-text,.mb-student-content) li{display:list-item!important;list-style:inherit!important}
