@@ -778,3 +778,13 @@ html[data-theme="dark"] dialog.pp-homework-assign-dialog :is(select,textarea,inp
 @media(max-width:480px){
  #student-public-view .pp-student-header-actions .pp-student-join{flex:1 1 135px!important;min-height:44px!important}
 }
+
+/* Student dashboard: separate learning actions from account header. */
+#student-public-view .pp-student-header-actions{flex:1 1 auto!important;justify-content:flex-end!important;margin-left:auto!important}
+#student-public-view .pp-student-quick-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0 16px;min-width:0}
+#student-public-view .pp-student-quick-actions .pp-student-join{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;font-size:14px!important;padding:9px 16px!important;min-height:44px;white-space:normal;text-decoration:none;text-align:center}
+#student-public-view .pp-student-quick-actions .pp-student-meet{background:var(--card-bg)!important;color:var(--text-color)!important;border-color:var(--border-color)!important}
+@media(max-width:600px){
+ #student-public-view .pp-student-header-actions{flex:1 1 100%!important;justify-content:space-between!important}
+ #student-public-view .pp-student-quick-actions .pp-student-join{flex:1 1 140px}
+}
