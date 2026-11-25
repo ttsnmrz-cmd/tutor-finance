@@ -1892,7 +1892,7 @@ async function openPublicCalendarLesson(index){
  if(!l||['cancelled_free','cancelled_charge','rescheduled'].includes(l.status))return;
  const live=publicStudentLiveStatuses.get(String(l.id));
  if(!live?.has_material){window.alert('Please wait until your teacher assigns a material to this lesson.');return;}
- if(live.status!=='active'){window.alert(live.status==='completed'?'This lesson has ended.':'Your teacher has not started this lesson yet.');return;}
+
 
  const studentId=new URLSearchParams(location.search).get('student');
  try{
@@ -1908,8 +1908,8 @@ function updatePublicJoinButton(){
  if(!header)return;
  let button=header.querySelector('.pp-student-join:not(.pp-student-homework)');
  if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join';header.prepend(button);}
- const candidates=publicStudentCalendarLessons.filter(l=>!['cancelled_free','cancelled_charge','rescheduled'].includes(l.status)&&publicStudentLiveStatuses.get(String(l.id))?.status==='active'&&publicStudentLiveStatuses.get(String(l.id))?.has_material);
- const lesson=candidates[0];
+ const candidates=publicStudentCalendarLessons.filter(l=>!['cancelled_free','cancelled_charge','rescheduled'].includes(l.status)&&publicStudentLiveStatuses.get(String(l.id))?.has_material);
+ const lesson=candidates.find(l=>publicCalendarTimeStatus(l)==='in_progress')||candidates.find(l=>publicCalendarTimeStatus(l)==='scheduled')||candidates[candidates.length-1];
  button.hidden=!lesson;
  button.textContent=window.getLanguage?.()==='en'?'Join lesson →':'Перейти на занятие →';
  button.onclick=async()=>{if(!lesson||button.disabled)return;button.disabled=true;try{await openPublicCalendarLesson(publicStudentCalendarLessons.indexOf(lesson));}finally{button.disabled=false;}};
@@ -1919,7 +1919,7 @@ function startPublicJoinPolling(studentId){
  if(publicJoinPolling)return;publicJoinPolling=true;
  async function refresh(){
   try{const {data,error}=await supabaseClient.rpc('get_public_student_live_status',{p_student_id:studentId});
-   if(!error&&Array.isArray(data)){const next=new Map(data.map(x=>[String(x.calendar_lesson_id),x]));const changed=JSON.stringify([...next])!==JSON.stringify([...publicStudentLiveStatuses]);publicStudentLiveStatuses=next;if(changed)renderPublicStudentCalendar();updatePublicJoinButton();}
+   if(!error&&Array.isArray(data)){const next=new Map(data.map(x=>[String(x.calendar_lesson_id),x]));const changed=JSON.stringify([...next])!==JSON.stringify([...publicStudentLiveStatuses]);publicStudentLiveStatuses=next;renderPublicStudentCalendar();updatePublicJoinButton();}
   }catch(e){console.warn('Live lesson status refresh failed',e);}
   finally{setTimeout(refresh,3000);}
  }
@@ -2269,6 +2269,16 @@ function changePublicStudentWeek(offset){
   renderPublicStudentCalendar();
 }
 
+function publicCalendarTimeStatus(l){
+ if(!['pending','scheduled','conducted','completed'].includes(l.status))return l.status;
+ const now=dateTimePartsInTimezone(new Date(),isValidTimezone(publicStudent?.timezone)?publicStudent.timezone:'Europe/Minsk');
+ const stamp=(date,time)=>Date.parse(date+'T'+String(time||'00:00').slice(0,5)+':00Z');
+ const start=stamp(l.date,l.time),current=stamp(now.date,now.time);
+ if(!Number.isFinite(start)||!Number.isFinite(current))return l.status;
+ if(current>=start+Number(l.duration||60)*60000)return 'conducted';
+ if(current>=start)return 'in_progress';
+ return ['conducted','completed'].includes(l.status)?l.status:'scheduled';
+}
 function renderPublicStudentCalendar(lessonRows){
   if(Array.isArray(lessonRows))publicStudentCalendarLessons=lessonRows;
   const calendarLessons=publicStudentCalendarLessons;
@@ -2292,12 +2302,12 @@ function renderPublicStudentCalendar(lessonRows){
     const dayLessons=calendarLessons.filter(l=>l.date===key).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
     return `<section class="calendar-day-column ${key===today?'is-today':''}">
       <div class="calendar-day-heading"><span class="calendar-weekday">${d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')}</span><span class="calendar-day-number">${d.getDate()}</span></div>
-      <div class="calendar-day-events">${dayLessons.length?dayLessons.map(l=>`<div class="calendar-event-card" role="button" tabindex="0" onclick="openPublicCalendarLesson(${calendarLessons.indexOf(l)})">
+      <div class="calendar-day-events">${dayLessons.length?dayLessons.map(l=>`<div class="calendar-event-card">
         <span class="calendar-event-time">${esc(displayTime(l.time))}</span>
         <span class="calendar-event-title ${['rescheduled','cancelled_charge','cancelled_free'].includes(l.status)?'is-cancelled':''}">${esc(l.student||'Занятие')}</span>
         <span class="calendar-event-meta">${l.duration||60} мин</span>
         <span class="calendar-event-meta">${esc(money(l.price??publicStudent?.price??0))}</span>
-        <span class="status ${publicStudentLiveStatuses.get(String(l.id))?.status==='active'?'bg-green-100 text-green-800':statusClass[l.status]||'bg-slate-100 text-slate-700'}">${publicStudentLiveStatuses.get(String(l.id))?.status==='active'?'● In progress':statusLabels[l.status]||l.status}</span>
+        <span class="status ${publicCalendarTimeStatus(l)==='in_progress'?'bg-green-100 text-green-800':statusClass[publicCalendarTimeStatus(l)]||'bg-slate-100 text-slate-700'}">${publicCalendarTimeStatus(l)==='in_progress'?'● In progress':statusLabels[publicCalendarTimeStatus(l)]||publicCalendarTimeStatus(l)}</span>
       </div>`).join(''):'<p class="calendar-empty-day">Нет занятий</p>'}</div>
     </section>`;
   }).join('');
@@ -2358,7 +2368,7 @@ async function initPublicStudent(){
       const saved=JSON.parse(sessionStorage.getItem('pp-student-live-lesson')||'null');
       if(saved?.studentId===id&&Number.isSafeInteger(saved.lessonId)){
         const liveRow=publicStudentLiveStatuses.get(String(saved.lessonId));
-        if(liveRow?.status==='active'&&liveRow.has_material){
+        if(liveRow?.has_material){
           const resumed=await supabaseClient.rpc('get_public_student_lesson_material',{p_student_id:id,p_calendar_lesson_id:saved.lessonId});
           if(!resumed.error&&resumed.data?.plan)showPublicLessonMaterial(resumed.data,id,saved.lessonId);
           else sessionStorage.removeItem('pp-student-live-lesson');
@@ -2466,7 +2476,7 @@ async function openStudentCabinet(){
     '<span class="text-slate-400">Пополнений нет</span>';
 
   const dashboardBalance=document.getElementById('public-dashboard-balance');if(dashboardBalance)dashboardBalance.textContent=money(paid-spent);
-  const nextLesson=document.getElementById('public-next-lesson');if(nextLesson){const active=ls.find(l=>publicStudentLiveStatuses.get(String(l.id))?.status==='active');const next=active||future[0];nextLesson.textContent=next?(active?'🟢 Lesson in progress: ':'Next lesson: ')+next.date+' · '+displayTime(next.time):'No upcoming lessons scheduled.';}
+  const nextLesson=document.getElementById('public-next-lesson');if(nextLesson){const active=ls.find(l=>publicCalendarTimeStatus(l)==='in_progress');const next=active||future[0];nextLesson.textContent=next?(active?'🟢 Lesson in progress: ':'Next lesson: ')+next.date+' · '+displayTime(next.time):'No upcoming lessons scheduled.';}
   renderPublicLessonsHistory(ls);
   renderPublicStudentCalendar(ls);
   updatePublicJoinButton();
