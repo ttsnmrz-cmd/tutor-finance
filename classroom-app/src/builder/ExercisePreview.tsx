@@ -70,7 +70,8 @@ export function ExercisePresentation({block,assetScope='',teacherHints=true}:{bl
  </div>;
 }
 export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',studentMode=false,liveSessionId}:{liveSessionId?:string;assetScope?:string;plan:Plan;selected:string;onBack:()=>void;scopeKey:string;studentMode?:boolean}){
- const ordered=[...plan.stages.flatMap(s=>plan.blocks.filter(b=>b.stage===s.id&&!b.hiddenFromStudent)),...plan.blocks.filter(b=>!b.hiddenFromStudent&&!plan.stages.some(s=>s.id===b.stage))];
+ const homeworkPreview=!studentMode&&!liveSessionId&&plan.stages.some(s=>s.homework&&plan.blocks.some(b=>b.id===selected&&b.stage===s.id));
+ const ordered=[...plan.stages.filter(s=>homeworkPreview? s.homework:!s.homework).flatMap(s=>plan.blocks.filter(b=>b.stage===s.id&&!b.hiddenFromStudent)),...plan.blocks.filter(b=>!homeworkPreview&&!b.hiddenFromStudent&&b.scope!=='homework'&&!plan.stages.some(s=>s.id===b.stage))];
  const steps:Block[][]=[];ordered.forEach(b=>{const last=steps[steps.length-1];if((b as Block&{joinPrevious?:boolean}).joinPrevious&&last?.[last.length-1].stage===b.stage)last.push(b);else steps.push([b]);});
  const [notesOpen,setNotesOpen]=useState(false),[teacherHints,setTeacherHints]=useState(!studentMode);
  const [studentNavOpen,setStudentNavOpen]=useState(false),[followEnabled,setFollowEnabled]=useState(false),[studentExercise,setStudentExercise]=useState<string|null>(null),[fillerOpen,setFillerOpen]=useState(false),[fillerState,setFillerState]=useState<FillerState>(initialFillerState);
