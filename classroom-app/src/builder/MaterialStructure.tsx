@@ -11,12 +11,12 @@ type Props={
  onSection:(id:string)=>void;onRename:(id:string)=>void;onAddSection:()=>void;
  onAddExercise:(stage:string)=>void;onCopy:(id:string)=>void;onMove:(id:string)=>void;
  onDelete:(id:string)=>void;onToggleStudentVisibility:(id:string)=>void;onDrop:(drag:Drag,stage:string,before?:string)=>void;
- onStep:(drag:Drag,delta:number)=>void;
+ onAssignHomework:(stage:string)=>void;
 };
 
 function Grip(){return <svg aria-hidden="true" width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="5" r="1.4"/><circle cx="10" cy="5" r="1.4"/><circle cx="4" cy="10" r="1.4"/><circle cx="10" cy="10" r="1.4"/><circle cx="4" cy="15" r="1.4"/><circle cx="10" cy="15" r="1.4"/></svg>;}
 
-export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onToggle,onSelect,onSection,onRename,onAddSection,onAddExercise,onCopy,onMove,onDelete,onToggleStudentVisibility,onDrop,onStep}:Props){
+export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onToggle,onSelect,onSection,onRename,onAddSection,onAddExercise,onCopy,onMove,onDelete,onToggleStudentVisibility,onDrop,onAssignHomework}:Props){
  const drag=useRef<Drag|null>(null);
  const [dragging,setDragging]=useState<Drag|null>(null);
  const [dropTarget,setDropTarget]=useState<string|null>(null);
@@ -55,7 +55,7 @@ export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onT
   return <div className={'mb-structure-exercise'+(active===b.id?' active':'')+(b.hiddenFromStudent?' mb-hidden-exercise':'')} key={b.id} data-mb-stage={b.stage} data-mb-block={b.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target,'exercise')} onDrop={e=>drop(e,b.stage,b.id,'exercise')}>
    <button type="button" className="mb-drag" draggable onDragStart={e=>start(e,{kind:'exercise',id:b.id})} onDragEnd={finish} title={'Drag exercise: '+b.title} aria-label={'Drag exercise: '+b.title}><Grip/></button>
    {b.hiddenFromStudent&&<span className="mb-hidden-eye" title={ui("Hidden from students")} aria-label={ui("Hidden from students")}>◉̸</span>}<button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title} onClick={()=>onSelect(b)}><span aria-hidden="true">{numbers.get(b.id)}.</span><span>{b.title||ui('Untitled exercise')}</span></button>
-   <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onToggleStudentVisibility(b.id)}>{b.hiddenFromStudent?'◉ '+ui('Show to students'):'◉̸ '+ui('Hide from students')}</button><button onClick={()=>onCopy(b.id)}>{ui('Copy to…')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div>
+   <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onToggleStudentVisibility(b.id)}>{b.hiddenFromStudent?'◉ '+ui('Show to students'):'◉̸ '+ui('Hide from students')}</button>{!b.hiddenFromStudent&&plan.stages.some(s=>s.id===b.stage&&s.homework)&&<button onClick={()=>onAssignHomework(b.stage)}>{ui('Assign homework section')}</button>}<button onClick={()=>onCopy(b.id)}>{ui('Copy to…')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div>
   </div>;
  }
  return <aside className="mb-structure" aria-label={ui('Material structure')}>
@@ -69,7 +69,7 @@ export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onT
       <button className="mb-chevron" aria-label={ui(collapsed.has(s.id)?'Expand section':'Collapse section')+' '+s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>onToggle(s.id)}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d={collapsed.has(s.id)?'m6 4 4 4-4 4':'m4 6 4 4 4-4'}/></svg></button>
       <button className="mb-select-section" title={s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>{onSection(s.id);onToggle(s.id);}}><span>{s.name||ui('Untitled section')}</span></button>
       <span className="mb-stage-count" aria-label={ui('Exercises created')}>{plan.blocks.filter(b=>b.stage===s.id).length}{typeof (s as unknown as {plannedTotal?:number}).plannedTotal==='number'?'/'+(s as unknown as {plannedTotal:number}).plannedTotal:''}</span>
-      <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Section actions')+' '+s.name} aria-expanded={menu===s.id} onClick={()=>onMenu(menu===s.id?null:s.id)}>···</button>{menu===s.id&&<div className="mb-menu"><button onClick={()=>onRename(s.id)}>{ui('Rename section')}</button><button onClick={()=>onStep({kind:'section',id:s.id},-1)}>{ui('Move up')}</button><button onClick={()=>onStep({kind:'section',id:s.id},1)}>{ui('Move down')}</button></div>}</div>
+      <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Section actions')+' '+s.name} aria-expanded={menu===s.id} onClick={()=>onMenu(menu===s.id?null:s.id)}>···</button>{menu===s.id&&<div className="mb-menu"><button onClick={()=>onRename(s.id)}>{ui('Rename section')}</button>{s.homework&&<button onClick={()=>onAssignHomework(s.id)}>{ui('Assign homework')}</button>}</div>}</div>
      </div>
      {!collapsed.has(s.id)&&<>
       {plan.blocks.filter(b=>b.stage===s.id).map(exercise)}
