@@ -602,7 +602,7 @@ function renderNativeStudentDetail(){
   if(!s){panel.innerHTML='<div class="native-student-empty">Выберите ученика</div>';return;}
   const st=studentStats(s);
   const id=esc(s.id);
-  const tabs=[['overview','Overview'],['lessons','Lessons'],['notes','Notes'],['payments','Payments'],['homework','Homework']];
+  const tabs=[['overview','Overview'],['lessons','Lessons'],['notes',document.documentElement.lang==='ru'?'Заметки':'Notes'],['payments','Payments'],['homework','Homework']];
   const head='<div class="native-selected-heading"><div class="native-student-identity"><span class="native-student-avatar">'+esc((s.name||'?').charAt(0).toUpperCase())+'</span><div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Individual student')+'</p></div></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><button type="button" class="native-add-button" onclick="copyStudentLink(\''+id+'\',this)" title="Copy student cabinet link">⧉ Student link</button><button class="native-student-edit" onclick="openStudentEdit(\''+id+'\')" title="Edit student">✎</button></div></div>';
   const nav='<div class="native-detail-tabs">'+tabs.map(([key,label])=>'<button type="button" class="'+(nativeStudentDetailTab===key?'is-active':'')+'" onclick="switchNativeStudentTab(\''+key+'\',this)">'+label+'</button>').join('')+'</div>';
   let content='';
