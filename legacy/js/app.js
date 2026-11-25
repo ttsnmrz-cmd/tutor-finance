@@ -2940,7 +2940,7 @@ async function openPublicHomeworkList(studentId){
    const note=document.createElement('p');note.textContent=row.instructions||'';
    const open=document.createElement('button');open.type='button';open.className='pp-student-join';open.textContent=homeworkText('Open homework','Открыть задание');
    open.onclick=async()=>{open.disabled=true;try{const {data:assignment,error}=await supabaseClient.rpc('get_public_student_homework_material',{p_student_id:studentId,p_assignment_id:row.id});if(error)throw error;if(!assignment?.plan)throw Error(homeworkText('Homework unavailable','Задание недоступно'));if(!dialog.isConnected)return;dialog.close();showPublicHomeworkMaterial(assignment,studentId);}catch(e){alert(e.message||e);}finally{open.disabled=false;}};
-   card.append(heading,meta,note,open);list.append(card);
+   card.append(heading);if(row.status!=='assigned')card.append(meta);if(row.instructions)card.append(note);card.append(open);list.append(card);
   }
   if(!list.children.length)list.textContent=homeworkText('No homework assigned','Нет домашних заданий');
   void refreshPublicHomework(studentId);
