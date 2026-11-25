@@ -560,7 +560,14 @@ function lessonMembersForStudent(studentId){
   return lessonMembers.filter(m=>String(m.student_id)===String(studentId));
 }
 
+function renderTeacherHeaderGreeting(){
+ const actions=document.querySelector('#teacher-header .teacher-header-actions');if(!actions)return;
+ let el=actions.querySelector('.pp-teacher-greeting');if(!el){el=document.createElement('span');el.className='pp-teacher-greeting';actions.prepend(el);}
+ const name=String(window.currentTeacherName||window.teacherProfile?.name||window.currentUser?.user_metadata?.full_name||window.currentUser?.user_metadata?.name||'').trim();
+ el.textContent=(window.getLanguage?.()==='en'?'Hello':'Привет')+(name?', '+name:'')+'!';
+}
 function renderDashboard(){
+ renderTeacherHeaderGreeting();
   const now=new Date(), today=localISO(now), month=today.slice(0,7);
   const active=students.filter(s=>!s.archived);
   const monthLessons=lessons.filter(l=>String(l.date||'').startsWith(month));
@@ -1698,6 +1705,13 @@ async function initializePlatformMonitoring(){
   }catch(e){ platformAdmin=false; }
   const nav=document.getElementById('nav-admin');
   if(nav)nav.classList.toggle('hidden',!platformAdmin);
+  const menu=document.getElementById('profile-menu');
+  if(menu){
+    let entry=menu.querySelector('[data-platform-admin-entry]');
+    if(!entry){entry=document.createElement('button');entry.type='button';entry.className='profile-menu-item';entry.dataset.platformAdminEntry='1';entry.onclick=()=>{if(!platformAdmin)return;menu.classList.add('hidden');document.getElementById('teacher-header')?.classList.remove('pp-mobile-profile');document.getElementById('profile-menu-button')?.setAttribute('aria-expanded','false');switchTab('admin');};menu.insertBefore(entry,menu.querySelector('.profile-menu-divider'));}
+    entry.hidden=!platformAdmin;entry.style.display=platformAdmin?'':'none';entry.textContent=window.getLanguage?.()==='en'?'Admin':'Админ';
+  }
+  renderTeacherHeaderGreeting();
 }
 async function loadPlatformAdminDashboard(){
   const panel=document.getElementById('platform-admin-content');
