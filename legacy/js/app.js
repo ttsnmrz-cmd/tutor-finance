@@ -2977,15 +2977,32 @@ function showPublicHomeworkMaterial(assignment,studentId){
  const source=document.querySelector('#student-public-view .app-header[data-shared-header="1"]');
  const header=source?source.cloneNode(true):createAppHeader('student');
  const back=document.createElement('button');back.type='button';back.className='pp-student-return';back.textContent=homeworkText('← Homework','← Домашняя работа');
- let cleanup;
- back.onclick=()=>{cleanup?.();overlay.remove();void openPublicHomeworkList(studentId);};
+ let cleanup,timer,queue=Promise.resolve(),dirty=false,busy=false;
+ let answers=assignment.answers||{},readOnly=['submitted','reviewed'].includes(assignment.status);
+ const status=document.createElement('span');
+ const submit=document.createElement('button');submit.type='button';submit.className='pp-student-join';submit.textContent=homeworkText('Submit homework','Сдать домашнюю работу');submit.hidden=readOnly;
+ function save(final=false){
+  clearTimeout(timer);
+  const snapshot=JSON.parse(JSON.stringify(answers));
+  const task=queue.catch(()=>{}).then(async()=>{
+   status.textContent=homeworkText('Saving…','Сохранение…');
+   const {error}=await supabaseClient.rpc('save_public_student_homework',{p_student_id:studentId,p_assignment_id:assignment.id,p_answers:snapshot,p_submit:final});
+   if(error)throw error;
+   if(JSON.stringify(snapshot)===JSON.stringify(answers))dirty=false;
+   status.textContent=final?homeworkText('Submitted','Сдано'):homeworkText('Saved','Сохранено');
+  });
+  queue=task;return task.catch(e=>{status.textContent=homeworkText('Not saved: ','Не сохранено: ')+(e.message||e);throw e;});
+ }
+ function onChange(next){if(readOnly||busy)return;answers=next;dirty=true;clearTimeout(timer);timer=setTimeout(()=>{void save().catch(()=>{});},500);}
+ back.onclick=async()=>{if(busy)return;busy=true;try{if(dirty)await save();else await queue;cleanup?.();overlay.remove();void openPublicHomeworkList(studentId);}catch(e){alert(e.message||e);}finally{busy=false;}};
+ submit.onclick=async()=>{if(busy||readOnly||!confirm(homeworkText('Submit this homework? You cannot edit it after submission.','Сдать работу? После сдачи редактирование будет недоступно.')))return;busy=true;submit.disabled=true;try{await save(true);readOnly=true;cleanup?.();overlay.remove();void refreshPublicHomework(studentId);void openPublicHomeworkList(studentId);}catch(e){alert(e.message||e);}finally{busy=false;submit.disabled=false;}};
  if(header){header.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));header.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));header.querySelectorAll('.pp-student-join').forEach(n=>n.remove());const actions=header.querySelector('.pp-student-header-actions');if(actions){installStudentProfileMenu(actions);actions.prepend(back);}else header.append(back);overlay.append(header);}else overlay.append(back);
  const main=document.createElement('main');main.className='pp-student-live-main';
- const host=document.createElement('div');main.append(host);overlay.append(main);document.body.append(overlay);
+ const host=document.createElement('div');const toolbar=document.createElement('div');toolbar.style.cssText='display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px';toolbar.append(status,submit);main.append(toolbar,host);overlay.append(main);document.body.append(overlay);
  // The snapshot contains only the assigned section. Normalize its stage flag
  // for the existing student renderer, which excludes homework during live lessons.
  const plan={...assignment.plan,stages:assignment.plan.stages.map(s=>({...s,homework:false}))};
  let attempts=0;
- function mount(){if(!host.isConnected)return;if(typeof window.mountProfiProfitStudentLesson==='function'){cleanup=window.mountProfiProfitStudentLesson(host,plan,supabaseClient);return;}if(++attempts<30){host.textContent=homeworkText('Loading…','Загрузка…');setTimeout(mount,300);}else host.textContent=homeworkText('Classroom unavailable. Refresh the page.','Редактор недоступен. Обновите страницу.');}
+ function mount(){if(!host.isConnected)return;if(typeof window.mountProfiProfitHomework==='function'){cleanup=window.mountProfiProfitHomework(host,plan,supabaseClient,{id:assignment.id,answers,readOnly,onChange});return;}if(++attempts<30){host.textContent=homeworkText('Loading…','Загрузка…');setTimeout(mount,300);}else host.textContent=homeworkText('Classroom unavailable. Refresh the page.','Редактор недоступен. Обновите страницу.');}
  mount();
 }
