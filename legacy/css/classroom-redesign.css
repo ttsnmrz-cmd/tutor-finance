@@ -754,3 +754,14 @@ dialog.app-card .student-theme-panel{border:1px solid var(--border-color);border
 #public-week-calendar .calendar-day-column{min-height:132px!important;padding-bottom:12px!important}
 #public-week-calendar .calendar-event-card{cursor:default!important;min-height:64px!important;padding-block:9px!important}
 #public-week-calendar{padding-bottom:0!important;align-items:stretch}
+
+/* Homework assignment dialog follows the same theme as native dialogs. */
+dialog.pp-homework-assign-dialog[open]{background:var(--card-bg)!important;color:var(--text-color)!important;border:1px solid var(--border-color)!important;width:min(460px,calc(100vw - 32px));padding:24px!important}
+dialog.pp-homework-assign-dialog :is(h2,label,.mb-dialog-heading button){color:var(--text-color)!important}
+dialog.pp-homework-assign-dialog :is(select,textarea,input){background:var(--accent-soft)!important;color:var(--text-color)!important;border:1px solid var(--border-color)!important}
+dialog.pp-homework-assign-dialog option{background:var(--card-bg);color:var(--text-color)}
+dialog.pp-homework-assign-dialog form{display:grid;gap:14px}
+dialog.pp-homework-assign-dialog .mb-field{margin:0!important;gap:6px}
+dialog.pp-homework-assign-dialog .mb-dialog-actions{margin-top:4px!important}
+html[data-theme="dark"] dialog.pp-homework-assign-dialog{color-scheme:dark;background:#2d2637!important;color:#f0eafa!important}
+html[data-theme="dark"] dialog.pp-homework-assign-dialog :is(select,textarea,input){background:#211c29!important;color:#f0eafa!important;border-color:#554b65!important}
