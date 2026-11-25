@@ -1867,10 +1867,22 @@ async function openPublicCalendarLesson(index){
  showPublicLessonMaterial(data,studentId,Number(l.id));
  }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
+function ensureStudentQuickActions(){
+ const header=document.querySelector('#student-public-view .student-brand-header[data-shared-header="1"]');
+ if(!header)return null;
+ let bar=document.querySelector('#student-public-view .pp-student-quick-actions');
+ if(!bar){bar=document.createElement('div');bar.className='pp-student-quick-actions';header.after(bar);}
+ let meet=bar.querySelector('.pp-student-meet');
+ if(!meet){meet=document.createElement('a');meet.className='pp-student-join pp-student-meet';meet.target='_blank';meet.rel='noopener noreferrer';meet.textContent='Google Meet ↗';bar.append(meet);}
+ let url;try{url=new URL(publicStudent?.google_meet_url||'');}catch{}
+ meet.hidden=!(url?.protocol==='https:'&&url.hostname==='meet.google.com');
+ if(!meet.hidden)meet.href=url.href;else meet.removeAttribute('href');
+ return bar;
+}
 function updatePublicJoinButton(){
- const header=document.querySelector('#student-public-view .pp-student-header-actions');
+ const header=ensureStudentQuickActions();
  if(!header)return;
- let button=header.querySelector('.pp-student-join:not(.pp-student-homework)');
+ let button=header.querySelector('.pp-student-join:not(.pp-student-homework):not(.pp-student-meet)');
  if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join';header.prepend(button);}
  const candidates=publicStudentCalendarLessons.filter(l=>!['cancelled_free','cancelled_charge','rescheduled'].includes(l.status)&&publicStudentLiveStatuses.get(String(l.id))?.has_material);
  const lesson=candidates.find(l=>publicCalendarTimeStatus(l)==='in_progress')||candidates.find(l=>publicCalendarTimeStatus(l)==='scheduled')||candidates[candidates.length-1];
@@ -1948,7 +1960,7 @@ function createAppHeader(role){
  const brand=header.querySelector(':scope > button:not(#pp-mobile-menu):not([data-mobile-menu])');
  if(brand){brand.onclick=null;brand.removeAttribute('title');brand.style.cursor='default';}
  const subtitle=brand?.querySelector('.text-slate-500');
- if(subtitle)subtitle.textContent='Lessons, students and payments';
+ if(subtitle){subtitle.removeAttribute('data-i18n');subtitle.textContent=homeworkText('Your space to learn','Твоё пространство для учёбы');}
  return prepareAppHeader(header,role);
 }
 function installStudentProfileMenu(actions){
@@ -2407,9 +2419,9 @@ async function openStudentCabinet(){
     );
 
   document.getElementById('public-student-title').textContent=
-    publicStudent.name;
+    homeworkText('Hello, ','Привет, ')+publicStudent.name+'!';
   document.getElementById('public-student-meta').textContent=
-    'Стоимость занятия: '+money(publicStudent.price||0);
+    money(publicStudent.price||0);
   document.getElementById('public-paid').textContent=money(paid);
   document.getElementById('public-spent').textContent=money(spent);
   document.getElementById('public-balance').textContent=
@@ -2907,10 +2919,10 @@ let publicHomeworkRows=[];
 function homeworkText(en,ru){return window.getLanguage?.()==='en'?en:ru;}
 async function refreshPublicHomework(studentId){
  ensureStudentPortalLayout();
- const actions=document.querySelector('#student-public-view .pp-student-header-actions');
+ const actions=ensureStudentQuickActions();
  if(!actions)return;
  let button=actions.querySelector('.pp-student-homework');
- if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join pp-student-homework';actions.prepend(button);}
+ if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join pp-student-homework';actions.append(button);}
  button.hidden=false;
  button.textContent=homeworkText('Homework','Домашняя работа');
  button.onclick=()=>openPublicHomeworkList(studentId);
