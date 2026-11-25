@@ -742,3 +742,11 @@ dialog.app-card .pp-student-join{background:var(--primary-color);color:white}
 dialog.app-card .student-theme-panel{border:1px solid var(--border-color);border-radius:12px;background:var(--accent-soft);display:grid;gap:8px}
 #student-live-material[data-mode="homework"] .pp-student-live-main{background:var(--bg-color)!important;color:var(--text-color)!important;min-height:calc(100dvh - 100px)!important}
 #student-live-material[data-mode="homework"] .profiprofit-student-lesson{background:transparent!important}
+
+#student-live-material[data-mode="homework"] .pp-homework-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:8px 0 12px;flex-wrap:wrap}
+#student-live-material[data-mode="homework"] .pp-homework-save-status{font-size:12px;color:var(--text-secondary)}
+#student-live-material[data-mode="homework"] .pp-homework-submit{background:#4E2A84!important;color:#fff!important;border:1px solid #684b9a!important;border-radius:10px!important;padding:10px 18px!important;font-weight:650;cursor:pointer}
+#student-live-material[data-mode="homework"] .pp-homework-submit:hover{background:#60379b!important}
+#student-live-material[data-mode="homework"] .pp-homework-submit:disabled{opacity:.55;cursor:wait}
+#student-live-material[data-mode="homework"] .pp-homework-submit[hidden]{display:none!important}
+#student-live-material[data-mode="homework"] .mb-student-card{border-color:var(--border-color)!important;border-radius:12px!important}
