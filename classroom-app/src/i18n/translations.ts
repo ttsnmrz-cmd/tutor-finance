@@ -119,6 +119,8 @@ export const ru:Record<string,string>={
  "All tiles placed":"Все плитки размещены",
  "Position":"Позиция",
  "Enter a word":"Введите слово",
+ "Free Sorting":"Свободная сортировка",
+ "Items (one per line)":"Элементы (по одному на строку)",
  "Sort into Columns":"Распределить по колонкам",
  "Column":"Колонка",
  "Column name":"Название колонки",
