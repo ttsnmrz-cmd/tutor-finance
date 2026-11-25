@@ -6,6 +6,9 @@ on:
       - 'classroom-app/**'
       - '.github/workflows/stage-classroom-assets.yml'
   workflow_dispatch:
+concurrency:
+  group: classroom-stage-${{ github.ref }}
+  cancel-in-progress: false
 permissions:
   contents: write
 jobs:
@@ -47,39 +50,44 @@ jobs:
         run: |
           test -s legacy/classroom-assets/classroom.js
           test -s legacy/classroom-assets/classroom.css
-      - name: Version embedded assets in production HTML
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-          version = '${{ github.sha }}'[:12]
-          for filename in ('index.html', '404.html'):
-              path = Path(filename)
-              if not path.exists():
-                  continue
-              html = path.read_text()
-              updated = re.sub(r'(/legacy/classroom-assets/classroom\.(?:js|css)\?v=)[^"\s<>]+', lambda m: m.group(1) + version, html)
-              if updated == html and 'classroom-assets/classroom.' not in html:
-                  raise SystemExit(f'Classroom assets not referenced in {filename}')
-              path.write_text(updated)
-          PY
       - name: Commit staged bundle and HTML asset versions
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f legacy/classroom-assets/classroom.js legacy/classroom-assets/classroom.css
-          git add index.html 404.html
-          if ! git diff --cached --quiet; then
+          source_sha=$(git rev-parse HEAD)
+          tmp=$(mktemp -d)
+          cp legacy/classroom-assets/classroom.{js,css} "$tmp/"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin ${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
+            if ! git diff --quiet "$source_sha" HEAD -- classroom-app; then
+              echo 'Newer Classroom source detected; queued build will publish it.'
+              exit 0
+            fi
+            cp "$tmp"/classroom.{js,css} legacy/classroom-assets/
+            export CLASSROOM_SOURCE_SHA="$source_sha"
+            python3 - <<'PY'
+            from pathlib import Path
+            import re
+            import subprocess
+            import os
+            version = os.environ['CLASSROOM_SOURCE_SHA'][:12]
+            for filename in ('index.html', '404.html'):
+                path = Path(filename)
+                if not path.exists():
+                    continue
+                html = path.read_text()
+                updated = re.sub(r'(/legacy/classroom-assets/classroom\.(?:js|css)\?v=)[^"\s<>]+', lambda m: m.group(1) + version, html)
+                if updated == html and 'classroom-assets/classroom.' not in html:
+                    raise SystemExit(f'Classroom assets not referenced in {filename}')
+                path.write_text(updated)
+            PY
+            git add -f legacy/classroom-assets/classroom.js legacy/classroom-assets/classroom.css
+            git add index.html 404.html
+            if git diff --cached --quiet; then exit 0; fi
             git commit -m 'build: stage verified Classroom bundle'
-            for attempt in 1 2 3 4 5; do
-              git fetch origin ${{ github.ref_name }}
-              git rebase origin/${{ github.ref_name }}
-              if git push origin HEAD:${{ github.ref_name }}; then
-                exit 0
-              fi
-              echo "Concurrent push detected; retrying ($attempt/5)"
-              sleep 2
-            done
-            echo 'Failed to push staged assets after retries' >&2
-            exit 1
-          fi
+            if git push origin HEAD:${{ github.ref_name }}; then exit 0; fi
+            sleep 2
+          done
+          echo 'Failed to push staged assets after retries' >&2
+          exit 1
