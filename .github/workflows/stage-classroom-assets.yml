@@ -57,6 +57,24 @@ jobs:
           source_sha=$(git rev-parse HEAD)
           tmp=$(mktemp -d)
           cp legacy/classroom-assets/classroom.{js,css} "$tmp/"
+          version_assets() {
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+          import os
+          version = os.environ['CLASSROOM_SOURCE_SHA'][:12]
+          for filename in ('index.html', '404.html'):
+              path = Path(filename)
+              if not path.exists():
+                  continue
+              html = path.read_text()
+              updated = re.sub(r'(/legacy/classroom-assets/classroom\.(?:js|css)\?v=)[^"\s<>]+', lambda m: m.group(1) + version, html)
+              if updated == html and 'classroom-assets/classroom.' not in html:
+                  raise SystemExit(f'Classroom assets not referenced in {filename}')
+              path.write_text(updated)
+          PY
+          }
           for attempt in 1 2 3 4 5; do
             git fetch origin ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
@@ -66,22 +84,7 @@ jobs:
             fi
             cp "$tmp"/classroom.{js,css} legacy/classroom-assets/
             export CLASSROOM_SOURCE_SHA="$source_sha"
-            python3 - <<'PY'
-            from pathlib import Path
-            import re
-            import subprocess
-            import os
-            version = os.environ['CLASSROOM_SOURCE_SHA'][:12]
-            for filename in ('index.html', '404.html'):
-                path = Path(filename)
-                if not path.exists():
-                    continue
-                html = path.read_text()
-                updated = re.sub(r'(/legacy/classroom-assets/classroom\.(?:js|css)\?v=)[^"\s<>]+', lambda m: m.group(1) + version, html)
-                if updated == html and 'classroom-assets/classroom.' not in html:
-                    raise SystemExit(f'Classroom assets not referenced in {filename}')
-                path.write_text(updated)
-            PY
+            version_assets
             git add -f legacy/classroom-assets/classroom.js legacy/classroom-assets/classroom.css
             git add index.html 404.html
             if git diff --cached --quiet; then exit 0; fi
