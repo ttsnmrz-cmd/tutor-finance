@@ -800,3 +800,7 @@ html[data-theme="dark"] #student-modal #student-telegram-link-button{background:
 html[data-theme="dark"] #student-modal #student-telegram-link-button:not(:disabled):hover{background:#805eb0!important}
 #student-modal #student-telegram-link-button:disabled{opacity:.55!important;cursor:not-allowed!important}
 #student-modal :is(.student-settings-tabs button,#student-telegram-link-button):focus-visible{outline:2px solid #a88acb!important;outline-offset:3px}
+
+#teacher-header .pp-teacher-greeting{font-size:15px;font-weight:600;color:inherit;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-inline-end:8px}
+#teacher-header [data-platform-admin-entry][hidden]{display:none!important}
+@media(max-width:768px){#teacher-header .pp-teacher-greeting{max-width:130px;font-size:13px;margin-inline-end:0}}
