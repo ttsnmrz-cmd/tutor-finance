@@ -2190,7 +2190,7 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  let materialSignature=JSON.stringify([data.session_id,data.plan]);
  function mountMaterial(next){
    overlay._classroomCleanup?.();
-   overlay._classroomCleanup=window.mountProfiProfitStudentLesson(host,next.plan,supabaseClient,next.session_id);
+   overlay._classroomCleanup=window.mountProfiProfitStudentLesson(host,next.plan,supabaseClient,next.session_id,Number(lessonId));
  }
  if(typeof window.mountProfiProfitStudentLesson==='function')mountMaterial(data);
  else{host.textContent='Loading Classroom…';let count=0;const wait=setInterval(()=>{if(!host.isConnected){clearInterval(wait);return;}if(typeof window.mountProfiProfitStudentLesson==='function'){clearInterval(wait);mountMaterial(data);}else if(++count>30){clearInterval(wait);host.textContent='Classroom is unavailable. Please refresh the page.';}},300);}
