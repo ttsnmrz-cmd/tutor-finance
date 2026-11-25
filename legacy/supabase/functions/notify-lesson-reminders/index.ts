@@ -248,7 +248,7 @@ Deno.serve(async (req) => {
       if (!enabled || !student.telegram_chat_id) { skipped++; continue; }
 
       const meet = typeof student.google_meet_url === 'string' && /^https:\/\/meet\.google\.com\/[a-zA-Z0-9_-]+(?:\?[^\s#]*)?$/.test(student.google_meet_url) ? student.google_meet_url : '';
-      const text = reminderText(type, start, student.timezone || timezone) + (type === '10m' && meet ? `\n\nGoogle Meet: ${meet}` : '');
+      const text = reminderText(type, start, student.timezone || timezone) + (type === '10m' ? `${meet ? `\n\nGoogle Meet: ${meet}` : ''}\n\nProfiProfit: https://profiprofit.com/?student=${encodeURIComponent(student.id)}` : '');
       if (!deliveryEnabled) {
         dryRun++;
         console.log("DRY RUN reminder", { lesson_id: lesson.id, student_id: student.id, type });
