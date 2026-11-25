@@ -807,3 +807,16 @@ html[data-theme="dark"] #student-modal #student-telegram-link-button:not(:disabl
 
 html[data-theme="dark"] #teacher-app .native-detail-tabs button.is-active{color:#fff!important;border-bottom:3px solid #e4d5ff!important;box-shadow:inset 0 -2px 0 #e4d5ff!important}
 html[data-theme="dark"] #teacher-app .native-detail-tabs button:not(.is-active){border-bottom-color:transparent!important;color:#b9afc7!important}
+
+/* Shared materials dialogs: keep surfaces and form text in the same theme. */
+html[data-theme="dark"] :is(dialog.mb-dialog,dialog.ml-dialog)[open]{
+ color-scheme:dark;background:#2d2637!important;color:#f0eafa!important;border:1px solid #51465f!important;
+}
+html[data-theme="dark"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(h2,h3,label,.mb-field,.mb-dialog-heading button){color:#f0eafa!important}
+html[data-theme="dark"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(input,select,textarea,option){
+ background:#373041!important;color:#f0eafa!important;border-color:#655873!important;
+}
+html[data-theme="dark"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(input,textarea)::placeholder{color:#b9afc7!important;opacity:1}
+html[data-theme="dark"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(input,select,textarea):focus-visible{outline:2px solid #bda0e6!important;outline-offset:1px}
+html[data-theme="light"] :is(dialog.mb-dialog,dialog.ml-dialog)[open]{color-scheme:light;background:#fff!important;color:#1f242d!important}
+html[data-theme="light"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(input,select,textarea,option){background:#fff!important;color:#1f242d!important;border-color:#ded8e7!important}
