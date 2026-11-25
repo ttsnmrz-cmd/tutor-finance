@@ -602,14 +602,16 @@ function renderNativeStudentDetail(){
   if(!s){panel.innerHTML='<div class="native-student-empty">Выберите ученика</div>';return;}
   const st=studentStats(s);
   const id=esc(s.id);
-  const tabs=[['overview','Overview'],['lessons','Lessons'],['notes','Notes'],['payments','Payments']];
-  const head='<div class="native-selected-heading"><div class="native-student-identity"><span class="native-student-avatar">'+esc((s.name||'?').charAt(0).toUpperCase())+'</span><div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Individual student')+'</p></div></div><button class="native-student-edit" onclick="openStudentEdit(\''+id+'\')" title="Edit student">✎</button></div>';
+  const tabs=[['overview','Overview'],['lessons','Lessons'],['notes','Notes'],['payments','Payments'],['homework','Homework']];
+  const head='<div class="native-selected-heading"><div class="native-student-identity"><span class="native-student-avatar">'+esc((s.name||'?').charAt(0).toUpperCase())+'</span><div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Individual student')+'</p></div></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><button type="button" class="native-add-button" onclick="copyStudentLink(\''+id+'\',this)" title="Copy student cabinet link">⧉ Student link</button><button class="native-student-edit" onclick="openStudentEdit(\''+id+'\')" title="Edit student">✎</button></div></div>';
   const nav='<div class="native-detail-tabs">'+tabs.map(([key,label])=>'<button type="button" class="'+(nativeStudentDetailTab===key?'is-active':'')+'" onclick="switchNativeStudentTab(\''+key+'\',this)">'+label+'</button>').join('')+'</div>';
   let content='';
   if(nativeStudentDetailTab==='overview'){
     content='<div class="native-overview-section"><div class="native-section-heading"><h3>Recent lessons</h3><button onclick="switchNativeStudentTab(\'lessons\')" aria-label="View all records">View all <span aria-hidden="true">→</span></button></div>'+nativeStudentLessonRows(s,3,false)+'</div><div class="native-overview-section"><div class="native-section-heading"><h3>Recent payments</h3><button onclick="switchNativeStudentTab(\'payments\')" aria-label="View all records">View all <span aria-hidden="true">→</span></button></div>'+nativeStudentPaymentRows(s,3)+'</div>';
   }else if(nativeStudentDetailTab==='lessons'){
     content='<div class="native-lesson-filters"><select aria-label="Filter lesson dates" onchange="nativeLessonDateFilter=this.value;renderNativeStudentDetail()"><option value="all" '+(nativeLessonDateFilter==='all'?'selected':'')+'>All dates</option><option value="past" '+(nativeLessonDateFilter==='past'?'selected':'')+'>Past</option><option value="upcoming" '+(nativeLessonDateFilter==='upcoming'?'selected':'')+'>Upcoming</option></select><select aria-label="Filter lesson status" onchange="nativeLessonStatusFilter=this.value;renderNativeStudentDetail()">'+[['all','All statuses'],['scheduled','Scheduled'],['conducted','Completed'],['rescheduled','Rescheduled'],['cancelled_charge','Cancelled · charged'],['cancelled_free','Cancelled · free']].map(([v,t])=>'<option value="'+v+'" '+(nativeLessonStatusFilter===v?'selected':'')+'>'+t+'</option>').join('')+'</select></div><div class="native-history-scroll">'+nativeStudentLessonRows(s)+'</div>';
+  }else if(nativeStudentDetailTab==='homework'){
+    content='<div id="native-homework-panel">Loading…</div>';
   }else if(nativeStudentDetailTab==='notes'){
     content='<div id="native-live-notes"></div>';
   }else{
@@ -624,10 +626,11 @@ function renderNativeStudentDetail(){
     const row=last&&Array.from(scroller?.querySelectorAll('[data-lesson-id]')||[]).find(el=>el.dataset.lessonId===String(last.id));
     if(row&&scroller)scroller.scrollTop=Math.max(0,row.offsetTop-scroller.offsetTop);
   }
+  if(nativeStudentDetailTab==='homework')renderNativeHomework(s.id);
   if(nativeStudentDetailTab==='notes'&&typeof renderNativeLessonNotes==='function')renderNativeLessonNotes(s);
 }
 function switchNativeStudentTab(tab){
-  nativeStudentDetailTab=['overview','lessons','notes','payments'].includes(tab)?tab:'overview';
+  nativeStudentDetailTab=['overview','lessons','notes','payments','homework'].includes(tab)?tab:'overview';
   renderNativeStudentDetail();
 }
 function toggleStudentDetail(id){
@@ -840,14 +843,14 @@ async function copyTelegramStudentLink(id){
   }
 }
 
-async function copyStudentLink(id){
+async function copyStudentLink(id,button){
   const url=new URL(location.href);
   url.search='';
   url.searchParams.set('student',id);
 
   try{
     await navigator.clipboard.writeText(url.toString());
-    alert('Ссылка для ученика скопирована.');
+    if(button){const old=button.textContent;button.textContent='✓ Copied';setTimeout(()=>{button.textContent=old;},1800);}else alert('Ссылка для ученика скопирована.');
   }catch(e){
     prompt('Скопируйте ссылку:',url.toString());
   }
@@ -1634,3 +1637,30 @@ async function addPayment(){
 }
 
 function switchStudentSettingsTab(tab){const modal=document.getElementById('student-modal');if(!modal)return;for(const name of ['general','telegram']){document.getElementById('student-settings-'+name)?.classList.toggle('hidden',name!==tab);modal.querySelector('[data-student-settings-tab="'+name+'"]')?.setAttribute('aria-pressed',String(name===tab));}}
+
+async function renderNativeHomework(studentId){
+ const panel=document.getElementById('native-homework-panel');if(!panel)return;
+ const ru=document.documentElement.lang==='ru',tr=(en,rus)=>ru?rus:en;
+ try{
+  const rows=await db('/homework_assignments?select=id,title,status,assigned_at,due_date,instructions&student_id=eq.'+encodeURIComponent(studentId)+'&order=assigned_at.desc',{headers});
+  if(!panel.isConnected)return;
+  panel.innerHTML='<div class="native-section-heading"><h3>'+tr('Homework','Домашняя работа')+'</h3><button type="button" class="native-add-button" data-assign>+ '+tr('Assign homework','Назначить')+'</button></div><div class="native-history-scroll">'+(rows.map(r=>'<div class="native-history-row"><strong>'+esc(r.title)+'</strong><span>'+esc(String(r.assigned_at).slice(0,10))+'</span><span>'+esc(r.due_date||'—')+'</span><span>'+esc(({assigned:tr('Assigned','Назначено'),in_progress:tr('In progress','В процессе'),submitted:tr('Submitted','Сдано'),reviewed:tr('Reviewed','Проверено'),returned:tr('Returned','На исправлении')})[r.status]||r.status)+'</span></div>').join('')||'<p class="native-history-empty">'+tr('No homework assigned','Нет домашних заданий')+'</p>')+'</div>';
+  panel.querySelector('[data-assign]').onclick=()=>openNativeHomeworkAssign(studentId);
+ }catch(e){if(panel.isConnected)panel.textContent=String(e.message||e);}
+}
+async function openNativeHomeworkAssign(studentId){
+ const ru=document.documentElement.lang==='ru',tr=(en,rus)=>ru?rus:en;
+ const d=document.createElement('dialog');d.className='app-card';d.style.cssText='width:min(480px,92vw);padding:24px;border:1px solid var(--border-color);border-radius:18px;background:var(--card-bg);color:var(--text-color)';
+ d.innerHTML='<form style="display:grid;gap:12px"><h3>'+tr('Assign homework','Назначить домашнюю работу')+'</h3><label>'+tr('Material and section','Материал и секция')+'<select required style="display:block;width:100%" name="section"><option value="">'+tr('Loading…','Загрузка…')+'</option></select></label><label>'+tr('Due date (optional)','Срок (необязательно)')+'<input style="display:block;width:100%" type="date" name="due"></label><label>'+tr('Comment','Комментарий')+'<textarea style="display:block;width:100%" name="comment"></textarea></label><p role="status"></p><div style="display:flex;justify-content:space-between"><button type="button" data-cancel>'+tr('Cancel','Отмена')+'</button><button type="submit" class="native-add-button" disabled>'+tr('Assign','Назначить')+'</button></div></form>';
+ document.body.append(d);d.addEventListener('close',()=>d.remove());d.showModal();
+ const form=d.querySelector('form'),select=form.elements.section,submit=form.querySelector('[type=submit]'),status=form.querySelector('[role=status]');
+ form.querySelector('[data-cancel]').onclick=()=>d.close();
+ try{
+ const plans=await db('/teaching_lesson_plans?select=id,body',{headers});
+ select.replaceChildren(new Option(tr('Choose homework','Выберите задание'),''));
+ for(const p of plans)for(const s of p.body?.stages||[])if(s.homework&&(p.body.blocks||[]).some(b=>b.stage===s.id&&!b.hiddenFromStudent))select.add(new Option(p.body.title+' · '+s.name,JSON.stringify([p.id,s.id])));
+ if(select.options.length===1)status.textContent=tr('No saved Homework sections with exercises','Нет сохранённых секций Homework с упражнениями');
+ select.onchange=()=>{submit.disabled=!select.value;};
+ }catch(e){status.textContent=String(e.message||e);}
+ form.onsubmit=async e=>{e.preventDefault();if(!select.value||submit.disabled)return;submit.disabled=true;try{const [plan,section]=JSON.parse(select.value);await db('/rpc/assign_homework',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({p_student_id:studentId,p_plan_id:plan,p_section_id:section,p_due_date:form.elements.due.value||null,p_instructions:form.elements.comment.value})});d.close();if(String(nativeSelectedStudentId)===String(studentId)&&nativeStudentDetailTab==='homework')renderNativeHomework(studentId);}catch(err){status.textContent=String(err.message||err);submit.disabled=false;}};
+}
