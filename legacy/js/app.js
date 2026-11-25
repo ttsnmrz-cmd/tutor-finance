@@ -466,13 +466,7 @@ async function loadData(){
     .filter(s=>s.archived)
     .forEach(s=>archived.add(String(s.id)));
 
-  // Auto-completing an old lesson must never prevent the dashboard
-  // from rendering after a page refresh.
-  try{
-    await autoCompletePastLessons();
-  }catch(e){
-    console.warn('Could not auto-complete past lessons:',e);
-  }
+
 }
 
 function lessonEndTimestamp(l){
@@ -495,36 +489,6 @@ function lessonEndTimestamp(l){
   return start+duration*60000;
 }
 
-async function autoCompletePastLessons(){
-  const now=Date.now();
-
-  const due=lessons.filter(
-    l=>
-      l.status==='pending'&&
-      lessonEndTimestamp(l)!==null&&
-      lessonEndTimestamp(l)<=now
-  );
-
-  if(!due.length)return;
-
-  for(const l of due){
-    await db(
-      '/lessons?id=eq.'+encodeURIComponent(l.id),
-      {
-        method:'PATCH',
-        headers:{
-          ...headers,
-          Prefer:'return=minimal'
-        },
-        body:JSON.stringify({
-          status:'conducted'
-        })
-      }
-    );
-  }
-
-  due.forEach(l=>l.status='conducted');
-}
 const TAB_PATHS={dashboard:'/dashboard',calendar:'/calendar',students:'/students',materials:'/materials',admin:'/admin',settings:'/settings'};
 function getTabFromPath(){
   const path=location.pathname.replace(/\/+$/,'')||'/';
