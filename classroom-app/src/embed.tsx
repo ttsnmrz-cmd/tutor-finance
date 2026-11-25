@@ -28,3 +28,14 @@ window.mountProfiProfitMaterials=(target,userId,client)=>{
  root.render(<React.StrictMode><ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'student:'+(liveSessionId||crypto.randomUUID())} studentMode liveSessionId={liveSessionId}/></React.StrictMode>);
  return ()=>root.unmount();
 };
+
+type HomeworkOptions={id:string;answers:Record<string,unknown>;readOnly:boolean;onChange:(answers:Record<string,unknown>)=>void};
+(window as Window & {mountProfiProfitHomework?:(target:HTMLElement,plan:Plan,client:SupabaseClient,options:HomeworkOptions)=>()=>void}).mountProfiProfitHomework=(target,plan,client,options)=>{
+ setProfiProfitSupabase(client);
+ target.setAttribute('data-classroom-root','');
+ target.classList.add('profiprofit-student-lesson');
+ setLanguage(localStorage.getItem('profiprofit-language')==='en'?'en':'ru');
+ const root=createRoot(target);
+ root.render(<ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'homework:'+options.id} studentMode homework={options}/>);
+ return ()=>root.unmount();
+};
