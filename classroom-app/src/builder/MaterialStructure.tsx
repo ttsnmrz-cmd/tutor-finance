@@ -50,10 +50,26 @@ export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onT
   if(item.kind==='exercise'&&item.id===before)return;
   onDrop(item,stage,before);
  }
+ const pointer=useRef<{item:Drag;x:number;y:number;moving:boolean}|null>(null);
+ function touchTarget(x:number,y:number,item:Drag){
+  const el=document.elementFromPoint(x,y);
+  const end=el?.closest<HTMLElement>('[data-touch-end]');
+  if(end&&end.dataset.touchKind===item.kind)return {stage:end.dataset.touchEnd||'',key:item.kind==='section'?'sections-end':'exercise-end:'+end.dataset.touchEnd};
+  const row=el?.closest<HTMLElement>(item.kind==='section'?'.mb-section-row':'.mb-structure-exercise,.mb-section-row');
+  if(!row)return null;
+  return {stage:row.dataset.mbStage||'',before:row.dataset.mbBlock,key:row.dataset.mbBlock?'exercise:'+row.dataset.mbBlock:'section:'+row.dataset.mbStage};
+ }
+ function touchHandlers(item:Drag){return {
+  style:{touchAction:'none'},
+  onPointerDown:(e:React.PointerEvent<HTMLButtonElement>)=>{if(e.pointerType==='mouse')return;pointer.current={item,x:e.clientX,y:e.clientY,moving:false};e.currentTarget.setPointerCapture(e.pointerId);},
+  onPointerMove:(e:React.PointerEvent<HTMLButtonElement>)=>{const p=pointer.current;if(!p)return;if(!p.moving&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>8){p.moving=true;drag.current=p.item;setDragging(p.item);}if(p.moving)setDropTarget(touchTarget(e.clientX,e.clientY,p.item)?.key||null);},
+  onPointerUp:(e:React.PointerEvent<HTMLButtonElement>)=>{const p=pointer.current;pointer.current=null;if(!p)return;const target=p.moving?touchTarget(e.clientX,e.clientY,p.item):null;finish();if(target&&!(p.item.kind==='section'&&p.item.id===target.stage)&&p.item.id!==target.before)onDrop(p.item,target.stage,target.before);},
+  onPointerCancel:()=>{pointer.current=null;finish();}
+ };}
  function exercise(b:Block){
   const target='exercise:'+b.id;
   return <div className={'mb-structure-exercise'+(active===b.id?' active':'')+(b.hiddenFromStudent?' mb-hidden-exercise':'')} key={b.id} data-mb-stage={b.stage} data-mb-block={b.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target,'exercise')} onDrop={e=>drop(e,b.stage,b.id,'exercise')}>
-   <button type="button" className="mb-drag" draggable onDragStart={e=>start(e,{kind:'exercise',id:b.id})} onDragEnd={finish} title={'Drag exercise: '+b.title} aria-label={'Drag exercise: '+b.title}><Grip/></button>
+   <button type="button" className="mb-drag" draggable {...touchHandlers({kind:'exercise',id:b.id})} onDragStart={e=>start(e,{kind:'exercise',id:b.id})} onDragEnd={finish} title={'Drag exercise: '+b.title} aria-label={'Drag exercise: '+b.title}><Grip/></button>
    {b.hiddenFromStudent&&<span className="mb-hidden-eye" title={ui("Hidden from students")} aria-label={ui("Hidden from students")}>◉̸</span>}<button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title} onClick={()=>onSelect(b)}><span aria-hidden="true">{numbers.get(b.id)}.</span><span>{b.title||ui('Untitled exercise')}</span></button>
    <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onToggleStudentVisibility(b.id)}>{b.hiddenFromStudent?'◉ '+ui('Show to students'):'◉̸ '+ui('Hide from students')}</button>{!b.hiddenFromStudent&&plan.stages.some(s=>s.id===b.stage&&s.homework)&&<button onClick={()=>onAssignHomework(b.stage)}>{ui('Assign homework section')}</button>}<button onClick={()=>onCopy(b.id)}>{ui('Copy to…')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div>
   </div>;
@@ -65,7 +81,7 @@ export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onT
     const target='section:'+s.id;
     return <div className="mb-stage" key={s.id}>
      <div className={'mb-section-row'+(section===s.id?' selected':'')} data-mb-stage={s.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target)} onDrop={e=>drop(e,s.id)}>
-      <button type="button" className="mb-drag" draggable onDragStart={e=>start(e,{kind:'section',id:s.id})} onDragEnd={finish} title={'Drag section: '+s.name} aria-label={'Drag section: '+s.name}><Grip/></button>
+      <button type="button" className="mb-drag" draggable {...touchHandlers({kind:'section',id:s.id})} onDragStart={e=>start(e,{kind:'section',id:s.id})} onDragEnd={finish} title={'Drag section: '+s.name} aria-label={'Drag section: '+s.name}><Grip/></button>
       <button className="mb-chevron" aria-label={ui(collapsed.has(s.id)?'Expand section':'Collapse section')+' '+s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>onToggle(s.id)}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d={collapsed.has(s.id)?'m6 4 4 4-4 4':'m4 6 4 4 4-4'}/></svg></button>
       <button className="mb-select-section" title={s.name} aria-expanded={!collapsed.has(s.id)} onClick={()=>{onSection(s.id);onToggle(s.id);}}><span>{s.name||ui('Untitled section')}</span></button>
       <span className="mb-stage-count" aria-label={ui('Exercises created')}>{plan.blocks.filter(b=>b.stage===s.id).length}{typeof (s as unknown as {plannedTotal?:number}).plannedTotal==='number'?'/'+(s as unknown as {plannedTotal:number}).plannedTotal:''}</span>
@@ -73,13 +89,13 @@ export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onT
      </div>
      {!collapsed.has(s.id)&&<>
       {plan.blocks.filter(b=>b.stage===s.id).map(exercise)}
-      {dragging?.kind==='exercise'&&<div className="mb-exercise-drop-end" data-drop-target={dropTarget==='exercise-end:'+s.id?'true':undefined} onDragOver={e=>allow(e,'exercise-end:'+s.id,'exercise')} onDrop={e=>drop(e,s.id,undefined,'exercise')}>{ui('Move to…')} {s.name} ↓</div>}
+      {dragging?.kind==='exercise'&&<div className="mb-exercise-drop-end" data-touch-kind="exercise" data-touch-end={s.id} data-drop-target={dropTarget==='exercise-end:'+s.id?'true':undefined} onDragOver={e=>allow(e,'exercise-end:'+s.id,'exercise')} onDrop={e=>drop(e,s.id,undefined,'exercise')}>{ui('Move to…')} {s.name} ↓</div>}
       <button className="mb-stage-add" onClick={()=>onAddExercise(s.id)}>+ {ui('Add exercise')}</button>
      </>}
     </div>;
    })}
    {unassigned.length>0&&<div><h3>{ui('Unassigned exercises')}</h3>{unassigned.map(exercise)}</div>}
-   {dragging?.kind==='section'&&<div className="mb-section-drop-end" data-drop-target={dropTarget==='sections-end'?'true':undefined} onDragOver={e=>allow(e,'sections-end','section')} onDrop={e=>drop(e,'',undefined,'section')}>{ui('Move down')} ↓</div>}
+   {dragging?.kind==='section'&&<div className="mb-section-drop-end" data-touch-kind="section" data-touch-end="" data-drop-target={dropTarget==='sections-end'?'true':undefined} onDragOver={e=>allow(e,'sections-end','section')} onDrop={e=>drop(e,'',undefined,'section')}>{ui('Move down')} ↓</div>}
    <button type="button" className="mb-add-section-footer" onClick={onAddSection}>+ {ui('Add section')}</button>
   </div>
  </aside>;
