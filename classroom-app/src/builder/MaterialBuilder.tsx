@@ -61,7 +61,7 @@ function MaterialBuilderInner({row,repository,folderTitle,onBack,onLegacy,startI
  </section>;
 }
 
-const lessonSectionPresets=['Warm-up / Lead-in','Presentation','Controlled Practice','Freer Practice / Production','Review / Consolidation','Cool-down / Wrap-up'] as const;
+const lessonSectionPresets=['Warm-up / Lead-in','Presentation','Controlled Practice','Freer Practice / Production','Review / Consolidation','Cool-down / Wrap-up','Homework'] as const;
 function BuilderDialog({action,plan,stage,onClose,onSubmit}:{action:Action;plan:Plan;stage:string;onClose:()=>void;onSubmit:(title:string,type:BuilderExerciseType,stage:string)=>string}){
  const ref=useRef<HTMLDialogElement>(null),[title,setTitle]=useState(action.kind==='rename-section'?(plan.stages.find(s=>s.id===action.id)?.name||''):ui(action.kind==='section'?'Warm-up / Lead-in':'New exercise')),[customSection,setCustomSection]=useState(false),[type,setType]=useState<BuilderExerciseType>('text'),[target,setTarget]=useState(plan.stages.some(s=>s.id===stage)?stage:plan.stages[0]?.id||''),[error,setError]=useState('');
  useEffect(()=>{const opener=document.activeElement as HTMLElement;ref.current?.showModal();return()=>opener?.focus();},[]);
