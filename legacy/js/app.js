@@ -447,7 +447,7 @@ function lessonPriceTotal(l){
 }
 async function loadData(){
   [students,lessons,payments,groups,lessonMembers]=await Promise.all([
-    db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments,timezone'),
+    db('/students?select=id,name,price,group_id,archived,email,telegram,telegram_chat_id,telegram_link_token,telegram_connected_at,telegram_notify_1h,telegram_notify_10m,telegram_notify_changes,telegram_notify_payments,telegram_notify_balance,google_meet_url,timezone'),
     db('/lessons?select=id,student,student_id,series_id,date,time,timezone,price,status,duration,group_id,comment'),
     db('/payments?select=id,student,student_id,amount,date'),
     db('/groups?select=id,name'),
