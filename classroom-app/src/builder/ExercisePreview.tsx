@@ -1,3 +1,4 @@
+import {TextImageScope} from './inlineImages';
 import {VocabularyListPreview} from './VocabularyListExercise';
 import {MediaPreview} from './MediaExercise';
 import {OrderingPreview} from './OrderingExercise';
@@ -89,7 +90,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  useEffect(()=>{if(!studentMode&&fillerOpen&&(fillerState.kind==='memory'||fillerState.kind==='bingo'))syncFiller(true,fillerState);},[fillerState,fillerOpen,followEnabled,studentMode]);
  function toggleFiller(){const next=!fillerOpen;setFillerOpen(next);syncFiller(next);}
  const studentAway=!studentMode&&!!studentExercise&&studentExercise!==block?.id;
- return <LiveAnswerContext.Provider value={{student:studentMode,enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section className="mb-builder mb-student-preview" aria-label={ui('Student preview')}>
+ return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section className="mb-builder mb-student-preview" aria-label={ui('Student preview')}>
   <div className="mb-preview-top">
    <div className="mb-preview-heading-row">
     <h1>{plan.title}{stage&&<><span className="mb-preview-crumb-separator" aria-hidden="true">›</span><span className="mb-preview-section-crumb">{stage.name}</span></>}</h1>
@@ -102,6 +103,6 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
   </div><div className="mb-preview-workspace">
   {fillerOpen?<article id="activity" className="mb-student-card mb-filler-card"><FillersPanel studentMode={studentMode} state={fillerState} onState={next=>{setFillerState(next);if(studentMode){if(navChannel.current)void navChannel.current.send({type:'broadcast',event:'lesson-navigation',payload:{type:next.kind==='bingo'?'bingo-turn':'memory-turn',state:next}});}else syncFiller(true,next);}} onClose={()=>{setFillerOpen(false);syncFiller(false);}}/></article>:block?<article id="activity" className="mb-student-card" key={block.id}><div className="mb-student-body">{steps[safeIndex].map(element=><section className="mb-combined-element" key={element.id} data-preview-element={element.id}>{!studentMode&&element.teacherNote?.trim()&&<aside className="mb-preview-teacher-note" aria-label={ui('Teacher note')}><strong>{ui('Teacher note')} · {ui('Visible only to teacher')}</strong><p>{element.teacherNote}</p></aside>}<h2 className="mb-preview-instruction">{element.title}</h2><LiveAnswerBlock.Provider value={element.id}><ExercisePresentation block={element} assetScope={assetScope} teacherHints={teacherHints}/></LiveAnswerBlock.Provider></section>)}</div>
   <div className="mb-preview-footer"><button className="mb-student-previous" disabled={safeIndex===0} onClick={()=>setIndex(safeIndex-1)}>‹ {ui('Previous')}</button><div className="mb-preview-progress" aria-label={`${safeIndex+1} / ${steps.length}`}>{steps.map((group,i)=><button type="button" key={group[0].id} className={i<=safeIndex?'current':''} aria-current={i===safeIndex?'step':undefined} aria-label={`${i+1}. ${group[0].title}`} title={`${i+1}. ${group[0].title}`} onClick={()=>setIndex(i)}/>)}</div><button className="primary" disabled={safeIndex===steps.length-1} onClick={()=>setIndex(safeIndex+1)}>{ui('Next')} ›</button></div></article>:<p>{ui('Choose an exercise or add your first one. No planning form is required.')}</p>}
- {!studentMode&&<PreviewNotes key={liveSessionId||scopeKey} liveSessionId={liveSessionId} scopeKey={scopeKey} open={notesOpen} onClose={()=>setNotesOpen(false)}/>}</div></section></LiveAnswerContext.Provider>;
+ {!studentMode&&<PreviewNotes key={liveSessionId||scopeKey} liveSessionId={liveSessionId} scopeKey={scopeKey} open={notesOpen} onClose={()=>setNotesOpen(false)}/>}</div></section></LiveAnswerContext.Provider></TextImageScope.Provider>;
 }
 
