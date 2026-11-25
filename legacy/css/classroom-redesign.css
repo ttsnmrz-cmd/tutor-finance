@@ -765,3 +765,16 @@ dialog.pp-homework-assign-dialog .mb-field{margin:0!important;gap:6px}
 dialog.pp-homework-assign-dialog .mb-dialog-actions{margin-top:4px!important}
 html[data-theme="dark"] dialog.pp-homework-assign-dialog{color-scheme:dark;background:#2d2637!important;color:#f0eafa!important}
 html[data-theme="dark"] dialog.pp-homework-assign-dialog :is(select,textarea,input){background:#211c29!important;color:#f0eafa!important;border-color:#554b65!important}
+
+
+/* Keep cabinet actions inside the shared header at tablet widths. */
+#student-public-view .app-header[data-shared-header="1"]{display:flex!important;flex-wrap:wrap!important;gap:10px!important;height:auto!important;min-height:0!important}
+#student-public-view .app-header[data-shared-header="1"] .app-header-brand{flex:0 0 auto!important;position:static!important}
+#student-public-view .pp-student-header-actions{flex:1 1 auto!important;min-width:0!important;flex-wrap:wrap!important;justify-content:flex-end!important;gap:8px!important}
+#student-public-view .pp-student-header-actions .pp-student-join{font-size:13px!important;padding:8px 12px!important;min-height:40px!important;white-space:normal!important;line-height:1.2!important}
+@media(max-width:1050px){
+ #student-public-view .pp-student-header-actions{flex:1 1 100%!important;justify-content:flex-start!important;margin-left:0!important}
+}
+@media(max-width:480px){
+ #student-public-view .pp-student-header-actions .pp-student-join{flex:1 1 135px!important;min-height:44px!important}
+}
