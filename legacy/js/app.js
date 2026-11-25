@@ -1906,7 +1906,7 @@ async function openPublicCalendarLesson(index){
 function updatePublicJoinButton(){
  const header=document.querySelector('#student-public-view .pp-student-header-actions');
  if(!header)return;
- let button=header.querySelector('.pp-student-join');
+ let button=header.querySelector('.pp-student-join:not(.pp-student-homework)');
  if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join';header.prepend(button);}
  const candidates=publicStudentCalendarLessons.filter(l=>!['cancelled_free','cancelled_charge','rescheduled'].includes(l.status)&&publicStudentLiveStatuses.get(String(l.id))?.status==='active'&&publicStudentLiveStatuses.get(String(l.id))?.has_material);
  const lesson=candidates[0];
@@ -2144,6 +2144,7 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  if(header){
    header.querySelectorAll(':scope > button:not(.app-header-brand)').forEach(node=>node.remove());
    header.querySelector('.pp-student-join')?.remove();
+   header.querySelector('.pp-student-homework')?.remove();
    header.removeAttribute('id');
    header.classList.add('pp-student-live-header','student-brand-header');
    header.dataset.sharedHeader='1';
@@ -2350,6 +2351,7 @@ async function initPublicStudent(){
     if(!live.error&&Array.isArray(live.data))publicStudentLiveStatuses=new Map(live.data.map(x=>[String(x.calendar_lesson_id),x]));
     else if(live.error)console.warn('Live status unavailable:',live.error.message);
     await openStudentCabinet();
+    void refreshPublicHomework(id);
     // Restore an active lesson after a refresh, without requiring the student
     // to return to the dashboard or confirm joining again.
     try{
@@ -2923,4 +2925,67 @@ async function loadIntegratedMaterials(){
   document.getElementById('native-materials-fallback')?.classList.remove('hidden');
   await loadNativeMaterials();
  }
+}
+
+ 
+// Homework uses the existing public cabinet credential and shared exercise renderer.
+let publicHomeworkRows=[];
+function homeworkText(en,ru){return window.getLanguage?.()==='en'?en:ru;}
+async function refreshPublicHomework(studentId){
+ ensureStudentPortalLayout();
+ const actions=document.querySelector('#student-public-view .pp-student-header-actions');
+ if(!actions)return;
+ let button=actions.querySelector('.pp-student-homework');
+ if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join pp-student-homework';actions.prepend(button);}
+ button.hidden=false;
+ button.textContent=homeworkText('Homework','Домашняя работа');
+ button.onclick=()=>openPublicHomeworkList(studentId);
+ try{
+  const {data,error}=await supabaseClient.rpc('get_public_student_homework',{p_student_id:studentId});
+  if(error)throw error;
+  publicHomeworkRows=Array.isArray(data)?data:[];
+  const count=publicHomeworkRows.filter(r=>['assigned','in_progress','returned'].includes(r.status)).length;
+  button.textContent=homeworkText('Homework','Домашняя работа')+(count?' ('+count+')':'');
+ }catch(e){console.warn('Homework list unavailable',e);}
+}
+async function openPublicHomeworkList(studentId){
+ const dialog=document.createElement('dialog');dialog.className='app-card';dialog.style.cssText='width:min(640px,94vw);max-height:85vh;overflow:auto;background:var(--card-bg);color:var(--text-color)';
+ const title=document.createElement('h2');title.textContent=homeworkText('Homework','Домашняя работа');
+ const close=document.createElement('button');close.type='button';close.className='pp-student-return';close.textContent=homeworkText('Close','Закрыть');close.onclick=()=>dialog.close();
+ const list=document.createElement('div');list.textContent=homeworkText('Loading…','Загрузка…');
+ dialog.append(title,close,list);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+ try{
+  const {data,error}=await supabaseClient.rpc('get_public_student_homework',{p_student_id:studentId});if(error)throw error;
+  if(!dialog.isConnected)return;
+  list.replaceChildren();
+  const labels={assigned:homeworkText('Assigned','Назначено'),in_progress:homeworkText('In progress','В процессе'),submitted:homeworkText('Submitted','Сдано'),reviewed:homeworkText('Reviewed','Проверено'),returned:homeworkText('Returned','На исправлении')};
+  for(const row of Array.isArray(data)?data:[]){
+   const card=document.createElement('div');card.className='student-theme-panel';card.style.cssText='padding:12px;margin:10px 0';
+   const heading=document.createElement('h3');heading.textContent=row.title;
+   const meta=document.createElement('p');meta.textContent=(labels[row.status]||row.status)+(row.due_date?' · '+homeworkText('Due: ','До: ')+row.due_date:'');
+   const note=document.createElement('p');note.textContent=row.instructions||'';
+   const open=document.createElement('button');open.type='button';open.className='pp-student-join';open.textContent=homeworkText('Open homework','Открыть задание');
+   open.onclick=async()=>{open.disabled=true;try{const {data:assignment,error}=await supabaseClient.rpc('get_public_student_homework_material',{p_student_id:studentId,p_assignment_id:row.id});if(error)throw error;if(!assignment?.plan)throw Error(homeworkText('Homework unavailable','Задание недоступно'));if(!dialog.isConnected)return;dialog.close();showPublicHomeworkMaterial(assignment,studentId);}catch(e){alert(e.message||e);}finally{open.disabled=false;}};
+   card.append(heading,meta,note,open);list.append(card);
+  }
+  if(!list.children.length)list.textContent=homeworkText('No homework assigned','Нет домашних заданий');
+  void refreshPublicHomework(studentId);
+ }catch(e){list.textContent=homeworkText('Unable to load homework: ','Не удалось загрузить задания: ')+(e.message||e);}
+}
+function showPublicHomeworkMaterial(assignment,studentId){
+ const overlay=document.createElement('div');overlay.id='student-live-material';overlay.dataset.mode='homework';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:var(--card-bg);overflow:auto';
+ const source=document.querySelector('#student-public-view .app-header[data-shared-header="1"]');
+ const header=source?source.cloneNode(true):createAppHeader('student');
+ const back=document.createElement('button');back.type='button';back.className='pp-student-return';back.textContent=homeworkText('← Homework','← Домашняя работа');
+ let cleanup;
+ back.onclick=()=>{cleanup?.();overlay.remove();void openPublicHomeworkList(studentId);};
+ if(header){header.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));header.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));header.querySelectorAll('.pp-student-join').forEach(n=>n.remove());const actions=header.querySelector('.pp-student-header-actions');if(actions){installStudentProfileMenu(actions);actions.prepend(back);}else header.append(back);overlay.append(header);}else overlay.append(back);
+ const main=document.createElement('main');main.className='pp-student-live-main';
+ const host=document.createElement('div');main.append(host);overlay.append(main);document.body.append(overlay);
+ // The snapshot contains only the assigned section. Normalize its stage flag
+ // for the existing student renderer, which excludes homework during live lessons.
+ const plan={...assignment.plan,stages:assignment.plan.stages.map(s=>({...s,homework:false}))};
+ let attempts=0;
+ function mount(){if(!host.isConnected)return;if(typeof window.mountProfiProfitStudentLesson==='function'){cleanup=window.mountProfiProfitStudentLesson(host,plan,supabaseClient);return;}if(++attempts<30){host.textContent=homeworkText('Loading…','Загрузка…');setTimeout(mount,300);}else host.textContent=homeworkText('Classroom unavailable. Refresh the page.','Редактор недоступен. Обновите страницу.');}
+ mount();
 }
