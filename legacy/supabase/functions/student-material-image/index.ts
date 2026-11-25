@@ -4,6 +4,11 @@ const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,
 function containsPath(value:unknown,path:string):boolean{
  if(Array.isArray(value))return value.some(v=>containsPath(v,path));
  if(value&&typeof value==='object'){const obj=value as Record<string,unknown>;return obj.storagePath===path||Object.values(obj).some(v=>containsPath(v,path));}
+ if(typeof value==='string'){
+  // Rich text stores image references as HTML attributes, not JSON properties.
+  const tags=value.match(/<span\b[^>]*>/gi)||[];
+  return tags.some(tag=>{const id=tag.match(/\sdata-mec-image\s*=\s*["']([0-9a-f-]{36})["']/i)?.[1];const stored=tag.match(/\sdata-storage-path\s*=\s*["']([^"']+)["']/i)?.[1];return !!id&&stored===path&&path.split('/')[1].split('.')[0]===id;});
+ }
  return false;
 }
 Deno.serve(async req=>{
