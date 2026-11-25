@@ -20,12 +20,12 @@ window.mountProfiProfitMaterials=(target,userId,client)=>{
 
 // Reuse the same interactive exercise renderer for the public student cabinet.
 // Student data is provided by the scoped public RPC, never by teacher repository access.
-(window as Window & {mountProfiProfitStudentLesson?:(target:HTMLElement,plan:Plan,client:SupabaseClient,liveSessionId?:string)=>()=>void}).mountProfiProfitStudentLesson=(target,plan,client,liveSessionId)=>{
+(window as Window & {mountProfiProfitStudentLesson?:(target:HTMLElement,plan:Plan,client:SupabaseClient,liveSessionId?:string,lessonId?:number)=>()=>void}).mountProfiProfitStudentLesson=(target,plan,client,liveSessionId,lessonId)=>{
  setProfiProfitSupabase(client);
  target.setAttribute('data-classroom-root','');
  target.classList.add('profiprofit-student-lesson');
  const root=createRoot(target);
- root.render(<React.StrictMode><ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'student:'+(liveSessionId||crypto.randomUUID())} studentMode liveSessionId={liveSessionId}/></React.StrictMode>);
+ root.render(<React.StrictMode><ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'student:'+(liveSessionId||crypto.randomUUID())} studentMode assetScope={'public-image:'+JSON.stringify({studentId:new URLSearchParams(location.search).get('student'),lessonId})} liveSessionId={liveSessionId}/></React.StrictMode>);
  return ()=>root.unmount();
 };
 
@@ -36,6 +36,6 @@ type HomeworkOptions={id:string;answers:Record<string,unknown>;readOnly:boolean;
  target.classList.add('profiprofit-student-lesson');
  setLanguage(localStorage.getItem('profiprofit-language')==='en'?'en':'ru');
  const root=createRoot(target);
- root.render(<ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'homework:'+options.id} studentMode homework={options}/>);
+ root.render(<ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'homework:'+options.id} studentMode assetScope={options.id.startsWith('review:')?'':'public-image:'+JSON.stringify({studentId:new URLSearchParams(location.search).get('student'),assignmentId:options.id})} homework={options}/>);
  return ()=>root.unmount();
 };
