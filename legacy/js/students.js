@@ -662,6 +662,14 @@ function toggleStudentMenu(id){
     ?.classList.toggle('hidden');
 }
 
+function ensureStudentMeetField(){
+ if(document.getElementById('student-edit-meet'))return;
+ const price=document.getElementById('student-edit-price');
+ if(!price)return;
+ const label=document.createElement('label');label.className='text-sm font-semibold';label.textContent='Google Meet';
+ const input=document.createElement('input');input.id='student-edit-meet';input.type='url';input.className='soft-input mt-1 w-full rounded-xl px-3 py-2';input.placeholder='https://meet.google.com/abc-defg-hij';
+ label.append(input);price.closest('label').after(label);
+}
 async function openStudentEdit(id){
   const s=students.find(
     x=>String(x.id)===String(id)
@@ -672,6 +680,7 @@ async function openStudentEdit(id){
   document.getElementById('student-edit-id').value=id;
   document.getElementById('student-edit-name').value=s.name;
   document.getElementById('student-edit-email').value=s.email||'';
+  ensureStudentMeetField();
   document.getElementById('student-edit-meet').value=s.google_meet_url||'';
   document.getElementById('student-edit-telegram').value=s.telegram||'';
   document.getElementById('student-edit-price').value=
@@ -699,6 +708,7 @@ async function openStudentEdit(id){
   }
 
   switchStudentSettingsTab('general');
+  document.querySelectorAll('[id^="menu-"]').forEach(m=>m.classList.add('hidden'));
   showModal('student-modal');
 }
 
