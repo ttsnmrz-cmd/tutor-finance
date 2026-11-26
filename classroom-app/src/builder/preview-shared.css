@@ -172,3 +172,7 @@ html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-p
 html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-preview-notes,.mb-student-card,.mb-preview-footer){background:#2d2637!important;color:#f0eafa!important;border-color:#574967!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-notes :is(textarea,[contenteditable],.mb-notes-content){background:#393044!important;color:#f0eafa!important;border-color:#655673!important}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-notes > div{background:#393044!important;color:#f0eafa!important;border-color:#655673!important}
+
+/* Consistent in-content heading typography in editor and shared exercise preview. */
+.mb-builder :is(.mb-rich-input,.mb-gap-editable,.mb-student-content,.mb-student-instruction,.mb-student-items,.mb-preview-text,.mb-combined-element) h2:not(.mb-combined-element>h2){font-family:inherit!important;font-size:clamp(21px,1.65vw,27px)!important;font-weight:700!important;line-height:1.3!important;letter-spacing:normal!important;color:#4B5260!important;margin:16px 0 10px!important;}
+html[data-theme="dark"] .mb-builder :is(.mb-rich-input,.mb-gap-editable,.mb-student-content,.mb-student-instruction,.mb-student-items,.mb-preview-text,.mb-combined-element) h2:not(.mb-combined-element>h2){color:#D6D0DF!important;}
