@@ -1,5 +1,5 @@
 import {createContext,useContext,useState,type Dispatch,type SetStateAction} from 'react';
-export type LiveAnswerContextValue={student:boolean;enabled:boolean;values:Record<string,unknown>;send:(key:string,value:unknown)=>void};
+export type LiveAnswerContextValue={student:boolean;enabled:boolean;review?:boolean;values:Record<string,unknown>;send:(key:string,value:unknown)=>void};
 export const LiveAnswerBlock=createContext('');
 export const LiveAnswerContext=createContext<LiveAnswerContextValue|null>(null);
 export function useLiveAnswer<T>(key:string,initial:T|(()=>T)):[T,Dispatch<SetStateAction<T>>]{
