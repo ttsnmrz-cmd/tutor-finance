@@ -1033,3 +1033,8 @@ html[data-theme="dark"] .pp-teacher-wallpaper-dialog{background:#292435;color:#f
 .pp-teacher-wallpaper-grid button{padding:8px;border:1px solid #827a9066;border-radius:12px;text-align:left;color:inherit}
 .pp-teacher-wallpaper-preview{height:100px;border-radius:8px;background-color:#827a9022;background-size:cover;background-position:center;margin-bottom:8px}
 .pp-teacher-wallpaper-dialog>button{padding:8px 14px;border:1px solid #827a9066;border-radius:9px}
+
+/* Library shell must expose wallpaper; keep actual workspace opaque. */
+html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.ml-preview.local-materials-preview:not(.ml-builder-host),
+html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.ml-preview.local-materials-preview > nav.ml-actions,
+html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.ml-preview.local-materials-preview > .ml-layout {background:transparent!important;box-shadow:none!important;border-color:transparent!important;}
