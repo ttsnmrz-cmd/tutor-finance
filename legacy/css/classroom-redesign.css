@@ -899,3 +899,15 @@ table[data-table-width] tr> :first-child:nth-last-child(2){width:var(--pp-table-
 .mb-text-image-menu button.mb-image-remove{color:#b43d48;border-color:currentColor;justify-self:start;}
 html[data-theme="dark"] .mb-text-image-menu{background:#2c2638;color:#f0eafa;}
 html[data-theme="dark"] .mb-text-image-menu button.mb-image-remove{color:#ffabb2;}
+
+/* Shared classroom panel geometry, without clipping sticky word banks. */
+:root{--pp-classroom-radius:16px;--pp-classroom-gap:14px}
+.mb-builder.mb-student-preview:not([data-homework-review="true"]),
+.mb-builder.mb-student-preview .mb-preview-workspace>:is(.mb-student-card,.mb-preview-notes){
+ border-radius:var(--pp-classroom-radius)!important;
+}
+#teacher-app:has(.mb-student-preview) > .native-layout{gap:var(--pp-classroom-gap)!important}
+#teacher-app:has(.mb-student-preview) > .native-layout:has(>.native-sidebar:not(.hidden)){column-gap:var(--pp-classroom-gap)!important}
+#teacher-app #classroom-materials-root .ml-builder-host:has(.mb-student-preview){border-radius:var(--pp-classroom-radius)!important;background:transparent!important}
+#teacher-app #tab-materials:has(.mb-student-preview)>.app-card{border-radius:var(--pp-classroom-radius)!important}
+#student-live-material :is(.pp-student-pointer,.pp-student-live-notes){border-radius:var(--pp-classroom-radius)!important}
