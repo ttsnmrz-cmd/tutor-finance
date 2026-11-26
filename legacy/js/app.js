@@ -2091,8 +2091,8 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-menu[hidden]{display:none}
  #student-live-material .pp-student-profile-menu label,#student-live-material .pp-student-profile-menu button{display:block;margin-top:14px}
  #student-live-material .pp-student-profile-menu select{padding:5px}
- #student-live-material .pp-student-live-main{background:#fff;border-radius:0;padding:18px}
- #student-live-material .pp-student-pointer{background:#fff;border-radius:0}
+ #student-live-material .pp-student-live-main{background:#fff;border-radius:var(--pp-classroom-radius,16px);padding:18px}
+ #student-live-material .pp-student-pointer{background:#fff;border-radius:var(--pp-classroom-radius,16px);overflow:hidden}
  #student-live-material .pp-student-profile-menu{min-width:240px;padding:18px;border-radius:18px;font-size:15px}
  #student-live-material .pp-student-menu-title{display:block;color:#746e84;font-size:14px;font-weight:600;margin-bottom:18px}
  #student-live-material .pp-student-profile-menu label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:12px 0}
@@ -2109,12 +2109,12 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-live-header{display:flex;align-items:center;justify-content:space-between}
  #student-live-material .pp-student-live-layout{padding:14px}
  
- #student-live-material .pp-student-live-main{border-radius:0!important}
- #student-live-material .mb-builder.mb-student-preview .mb-student-card{border-color:#dfe3e8!important;border-radius:0!important}
- #student-live-material .mb-builder.mb-student-preview .mb-preview-notes{border-color:#dfe3e8!important;border-radius:0!important}
+
+ #student-live-material .mb-builder.mb-student-preview .mb-student-card{border-color:#dfe3e8!important}
+ #student-live-material .mb-builder.mb-student-preview .mb-preview-notes{border-color:#dfe3e8!important}
  #student-live-material .pp-student-live-main{min-width:0;flex:1}
  #student-live-material .pp-student-live-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,27%);gap:14px}
- #student-live-material .pp-student-live-notes{background:#fff;border:1px solid #dfe3e8;border-radius:0;padding:14px}
+ #student-live-material .pp-student-live-notes{background:#fff;border:1px solid #dfe3e8;border-radius:var(--pp-classroom-radius,16px);padding:14px}
  #student-live-material .pp-student-live-notes textarea{width:100%;min-height:340px;background:#f4f5f7;border-radius:10px;padding:12px;resize:vertical}
  #student-live-material .pp-student-live-tools{display:flex;gap:10px;align-items:center;margin-bottom:12px}
  #student-live-material .pp-student-pointer{position:relative}
