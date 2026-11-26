@@ -1131,3 +1131,14 @@ html[data-theme="dark"] img[src*="ProfoProfit_logo"]{content:url("/legacy/ProfiP
 :is(#teacher-app,#student-public-view) .app-card:not(#classroom-materials-root *){border-radius:var(--pp-panel-radius)!important;border-color:var(--pp-shell-border,var(--border-color))!important}
 :is(#teacher-app,#student-public-view) :is(.native-sidebar,.native-student-detail){border-radius:var(--pp-panel-radius)!important;border-color:var(--pp-shell-border,var(--border-color))!important}
 .pp-homework-feedback-toggle{width:var(--pp-control-size);height:var(--pp-control-size)}
+
+/* Opaque profile popup above the materials workspace. */
+#teacher-app #teacher-header #profile-menu{background:#fff!important;opacity:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border:1px solid var(--pp-shell-border,var(--border-color))!important;box-shadow:0 12px 32px #21162f26!important}
+html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#30283b!important}
+/* Restore the actual editor shell without changing library or live preview. */
+#teacher-app #classroom-materials-root .ml-builder-host:not(:has(.mb-student-preview)) .mb-builder{border-radius:var(--pp-panel-radius,12px)!important;border:1px solid var(--pp-shell-border,var(--border-color))!important;overflow:clip}
+/* Teacher homework review is display-only; keep the score. */
+.pp-homework-review .mb-homework-readonly,
+.pp-homework-review :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check) button,
+.pp-homework-review :is(.mb-image-label-reset,.mb-image-label-check){display:none!important}
+.pp-homework-review :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check){justify-content:center!important}
