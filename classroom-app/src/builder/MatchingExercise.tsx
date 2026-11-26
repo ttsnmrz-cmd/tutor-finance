@@ -28,7 +28,8 @@ export function MatchingPreview({block,teacherHints=false}:{block:Block;teacherH
  return <section className="mb-matching-preview" aria-label={ui('Matching')}>
  {block.content&&<div className="mb-student-text"><FormattedText text={block.content} html={formatOf(block,'content',block.content)}/></div>}
  <p className="mb-match-hint">{ui('Choose a card on the left, then its match on the right. Click a paired right card to undo.')}</p>
- <div className="mb-matching-columns"><div aria-label={ui('Left column')}>{order.left.map(id=>card(id,'left'))}</div><div aria-label={ui('Right column')}>{order.right.map(id=>card(id,'right'))}</div></div>
+ <div className="mb-matching-columns mb-matching-paired-grid" style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',alignItems:'stretch'}}>{order.left.filter(id=>matches[id]!==undefined&&order.right.includes(matches[id])).map(id=><div key={'pair:'+id} style={{display:'contents'}}>{card(id,'left')}{card(matches[id],'right')}</div>)}</div>
+ <div className="mb-matching-columns"><div aria-label={ui('Left column')}>{order.left.filter(id=>matches[id]===undefined||!order.right.includes(matches[id])).map(id=>card(id,'left'))}</div><div aria-label={ui('Right column')}>{order.right.filter(id=>!order.left.some(left=>matches[left]===id)).map(id=>card(id,'right'))}</div></div>
  {valid.length<block.items.length&&<p className="mb-help">{ui('Some pairs are incomplete. Finish them in the Builder.')}</p>}
  <div className="mb-check-actions"><button type="button" disabled={!valid.length} onClick={()=>setChecked(true)}>{ui('Check')}</button><span role="status">{checked?score+' / '+valid.length+' '+ui('correct'):''}</span></div>
  </section>;
