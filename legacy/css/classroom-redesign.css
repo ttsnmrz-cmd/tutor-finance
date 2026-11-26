@@ -911,3 +911,15 @@ html[data-theme="dark"] .mb-text-image-menu button.mb-image-remove{color:#ffabb2
 #teacher-app #classroom-materials-root .ml-builder-host:has(.mb-student-preview){border-radius:var(--pp-classroom-radius)!important;background:transparent!important}
 #teacher-app #tab-materials:has(.mb-student-preview)>.app-card{border-radius:var(--pp-classroom-radius)!important}
 #student-live-material :is(.pp-student-pointer,.pp-student-live-notes){border-radius:var(--pp-classroom-radius)!important}
+
+/* Learner heading and pointer share one row; only actual cards paint surfaces. */
+#student-live-material .pp-student-pointer,
+#student-live-material .pp-student-pointer .mb-builder.mb-student-preview,
+#student-live-material .pp-student-pointer .profiprofit-student-lesson{
+ background:transparent!important;
+}
+#student-live-material .mb-preview-heading-row>.mb-preview-controls{
+ display:flex!important;align-items:center!important;justify-content:flex-end!important;
+ flex:0 0 auto!important;width:auto!important;margin:0!important;
+}
+#student-live-material .mb-preview-heading-row{flex-wrap:wrap}
