@@ -829,3 +829,20 @@ html[data-theme="light"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(input,select
 .mb-student-preview .mb-student-body{flex:1 0 auto!important}
 .mb-student-preview .mb-preview-footer{margin-top:auto!important;flex-shrink:0}
 @media(max-width:700px){.mb-student-preview{min-height:calc(100dvh - 150px)!important}}
+
+/* Compact lesson workspace; keep normal navigation outside preview. */
+#teacher-app:has(.mb-student-preview) .native-layout{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
+#teacher-app:has(.mb-student-preview) .native-sidebar{display:none!important}
+[data-classroom-root]:has(.mb-student-preview) .mb-breadcrumb{padding:4px 12px!important;margin:0!important;min-height:0!important}
+[data-classroom-root] .mb-student-preview{padding:8px 12px!important;gap:8px!important}
+[data-classroom-root] .mb-preview-top{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px!important;margin:0!important;padding:0!important}
+[data-classroom-root] .mb-preview-heading-row{display:contents!important}
+[data-classroom-root] .mb-preview-heading-row h1{grid-column:1;grid-row:1;margin:0!important;font-size:20px!important;align-self:center}
+[data-classroom-root] .mb-preview-back{grid-column:2;grid-row:1;justify-self:end}
+[data-classroom-root] .mb-preview-tools-row{grid-column:1/-1;display:flex!important;flex-wrap:wrap;gap:6px!important;margin:0!important;padding:0!important;min-height:0!important}
+[data-classroom-root] .mb-preview-top button{min-height:32px!important;padding:6px 10px!important}
+[data-classroom-root] .mb-preview-workspace{margin:0!important;gap:12px!important}
+[data-classroom-root] .mb-student-body{padding:18px 24px!important}
+[data-classroom-root] .mb-preview-teacher-note{margin:0 0 16px!important;padding:12px 16px!important}
+[data-classroom-root] .mb-preview-footer{padding:8px 14px!important}
+@media(max-width:700px){[data-classroom-root] .mb-student-body{padding:12px!important}[data-classroom-root] .mb-preview-heading-row h1{font-size:17px!important}}
