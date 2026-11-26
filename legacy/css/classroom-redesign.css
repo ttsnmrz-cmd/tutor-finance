@@ -1211,3 +1211,10 @@ html #teacher-app #teacher-header,html #student-public-view #student-header{bord
 /* Focus mode must override collapsed navigation grid and explicit main placement. */
 html #teacher-app:has(.mb-student-preview) > .native-layout,html #teacher-app:has(.mb-student-preview) > .native-layout.sidebar-collapsed{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;gap:0!important}
 html #teacher-app:has(.mb-student-preview) > .native-layout > #teacher-main{grid-area:auto!important;grid-column:1 / -1!important;grid-row:1!important;width:100%!important;min-width:0!important;max-width:none!important}
+
+/* Focused preview: one painted surface per panel, no rectangular inner chrome. */
+html #teacher-app #teacher-header.app-header{border-radius:12px!important}
+#teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-top :is(.mb-preview-heading-row,.mb-preview-tools-row){background:transparent!important;box-shadow:none!important;border-radius:0!important}
+#teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-notes{background:var(--pp-classroom-surface)!important;border-radius:12px!important;overflow:clip!important}
+#teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-notes :is(.mb-preview-notes-heading,.mb-rich-field){background:transparent!important;box-shadow:none!important}
+#teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-notes .mb-rich-input{border-radius:8px!important;background-clip:padding-box!important}
