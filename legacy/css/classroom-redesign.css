@@ -157,7 +157,7 @@ html[data-theme=dark] .native-page-heading h1{color:#f3eaf9}
 /* Classroom profile: distinct Overview, Lessons, Notes and Payments views. */
 .native-student-identity{display:flex;align-items:center;gap:15px;min-width:0}
 .native-student-avatar{display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:50%;background:#eaf1fc;color:#728bd0;font-size:25px;font-weight:700}
-.native-student-edit{display:grid;place-items:center;border:1px solid #e7def0;border-radius:13px;width:43px;height:43px;font-size:22px;color:#5f4a7d}
+.native-student-edit{display:grid;place-items:center;border:1px solid var(--pp-shell-border,var(--border-color));border-radius:var(--pp-control-radius);width:var(--pp-control-size);height:var(--pp-control-size);font-size:22px;color:#5f4a7d}
 #native-student-detail .native-detail-tabs{margin:12px 0 20px;gap:10px}
 #native-student-detail .native-detail-tabs button{flex:0 0 auto;padding:13px 17px}
 #native-student-detail .native-student-stats{margin:8px 0 24px}
@@ -1123,3 +1123,11 @@ html[data-theme="dark"] #teacher-app #tab-students button.native-student-edit:ho
 
 /* Transparent brand mark: invert black to white and lift purple on dark surfaces. */
 html[data-theme="dark"] img[src*="ProfoProfit_logo"]{content:url("/legacy/ProfiProfit-logo-dark.svg");filter:none;}
+
+/* Shared shell sizing; keep exercise answer controls and calendar cells independent. */
+:root{--pp-control-size:36px;--pp-primary-size:40px;--pp-control-radius:8px;--pp-panel-radius:12px}
+:is(#teacher-app,#student-public-view,#student-live-material,.pp-homework-review) :is(.native-add-button,.pp-homework-submit,.pp-homework-exit,.pp-homework-feedback-toggle,.pp-homework-review-actions button){box-sizing:border-box;min-height:var(--pp-control-size);border-radius:var(--pp-control-radius)!important}
+:is(#teacher-app,#student-public-view,#student-live-material,.pp-homework-review) :is(.native-add-button,.pp-homework-submit){min-height:var(--pp-primary-size)}
+:is(#teacher-app,#student-public-view) .app-card:not(#classroom-materials-root *){border-radius:var(--pp-panel-radius)!important;border-color:var(--pp-shell-border,var(--border-color))!important}
+:is(#teacher-app,#student-public-view) :is(.native-sidebar,.native-student-detail){border-radius:var(--pp-panel-radius)!important;border-color:var(--pp-shell-border,var(--border-color))!important}
+.pp-homework-feedback-toggle{width:var(--pp-control-size);height:var(--pp-control-size)}
