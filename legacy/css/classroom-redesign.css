@@ -915,7 +915,7 @@ html[data-theme="dark"] .mb-text-image-menu{background:#2c2638;color:#f0eafa;}
 html[data-theme="dark"] .mb-text-image-menu button.mb-image-remove{color:#ffabb2;}
 
 /* Shared classroom panel geometry, without clipping sticky word banks. */
-:root{--pp-classroom-radius:16px;--pp-classroom-gap:14px}
+:root{--pp-classroom-radius:var(--pp-panel-radius,12px);--pp-classroom-gap:12px}
 .mb-builder.mb-student-preview:not([data-homework-review="true"]),
 .mb-builder.mb-student-preview .mb-preview-workspace>:is(.mb-student-card,.mb-preview-notes){
  border-radius:var(--pp-classroom-radius)!important;
@@ -1159,3 +1159,12 @@ html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#3
 
 /* Review: only the exercise card owns the painted surface. */
 .pp-homework-review :is(.pp-homework-content,.mb-builder.mb-student-preview,.mb-preview-workspace){background:transparent!important;box-shadow:none!important;border-color:transparent!important;border-radius:var(--pp-review-radius,12px)!important}
+
+/* Surface ownership: layout wrappers never paint behind rounded classroom cards. */
+:is(#teacher-app,#student-live-material,.pp-homework-review) :is(.mb-builder.mb-student-preview,.mb-preview-workspace,.mb-student-body,.mb-student-content){background:transparent!important;box-shadow:none!important}
+#teacher-app #classroom-materials-root :is(.ml-builder-host,.ml-layout:has(.ml-builder-host),.ml-preview:has(.ml-builder-host)){background:transparent!important;box-shadow:none!important}
+#teacher-app #tab-materials:has(.ml-builder-host)>.app-card{background:transparent!important;box-shadow:none!important;border-color:transparent!important}
+:is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview :is(.mb-student-card,.mb-preview-notes,.mb-preview-top){border-radius:var(--pp-panel-radius,12px)!important;background-clip:padding-box!important}
+:is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview :is(.mb-student-card,.mb-preview-notes){overflow:clip!important}
+:is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-preview-notes :is(textarea,[contenteditable="true"]){border-radius:var(--pp-control-radius,8px)!important;background-clip:padding-box!important}
+.pp-homework-review .mb-builder.mb-student-preview :is(.mb-student-card,.mb-preview-notes){border-radius:var(--pp-panel-radius,12px)!important}
