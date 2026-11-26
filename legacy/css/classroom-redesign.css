@@ -886,3 +886,6 @@ table[data-table-borders] [data-mec-image]{float:none!important;display:block!im
 
 /* Drag-resizable two-column tables; percentage widths remain responsive. */
 table[data-table-width] tr> :first-child:nth-last-child(2){width:var(--pp-table-width,50%);}
+
+/* Keep callouts below preceding floated images and isolate their contents. */
+[data-callout]{clear:both;display:flow-root;}
