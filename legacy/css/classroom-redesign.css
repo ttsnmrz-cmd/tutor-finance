@@ -935,3 +935,13 @@ html[data-theme="dark"] .mb-text-image-menu button.mb-image-remove{color:#ffabb2
 .mb-builder.mb-student-preview .mb-preview-top :is(.mb-preview-heading-row,.mb-preview-tools-row){
  background:transparent!important;
 }
+
+/* Paint only rounded preview surfaces, not their rectangular grid wrapper. */
+[data-classroom-root] .mb-builder.mb-student-preview .mb-preview-workspace,
+.mb-builder.mb-student-preview .mb-preview-workspace{
+ background:transparent!important;
+}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card>.mb-preview-footer:first-child{
+ border-top-left-radius:var(--pp-classroom-radius,16px);
+ border-top-right-radius:var(--pp-classroom-radius,16px);
+}
