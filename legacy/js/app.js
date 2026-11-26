@@ -3089,7 +3089,10 @@ function showPublicHomeworkMaterial(assignment,studentId){
  const plan={...assignment.plan,stages:assignment.plan.stages.map(s=>({...s,homework:false}))};
  let attempts=0;
  function mount(){if(!host.isConnected)return;if(typeof window.mountProfiProfitHomework==='function'){cleanup=window.mountProfiProfitHomework(host,plan,supabaseClient,{id:assignment.id,answers,readOnly,onChange});return;}if(++attempts<30){host.textContent=homeworkText('Loading…','Загрузка…');setTimeout(mount,300);}else host.textContent=homeworkText('Classroom unavailable. Refresh the page.','Редактор недоступен. Обновите страницу.');}
- mount();
+ const placeSubmit=()=>{if(!overlay.isConnected)return;if(readOnly)return;const checks=host.querySelectorAll('.mb-image-label-check,.mb-check-actions button:last-child,.mb-inline-check button:last-child');const check=Array.from(checks).find(b=>b.getClientRects().length);if(check){if(submit.previousElementSibling!==check)check.after(submit);}else if(submit.parentElement!==toolbar)toolbar.append(submit);};
+ submit.style.cssText='background:#CDA13E!important;color:#1F242D!important;border-color:#CDA13E!important;font-weight:700!important;margin-left:12px!important;flex-shrink:0';
+ const observer=new MutationObserver(placeSubmit);observer.observe(host,{childList:true,subtree:true});const detach=new MutationObserver(()=>{if(!overlay.isConnected){observer.disconnect();detach.disconnect();}});detach.observe(document.body,{childList:true});
+ mount();placeSubmit();
 }
 
 /* Teacher wallpaper picker. */
