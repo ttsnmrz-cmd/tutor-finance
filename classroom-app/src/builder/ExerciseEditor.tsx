@@ -1,3 +1,4 @@
+import {TeacherPrompts} from './TeacherPrompts';
 import {VocabularyListEditor} from './VocabularyListExercise';
 import {MediaEditor} from './MediaExercise';
 import {ImageLabelingEditor} from './ImageLabelingExercise';
@@ -31,7 +32,7 @@ export function ExerciseEditor({block,onChange,onSave,saveStatus,assetScope='',c
   <div className="mb-editor-heading"><h2><input aria-label={ui('Exercise title')} value={block.title} onChange={e=>patch({title:e.target.value})}/></h2><select aria-label={ui('Exercise type')} value={builderType(block)} onChange={e=>{const type=e.target.value as BuilderExerciseType;if(type===builderType(block))return;if((block.content.trim()||block.items.length)&&!confirm(ui('Change exercise type? Text, formatting and existing answers will be kept. Review the exercise after changing its type.')))return;onChange(switchBlockType(block,type));}}>{([...blockTypes.filter(t=>!['video','writing'].includes(t)&&(t!=='questions'||block.type==='questions'&&!isMultipleChoice(block))),'multiple_choice','inline_choice','columns','free_columns','sentence','typed_gap','letters','gallery','image_labeling','vocabulary_list',...(['text','video','writing'].includes(builderType(block))?[builderType(block)]:[])] as BuilderExerciseType[]).sort((a,b)=>exerciseTypeLabel(a,block).localeCompare(exerciseTypeLabel(b,block),'en')).map(type=><option key={type} value={type}>{ui(type==='vocabulary_list'?'Vocabulary List':type==='image_labeling'?'Image Labeling':type==='text'?'Text / Reading':type==='gallery'?'Image / Gallery':type==='typed_gap'?'Type the Missing Word':type==='letters'?'Build a Word':type==='sentence'?'Build a Sentence':type==='free_columns'?'Free Sorting':type==='columns'?'Sort into Columns':type==='inline_choice'?'Inline Choice':type==='multiple_choice'?'Multiple Choice':type==='questions'?'Speaking / Discussion':block.type!=='gaps'&&type==='gaps'?'Gap Fill (Text)':exerciseLabel({...block,type,choiceMode:undefined} as Block))}</option>)}</select></div>
 
 
-  <div className="mb-teacher-note-editor">
+  <TeacherPrompts scope={assetScope} editor/><div className="mb-teacher-note-editor">
    {!noteOpen?<button type="button" className="mb-teacher-note-add" onClick={()=>setNoteOpen(true)}>＋ {ui('Add teacher note')}</button>:
     <div className="mb-teacher-note-card"><div className="mb-teacher-note-heading"><strong>{ui('Teacher note')}</strong><span>{ui('Visible only to teacher')}</span><button type="button" aria-label={ui('Remove teacher note')} onClick={()=>{patch({teacherNote:''});setNoteOpen(false);}}>×</button></div><textarea rows={3} aria-label={ui('Teacher note')} placeholder={ui('Add instructions or reminders for yourself…')} value={block.teacherNote||''} onChange={e=>patch({teacherNote:e.target.value})}/></div>}
   </div>
