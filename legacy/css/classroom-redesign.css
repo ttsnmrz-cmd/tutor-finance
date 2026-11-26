@@ -1076,3 +1076,15 @@ html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main){border:1
 #student-live-material[data-mode="homework"] .pp-homework-heading{padding:4px 12px}
 #student-live-material[data-mode="homework"] .pp-homework-content{padding:0!important;margin:0!important}
 #student-live-material[data-mode="homework"] .pp-homework-content .mb-preview-workspace{margin:0!important;padding:0!important}
+
+/* Teacher review uses the same fixed heading/content/footer layout as homework. */
+dialog.pp-homework-review[open]{display:flex!important;flex-direction:column;gap:8px;box-sizing:border-box;width:calc(100vw - 24px)!important;max-width:none!important;height:calc(100dvh - 24px)!important;max-height:none!important;overflow:hidden!important;padding:12px!important;border:1px solid var(--pp-shell-border)!important;border-radius:12px}
+.pp-homework-review .pp-homework-heading,.pp-homework-review .pp-homework-toolbar{flex:0 0 auto;background:var(--card-bg);border:1px solid var(--pp-shell-border);border-radius:12px;padding:8px 12px}
+.pp-homework-review .pp-homework-heading{margin:0!important}
+.pp-homework-review .pp-homework-content{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain}
+.pp-homework-review .pp-homework-content :is(.mb-student-preview,.mb-preview-workspace,.mb-student-card){height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+.pp-homework-review .mb-student-card > .mb-preview-footer:first-child,.pp-homework-review .mb-preview-footer:has(.mb-preview-progress > button:only-child){display:none!important}
+.pp-homework-review .pp-homework-toolbar textarea{display:block;width:100%;box-sizing:border-box;min-height:48px;max-height:20dvh;resize:vertical}
+.pp-homework-review .pp-homework-toolbar [role="status"]:empty,.pp-homework-review button[hidden]{display:none!important}
+.pp-homework-review-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:8px}
+html[data-pp-teacher-wallpaper] .pp-homework-review :is(.pp-homework-heading,.pp-homework-toolbar){background:var(--pp-glass-surface);backdrop-filter:var(--pp-glass-blur)}
