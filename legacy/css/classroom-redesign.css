@@ -1173,3 +1173,14 @@ html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#3
 #teacher-app #classroom-materials-root .mb-breadcrumb{background:var(--card,var(--card-bg,#fff))!important;color:var(--text,#1f242d)!important;border-radius:var(--pp-panel-radius,12px)!important;padding:8px 16px!important;margin-bottom:8px!important;box-sizing:border-box}
 html[data-theme="dark"] #teacher-app #classroom-materials-root .mb-breadcrumb{background:#292435!important;color:#e8e2ef!important}
 #teacher-app #classroom-materials-root .mb-breadcrumb :is(a,button,span){color:inherit!important}
+
+/* Shared glass surface contract for classroom panels, independent of role. */
+:root{--pp-classroom-surface:rgba(255,255,255,.8);--pp-classroom-blur:blur(1px)}
+html[data-theme="dark"]{--pp-classroom-surface:rgba(41,36,53,.8)}
+html:is([data-pp-teacher-wallpaper],[data-pp-student-background]) :is(#teacher-app,#student-live-material,.pp-homework-review) :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card,.mb-preview-workspace>.mb-preview-notes,.mb-builder:not(.mb-student-preview),.mb-breadcrumb,.pp-homework-heading,.pp-homework-toolbar,.pp-homework-feedback){
+ background:var(--pp-classroom-surface)!important;
+ backdrop-filter:var(--pp-classroom-blur)!important;
+ -webkit-backdrop-filter:var(--pp-classroom-blur)!important;
+ border-radius:var(--pp-panel-radius,12px)!important;
+ background-clip:padding-box!important;
+}
