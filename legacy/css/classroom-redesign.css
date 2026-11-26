@@ -883,3 +883,6 @@ table[data-table-width="40"] tr> :first-child:nth-last-child(2){width:40%;}
 table[data-table-width="60"] tr> :first-child:nth-last-child(2){width:60%;}
 table[data-table-borders] img{max-width:100%;height:auto;}
 table[data-table-borders] [data-mec-image]{float:none!important;display:block!important;width:100%!important;max-width:100%!important;margin:0 0 6px!important;}
+
+/* Drag-resizable two-column tables; percentage widths remain responsive. */
+table[data-table-width] tr> :first-child:nth-last-child(2){width:var(--pp-table-width,50%);}
