@@ -366,11 +366,41 @@ html[data-theme=dark] #teacher-app > .native-layout > .native-sidebar{background
 html[data-theme="dark"] :is(#teacher-app, #student-public-view.pp-student-one-page) {
  --pp-dark-surface:#30283b;
  --pp-dark-surface-raised:#3b3248;
- --pp-dark-border:#51445f;
+ --pp-dark-border:#51475f;
  --pp-dark-border-raised:#645573;
  --pp-dark-text:#f4eefa;
 }
 
+/* Neutral portal outlines follow one token in both themes. Active/semantic
+   states and the Classroom exercise editor are intentionally excluded. */
+html:not([data-theme="dark"]) #teacher-app {
+  --pp-shell-border:var(--pp-light-border,#e0e3e9);
+}
+html[data-theme="dark"] #teacher-app {
+  --pp-shell-border:var(--pp-dark-border);
+}
+html[data-theme="dark"] #teacher-app :is(
+  #dashboard-cards > *,
+  #dashboard-calendar,
+  .native-calendar,
+  .native-calendar-scroll,
+  .native-calendar-day,
+  .native-calendar-time,
+  .native-history-row,
+  .native-student-stats > *,
+  .native-section-card,
+  .native-detail-panel
+) {
+  border-color:var(--pp-shell-border)!important;
+}
+html[data-theme="dark"] #teacher-app #tab-students :is(
+  .native-student-row:not(.is-selected),
+  .cw-student-row:not(.is-selected),
+  .cw-student-list-item:not(.is-selected),
+  .cw-directory-row:not(.is-selected)
+) {
+  border-color:var(--pp-shell-border)!important;
+}
 /* Dark theme: dashboard, calendar, student directory. Migrated unchanged. */
 /* Dark mode contrast corrections for dashboard, calendar and student directory. */
 html[data-theme="dark"] #teacher-app #dashboard-cards>*{background:var(--pp-dark-surface)!important;border-color:var(--pp-dark-border)!important;color:#f4eef9!important}
