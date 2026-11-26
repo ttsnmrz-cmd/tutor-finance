@@ -1020,7 +1020,7 @@ html[data-pp-teacher-wallpaper] #teacher-app [role="dialog"].app-card{background
 html[data-theme="dark"] #teacher-app :is(dialog,.modal-card,.modal-content).app-card,
 html[data-theme="dark"] #teacher-app [role="dialog"].app-card{background:#30283b!important}
 html[data-pp-teacher-wallpaper] #teacher-app{background-image:var(--pp-teacher-wallpaper)!important;background-size:100% auto!important;background-repeat:repeat-y!important;background-position:center top!important;min-height:100vh}
-html[data-pp-teacher-wallpaper-style="dark"] #teacher-app{background-image:linear-gradient(#171125b8,#171125b8),var(--pp-teacher-wallpaper)!important}
+html[data-pp-teacher-wallpaper-style="dark"] #teacher-app{background-image:var(--pp-teacher-wallpaper)!important}
 html[data-theme="dark"][data-pp-teacher-wallpaper] #teacher-app :is(.native-workspace,.native-layout){background:transparent!important}
 #teacher-header{position:relative!important;z-index:1000!important;overflow:visible!important}
 #teacher-header .profile-menu-wrap{position:relative;z-index:1001!important;overflow:visible!important}
