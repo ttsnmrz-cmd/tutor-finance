@@ -740,16 +740,22 @@ dialog.app-card textarea{min-height:80px}
 dialog.app-card :is(.pp-student-join,.pp-student-return,[data-cancel]){padding:9px 14px;border:1px solid var(--border-color);border-radius:10px;font-weight:600;background:var(--accent-soft);color:var(--text-color)}
 dialog.app-card .pp-student-join{background:var(--primary-color);color:white}
 dialog.app-card .student-theme-panel{border:1px solid var(--border-color);border-radius:12px;background:var(--accent-soft);display:grid;gap:8px}
-#student-live-material[data-mode="homework"] .pp-student-live-main{background:var(--bg-color)!important;color:var(--text-color)!important;min-height:calc(100dvh - 100px)!important}
+#student-live-material[data-mode="homework"]{display:flex!important;flex-direction:column;overflow:hidden!important;box-sizing:border-box;height:100dvh}
+#student-live-material[data-mode="homework"] > .app-header{flex:0 0 auto}
+#student-live-material[data-mode="homework"] .pp-student-live-main{display:flex!important;flex-direction:column;flex:1 1 0;min-height:0!important;height:auto!important;overflow:hidden!important;background:transparent!important;color:var(--text-color)!important}
+#student-live-material[data-mode="homework"] .pp-homework-content{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain}
+#student-live-material[data-mode="homework"] .pp-homework-close{font-size:24px;line-height:1;min-width:40px;min-height:40px}
+#student-live-material[data-mode="homework"] .pp-homework-save-status{margin-left:auto}
+html[data-pp-student-background] #student-live-material[data-mode="homework"] .pp-homework-toolbar{background:var(--pp-glass-surface);backdrop-filter:var(--pp-glass-blur);-webkit-backdrop-filter:var(--pp-glass-blur)}
 #student-live-material[data-mode="homework"] .profiprofit-student-lesson{background:transparent!important}
 
-#student-live-material[data-mode="homework"] .pp-homework-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:8px 0 12px;flex-wrap:wrap}
+#student-live-material[data-mode="homework"] .pp-homework-toolbar{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;gap:10px;padding:10px 12px;flex-wrap:wrap;background:var(--card-bg);border:1px solid var(--pp-shell-border);border-radius:12px}
 #student-live-material[data-mode="homework"] .pp-homework-save-status{font-size:12px;color:var(--text-secondary)}
-#student-live-material[data-mode="homework"] .pp-homework-submit{background:#4E2A84!important;color:#fff!important;border:1px solid #684b9a!important;border-radius:10px!important;padding:10px 18px!important;font-weight:650;cursor:pointer}
-#student-live-material[data-mode="homework"] .pp-homework-submit:hover{background:#60379b!important}
+#student-live-material[data-mode="homework"] .pp-homework-submit{background:#D99B26!important;color:#1F242D!important;border:1px solid #D99B26!important;border-radius:10px!important;padding:10px 18px!important;font-weight:650;cursor:pointer}
+#student-live-material[data-mode="homework"] .pp-homework-submit:hover{background:#e5ae40!important}
 #student-live-material[data-mode="homework"] .pp-homework-submit:disabled{opacity:.55;cursor:wait}
 #student-live-material[data-mode="homework"] .pp-homework-submit[hidden]{display:none!important}
-#student-live-material[data-mode="homework"] .mb-student-card{border-color:var(--border-color)!important;border-radius:12px!important}
+#student-live-material[data-mode="homework"] .mb-student-card{border-color:var(--pp-shell-border)!important;border-radius:12px!important}
 
 #public-week-calendar .calendar-day-column{min-height:132px!important;padding-bottom:12px!important}
 #public-week-calendar .calendar-event-card{cursor:default!important;min-height:64px!important;padding-block:9px!important}
@@ -783,7 +789,7 @@ html[data-theme="dark"] dialog.pp-homework-assign-dialog :is(select,textarea,inp
 #student-public-view .pp-student-header-actions{flex:1 1 auto!important;justify-content:flex-end!important;margin-left:auto!important}
 #student-public-view .pp-student-quick-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0 16px;min-width:0}
 #student-public-view .pp-student-quick-actions .pp-student-join{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;font-size:14px!important;padding:9px 16px!important;min-height:44px;white-space:normal;text-decoration:none;text-align:center}
-#student-public-view .pp-student-quick-actions .pp-student-meet{background:var(--card-bg)!important;color:var(--text-color)!important;border-color:var(--border-color)!important}
+#student-public-view .pp-student-quick-actions .pp-student-meet{background:#D99B26!important;color:#1F242D!important;border-color:#D99B26!important}
 @media(max-width:600px){
  #student-public-view .pp-student-header-actions{flex:1 1 100%!important;justify-content:space-between!important}
  #student-public-view .pp-student-quick-actions .pp-student-join{flex:1 1 140px}
