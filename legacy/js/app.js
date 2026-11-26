@@ -2422,6 +2422,7 @@ async function initPublicStudent(){
     else if(live.error)console.warn('Live status unavailable:',live.error.message);
     await openStudentCabinet();
     await refreshPublicHomework(id);
+    await restorePublicHomework(id);
     // Restore an active lesson after a refresh, without requiring the student
     // to return to the dashboard or confirm joining again.
     try{
@@ -3047,7 +3048,16 @@ async function openPublicHomeworkList(studentId){
   void refreshPublicHomework(studentId);
  }catch(e){list.textContent=homeworkText('Unable to load homework: ','Не удалось загрузить задания: ')+(e.message||e);}
 }
+async function restorePublicHomework(studentId){
+ if(document.getElementById('student-live-material'))return;
+ let id;try{id=sessionStorage.getItem('pp-open-homework:'+studentId);}catch{return;}
+ if(!id)return;
+ try{const {data,error}=await supabaseClient.rpc('get_public_student_homework_material',{p_student_id:studentId,p_assignment_id:id});if(error)throw error;if(data?.plan&&!document.getElementById('student-live-material'))showPublicHomeworkMaterial(data,studentId);else if(!data?.plan)sessionStorage.removeItem('pp-open-homework:'+studentId);}catch(e){console.warn('Homework restore failed',e);}
+}
 function showPublicHomeworkMaterial(assignment,studentId){
+ const resumeKey='pp-open-homework:'+studentId;
+ try{sessionStorage.setItem(resumeKey,assignment.id);}catch{}
+ const clearResume=()=>{try{sessionStorage.removeItem(resumeKey);}catch{}};
  const overlay=document.createElement('div');overlay.id='student-live-material';overlay.dataset.mode='homework';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:var(--card-bg);overflow:auto';
  const source=document.querySelector('#student-public-view .app-header[data-shared-header="1"]');
  const header=source?source.cloneNode(true):createAppHeader('student');
@@ -3069,11 +3079,11 @@ function showPublicHomeworkMaterial(assignment,studentId){
   queue=task;return task.catch(e=>{status.textContent=homeworkText('Not saved: ','Не сохранено: ')+(e.message||e);throw e;});
  }
  function onChange(next){if(readOnly||busy)return;answers=next;dirty=true;clearTimeout(timer);timer=setTimeout(()=>{void save().catch(()=>{});},500);}
- back.onclick=async()=>{if(busy)return;busy=true;try{if(dirty)await save();else await queue;cleanup?.();overlay.remove();void openPublicHomeworkList(studentId);}catch(e){alert(e.message||e);}finally{busy=false;}};
- submit.onclick=async()=>{if(busy||readOnly||!confirm(homeworkText('Submit this homework? You cannot edit it after submission.','Сдать работу? После сдачи редактирование будет недоступно.')))return;busy=true;submit.disabled=true;try{await save(true);readOnly=true;void refreshPublicHomework(studentId);const done=document.createElement('dialog');done.className='app-card';done.style.width='min(420px,92vw)';const heading=document.createElement('h2');heading.textContent=homeworkText('✓ Homework submitted','✓ Домашняя работа сдана');const message=document.createElement('p');message.textContent=homeworkText('Your homework has been submitted successfully.','Домашняя работа успешно отправлена преподавателю.');const finish=document.createElement('button');finish.type='button';finish.className='pp-student-join';finish.style.cssText='display:block;width:100%;margin-top:20px';finish.textContent=homeworkText('Close','Закрыть');finish.onclick=()=>done.close();done.append(heading,message,finish);document.body.append(done);done.addEventListener('close',()=>{done.remove();cleanup?.();overlay.remove();void openPublicHomeworkList(studentId);},{once:true});submit.hidden=true;done.showModal();}catch(e){alert(e.message||e);}finally{busy=false;submit.disabled=false;}};
+ back.onclick=async()=>{if(busy)return;busy=true;try{if(dirty)await save();else await queue;clearResume();cleanup?.();overlay.remove();void openPublicHomeworkList(studentId);}catch(e){alert(e.message||e);}finally{busy=false;}};
+ submit.onclick=async()=>{if(busy||readOnly||!confirm(homeworkText('Submit this homework? You cannot edit it after submission.','Сдать работу? После сдачи редактирование будет недоступно.')))return;busy=true;submit.disabled=true;try{await save(true);clearResume();readOnly=true;void refreshPublicHomework(studentId);const done=document.createElement('dialog');done.className='app-card';done.style.width='min(420px,92vw)';const heading=document.createElement('h2');heading.textContent=homeworkText('✓ Homework submitted','✓ Домашняя работа сдана');const message=document.createElement('p');message.textContent=homeworkText('Your homework has been submitted successfully.','Домашняя работа успешно отправлена преподавателю.');const finish=document.createElement('button');finish.type='button';finish.className='pp-student-join';finish.style.cssText='display:block;width:100%;margin-top:20px';finish.textContent=homeworkText('Close','Закрыть');finish.onclick=()=>done.close();done.append(heading,message,finish);document.body.append(done);done.addEventListener('close',()=>{done.remove();cleanup?.();overlay.remove();void openPublicHomeworkList(studentId);},{once:true});submit.hidden=true;done.showModal();}catch(e){alert(e.message||e);}finally{busy=false;submit.disabled=false;}};
  if(header){header.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));header.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));header.querySelectorAll('.pp-student-join').forEach(n=>n.remove());const actions=header.querySelector('.pp-student-header-actions');if(actions){installStudentProfileMenu(actions);actions.prepend(back);}else header.append(back);overlay.append(header);}else overlay.append(back);
  const main=document.createElement('main');main.className='pp-student-live-main';
- const host=document.createElement('div');const toolbar=document.createElement('div');toolbar.className='pp-homework-toolbar';status.className='pp-homework-save-status';submit.classList.add('pp-homework-submit');toolbar.append(status,submit);main.append(toolbar,host);overlay.append(main);document.body.append(overlay);
+ const host=document.createElement('div');const toolbar=document.createElement('div');toolbar.className='pp-homework-toolbar';status.className='pp-homework-save-status';submit.classList.add('pp-homework-submit');const cancel=document.createElement('button');cancel.type='button';cancel.className='pp-student-return';cancel.textContent=homeworkText('Cancel','Отмена');cancel.onclick=()=>back.click();toolbar.style.cssText='display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding:12px 0';status.style.marginRight='auto';toolbar.append(cancel,status,submit);main.append(host,toolbar);overlay.append(main);document.body.append(overlay);
  // The snapshot contains only the assigned section. Normalize its stage flag
  // for the existing student renderer, which excludes homework during live lessons.
  const plan={...assignment.plan,stages:assignment.plan.stages.map(s=>({...s,homework:false}))};
