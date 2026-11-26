@@ -364,10 +364,10 @@ html[data-theme=dark] #teacher-app > .native-layout > .native-sidebar{background
 /* Shared dark-theme semantic palette for teacher and student dashboard surfaces.
    Keep these scoped to the two portal roots, not the Classroom editor. */
 html[data-theme="dark"] :is(#teacher-app, #student-public-view.pp-student-one-page) {
- --pp-dark-surface:#30283b;
- --pp-dark-surface-raised:#3b3248;
+ --pp-dark-surface:#2D2637;
+ --pp-dark-surface-raised:#393245;
  --pp-dark-border:#51475f;
- --pp-dark-border-raised:#645573;
+ --pp-dark-border-raised:#51475F;
  --pp-dark-text:#f4eefa;
 }
 
@@ -601,16 +601,16 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 
 /* Shared portal surface tokens. Keep dialogs and exercise feedback opaque. */
 :root {
- --pp-shell-border:#e0e3e9;
+ --pp-shell-border:#DADCE3;
  --pp-shell-border-width:1px;
- --pp-glass-surface:rgba(255,255,255,.65);
+ --pp-glass-surface:rgba(244,245,247,.65);
  --pp-glass-raised:rgba(255,255,255,.75);
  --pp-glass-blur:blur(1px);
 }
 html[data-theme="dark"] {
  --pp-shell-border:#51475f;
- --pp-glass-surface:rgba(48,40,59,.65);
- --pp-glass-raised:rgba(59,50,72,.75);
+ --pp-glass-surface:rgba(45,38,55,.65);
+ --pp-glass-raised:#393245;
 }
 html:not([data-theme="dark"]) #teacher-app,
 html[data-theme="dark"] #teacher-app {--pp-shell-border:inherit;}
@@ -653,3 +653,7 @@ html[data-pp-teacher-wallpaper] #teacher-app #tab-dashboard :is(#dashboard-cards
  backdrop-filter:var(--pp-glass-blur)!important;
  -webkit-backdrop-filter:var(--pp-glass-blur)!important;
 }
+
+/* Canonical surface tokens shared by portal and classroom. */
+:root{--pp-surface:#F4F5F7;--pp-raised:#FFFFFF;--pp-panel-radius:12px;--pp-control-radius:8px;--app-header-surface:var(--pp-surface);--pp-glass-raised:var(--pp-raised)}
+html[data-theme="dark"]{--pp-surface:var(--pp-dark-surface);--pp-raised:var(--pp-dark-surface-raised);--app-header-surface:var(--pp-surface)}
