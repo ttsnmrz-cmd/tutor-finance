@@ -1207,3 +1207,7 @@ html[data-theme="dark"] #teacher-app #classroom-materials-root .mb-builder:not(.
 /* Shared header geometry and breathing room above builder breadcrumbs. */
 html #teacher-app #teacher-header,html #student-public-view #student-header{border-radius:var(--pp-panel-radius,12px)!important}
 #teacher-app #classroom-materials-root .mb-builder:not(.mb-student-preview){padding-top:12px!important;border-radius:var(--pp-panel-radius,12px)!important}
+
+/* Focus mode must override collapsed navigation grid and explicit main placement. */
+html #teacher-app:has(.mb-student-preview) > .native-layout,html #teacher-app:has(.mb-student-preview) > .native-layout.sidebar-collapsed{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-areas:none!important;gap:0!important}
+html #teacher-app:has(.mb-student-preview) > .native-layout > #teacher-main{grid-area:auto!important;grid-column:1 / -1!important;grid-row:1!important;width:100%!important;min-width:0!important;max-width:none!important}
