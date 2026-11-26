@@ -20,17 +20,26 @@ window.openCalendarLivePicker=async function(sessionId=null){
  try{
   const {data:{user},error:authError}=await supabaseClient.auth.getUser();
   if(authError||!user)throw Error('Войдите в аккаунт преподавателя.');
-  const [session,plans,versions]=await Promise.all([
+  const [session,plans,versions,folders]=await Promise.all([
    supabaseClient.from('live_sessions').select('id,material_plan_id,material_version_id').eq(changingSession?'id':'calendar_lesson_id',changingSession||id).maybeSingle(),
-   supabaseClient.from('teaching_lesson_plans').select('id,body').eq('teacher_id',user.id),
-   supabaseClient.from('teaching_lesson_versions').select('id,plan_id,published_at').eq('teacher_id',user.id).order('published_at',{ascending:false})
+   supabaseClient.from('teaching_lesson_plans').select('id,body,section_id').eq('teacher_id',user.id),
+   supabaseClient.from('teaching_lesson_versions').select('id,plan_id,published_at').eq('teacher_id',user.id).order('published_at',{ascending:false}),
+   supabaseClient.from('material_sections').select('id,title,parent_id,position').eq('teacher_id',user.id).order('position')
   ]);
-  for(const r of [session,plans,versions])if(r.error)throw r.error;
+  for(const r of [session,plans,versions,folders])if(r.error)throw r.error;
   const existing=session.data;
   select.append(new Option('Без материала (выбрать позже)',''));
   const latest=new Map();
   for(const v of versions.data||[])if(!latest.has(v.plan_id))latest.set(v.plan_id,v.id);
-  for(const p of plans.data||[])select.append(new Option((p.body?.title||'Без названия')+(latest.has(p.id)?'':' · черновик'),p.id));
+  const all=plans.data||[],sections=folders.data||[],seen=new Set(),added=new Set();
+  const en=document.documentElement.lang!=='ru';
+  const label=p=>(p.body?.title|| (en?'Untitled':'Без названия'))+' · '+(p.body?.readiness==='ready'?(en?'Ready':'Готово'):(en?'Draft':'Черновик'));
+  const append=(parent,rows)=>{for(const p of [...rows].sort((a,b)=>(a.body?.title||'').localeCompare(b.body?.title||'',undefined,{numeric:true}))){parent.append(new Option(label(p),p.id));added.add(p.id);}};
+  append(select,all.filter(p=>!p.section_id));
+  function visit(folder,path){if(seen.has(folder.id))return;seen.add(folder.id);const full=[...path,folder.title];const rows=all.filter(p=>p.section_id===folder.id);if(rows.length){const group=document.createElement('optgroup');group.label=full.join(' › ');append(group,rows);select.append(group);}for(const child of sections.filter(f=>f.parent_id===folder.id))visit(child,full);}
+  for(const folder of sections.filter(f=>!f.parent_id))visit(folder,[]);
+  for(const folder of sections)if(!seen.has(folder.id))visit(folder,[]);
+  append(select,all.filter(p=>!added.has(p.id)));
   select.value=existing?.material_plan_id||'';
   select.disabled=false;
   picker.dataset.sessionId=existing?.id||'';
