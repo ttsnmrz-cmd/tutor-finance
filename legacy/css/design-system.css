@@ -598,3 +598,17 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 #student-live-material#student-live-material,#student-public-view#student-public-view{padding:14px!important;box-sizing:border-box!important}
 @media(min-width:769px){#teacher-app #pp-mobile-menu,#teacher-app .native-sidebar .pp-mobile-profile-entry{display:none!important}}
 @media(max-width:768px){:is(#teacher-app #teacher-header,#student-public-view .student-brand-header,#student-live-material .pp-student-live-header).app-header{padding:10px 12px!important;min-height:0!important}:is(#teacher-app #teacher-header,#student-public-view .student-brand-header,#student-live-material .pp-student-live-header).app-header > .app-header-brand img{width:38px!important;height:38px!important;max-width:38px!important;flex-basis:38px!important}:is(#teacher-app #teacher-header,#student-public-view .student-brand-header,#student-live-material .pp-student-live-header).app-header > .app-header-brand .text-2xl{font-size:17px!important}}
+
+/* Teacher wallpaper: shared header consumes the translucent surface token. */
+html[data-pp-teacher-wallpaper] #teacher-app #teacher-header.app-header {
+ --app-header-surface:rgba(255,255,255,.65);
+ background:var(--app-header-surface)!important;
+ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+html[data-theme="dark"][data-pp-teacher-wallpaper] #teacher-app #teacher-header.app-header {
+ --app-header-surface:rgba(45,38,55,.65);
+ --app-header-border:var(--pp-dark-border,#51475f);
+}
+html[data-theme="dark"] #teacher-app > .native-layout > #teacher-main {
+ border-color:var(--pp-dark-border,#51475f)!important;
+}
