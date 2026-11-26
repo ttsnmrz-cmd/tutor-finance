@@ -591,3 +591,8 @@ html[data-theme="dark"] .mb-fillers .mb-memory-cell[data-state="matched"]{backgr
 .mb-builder.mb-student-preview[data-homework-review="true"]{padding:0!important;margin:0!important;gap:0!important;min-height:0!important;height:auto!important;}
 .mb-builder.mb-student-preview[data-homework-review="true"] .mb-preview-workspace{padding:0!important;margin:0!important;gap:0!important;min-height:0!important;}
 .mb-builder.mb-student-preview[data-homework-review="true"] .mb-student-card{margin:0!important;min-height:0!important;}
+
+/* Homework uses the same frosted surfaces as the student header. */
+.mb-builder.mb-student-preview[data-homework-mode="true"]:not([data-homework-review="true"]) :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card){background:rgba(255,255,255,.72)!important;backdrop-filter:blur(8px);}
+html[data-theme="dark"] .mb-builder.mb-student-preview[data-homework-mode="true"]:not([data-homework-review="true"]) :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card){background:rgba(45,38,55,.65)!important;backdrop-filter:blur(8px);border-color:#51475f!important;}
+.mb-homework-readonly{margin:0 0 12px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:13px;}
