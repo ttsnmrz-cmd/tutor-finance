@@ -76,6 +76,8 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  const homeworkPreview=!studentMode&&!liveSessionId&&plan.stages.some(s=>s.homework&&plan.blocks.some(b=>b.id===selected&&b.stage===s.id));
  const ordered=[...plan.stages.filter(s=>homeworkPreview? s.homework:!s.homework).flatMap(s=>plan.blocks.filter(b=>b.stage===s.id&&!b.hiddenFromStudent)),...plan.blocks.filter(b=>!homeworkPreview&&!b.hiddenFromStudent&&b.scope!=='homework'&&!plan.stages.some(s=>s.id===b.stage))];
  const steps:Block[][]=[];ordered.forEach(b=>{const last=steps[steps.length-1];if((b as Block&{joinPrevious?:boolean}).joinPrevious&&last?.[last.length-1].stage===b.stage)last.push(b);else steps.push([b]);});
+ const [focusMode,setFocusMode]=useState(!!liveSessionId&&!homework);
+ useEffect(()=>{setFocusMode(!!liveSessionId&&!homework);},[liveSessionId,!!homework]);
  const [notesOpen,setNotesOpen]=useState(false),[teacherHints,setTeacherHints]=useState(!studentMode);
  const [studentNavOpen,setStudentNavOpen]=useState(false),[followEnabled,setFollowEnabled]=useState(false),[studentExercise,setStudentExercise]=useState<string|null>(null),[fillerOpen,setFillerOpen]=useState(false),[fillerState,setFillerState]=useState<FillerState>(initialFillerState);
  const [index,setIndex]=useState(()=>{if(studentMode){try{const saved=sessionStorage.getItem(scopeKey+':exercise');const found=steps.findIndex(group=>group.some(b=>b.id===saved));if(found>=0)return found;}catch{}}return Math.max(0,steps.findIndex(group=>group.some(b=>b.id===selected)));});
@@ -98,14 +100,16 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
   resize();window.addEventListener('resize',resize);const observer=new ResizeObserver(resize);if(el.parentElement)observer.observe(el.parentElement);return()=>{window.removeEventListener('resize',resize);observer.disconnect();};
  },[]);
  const studentAway=!studentMode&&!!studentExercise&&studentExercise!==block?.id;
- return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,review:scopeKey.startsWith('homework:review:'),enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section ref={viewportRef} style={{display:"flex",flexDirection:"column"}} className="mb-builder mb-student-preview" data-homework-mode={homework?"true":undefined} data-homework-review={scopeKey.startsWith("homework:review:")?"true":undefined} aria-label={ui('Student preview')}>
+ return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,review:scopeKey.startsWith('homework:review:'),enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section ref={viewportRef} style={{display:"flex",flexDirection:"column"}} className="mb-builder mb-student-preview" data-focus-mode={focusMode?"true":undefined} data-homework-mode={homework?"true":undefined} data-homework-review={scopeKey.startsWith("homework:review:")?"true":undefined} aria-label={ui('Student preview')}>
   {!scopeKey.startsWith("homework:review:")&&<div className="mb-preview-top">
    <div className="mb-preview-heading-row">
+    {studentMode&&!homework&&<button type="button" className="mb-focus-toggle" aria-pressed={focusMode} aria-label={ui(focusMode?"Show header":"Hide header")} title={ui(focusMode?"Show header":"Hide header")} onClick={()=>setFocusMode(v=>!v)}>{focusMode?"⌄":"⌃"}</button>}
     <h1>{plan.title}{stage&&<><span className="mb-preview-crumb-separator" aria-hidden="true">›</span><span className="mb-preview-section-crumb">{stage.name}</span></>}</h1>
     {studentMode&&!homework&&<PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} liveSessionId={liveSessionId} onNotes={()=>setNotesOpen(true)} followEnabled={followEnabled} studentAway={studentAway} onToggleFollow={()=>{const next=!followEnabled;setFollowEnabled(next);if(next)bringStudentHere();}} onBringHere={bringStudentHere} onFillers={toggleFiller} fillersOpen={fillerOpen}/>}
     {!studentMode&&<button className="mb-preview-back" onClick={onBack}>✎ {ui('Builder')}</button>}
    </div>
    {!studentMode&&<div className="mb-preview-tools-row">
+    {!homework&&<button type="button" className="mb-focus-toggle" aria-pressed={focusMode} aria-label={ui(focusMode?"Show header":"Hide header")} title={ui(focusMode?"Show header":"Hide header")} onClick={()=>setFocusMode(v=>!v)}>{focusMode?"⌄":"⌃"}</button>}
     {!studentMode&&<label className="mb-teacher-hints-toggle"><input type="checkbox" checked={teacherHints} onChange={e=>setTeacherHints(e.target.checked)}/> {ui('Teacher Hints')}</label>}
     {!studentMode&&<TeacherPrompts key={stage?.name||''} scope={assetScope} section={stage?.name||''}/>}{!studentMode&&!homework&&<PreviewControls activeId={block?.id||'empty'} scopeKey={scopeKey} studentMode={studentMode} liveSessionId={liveSessionId} onNotes={()=>setNotesOpen(true)} followEnabled={followEnabled} studentAway={studentAway} onToggleFollow={()=>{const next=!followEnabled;setFollowEnabled(next);if(next)bringStudentHere();}} onBringHere={bringStudentHere} onFillers={toggleFiller} fillersOpen={fillerOpen}/>}
    </div>}
