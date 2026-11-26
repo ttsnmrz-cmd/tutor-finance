@@ -2366,6 +2366,15 @@ async function initPublicStudent(){
   const nameEl=document.getElementById('student-public-name');
   const errorEl=document.getElementById('student-public-error');
 
+  const loader=document.createElement('div');
+  loader.setAttribute('role','status');
+  loader.style.cssText='position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--card-bg,#f4f5f7);color:var(--text-color,#292d36)';
+  const logo=document.createElement('img');
+  logo.src='/legacy/ProfoProfit_logo%20svg.svg';logo.alt='ProfiProfit';
+  logo.style.cssText='width:88px;height:88px;border-radius:22px';
+  const label=document.createElement('span');label.textContent=homeworkText('Loading…','Загрузка…');
+  loader.append(logo,label);document.body.append(loader);
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)logo.animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:1800,iterations:Infinity,easing:'linear'});
   view.classList.remove('hidden');
   nameEl.textContent='Загрузка...';
   errorEl.textContent='';
@@ -2402,7 +2411,7 @@ async function initPublicStudent(){
     if(!live.error&&Array.isArray(live.data))publicStudentLiveStatuses=new Map(live.data.map(x=>[String(x.calendar_lesson_id),x]));
     else if(live.error)console.warn('Live status unavailable:',live.error.message);
     await openStudentCabinet();
-    void refreshPublicHomework(id);
+    await refreshPublicHomework(id);
     // Restore an active lesson after a refresh, without requiring the student
     // to return to the dashboard or confirm joining again.
     try{
@@ -2423,6 +2432,8 @@ async function initPublicStudent(){
     nameEl.textContent='Личный кабинет';
     errorEl.textContent=
       e?.message||'Не удалось загрузить данные ученика.';
+  }finally{
+    loader.remove();
   }
 
   return true;
