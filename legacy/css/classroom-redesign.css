@@ -1114,3 +1114,9 @@ html[data-theme="dark"] #teacher-app .native-student-list-tabs button.is-active{
 :is(.pp-pointer-controls,.annotation-tool-icons) button svg{color:inherit}
 html[data-theme="dark"] :is(.pp-pointer-controls,.annotation-tool-icons) button{color:#eee6fa}
 @media(max-width:600px){#student-live-material[data-mode="homework"] .pp-homework-toolbar{gap:6px;padding:8px}.pp-homework-submit{white-space:normal;max-width:100%}.pp-homework-review-actions button{flex:1 1 auto}}
+
+html[data-theme="dark"] #teacher-app #tab-students .native-student-list-tabs{border-bottom-color:var(--pp-shell-border)!important}
+html[data-theme="dark"] #teacher-app #tab-students .native-student-list-tabs button{color:#c9bddb!important;border-bottom-color:transparent!important}
+html[data-theme="dark"] #teacher-app #tab-students .native-student-list-tabs button.is-active{color:#f5edff!important;border-bottom-color:#bda4e8!important}
+html[data-theme="dark"] #teacher-app #tab-students button.native-student-edit{color:#eee6fa!important;border:1px solid var(--pp-shell-border)!important;background:rgba(160,139,192,.15)!important}
+html[data-theme="dark"] #teacher-app #tab-students button.native-student-edit:hover{background:rgba(160,139,192,.28)!important}
