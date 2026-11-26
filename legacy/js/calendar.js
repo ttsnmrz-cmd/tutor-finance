@@ -74,7 +74,7 @@ function renderWeek(){
       const height=Math.max(48,Math.min(180,Number(l.duration||60)*pxPerHour/60-4));
       const comment=String(l.comment||'').trim();
       const cancelled=['rescheduled','cancelled_charge','cancelled_free'].includes(l.status);
-      return '<button type="button" style="top:'+top+'px;height:'+height+'px" onclick="openEditLesson(\''+esc(l.id)+'\')" class="calendar-event-card native-timed-event '+(cancelled?'is-cancelled':'')+'"><span class="native-event-row"><strong class="calendar-event-time">'+esc(displayTime(l.time))+'</strong><strong class="calendar-event-title">'+esc(lessonTitle(l))+'</strong></span><span class="native-event-row"><span class="calendar-event-meta">'+money(['cancelled_free','rescheduled'].includes(l.status)?0:lessonPriceTotal(l))+'</span><span class="status '+(statusClass[l.status]||'bg-slate-100')+'">'+(statusLabels[l.status]||l.status)+'</span></span>'+(comment?'<span class="native-event-comment" title="'+esc(comment)+'">'+esc(comment)+'</span>':'')+'</button>';
+      return '<button type="button" style="top:'+top+'px;height:'+height+'px" onclick="openCalendarLessonSummary(\''+esc(l.id)+'\')" class="calendar-event-card native-timed-event '+(cancelled?'is-cancelled':'')+'"><span class="native-event-row"><strong class="calendar-event-time">'+esc(displayTime(l.time))+'</strong><strong class="calendar-event-title">'+esc(lessonTitle(l))+'</strong></span><span class="native-event-row"><span class="calendar-event-meta">'+money(['cancelled_free','rescheduled'].includes(l.status)?0:lessonPriceTotal(l))+'</span><span class="status '+(statusClass[l.status]||'bg-slate-100')+'">'+(statusLabels[l.status]||l.status)+'</span></span>'+(comment?'<span class="native-event-comment" title="'+esc(comment)+'">'+esc(comment)+'</span>':'')+'</button>';
     }).join('');
     return '<div class="native-day"><button type="button" class="calendar-day-heading '+(isToday?'is-today':'')+'" onclick="selectDay(\''+key+'\')"><span class="calendar-weekday">'+d.toLocaleDateString(lang,{weekday:'short'}).replace('.','')+'</span><span class="calendar-day-number">'+d.getDate()+'</span></button><div class="native-day-track" data-date="'+key+'" onclick="createLessonFromCalendarSlot(event,this)" style="height:'+((hourEnd-hourStart)*pxPerHour)+'px">'+cards+'</div></div>';
   }).join('');
@@ -147,7 +147,7 @@ function renderDay(){
   document.getElementById('day-lessons').innerHTML=
     (ls.length
       ?ls.map(l=>
-        `<button onclick="openEditLesson('${esc(l.id)}')" class="w-full text-left border-b last:border-0 py-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl px-2">
+        `<button onclick="openCalendarLessonSummary('${esc(l.id)}')" class="w-full text-left border-b last:border-0 py-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl px-2">
           <div class="w-16 font-bold">
             ${esc(displayTime(l.time))}
           </div>
@@ -186,4 +186,31 @@ function createLessonFromCalendarSlot(event,track){
   selectedDate=date;
   const time=String(Math.floor(minutes/60)).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
   openNewLessonForDate(date,time);
+}
+
+function openCalendarLessonSummary(id){
+ const l=lessons.find(x=>String(x.id)===String(id));if(!l)return;
+ const tr=(en,ru)=>window.getLanguage?.()==='en'?en:ru;
+ document.getElementById('calendar-lesson-summary')?.remove();
+ const d=document.createElement('dialog');d.id='calendar-lesson-summary';d.className='app-card';
+ const dark=document.documentElement.dataset.theme==='dark';
+ d.style.cssText='width:min(420px,92vw);padding:24px;border-radius:20px;border:1px solid '+(dark?'#625571':'#ded9e7')+';background:'+(dark?'#292536':'#fff')+';color:'+(dark?'#eeeaf5':'#1f242d')+';';
+ const dt=lessonDateTimeInTimezone(l,getTeacherTimezone()),duration=Number(l.duration||60);
+ const start=String(dt.time||'').replace('.',':').split(':');const end=(Number(start[0])*60+Number(start[1])+duration)%1440;
+ const endText=String(Math.floor(end/60)).padStart(2,'0')+':'+String(end%60).padStart(2,'0');
+ const header=document.createElement('div');header.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px';
+ const title=document.createElement('h2');title.style.cssText='font-size:22px;font-weight:700;margin:0';title.textContent=lessonTitle(l);
+ const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label',tr('Close','Закрыть'));close.style.cssText='font-size:24px;padding:4px 8px';close.onclick=()=>d.close();header.append(title,close);d.append(header);
+ const meta=document.createElement('div');meta.style.cssText='display:flex;justify-content:space-between;align-items:center;margin:12px 0;padding-bottom:12px;border-bottom:1px solid #827a9044';
+ const status=document.createElement('span');status.className='status '+(statusClass[l.status]||'');status.textContent=statusLabels[l.status]||l.status;
+ const price=document.createElement('strong');price.textContent=money(['cancelled_free','rescheduled'].includes(l.status)?0:lessonPriceTotal(l));meta.append(status,price);d.append(meta);
+ const details=document.createElement('div');details.style.cssText='display:grid;gap:10px;margin-bottom:20px';
+ function line(value){const p=document.createElement('div');p.textContent=value;details.append(p);}
+ line('▦  '+dateAtLocalNoon(dt.date).toLocaleDateString(tr('en-US','ru-RU'),{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+ line('◷  '+start.slice(0,2).join(':')+' – '+endText+' · '+duration+' '+tr('min','мин'));
+ if(l.comment)line(l.comment);d.append(details);
+ function action(label,primary,fn){const b=document.createElement('button');b.type='button';b.textContent=label;b.style.cssText='display:block;width:100%;padding:12px;margin-top:8px;border-radius:12px;font-weight:600;border:1px solid '+(primary?'#4e2a84':'#827a9066')+';background:'+(primary?'#4e2a84':'transparent')+';color:'+(primary?'#fff':'inherit');b.onclick=fn;d.append(b);}
+ action(l.status==='conducted'?tr('▶ Open lesson','▶ Открыть занятие'):tr('▶ Go to lesson','▶ Перейти к занятию'),true,()=>{d.close();openEditLesson(id);document.getElementById('lesson-modal')?.classList.add('hidden');window.openCalendarLivePicker();});
+ action(tr('Edit lesson','Редактировать занятие'),false,()=>{d.close();openEditLesson(id);});
+ d.addEventListener('close',()=>d.remove(),{once:true});document.body.append(d);d.showModal();
 }
