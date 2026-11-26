@@ -1174,8 +1174,8 @@ html[data-theme="dark"] #teacher-app #classroom-materials-root .mb-breadcrumb{ba
 #teacher-app #classroom-materials-root .mb-breadcrumb :is(a,button,span){color:inherit!important}
 
 /* Shared glass surface contract for classroom panels, independent of role. */
-:root{--pp-classroom-surface:rgba(255,255,255,.8);--pp-classroom-blur:blur(1px)}
-html[data-theme="dark"]{--pp-classroom-surface:rgba(41,36,53,.8)}
+:root{--pp-classroom-surface:var(--pp-surface);--pp-classroom-blur:none}
+html:is([data-pp-teacher-wallpaper],[data-pp-student-background]){--pp-classroom-surface:var(--pp-glass-surface);--pp-classroom-blur:var(--pp-glass-blur)}
 html:is([data-pp-teacher-wallpaper],[data-pp-student-background]) :is(#teacher-app,#student-live-material,.pp-homework-review) :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card,.mb-preview-workspace>.mb-preview-notes,.mb-builder:not(.mb-student-preview),.mb-breadcrumb,.pp-homework-heading,.pp-homework-toolbar,.pp-homework-feedback){
  background:var(--pp-classroom-surface)!important;
  backdrop-filter:var(--pp-classroom-blur)!important;
@@ -1189,8 +1189,8 @@ html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root:has(.mb-s
 html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card,.mb-preview-workspace>.mb-preview-notes){background:var(--pp-classroom-surface)!important;backdrop-filter:var(--pp-classroom-blur)!important;-webkit-backdrop-filter:var(--pp-classroom-blur)!important}
 
 /* Keep exercise content opaque; glass is reserved for surrounding chrome. */
-html:not([data-theme="dark"]) :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:#fff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-html[data-theme="dark"] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:#292435!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html:not([data-theme="dark"]) :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html[data-theme="dark"] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 
 
 /* Opaque exercise editing surface, matching the preview body. */
@@ -1227,3 +1227,9 @@ dialog.pp-student-lesson-dialog :is(h2,[data-lesson-notes],.pp-student-dialog-he
 dialog.pp-student-lesson-dialog .pp-student-dialog-heading{align-items:flex-start!important}
 .pp-lesson-note-date{display:block;font-size:13px;font-weight:400;opacity:.75;margin-top:4px}
 html[data-pp-teacher-wallpaper] #teacher-app #teacher-header.app-header{background:var(--pp-classroom-surface)!important;background-image:none!important;backdrop-filter:var(--pp-classroom-blur)!important;-webkit-backdrop-filter:var(--pp-classroom-blur)!important}
+
+/* Shared preview surface ownership: only outer panels paint. */
+:is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview{--card:var(--pp-surface);--page:var(--pp-raised);--soft:var(--pp-raised);--line:var(--pp-shell-border)}
+html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-student-card,.mb-preview-notes){background:var(--pp-classroom-surface)!important;border-color:var(--pp-shell-border)!important;backdrop-filter:var(--pp-classroom-blur)!important;-webkit-backdrop-filter:var(--pp-classroom-blur)!important}
+html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview :is(.mb-preview-heading-row,.mb-preview-tools-row,.mb-student-body,.mb-student-content,.mb-preview-footer,.mb-preview-notes-heading,.mb-rich-field){background:transparent!important;box-shadow:none!important}
+html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-rich-input{background:var(--pp-raised)!important;border-color:var(--pp-shell-border)!important}
