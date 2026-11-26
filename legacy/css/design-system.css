@@ -612,3 +612,16 @@ html[data-theme="dark"][data-pp-teacher-wallpaper] #teacher-app #teacher-header.
 html[data-theme="dark"] #teacher-app > .native-layout > #teacher-main {
  border-color:var(--pp-dark-border,#51475f)!important;
 }
+
+/* Materials has its own panel; do not frame the transparent outer workspace. */
+html[data-pp-teacher-wallpaper] #teacher-app > .native-layout > #teacher-main:has(#tab-materials:not(.hidden)) {
+ border-color:transparent!important;box-shadow:none!important;
+}
+/* Match the header even before the shared app-header class is attached. */
+html[data-pp-teacher-wallpaper] #teacher-app #teacher-header#teacher-header {
+ background:rgba(255,255,255,.65)!important;
+ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+html[data-theme="dark"][data-pp-teacher-wallpaper] #teacher-app #teacher-header#teacher-header {
+ background:rgba(45,38,55,.55)!important;
+}
