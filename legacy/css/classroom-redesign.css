@@ -1191,8 +1191,15 @@ html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root .mb-build
 /* Keep exercise content opaque; glass is reserved for surrounding chrome. */
 html:not([data-theme="dark"]) :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:#fff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html[data-theme="dark"] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:#292435!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-@media(min-width:701px){#teacher-app:has(.mb-student-preview)>.native-layout:has(>.native-sidebar:not(.hidden)){display:grid!important;grid-template-columns:220px minmax(0,1fr)!important;align-items:start;gap:12px!important}#teacher-app:has(.mb-student-preview)>.native-layout.sidebar-collapsed:has(>.native-sidebar:not(.hidden)){grid-template-columns:76px minmax(0,1fr)!important}#teacher-app:has(.mb-student-preview)>.native-layout>.native-sidebar:not(.hidden){width:100%!important;min-width:0!important;box-sizing:border-box}}
+
 
 /* Opaque exercise editing surface, matching the preview body. */
 html:not([data-theme="dark"]) #teacher-app #classroom-materials-root .mb-builder:not(.mb-student-preview) .mb-editor{background:#fff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html[data-theme="dark"] #teacher-app #classroom-materials-root .mb-builder:not(.mb-student-preview) .mb-editor{background:#292435!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* Focused lesson/preview workspace: navigation returns automatically in builder. */
+#teacher-app:has(.mb-student-preview)>.native-layout{grid-template-columns:minmax(0,1fr)!important;gap:0!important;padding-inline:12px!important}
+#teacher-app:has(.mb-student-preview)>.native-layout>.native-sidebar{display:none!important}
+#teacher-app #classroom-materials-root .ml-builder-host:has(.mb-student-preview){padding-inline:0!important}
+#teacher-app #classroom-materials-root .mb-builder.mb-student-preview{padding-inline:0!important;margin-inline:0!important;width:100%!important;box-sizing:border-box}
+#teacher-app #classroom-materials-root:has(.mb-student-preview) .mb-breadcrumb{margin-inline:0!important;width:100%!important;box-sizing:border-box}
