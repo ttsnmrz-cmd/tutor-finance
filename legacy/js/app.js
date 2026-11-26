@@ -1984,10 +1984,11 @@ const ppStudentBackgrounds={
  gaming:{en:'Gaming',ru:'Игровой мир',color:'#77a9c6',art:'<g shape-rendering="crispEdges"><path d="M0 170h40v-35h40v-35h40v35h40v35h40v-65h40v-35h40v35h40v135H0Z" fill="#437b65"/><path d="M0 190h320v50H0Z" fill="#806047"/><path d="M0 180h320v20H0Z" fill="#83b94e"/><path d="M35 30h60v15h20v15H20V45h15ZM210 20h60v15h20v15h-95V35h15Z" fill="#e7f2ef"/><path d="M145 145h30v30h-30Z" fill="#eac15e"/><path d="M150 150h20v5h-20Z" fill="#fff2b0"/></g>'}
 };
 const ppWallpaperKeys=['cars','space','animals','gaming'];
-for(const key of ppWallpaperKeys){ppStudentBackgrounds['wallpaper-'+key]={...ppStudentBackgrounds[key],wallpaper:key+'.webp'};}
+const ppWallpaperFiles={cars:'Neon Rainy Night Sports Cars-1.png',space:'Cinematic Multiplanet Nebula Panorama-2.png',animals:'Majestic Wildlife at Sunset-3.png',gaming:'Neon Sci-Fi Gaming Battlestation-4.png'};
+for(const key of ppWallpaperKeys){ppStudentBackgrounds['wallpaper-'+key]={...ppStudentBackgrounds[key],wallpaper:ppWallpaperFiles[key]};}
 function ppStudentBackgroundKey(){return 'pp-student-background:'+new URLSearchParams(location.search).get('student');}
 function ppStudentBackgroundChoice(){try{return localStorage.getItem(ppStudentBackgroundKey())||'default';}catch{return 'default';}}
-function ppStudentBackgroundImage(key){const item=ppStudentBackgrounds[key];if(item?.wallpaper){const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl(item.wallpaper).data.publicUrl;return 'url("'+url+'?v=20261126-2")';}return item?'url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240"><rect width="320" height="240" fill="'+item.color+'"/>'+item.art+'</svg>')+'")':'none';}
+function ppStudentBackgroundImage(key){const item=ppStudentBackgrounds[key];if(item?.wallpaper){const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl(item.wallpaper).data.publicUrl;return 'url("'+url+'?v=20261126-3")';}return item?'url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240"><rect width="320" height="240" fill="'+item.color+'"/>'+item.art+'</svg>')+'")':'none';}
 function ppApplyStudentBackground(){
  if(!new URLSearchParams(location.search).get('student'))return;
  const key=ppStudentBackgroundChoice(),item=ppStudentBackgrounds[key];
