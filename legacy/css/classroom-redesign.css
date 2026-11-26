@@ -742,7 +742,7 @@ dialog.app-card .pp-student-join{background:var(--primary-color);color:white}
 dialog.app-card .student-theme-panel{border:1px solid var(--border-color);border-radius:12px;background:var(--accent-soft);display:grid;gap:8px}
 #student-live-material[data-mode="homework"]{display:flex!important;flex-direction:column;overflow:hidden!important;box-sizing:border-box;height:100dvh}
 #student-live-material[data-mode="homework"] > .app-header{flex:0 0 auto}
-#student-live-material[data-mode="homework"] .pp-student-live-main{display:flex!important;flex-direction:column;flex:1 1 0;min-height:0!important;height:auto!important;overflow:hidden!important;background:transparent!important;color:var(--text-color)!important}
+#student-live-material[data-mode="homework"] .pp-student-live-main{display:flex!important;flex-direction:column;gap:var(--pp-homework-gap,12px)!important;flex:1 1 0;min-height:0!important;height:auto!important;overflow:hidden!important;background:transparent!important;color:var(--text-color)!important}
 #student-live-material[data-mode="homework"] .pp-homework-content{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain}
 #student-live-material[data-mode="homework"] .pp-homework-close{font-size:14px;line-height:1.2;min-height:40px;flex-shrink:0}
 #student-live-material[data-mode="homework"] .pp-homework-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:10px 16px;border:1px solid var(--pp-shell-border);border-radius:12px;background:var(--card-bg)}
@@ -1078,7 +1078,7 @@ html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main){border:1
 #student-live-material[data-mode="homework"] .pp-homework-content .mb-preview-workspace{margin:0!important;padding:0!important}
 
 /* Teacher review uses the same fixed heading/content/footer layout as homework. */
-dialog.pp-homework-review[open]{display:flex!important;flex-direction:column;gap:8px;box-sizing:border-box;width:calc(100vw - 24px)!important;max-width:none!important;height:calc(100dvh - 24px)!important;max-height:none!important;overflow:hidden!important;padding:12px!important;border:1px solid var(--pp-shell-border)!important;border-radius:12px}
+dialog.pp-homework-review[open]{display:flex!important;flex-direction:column;gap:var(--pp-homework-gap,12px);box-sizing:border-box;width:calc(100vw - 24px)!important;max-width:none!important;height:calc(100dvh - 24px)!important;max-height:none!important;overflow:hidden!important;padding:12px!important;border:1px solid var(--pp-shell-border)!important;border-radius:12px}
 .pp-homework-review .pp-homework-heading,.pp-homework-review .pp-homework-toolbar{flex:0 0 auto;background:var(--card-bg);border:1px solid var(--pp-shell-border);border-radius:12px;padding:8px 12px}
 .pp-homework-review .pp-homework-heading{margin:0!important}
 .pp-homework-review .pp-homework-content{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain}
