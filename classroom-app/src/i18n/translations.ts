@@ -641,6 +641,8 @@ export const ru:Record<string,string>={
   "US": "US",
   "Unsaved notes from this browser are available.": "В этом браузере есть несохранённые заметки.",
   "Unspecified": "Не указан",
+  "Submitted": "Сдано",
+  "Read only": "Только просмотр",
   "Use": "Использовать",
   "Use Create material to add a lesson or a folder.": "Нажмите «Создать материал», чтобы добавить урок или папку.",
   "Use the email address your teacher invited.": "Используйте почту, на которую преподаватель выслал приглашение.",
