@@ -98,7 +98,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
   resize();window.addEventListener('resize',resize);const observer=new ResizeObserver(resize);if(el.parentElement)observer.observe(el.parentElement);return()=>{window.removeEventListener('resize',resize);observer.disconnect();};
  },[]);
  const studentAway=!studentMode&&!!studentExercise&&studentExercise!==block?.id;
- return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section ref={viewportRef} style={{display:"flex",flexDirection:"column"}} className="mb-builder mb-student-preview" data-homework-mode={homework?"true":undefined} data-homework-review={scopeKey.startsWith("homework:review:")?"true":undefined} aria-label={ui('Student preview')}>
+ return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,review:scopeKey.startsWith('homework:review:'),enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section ref={viewportRef} style={{display:"flex",flexDirection:"column"}} className="mb-builder mb-student-preview" data-homework-mode={homework?"true":undefined} data-homework-review={scopeKey.startsWith("homework:review:")?"true":undefined} aria-label={ui('Student preview')}>
   {!scopeKey.startsWith("homework:review:")&&<div className="mb-preview-top">
    <div className="mb-preview-heading-row">
     <h1>{plan.title}{stage&&<><span className="mb-preview-crumb-separator" aria-hidden="true">›</span><span className="mb-preview-section-crumb">{stage.name}</span></>}</h1>
