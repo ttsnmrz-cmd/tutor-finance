@@ -609,7 +609,7 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 }
 html[data-theme="dark"] {
  --pp-shell-border:#51475f;
- --pp-glass-surface:rgba(45,38,55,.65);
+ --pp-glass-surface:rgba(45,38,55,.90);
  --pp-glass-raised:#393245;
 }
 html:not([data-theme="dark"]) #teacher-app,
