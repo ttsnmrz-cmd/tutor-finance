@@ -1259,4 +1259,17 @@ html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .m
 .mb-preview-tools-row:has(.mb-preview-timer)>.mb-teacher-hints-toggle{grid-row:2;grid-column:2;margin:0!important;white-space:nowrap}
 .mb-preview-tools-row:has(.mb-preview-timer)>:has(>button[aria-expanded]){grid-row:2;grid-column:1;justify-self:start}
 .mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls{grid-row:2;grid-column:3;justify-self:end;justify-content:flex-end;margin:0!important}
-@media(max-width:700px){.mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls{grid-row:3;grid-column:1/-1;justify-self:end}}
+ .mb-builder.mb-student-preview .mb-preview-top{container-type:inline-size}
+.mb-builder.mb-student-preview .mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls{flex-wrap:nowrap!important;width:max-content;max-width:100%;gap:8px}
+.mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls>button{white-space:nowrap}
+@container (max-width:1050px){
+.mb-builder.mb-student-preview .mb-preview-tools-row:has(.mb-preview-timer){grid-template-columns:auto minmax(0,1fr)}
+.mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls{grid-row:3;grid-column:1/-1;justify-self:end}
+}
+@container (max-width:480px){
+.mb-builder.mb-student-preview .mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls{flex-wrap:wrap!important;width:100%;justify-content:flex-start}
+.mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-timer{white-space:normal}
+}
+.mb-builder .mb-focus-toggle{display:inline-flex!important;align-items:center;justify-content:center;padding:6px!important}
+.mb-focus-toggle svg{width:20px;height:20px;flex-shrink:0}
+
