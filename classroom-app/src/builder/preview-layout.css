@@ -581,3 +581,9 @@ html[data-theme="dark"] .mb-fillers .mb-bingo .mb-bingo-error {color:#f4c778!imp
 html[data-theme="dark"] .mb-fillers .mb-bingo select {color-scheme:dark;}
 .mb-fillers .mb-bingo button:disabled {opacity:.55!important;}
 .mb-fillers .mb-bingo :is(button,select,textarea):focus-visible {outline:2px solid #a78bfa!important;outline-offset:2px;}
+
+.mb-fillers .mb-filler-settings :is(button,select){min-height:36px!important;padding:7px 12px!important;border:1px solid #c9c1d5!important;border-radius:8px!important;background:#f4f5f7!important;color:#292333!important;font-weight:600!important;}
+.mb-fillers .mb-filler-settings select{appearance:auto!important;width:auto!important;}
+html[data-theme="dark"] .mb-fillers .mb-filler-settings :is(button,select),html[data-theme="dark"] .mb-fillers .mb-filler-choice strong,html[data-theme="dark"] .mb-fillers .mb-memory-cell[data-state="open"]{background:#302a3d!important;color:#eeeaf5!important;border-color:#625571!important;color-scheme:dark;}
+html[data-theme="dark"] .mb-fillers .mb-memory-cell[data-state="matched"]{background:#203f32!important;color:#b6f2cc!important;border-color:#26965b!important;}
+.mb-fillers .mb-memory-cell{min-width:0;overflow-wrap:anywhere;}
