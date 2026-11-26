@@ -564,3 +564,20 @@ html[data-theme="dark"] .mb-fillers .mb-question-bank :is(button,select,textarea
 .mb-fillers .mb-question-bank button.mb-question-save {background:#4e2a84!important;color:#fff!important;border-color:#7953b0!important;}
 .mb-fillers .mb-question-bank :is(button,select):disabled {opacity:.55!important;cursor:default!important;}
 .mb-fillers .mb-question-bank :is(button,select,textarea):focus-visible {outline:2px solid #a78bfa!important;outline-offset:2px;}
+
+/* Shared filler controls, including library and live lesson views. */
+.mb-fillers :is(.mb-bingo) {--game-bg:#f4f5f7;--game-ink:#1f242d;--game-border:#c9c1d5;--game-mark:#e6f7ec;--game-mark-ink:#14532d;}
+html[data-theme="dark"] .mb-fillers .mb-bingo {--game-bg:#302a3d;--game-ink:#eeeaf5;--game-border:#625571;--game-mark:#203f32;--game-mark-ink:#b6f2cc;color:var(--game-ink)!important;}
+.mb-fillers .mb-bingo :is(button,select,textarea) {box-sizing:border-box!important;background:var(--game-bg)!important;color:var(--game-ink)!important;border:1px solid var(--game-border)!important;border-radius:8px!important;padding:8px 12px!important;min-height:36px!important;}
+.mb-fillers .mb-bingo select {appearance:auto!important;width:auto!important;}
+.mb-fillers .mb-bingo textarea {display:block!important;margin:8px 0!important;line-height:1.5!important;}
+.mb-fillers .mb-bingo summary {cursor:pointer;}
+.mb-fillers .mb-bingo .mb-bingo-primary {background:#4e2a84!important;color:white!important;border-color:#7953b0!important;font-weight:600!important;}
+.mb-fillers .mb-bingo .mb-bingo-cell {min-height:72px!important;border-radius:12px!important;}
+.mb-fillers .mb-bingo .mb-bingo-cell[aria-pressed="true"] {background:var(--game-mark)!important;color:var(--game-mark-ink)!important;border:2px solid #26965b!important;}
+.mb-fillers .mb-bingo .mb-bingo-draw {border-color:var(--game-border)!important;}
+.mb-fillers .mb-bingo .mb-bingo-error {color:#b45309!important;margin:0!important;}
+html[data-theme="dark"] .mb-fillers .mb-bingo .mb-bingo-error {color:#f4c778!important;}
+html[data-theme="dark"] .mb-fillers .mb-bingo select {color-scheme:dark;}
+.mb-fillers .mb-bingo button:disabled {opacity:.55!important;}
+.mb-fillers .mb-bingo :is(button,select,textarea):focus-visible {outline:2px solid #a78bfa!important;outline-offset:2px;}
