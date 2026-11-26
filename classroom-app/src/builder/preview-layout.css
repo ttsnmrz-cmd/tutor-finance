@@ -606,3 +606,8 @@ html[data-theme="dark"] .mb-builder.mb-student-preview[data-homework-mode="true"
 .mb-builder[data-homework-review="true"] .mb-student-body:has(.mb-image-label-actions){position:relative;padding-top:0!important}
 .mb-builder[data-homework-review="true"] .mb-image-label-actions{position:absolute!important;top:8px;right:16px;width:auto!important;margin:0!important;padding:0!important;min-height:0!important;display:flex!important;justify-content:flex-end!important}
 .mb-builder[data-homework-review="true"] .mb-image-label-actions [role="status"]{font-size:13px;text-align:right!important;white-space:nowrap}
+
+/* Progress segments: no decorative outlines; retain keyboard focus. */
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress{gap:4px!important}
+html[data-theme] .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button{height:5px!important;border:0!important;border-radius:999px!important;box-shadow:none!important;outline:none!important;outline-offset:0!important}
+html[data-theme] .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button:focus-visible{outline:2px solid var(--purple,#7953a6)!important;outline-offset:2px!important}
