@@ -960,3 +960,12 @@ html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.p
  background:color-mix(in srgb,var(--card-bg,#fff) 75%,transparent)!important;
  backdrop-filter:blur(5px);
 }
+
+/* Full-size wallpapers are viewport backgrounds, not repeating tiles. */
+html[data-pp-student-background][data-pp-wallpaper] #student-public-view,
+html[data-pp-student-background][data-pp-wallpaper] #student-live-material{
+ background-size:cover,cover!important;
+ background-repeat:no-repeat,no-repeat!important;
+ background-position:center center,center center!important;
+ background-attachment:fixed,fixed!important;
+}
