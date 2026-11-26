@@ -1168,3 +1168,8 @@ html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#3
 :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview :is(.mb-student-card,.mb-preview-notes){overflow:clip!important}
 :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-preview-notes :is(textarea,[contenteditable="true"]){border-radius:var(--pp-control-radius,8px)!important;background-clip:padding-box!important}
 .pp-homework-review .mb-builder.mb-student-preview :is(.mb-student-card,.mb-preview-notes){border-radius:var(--pp-panel-radius,12px)!important}
+
+/* Breadcrumbs remain readable over any personal wallpaper. */
+#teacher-app #classroom-materials-root .mb-breadcrumb{background:var(--card,var(--card-bg,#fff))!important;color:var(--text,#1f242d)!important;border-radius:var(--pp-panel-radius,12px)!important;padding:8px 16px!important;margin-bottom:8px!important;box-sizing:border-box}
+html[data-theme="dark"] #teacher-app #classroom-materials-root .mb-breadcrumb{background:#292435!important;color:#e8e2ef!important}
+#teacher-app #classroom-materials-root .mb-breadcrumb :is(a,button,span){color:inherit!important}
