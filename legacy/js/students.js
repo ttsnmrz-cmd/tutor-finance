@@ -171,42 +171,7 @@ function studentRow(s){
         ${money(st.bal)}
       </div>
 
-      <div class="student-menu-wrap relative">
-        <button
-          onclick="event.stopPropagation();toggleStudentMenu('${esc(id)}')"
-          class="w-9 h-9 rounded-xl bg-slate-100 text-xl"
-        >⋮</button>
 
-        <div
-          id="menu-${esc(id)}"
-          class="hidden absolute right-0 top-10 z-20 bg-white border rounded-2xl shadow-xl p-2 w-56"
-        >
-          <button
-            onclick="openStudentEdit('${esc(id)}')"
-            class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100"
-          >Изменить</button>
-
-          <button
-            onclick="addToGroup('${esc(id)}')"
-            class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100"
-          >Включить в группу</button>
-
-          <button
-            onclick="copyStudentLink('${esc(id)}')"
-            class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100"
-          >Ссылка для ученика</button>
-
-          <button
-            onclick="toggleArchive('${esc(id)}')"
-            class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100"
-          >${isArchived?'Вернуть из архива':'Заархивировать'}</button>
-
-          <button
-            onclick="removeStudent('${esc(id)}')"
-            class="block w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600"
-          >Удалить ученика</button>
-        </div>
-      </div>
     </div>
 
   </div>`;
@@ -603,7 +568,7 @@ function renderNativeStudentDetail(){
   const st=studentStats(s);
   const id=esc(s.id);
   const tabs=[['overview','Overview'],['lessons','Lessons'],['notes',document.documentElement.lang==='ru'?'Заметки':'Notes'],['payments','Payments'],['homework','Homework']];
-  const head='<div class="native-selected-heading"><div class="native-student-identity"><span class="native-student-avatar">'+esc((s.name||'?').charAt(0).toUpperCase())+'</span><div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Individual student')+'</p></div></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><button type="button" class="native-add-button" onclick="copyStudentLink(\''+id+'\',this)" title="Copy student cabinet link">⧉ Student link</button><button class="native-student-edit" onclick="openStudentEdit(\''+id+'\')" title="Edit student">✎</button></div></div>';
+  const head='<div class="native-selected-heading"><div class="native-student-identity"><span class="native-student-avatar">'+esc((s.name||'?').charAt(0).toUpperCase())+'</span><div><h2>'+esc(s.name)+'</h2><p>'+esc(studentGroup(s.id)?.name||'Individual student')+'</p></div></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><button type="button" class="native-add-button" onclick="copyStudentLink(\''+id+'\',this)" title="Copy student cabinet link">⧉ Student link</button><div class="student-menu-wrap relative"><button type="button" class="native-student-edit" onclick="event.stopPropagation();toggleStudentMenu(\''+id+'\')" title="Student actions" aria-label="Student actions">✎</button><div id="menu-'+id+'" class="hidden absolute right-0 top-full z-30 bg-white border rounded-2xl shadow-xl p-2 w-56" style="min-width:220px"><button class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100" onclick="openStudentEdit(\''+id+'\',\'general\')">Edit student&#39;s info</button><button class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100" onclick="openStudentEdit(\''+id+'\',\'telegram\')">Edit Telegram settings</button><button class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100" onclick="this.parentElement.classList.add(\'hidden\');addToGroup(\''+id+'\')">Add to group</button><button class="block w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100" onclick="this.parentElement.classList.add(\'hidden\');toggleArchive(\''+id+'\')">'+(s.archived?'Restore from archive':'Archive')+'</button><button class="block w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-600" onclick="this.parentElement.classList.add(\'hidden\');removeStudent(\''+id+'\')">Delete student</button></div></div></div></div>';
   const nav='<div class="native-detail-tabs">'+tabs.map(([key,label])=>'<button type="button" class="'+(nativeStudentDetailTab===key?'is-active':'')+'" onclick="switchNativeStudentTab(\''+key+'\',this)">'+label+'</button>').join('')+'</div>';
   let content='';
   if(nativeStudentDetailTab==='overview'){
@@ -670,7 +635,7 @@ function ensureStudentMeetField(){
  const input=document.createElement('input');input.id='student-edit-meet';input.type='url';input.className='soft-input mt-1 w-full rounded-xl px-3 py-2';input.placeholder='https://meet.google.com/abc-defg-hij';
  label.append(input);price.closest('label').after(label);
 }
-async function openStudentEdit(id){
+async function openStudentEdit(id,tab='general'){
   const s=students.find(
     x=>String(x.id)===String(id)
   );
@@ -707,7 +672,10 @@ async function openStudentEdit(id){
     linkButton.classList.toggle('opacity-50',!s.telegram_link_token);
   }
 
-  switchStudentSettingsTab('general');
+  switchStudentSettingsTab(tab);
+  const modal=document.getElementById('student-modal');
+  modal?.querySelectorAll('[data-student-settings-tab]').forEach(button=>button.style.display='none');
+  const heading=modal?.querySelector('h2,h3');if(heading)heading.textContent=tab==='telegram'?'Edit Telegram settings':"Edit student's info";
   document.querySelectorAll('[id^="menu-"]').forEach(m=>m.classList.add('hidden'));
   showModal('student-modal');
 }
