@@ -961,11 +961,11 @@ html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.p
  backdrop-filter:blur(5px);
 }
 
-/* Full-size wallpapers are viewport backgrounds, not repeating tiles. */
+/* Full-width wallpapers preserve aspect ratio and repeat vertically only. */
 html[data-pp-student-background][data-pp-wallpaper] #student-public-view,
 html[data-pp-student-background][data-pp-wallpaper] #student-live-material{
- background-size:cover,cover!important;
- background-repeat:no-repeat,no-repeat!important;
- background-position:center center,center center!important;
- background-attachment:fixed,fixed!important;
+ background-size:100% 100%,100% auto!important;
+ background-repeat:no-repeat,repeat-y!important;
+ background-position:center top,center top!important;
+ background-attachment:scroll,scroll!important;
 }
