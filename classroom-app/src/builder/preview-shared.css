@@ -185,3 +185,7 @@ html[data-theme="dark"] .mb-builder :is(.mb-rich-input,.mb-gap-editable,.mb-stud
 .mb-builder :is(.mb-rich-input,.mb-gap-editable,.mb-student-content,.mb-student-instruction,.mb-student-items,.mb-preview-text,.mb-combined-element) :is(p,div:not([class]):not([data-callout])) {
   margin-block-end: 0 !important;
 }
+
+/* Keep the image and its coordinate overlay exactly the same size. */
+.mb-builder .mb-image-label-preview .mb-image-label-stage:not(.is-editing){width:fit-content;max-width:100%;min-height:0;margin-inline:auto;}
+.mb-builder .mb-image-label-preview .mb-image-label-stage:not(.is-editing)>img{width:auto;height:auto;max-width:100%;max-height:50vh;max-height:50dvh;}
