@@ -3086,7 +3086,7 @@ function showPublicHomeworkMaterial(assignment,studentId){
 function ppTeacherWallpaperChoice(){try{return localStorage.getItem('pp-teacher-wallpaper')||'default';}catch{return 'default';}}
 function ppTeacherWallpaperImage(key){
  if(key==='default')return 'none';
- const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl('Soft Lavender Wave Ribbons.png').data.publicUrl;
+ const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl(key==='dark'?'Luminous Indigo Wave Ribbons.png':'Soft Lavender Wave Ribbons.png').data.publicUrl;
  return 'url("'+url+'")';
 }
 function ppApplyTeacherWallpaper(){
@@ -3102,7 +3102,7 @@ function ppOpenTeacherWallpaper(){
  const grid=document.createElement('div');grid.className='pp-teacher-wallpaper-grid';
  for(const [key,ru,label] of [['default','Стандартный','Default'],['lavender','Светлые волны','Light waves'],['dark','Тёмные волны','Dark waves']]){
  const b=document.createElement('button');b.type='button';
- const p=document.createElement('div');p.className='pp-teacher-wallpaper-preview';p.style.backgroundImage=ppTeacherWallpaperImage(key);if(key==='dark')p.style.filter='brightness(.35) saturate(1.3)';
+ const p=document.createElement('div');p.className='pp-teacher-wallpaper-preview';p.style.backgroundImage=ppTeacherWallpaperImage(key);
  const t=document.createElement('span');t.textContent=(en?label:ru)+(ppTeacherWallpaperChoice()===key?' ✓':'');b.append(p,t);
  b.onclick=()=>{try{localStorage.setItem('pp-teacher-wallpaper',key);}catch{return;}ppApplyTeacherWallpaper();d.close();};grid.append(b);
  }
