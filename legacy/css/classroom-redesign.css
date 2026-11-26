@@ -1233,3 +1233,16 @@ html[data-pp-teacher-wallpaper] #teacher-app #teacher-header.app-header{backgrou
 html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-student-card,.mb-preview-notes){background:var(--pp-classroom-surface)!important;border-color:var(--pp-shell-border)!important;backdrop-filter:var(--pp-classroom-blur)!important;-webkit-backdrop-filter:var(--pp-classroom-blur)!important}
 html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview :is(.mb-preview-heading-row,.mb-preview-tools-row,.mb-student-body,.mb-student-content,.mb-preview-footer,.mb-preview-notes-heading,.mb-rich-field){background:transparent!important;box-shadow:none!important}
 html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-rich-input{background:var(--pp-raised)!important;border-color:var(--pp-shell-border)!important}
+
+/* Focus mode changes layout only: keep the mounted lesson, notes and timer. */
+#teacher-app:has(.mb-builder[data-focus-mode="true"]) #teacher-header,
+#teacher-app:has(.mb-builder[data-focus-mode="true"]) #classroom-materials-root .mb-breadcrumb,
+#student-live-material:has(.mb-builder[data-focus-mode="true"]) .pp-student-live-header{display:none!important}
+.mb-builder[data-focus-mode="true"] .mb-preview-heading-row>h1,.mb-builder[data-focus-mode="true"] .mb-preview-heading-row>.mb-preview-back{display:none!important}
+.mb-builder[data-focus-mode="true"] .mb-preview-heading-row:not(:has(.mb-focus-toggle)){display:none!important}
+.mb-builder[data-focus-mode="true"] .mb-preview-top{position:sticky!important;top:0;z-index:30;min-width:0!important}
+.mb-builder .mb-preview-tools-row,.mb-builder .mb-preview-controls{flex-wrap:wrap!important;min-width:0!important}
+.mb-builder .mb-focus-toggle{flex:0 0 auto;min-width:32px;min-height:32px;border:1px solid var(--pp-shell-border);border-radius:8px;background:var(--pp-raised);color:inherit}
+.mb-builder .mb-preview-timer{display:inline-flex!important;align-items:center;gap:6px;flex-wrap:wrap;white-space:nowrap}
+.mb-builder[data-focus-mode="true"] .mb-preview-workspace{min-width:0!important;max-width:100%!important}
+.mb-builder[data-focus-mode="true"] .mb-preview-workspace>*{min-width:0!important}
