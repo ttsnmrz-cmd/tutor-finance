@@ -1681,26 +1681,26 @@ async function openHomeworkManage(studentId,row){
 }
 async function openNativeHomeworkReview(studentId,assignmentId){
  const tr=(en,ru)=>window.getLanguage?.()==='en'?en:ru;
- const d=document.createElement('dialog');d.className='app-card';d.style.width='min(1100px,94vw)';
+ const d=document.createElement('dialog');d.className='app-card';d.style.width='calc(100vw - 24px)';
  const title=document.createElement('h2');title.textContent=tr('Homework review','Проверка домашней работы');
  const close=document.createElement('button');close.type='button';close.className='pp-student-return';close.textContent=tr('Close','Закрыть');close.onclick=()=>d.close();
- const host=document.createElement('div');host.textContent=tr('Loading…','Загрузка…');
+ const host=document.createElement('div');host.className='pp-homework-content';host.textContent=tr('Loading…','Загрузка…');
  const feedback=document.createElement('textarea');feedback.placeholder=tr('Teacher feedback','Комментарий преподавателя');
  const status=document.createElement('p');status.setAttribute('role','status');
- const actions=document.createElement('div');actions.style.cssText='display:flex;gap:12px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap';
+ const actions=document.createElement('div');actions.className='pp-homework-review-actions';
  const accept=document.createElement('button'),sendBack=document.createElement('button');
  for(const b of [accept,sendBack]){b.type='button';b.className='native-add-button';b.disabled=true;}
  accept.textContent=tr('Mark as reviewed','Принять работу');sendBack.textContent=tr('Return for correction','Вернуть на исправление');
  const header=document.createElement('header');header.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px';title.style.cssText='margin:0;min-width:0;font-size:18px;font-weight:700';close.style.cssText='flex:none;margin:0';header.append(title,close);
  const style=document.createElement('style');style.textContent='.pp-homework-review .mb-preview-top{display:none!important}.pp-homework-review .mb-preview-workspace{padding-top:0!important;margin-top:0!important}.pp-homework-review .mb-student-preview{padding:0!important;min-height:0!important;gap:0!important}';
- d.classList.add('pp-homework-review');actions.append(sendBack,accept);d.append(style,header,host,feedback,status,actions);document.body.append(d);
+ d.classList.add('pp-homework-review');header.className='pp-homework-heading';const footer=document.createElement('footer');footer.className='pp-homework-toolbar';actions.append(sendBack,accept);footer.append(feedback,status,actions);d.append(style,header,host,footer);document.body.append(d);
  let cleanup;d.addEventListener('close',()=>{cleanup?.();d.remove();},{once:true});d.showModal();
  try{
   const rows=await db('/homework_assignments?select=id,title,status,material_snapshot,answers,teacher_feedback&student_id=eq.'+encodeURIComponent(studentId)+'&id=eq.'+encodeURIComponent(assignmentId),{headers});
   const row=rows?.[0];if(!row)throw Error(tr('Homework not found','Задание не найдено'));if(!d.isConnected)return;
   title.textContent=row.title+' › '+tr('Homework review','Проверка домашней работы');
-  feedback.value=row.teacher_feedback||'';feedback.readOnly=row.status!=='submitted';
-  accept.disabled=sendBack.disabled=row.status!=='submitted';
+  feedback.value=row.teacher_feedback||'';const canAccept=row.status==='submitted',canReturn=['submitted','reviewed'].includes(row.status);feedback.readOnly=!canReturn;
+  accept.disabled=!canAccept;sendBack.disabled=!canReturn;accept.hidden=!canAccept;sendBack.hidden=!canReturn;
   const plan={...row.material_snapshot,stages:row.material_snapshot.stages.map(s=>({...s,homework:false}))};
   let attempts=0;
   function mount(){if(!host.isConnected)return;if(typeof window.mountProfiProfitHomework==='function'){host.replaceChildren();cleanup=window.mountProfiProfitHomework(host,plan,supabaseClient,{id:'review:'+row.id,answers:row.answers||{},readOnly:true,onChange:()=>{}});}else if(++attempts<30)setTimeout(mount,300);else host.textContent=tr('Classroom unavailable','Редактор недоступен');}
@@ -1708,7 +1708,7 @@ async function openNativeHomeworkReview(studentId,assignmentId){
   async function review(returned){
    accept.disabled=sendBack.disabled=true;
    try{await db('/rpc/review_homework',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({p_assignment_id:row.id,p_feedback:feedback.value,p_return:returned})});d.close();if(String(nativeSelectedStudentId)===String(studentId)&&nativeStudentDetailTab==='homework')void renderNativeHomework(studentId);}
-   catch(e){status.textContent=String(e.message||e);accept.disabled=sendBack.disabled=false;}
+   catch(e){status.textContent=String(e.message||e);accept.disabled=!canAccept;sendBack.disabled=!canReturn;}
   }
   accept.onclick=()=>review(false);sendBack.onclick=()=>review(true);
  }catch(e){host.textContent=String(e.message||e);}
