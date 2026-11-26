@@ -16,6 +16,7 @@ function toggleProfileMenu(){
   const menu=document.getElementById('profile-menu');
   const button=document.getElementById('profile-menu-button');
   if(!menu||!button)return;
+  ppInstallTeacherWallpaperMenu(menu);
   const opening=menu.classList.contains('hidden');
   menu.classList.toggle('hidden',!opening);
   button.setAttribute('aria-expanded',String(opening));
@@ -3080,3 +3081,25 @@ function showPublicHomeworkMaterial(assignment,studentId){
  function mount(){if(!host.isConnected)return;if(typeof window.mountProfiProfitHomework==='function'){cleanup=window.mountProfiProfitHomework(host,plan,supabaseClient,{id:assignment.id,answers,readOnly,onChange});return;}if(++attempts<30){host.textContent=homeworkText('Loading…','Загрузка…');setTimeout(mount,300);}else host.textContent=homeworkText('Classroom unavailable. Refresh the page.','Редактор недоступен. Обновите страницу.');}
  mount();
 }
+
+/* Teacher-only optional wallpaper, independent of learner preferences. */
+function ppApplyTeacherWallpaper(){
+ let enabled=false;
+ try{enabled=localStorage.getItem('pp-teacher-wallpaper')==='lavender';}catch{}
+ document.documentElement.toggleAttribute('data-pp-teacher-wallpaper',enabled);
+ if(enabled){
+  const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl('Soft Lavender Wave Ribbons.png').data.publicUrl;
+  document.documentElement.style.setProperty('--pp-teacher-wallpaper','url("'+url+'")');
+ }else document.documentElement.style.removeProperty('--pp-teacher-wallpaper');
+}
+function ppInstallTeacherWallpaperMenu(menu){
+ let entry=menu.querySelector('[data-teacher-wallpaper]');
+ if(!entry){
+  entry=document.createElement('button');entry.type='button';entry.className='profile-menu-item';entry.dataset.teacherWallpaper='1';
+  entry.onclick=()=>{try{localStorage.setItem('pp-teacher-wallpaper',document.documentElement.hasAttribute('data-pp-teacher-wallpaper')?'default':'lavender');}catch{return;}ppApplyTeacherWallpaper();ppInstallTeacherWallpaperMenu(menu);};
+  menu.insertBefore(entry,menu.querySelector('.profile-menu-divider'));
+ }
+ const en=window.getLanguage?.()==='en';
+ entry.textContent=(en?'Lavender wallpaper':'Лавандовые обои')+(document.documentElement.hasAttribute('data-pp-teacher-wallpaper')?' ✓':'');
+}
+document.addEventListener('DOMContentLoaded',ppApplyTeacherWallpaper);
