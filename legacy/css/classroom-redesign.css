@@ -1091,3 +1091,8 @@ html[data-pp-teacher-wallpaper] .pp-homework-review::backdrop{background:var(--b
 .pp-homework-review .pp-homework-toolbar [role="status"]:empty,.pp-homework-review button[hidden]{display:none!important}
 .pp-homework-review-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:8px}
 html[data-pp-teacher-wallpaper] .pp-homework-review :is(.pp-homework-heading,.pp-homework-toolbar){background:var(--pp-glass-surface)!important;backdrop-filter:var(--pp-glass-blur);-webkit-backdrop-filter:var(--pp-glass-blur)}
+
+#student-live-material[data-mode="homework"] .pp-homework-feedback{flex:0 0 auto;min-height:0;max-height:22dvh;overflow:auto;box-sizing:border-box;padding:10px 12px;border:1px solid var(--pp-shell-border);border-inline-start:3px solid #D99B26;border-radius:12px;background:var(--card-bg);color:var(--text-color);overflow-wrap:anywhere}
+#student-live-material[data-mode="homework"] .pp-homework-feedback strong{display:block;margin-bottom:4px}
+#student-live-material[data-mode="homework"] .pp-homework-feedback div{white-space:pre-wrap}
+html[data-pp-student-background] #student-live-material[data-mode="homework"] .pp-homework-feedback{background:var(--pp-glass-surface);backdrop-filter:var(--pp-glass-blur)}
