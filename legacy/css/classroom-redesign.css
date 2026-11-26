@@ -846,3 +846,21 @@ html[data-theme="light"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(input,select
 [data-classroom-root] .mb-preview-teacher-note{margin:0 0 16px!important;padding:12px 16px!important}
 [data-classroom-root] .mb-preview-footer{padding:8px 14px!important}
 @media(max-width:700px){[data-classroom-root] .mb-student-body{padding:12px!important}[data-classroom-root] .mb-preview-heading-row h1{font-size:17px!important}}
+
+/* Shared rich text callouts */
+[data-callout]{position:relative;display:block;box-sizing:border-box;margin:10px 0;padding:12px 14px 12px 42px;border:1px solid var(--callout-border);border-radius:10px;background:var(--callout-bg);color:var(--callout-ink);min-height:42px;overflow-wrap:anywhere;}
+[data-callout]::before{position:absolute;left:13px;top:11px;font-size:20px;line-height:1.2;font-weight:700;color:var(--callout-ink);content:var(--callout-icon);}
+[data-callout]>:first-child{margin-top:0;}[data-callout]>:last-child{margin-bottom:0;}
+.mb-format-toolbar .mb-callout-menu button{width:100%;justify-content:flex-start;min-height:32px;white-space:nowrap;padding:6px 10px;}
+[data-callout="information"]{--callout-icon:"ⓘ";--callout-bg:#eaf3fc;--callout-border:#bfd7ef;--callout-ink:#20588e;}
+html[data-theme="dark"] [data-callout="information"]{--callout-bg:#23374c;--callout-border:#45678a;--callout-ink:#b9dcff;}
+[data-callout="attention"]{--callout-icon:"⚠";--callout-bg:#fff5d9;--callout-border:#e7d29b;--callout-ink:#85600d;}
+html[data-theme="dark"] [data-callout="attention"]{--callout-bg:#403620;--callout-border:#796238;--callout-ink:#ffe2a0;}
+[data-callout="tip"]{--callout-icon:"✧";--callout-bg:#eaf5e9;--callout-border:#bdd9bc;--callout-ink:#367a46;}
+html[data-theme="dark"] [data-callout="tip"]{--callout-bg:#243b30;--callout-border:#456b52;--callout-ink:#bce9c5;}
+[data-callout="remember"]{--callout-icon:"▤";--callout-bg:#f0eaf8;--callout-border:#d5c4e9;--callout-ink:#684398;}
+html[data-theme="dark"] [data-callout="remember"]{--callout-bg:#382c4b;--callout-border:#70558e;--callout-ink:#e1caff;}
+[data-callout="mistake"]{--callout-icon:"⊗";--callout-bg:#fcebec;--callout-border:#eac5c8;--callout-ink:#a43740;}
+html[data-theme="dark"] [data-callout="mistake"]{--callout-bg:#452c34;--callout-border:#87515a;--callout-ink:#ffc7cc;}
+[data-callout="example"]{--callout-icon:"▣";--callout-bg:#f0f1f4;--callout-border:#d5d8df;--callout-ink:#465164;}
+html[data-theme="dark"] [data-callout="example"]{--callout-bg:#30333d;--callout-border:#606577;--callout-ink:#e0e4ef;}
