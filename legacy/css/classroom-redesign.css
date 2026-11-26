@@ -1038,3 +1038,8 @@ html[data-theme="dark"] .pp-teacher-wallpaper-dialog{background:#292435;color:#f
 html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.ml-preview.local-materials-preview:not(.ml-builder-host),
 html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.ml-preview.local-materials-preview > nav.ml-actions,
 html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.ml-preview.local-materials-preview > .ml-layout {background:transparent!important;box-shadow:none!important;border-color:transparent!important;}
+
+/* Shared shell borders: keep semantic exercise and active-state borders intact. */
+html[data-theme="dark"] #teacher-app {--pp-shell-border:#51475f;}
+html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main,#teacher-header,.native-workspace>header,.app-card,.native-metric-strip>*) {border-color:var(--pp-shell-border)!important;}
+html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main){border:1px solid var(--pp-shell-border)!important;}
