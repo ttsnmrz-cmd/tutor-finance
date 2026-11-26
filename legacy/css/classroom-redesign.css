@@ -1246,3 +1246,8 @@ html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .m
 .mb-builder .mb-preview-timer{display:inline-flex!important;align-items:center;gap:6px;flex-wrap:wrap;white-space:nowrap}
 .mb-builder[data-focus-mode="true"] .mb-preview-workspace{min-width:0!important;max-width:100%!important}
 .mb-builder[data-focus-mode="true"] .mb-preview-workspace>*{min-width:0!important}
+
+/* Keep toolbar popovers above glass exercise surfaces. */
+.mb-builder.mb-student-preview .mb-preview-top{position:relative;z-index:40!important;overflow:visible!important}
+.mb-builder.mb-student-preview .mb-preview-tools-row{overflow:visible!important}
+.mb-builder.mb-student-preview .mb-preview-workspace{position:relative;z-index:0}
