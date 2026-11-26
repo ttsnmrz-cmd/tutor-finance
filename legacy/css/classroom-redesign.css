@@ -991,3 +991,9 @@ html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.p
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar-track{background:transparent}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar-thumb{background:#74658999;border-radius:10px}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar-button{display:none}
+
+/* Match the top-ups card to the other finance cards; keep payment rows clear. */
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances :is(div,section):has(> #public-payments){background:rgba(255,255,255,.75)!important;border-radius:12px!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances #public-payments{background:transparent!important}
+/* The cloned header may retain legacy utility classes. Target the actual role. */
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .student-brand-header.student-brand-header[data-app-header-role="student"],html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .app-header.app-header[data-app-header-role="student"]{background:rgba(255,255,255,.65)!important;background-color:rgba(255,255,255,.65)!important;background-image:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}
