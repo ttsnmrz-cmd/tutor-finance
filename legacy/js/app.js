@@ -2092,7 +2092,7 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-profile-menu label,#student-live-material .pp-student-profile-menu button{display:block;margin-top:14px}
  #student-live-material .pp-student-profile-menu select{padding:5px}
  #student-live-material .pp-student-live-main{background:var(--card-bg);border-radius:var(--pp-classroom-radius,16px);padding:18px}
- #student-live-material .pp-student-pointer{background:var(--card-bg);border-radius:var(--pp-classroom-radius,16px);overflow:hidden}
+ #student-live-material .pp-student-pointer{background:transparent;border-radius:var(--pp-classroom-radius,16px);overflow:hidden}
  #student-live-material .pp-student-profile-menu{min-width:240px;padding:18px;border-radius:18px;font-size:15px}
  #student-live-material .pp-student-menu-title{display:block;color:#746e84;font-size:14px;font-weight:600;margin-bottom:18px}
  #student-live-material .pp-student-profile-menu label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:12px 0}
@@ -2122,10 +2122,11 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-pointer.drawing canvas{pointer-events:auto;cursor:crosshair}
  @media(max-width:780px){#student-live-material .pp-student-live-content{grid-template-columns:1fr}.pp-student-sidebar{width:58px}.pp-student-sidebar-label{display:none}}
  
- #student-live-material .pp-student-pointer,#student-live-material .pp-student-live-notes{background:var(--card-bg)!important;color:var(--text-color)!important;border-radius:var(--pp-classroom-radius,16px)!important;overflow:hidden}
+ #student-live-material .pp-student-live-notes{background:var(--card-bg)!important;color:var(--text-color)!important;border-radius:var(--pp-classroom-radius,16px)!important;overflow:hidden}
+ #student-live-material .pp-student-pointer,#student-live-material .pp-student-pointer>div,#student-live-material .pp-student-pointer .mb-builder{background:transparent!important;box-shadow:none!important}
  #student-live-material .pp-student-notes-content{background:var(--accent-soft)!important;color:var(--text-color)!important}
  #student-live-material .pp-student-live-main{color:var(--text-color)}
- #student-live-material .pp-student-pointer .mb-builder{background:var(--card-bg)}
+
 `;document.head.append(style);
 }
 // The public student dashboard is rendered before its first tab click.
