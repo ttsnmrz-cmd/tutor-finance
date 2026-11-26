@@ -598,5 +598,5 @@ html[data-theme="dark"] .mb-builder.mb-student-preview[data-homework-mode="true"
 .mb-homework-readonly{margin:0 0 12px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:13px;}
 
 /* Homework wallpaper: one translucent surface per panel, no opaque nested layers. */
-html[data-theme="dark"] #student-live-material[data-mode="homework"] .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card){background:rgba(35,29,46,.65)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-color:#51475f!important;}
-html[data-theme="dark"] #student-live-material[data-mode="homework"] .mb-builder.mb-student-preview :is(.mb-preview-top>*,.mb-student-body,.mb-student-content,.mb-combined-element,.mb-preview-footer){background:transparent!important;box-shadow:none!important;}
+html[data-theme="dark"] .mb-builder.mb-student-preview[data-homework-mode="true"]:not([data-homework-review="true"]) :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card){background:rgba(35,29,46,.65)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-color:#51475f!important;}
+html[data-theme="dark"] .mb-builder.mb-student-preview[data-homework-mode="true"]:not([data-homework-review="true"]) :is(.mb-preview-top>*,.mb-student-body,.mb-student-content,.mb-combined-element,.mb-preview-footer){background:transparent!important;box-shadow:none!important;}
