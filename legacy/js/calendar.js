@@ -116,8 +116,16 @@ function renderWeek(){
   scroller.insertAdjacentHTML('afterbegin',axis);
   const weekId=days[0].toISOString().slice(0,10);
   if(scroller.dataset.week!==weekId){
-    scroller.scrollTop=targetScroll;
     scroller.dataset.week=weekId;
+    requestAnimationFrame(()=>{
+      if(scroller.dataset.week!==weekId)return;
+      if(!weekKeys.has(today)){scroller.scrollTop=targetScroll;return;}
+      const parts=new Intl.DateTimeFormat('en-GB',{timeZone:getTeacherTimezone(),hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+      const minutes=Number(parts.find(p=>p.type==='hour')?.value)*60+Number(parts.find(p=>p.type==='minute')?.value);
+      const heading=c.querySelector('.calendar-day-heading')?.getBoundingClientRect().height||0;
+      const visible=Math.max(0,scroller.clientHeight-heading);
+      scroller.scrollTop=Math.max(0,(minutes/60-hourStart)*pxPerHour-visible/2);
+    });
   }
 }
 
