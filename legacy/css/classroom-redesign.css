@@ -1101,3 +1101,16 @@ html[data-pp-student-background] #student-live-material[data-mode="homework"] .p
 #student-live-material[data-mode="homework"] .mb-student-body [inert] :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check) button,
 #student-live-material[data-mode="homework"] .mb-student-body [inert] :is(.mb-image-label-reset,.mb-image-label-check){display:none!important}
 #student-live-material[data-mode="homework"] .mb-student-body [inert] :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check){justify-content:center!important}
+
+/* Compact feedback and shared controls. */
+#student-live-material[data-mode="homework"] .pp-homework-feedback{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 12px}
+#student-live-material[data-mode="homework"] .pp-homework-feedback strong{margin:0}
+#student-live-material[data-mode="homework"] .pp-homework-feedback div{grid-column:1/-1}
+#student-live-material[data-mode="homework"] .pp-homework-feedback [hidden]{display:none!important}
+.pp-homework-feedback-toggle{display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--pp-shell-border);border-radius:8px;color:var(--text-color);background:transparent;font-size:20px;line-height:1}
+html[data-theme="dark"] #teacher-app .native-student-list-tabs button{color:#c9bddb!important;border-color:var(--pp-shell-border)}
+html[data-theme="dark"] #teacher-app .native-student-list-tabs button.is-active{color:#f5edff!important;border-bottom-color:#bda4e8!important}
+:is(.pp-pointer-controls,.annotation-tool-icons) button{color:var(--text-color,#1f242d)}
+:is(.pp-pointer-controls,.annotation-tool-icons) button svg{color:inherit}
+html[data-theme="dark"] :is(.pp-pointer-controls,.annotation-tool-icons) button{color:#eee6fa}
+@media(max-width:600px){#student-live-material[data-mode="homework"] .pp-homework-toolbar{gap:6px;padding:8px}.pp-homework-submit{white-space:normal;max-width:100%}.pp-homework-review-actions button{flex:1 1 auto}}
