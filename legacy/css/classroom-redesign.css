@@ -845,8 +845,7 @@ html[data-theme="light"] :is(dialog.mb-dialog,dialog.ml-dialog) :is(input,select
 @media(max-width:700px){.mb-student-preview{min-height:calc(100dvh - 150px)!important}}
 
 /* Compact lesson workspace; keep normal navigation outside preview. */
-#teacher-app:has(.mb-student-preview) .native-layout{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
-#teacher-app:has(.mb-student-preview) .native-sidebar{display:none!important}
+/* Preview uses the normal teacher navigation layout. */
 [data-classroom-root]:has(.mb-student-preview) .mb-breadcrumb{padding:4px 12px!important;margin:0!important;min-height:0!important}
 [data-classroom-root] .mb-student-preview{padding:8px 12px!important;gap:8px!important}
 [data-classroom-root] .mb-preview-top{display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px!important;margin:0!important;padding:0!important}
@@ -1188,3 +1187,8 @@ html:is([data-pp-teacher-wallpaper],[data-pp-student-background]) :is(#teacher-a
 /* Match the breadcrumb to the preview's actual horizontal inset. */
 html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root:has(.mb-student-preview) .mb-breadcrumb{margin-inline:0!important;width:100%;max-width:100%;background:var(--pp-classroom-surface)!important;backdrop-filter:var(--pp-classroom-blur)!important}
 html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card,.mb-preview-workspace>.mb-preview-notes){background:var(--pp-classroom-surface)!important;backdrop-filter:var(--pp-classroom-blur)!important;-webkit-backdrop-filter:var(--pp-classroom-blur)!important}
+
+/* Keep exercise content opaque; glass is reserved for surrounding chrome. */
+html:not([data-theme="dark"]) :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:#fff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html[data-theme="dark"] :is(#teacher-app,#student-live-material,.pp-homework-review) .mb-builder.mb-student-preview .mb-student-body{background:#292435!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@media(min-width:701px){#teacher-app:has(.mb-student-preview)>.native-layout:has(>.native-sidebar:not(.hidden)){display:grid!important;grid-template-columns:220px minmax(0,1fr)!important;align-items:start;gap:12px!important}#teacher-app:has(.mb-student-preview)>.native-layout.sidebar-collapsed:has(>.native-sidebar:not(.hidden)){grid-template-columns:76px minmax(0,1fr)!important}#teacher-app:has(.mb-student-preview)>.native-layout>.native-sidebar:not(.hidden){width:100%!important;min-width:0!important;box-sizing:border-box}}
