@@ -55,8 +55,19 @@ function balanceClass(b){
 
 let studentSort=localStorage.getItem('student_sort')||'new';
 
+let studentArchiveFilter='active';
+function setStudentArchiveFilter(mode){studentArchiveFilter=mode;document.getElementById('student-sort-menu')?.classList.add('hidden');renderStudents();}
 function toggleStudentSort(){
-  document.getElementById('student-sort-menu')?.classList.toggle('hidden');
+  const menu=document.getElementById('student-sort-menu');
+  if(menu){
+    menu.querySelector('[data-archive-filter]')?.remove();
+    const box=document.createElement('div');box.dataset.archiveFilter='1';box.style.cssText='border-top:1px solid #827a9066;padding-top:6px;margin-top:6px';
+    const ru=document.documentElement.lang==='ru';
+    for(const [mode,en,label] of [['active','Active students','Активные'],['archived','Archived students','Архив'],['all','All students','Все ученики']]){
+      const b=document.createElement('button');b.type='button';b.className='block w-full text-left px-3 py-2 rounded-lg';b.textContent=(studentArchiveFilter===mode?'✓ ':'')+(ru?label:en);b.onclick=()=>setStudentArchiveFilter(mode);box.append(b);
+    }menu.append(box);
+  }
+  menu?.classList.toggle('hidden');
 }
 
 function setStudentSort(mode){
@@ -67,7 +78,7 @@ function setStudentSort(mode){
 }
 
 function sortedActiveStudents(){
-  const active=students.filter(s=>!s.archived);
+  const active=students.filter(s=>studentArchiveFilter==='all'||(studentArchiveFilter==='archived'?!!s.archived:!s.archived));
 
   if(studentSort==='name_asc'){
     active.sort((a,b)=>String(a.name||'').localeCompare(
@@ -841,6 +852,7 @@ async function copyStudentLink(id,button){
 async function toggleArchive(id){
   const s=students.find(x=>String(x.id)===String(id));
   if(!s)return;
+  if(!s.archived&&!confirm(document.documentElement.lang==='ru'?'Архивировать ученика '+s.name+'? Занятия и платежи сохранятся.':'Archive '+s.name+'? Lessons and payments will be retained.'))return;
 
   try{
     await db(
