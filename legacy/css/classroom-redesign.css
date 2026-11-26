@@ -1156,3 +1156,6 @@ html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#3
 .pp-homework-review .mb-student-card{padding-inline:0!important;overflow:clip!important}
 .pp-homework-review .mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding-inline:var(--pp-review-inset)!important}
 .pp-homework-review .pp-homework-content{border-radius:var(--pp-review-radius)!important}
+
+/* Review: only the exercise card owns the painted surface. */
+.pp-homework-review :is(.pp-homework-content,.mb-builder.mb-student-preview,.mb-preview-workspace){background:transparent!important;box-shadow:none!important;border-color:transparent!important;border-radius:var(--pp-review-radius,12px)!important}
