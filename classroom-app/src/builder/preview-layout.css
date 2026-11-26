@@ -603,6 +603,6 @@ html[data-theme="dark"] .mb-builder.mb-student-preview[data-homework-mode="true"
 
 /* Teacher review: show score at the top of each exercise, not student actions. */
 .mb-builder[data-homework-review="true"] :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check) button,.mb-builder[data-homework-review="true"] :is(.mb-image-label-check,.mb-image-label-reset){display:none!important}
-.mb-builder[data-homework-review="true"] .mb-student-body:has(.mb-image-label-actions){position:relative;padding-top:34px!important}
+.mb-builder[data-homework-review="true"] .mb-student-body:has(.mb-image-label-actions){position:relative;padding-top:0!important}
 .mb-builder[data-homework-review="true"] .mb-image-label-actions{position:absolute!important;top:8px;right:16px;width:auto!important;margin:0!important;padding:0!important;min-height:0!important;display:flex!important;justify-content:flex-end!important}
 .mb-builder[data-homework-review="true"] .mb-image-label-actions [role="status"]{font-size:13px;text-align:right!important;white-space:nowrap}
