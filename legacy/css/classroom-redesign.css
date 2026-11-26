@@ -970,3 +970,10 @@ html[data-pp-student-background][data-pp-wallpaper] #student-live-material{
  background-position:center top,center top!important;
  background-attachment:scroll,scroll!important;
 }
+
+/* Light wallpaper dashboard: frosted surfaces, readable graphite text. */
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .student-portal-panel:has(:is(#public-week-calendar,#public-lessons-history)){background:rgba(255,255,255,.4)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;color:#1f242d!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.calendar-day-column,.pp-student-lesson-row){background:rgba(255,255,255,.75)!important;color:#1f242d!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .calendar-event-card{background:rgba(232,224,246,.85)!important;color:#1f242d!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.student-brand-header,.app-header){background:rgba(255,255,255,.85)!important;backdrop-filter:blur(8px)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(#public-week-range,.pp-history-split h3,.pp-history-split label,.pp-history-split small,.calendar-empty-day,.calendar-weekday,.student-portal-panel > p){color:#30333e!important}
