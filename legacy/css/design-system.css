@@ -618,7 +618,7 @@ html[data-theme="dark"] #teacher-app {--pp-shell-border:inherit;}
  --app-header-border:var(--pp-shell-border);
  border:var(--pp-shell-border-width) solid var(--pp-shell-border)!important;
 }
-#teacher-app > .native-layout > :is(.native-sidebar,#teacher-main),
+#teacher-app > .native-layout > .native-sidebar,
 #student-public-view.pp-student-one-page .student-portal-panel {
  border:var(--pp-shell-border-width) solid var(--pp-shell-border)!important;
 }
@@ -633,6 +633,23 @@ html[data-pp-student-background] #student-public-view.pp-student-one-page #stude
  -webkit-backdrop-filter:var(--pp-glass-blur)!important;
  border-color:var(--pp-shell-border)!important;
 }
-html[data-pp-teacher-wallpaper] #teacher-app > .native-layout > #teacher-main:has(#tab-materials:not(.hidden)) {
- border-color:transparent!important;box-shadow:none!important;
+html #teacher-app > .native-layout > #teacher-main {
+ border:0!important;box-shadow:none!important;
+}
+
+/* Wallpaper covers the viewport; only actual cards receive glass. */
+html[data-pp-teacher-wallpaper] #teacher-app:not(.hidden) {
+ min-height:100vh!important;
+ min-height:100dvh!important;
+}
+html[data-pp-teacher-wallpaper] #teacher-app > .native-layout > #teacher-main,
+html[data-pp-teacher-wallpaper] #teacher-app #tab-dashboard {
+ background:transparent!important;
+}
+html[data-pp-teacher-wallpaper] #teacher-app #tab-students :is(.native-students-panel,.native-student-detail),
+html[data-pp-teacher-wallpaper] #teacher-app #tab-dashboard :is(#dashboard-cards > *,#dashboard-calendar,.native-calendar) {
+ background:var(--pp-glass-surface)!important;
+ border:var(--pp-shell-border-width) solid var(--pp-shell-border)!important;
+ backdrop-filter:var(--pp-glass-blur)!important;
+ -webkit-backdrop-filter:var(--pp-glass-blur)!important;
 }
