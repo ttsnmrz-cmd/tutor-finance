@@ -1218,3 +1218,12 @@ html #teacher-app #teacher-header.app-header{border-radius:12px!important}
 #teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-notes{background:var(--pp-classroom-surface)!important;border-radius:12px!important;overflow:clip!important}
 #teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-notes :is(.mb-preview-notes-heading,.mb-rich-field){background:transparent!important;box-shadow:none!important}
 #teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-notes .mb-rich-input{border-radius:8px!important;background-clip:padding-box!important}
+
+/* Native dialogs must override the legacy global margin reset. */
+dialog.pp-teacher-wallpaper-dialog,dialog.pp-student-lesson-dialog{position:fixed!important;inset:0!important;margin:auto!important;max-width:calc(100vw - 32px);max-height:85dvh;border-radius:var(--pp-panel-radius,12px)!important;box-sizing:border-box}
+dialog.pp-student-lesson-dialog{background:#fff!important;color:#1f242d!important;border:1px solid #827a9066!important}
+html[data-theme="dark"] dialog.pp-student-lesson-dialog{background:#292435!important;color:#e8e2ef!important}
+dialog.pp-student-lesson-dialog :is(h2,[data-lesson-notes],.pp-student-dialog-heading button){color:inherit!important}
+dialog.pp-student-lesson-dialog .pp-student-dialog-heading{align-items:flex-start!important}
+.pp-lesson-note-date{display:block;font-size:13px;font-weight:400;opacity:.75;margin-top:4px}
+html[data-pp-teacher-wallpaper] #teacher-app #teacher-header.app-header{background:var(--pp-classroom-surface)!important;background-image:none!important;backdrop-filter:var(--pp-classroom-blur)!important;-webkit-backdrop-filter:var(--pp-classroom-blur)!important}
