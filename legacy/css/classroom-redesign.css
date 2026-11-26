@@ -1148,3 +1148,11 @@ html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#3
 .pp-homework-heading-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
 .pp-homework-state{display:inline-flex;align-items:center;border:1px solid currentColor;border-radius:8px;padding:3px 9px;font-size:12px;font-weight:600;color:var(--text-secondary);line-height:1.4}
 .pp-homework-view-icon{display:inline-flex;align-items:center;color:var(--text-secondary);cursor:help}
+
+/* Homework review: shared panel geometry and aligned content inset. */
+.pp-homework-review{--pp-review-inset:16px;--pp-review-radius:var(--pp-panel-radius,12px)}
+.pp-homework-review :is(.pp-homework-heading,.pp-homework-toolbar,.mb-student-card){border-radius:var(--pp-review-radius)!important;box-sizing:border-box}
+.pp-homework-review :is(.pp-homework-heading,.pp-homework-toolbar){padding-inline:var(--pp-review-inset)!important}
+.pp-homework-review .mb-student-card{padding-inline:0!important;overflow:clip!important}
+.pp-homework-review .mb-builder.mb-student-preview .mb-preview-workspace .mb-student-body{padding-inline:var(--pp-review-inset)!important}
+.pp-homework-review .pp-homework-content{border-radius:var(--pp-review-radius)!important}
