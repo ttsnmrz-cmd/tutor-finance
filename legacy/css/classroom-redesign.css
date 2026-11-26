@@ -944,7 +944,7 @@ html[data-theme="dark"] .mb-text-image-menu button.mb-image-remove{color:#ffabb2
  border-radius:var(--pp-classroom-radius,16px)!important;
  padding:12px 16px!important;
  box-sizing:border-box!important;
- background:var(--card,var(--card-bg))!important;
+ background:var(--pp-classroom-surface,var(--card,var(--card-bg)))!important;
 }
 .mb-builder.mb-student-preview .mb-preview-top :is(.mb-preview-heading-row,.mb-preview-tools-row){
  background:transparent!important;
@@ -1170,8 +1170,8 @@ html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#3
 .pp-homework-review .mb-builder.mb-student-preview :is(.mb-student-card,.mb-preview-notes){border-radius:var(--pp-panel-radius,12px)!important}
 
 /* Breadcrumbs remain readable over any personal wallpaper. */
-#teacher-app #classroom-materials-root .mb-breadcrumb{background:var(--card,var(--card-bg,#fff))!important;color:var(--text,#1f242d)!important;border-radius:var(--pp-panel-radius,12px)!important;padding:8px 16px!important;margin-bottom:8px!important;box-sizing:border-box}
-html[data-theme="dark"] #teacher-app #classroom-materials-root .mb-breadcrumb{background:#292435!important;color:#e8e2ef!important}
+#teacher-app #classroom-materials-root .mb-breadcrumb{background:var(--pp-classroom-surface,#fff)!important;color:var(--text,#1f242d)!important;border-radius:var(--pp-panel-radius,12px)!important;padding:8px 16px!important;margin-bottom:8px!important;box-sizing:border-box}
+html[data-theme="dark"] #teacher-app #classroom-materials-root .mb-breadcrumb{background:var(--pp-classroom-surface,#292435)!important;color:#e8e2ef!important}
 #teacher-app #classroom-materials-root .mb-breadcrumb :is(a,button,span){color:inherit!important}
 
 /* Shared glass surface contract for classroom panels, independent of role. */
@@ -1184,3 +1184,7 @@ html:is([data-pp-teacher-wallpaper],[data-pp-student-background]) :is(#teacher-a
  border-radius:var(--pp-panel-radius,12px)!important;
  background-clip:padding-box!important;
 }
+
+/* Match the breadcrumb to the preview's actual horizontal inset. */
+html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root:has(.mb-student-preview) .mb-breadcrumb{margin-inline:0!important;width:100%;max-width:100%;background:var(--pp-classroom-surface)!important;backdrop-filter:var(--pp-classroom-blur)!important}
+html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root .mb-builder.mb-student-preview :is(.mb-preview-top,.mb-preview-workspace>.mb-student-card,.mb-preview-workspace>.mb-preview-notes){background:var(--pp-classroom-surface)!important;backdrop-filter:var(--pp-classroom-blur)!important;-webkit-backdrop-filter:var(--pp-classroom-blur)!important}
