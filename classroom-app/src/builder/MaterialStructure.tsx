@@ -1,3 +1,4 @@
+import {exerciseLabel} from './commands';
 import {useRef,useState} from 'react';
 import type {Block,Plan} from '../planning/model';
 import {ui} from '../i18n';
@@ -70,7 +71,7 @@ export function MaterialStructure({plan,active,section,collapsed,menu,onMenu,onT
   const target='exercise:'+b.id;
   return <div className={'mb-structure-exercise'+(active===b.id?' active':'')+(b.hiddenFromStudent?' mb-hidden-exercise':'')} key={b.id} data-mb-stage={b.stage} data-mb-block={b.id} data-drop-target={dropTarget===target?'true':undefined} onDragOver={e=>allow(e,target,'exercise')} onDrop={e=>drop(e,b.stage,b.id,'exercise')}>
    <button type="button" className="mb-drag" draggable {...touchHandlers({kind:'exercise',id:b.id})} onDragStart={e=>start(e,{kind:'exercise',id:b.id})} onDragEnd={finish} title={'Drag exercise: '+b.title} aria-label={'Drag exercise: '+b.title}><Grip/></button>
-   {b.hiddenFromStudent&&<span className="mb-hidden-eye" title={ui("Hidden from students")} aria-label={ui("Hidden from students")}>◉̸</span>}<button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title} onClick={()=>onSelect(b)}><span aria-hidden="true">{numbers.get(b.id)}.</span><span>{b.title||ui('Untitled exercise')}</span></button>
+   {b.hiddenFromStudent&&<span className="mb-hidden-eye" title={ui("Hidden from students")} aria-label={ui("Hidden from students")}>◉̸</span>}<button className="mb-select-exercise" aria-current={active===b.id?'step':undefined} title={b.title.trim()||ui(exerciseLabel(b))} onClick={()=>onSelect(b)}><span aria-hidden="true">{numbers.get(b.id)}.</span><span>{b.title.trim()||ui(exerciseLabel(b))}</span></button>
    <div className="mb-menu-wrap"><button className="mb-more" aria-label={ui('Exercise actions')+' '+b.title} aria-expanded={menu===b.id} onClick={()=>onMenu(menu===b.id?null:b.id)}>···</button>{menu===b.id&&<div className="mb-menu"><button onClick={()=>onToggleStudentVisibility(b.id)}>{b.hiddenFromStudent?'◉ '+ui('Show to students'):'◉̸ '+ui('Hide from students')}</button>{!b.hiddenFromStudent&&plan.stages.some(s=>s.id===b.stage&&s.homework)&&<button onClick={()=>onAssignHomework(b.stage)}>{ui('Assign homework section')}</button>}<button onClick={()=>onCopy(b.id)}>{ui('Copy to…')}</button><button onClick={()=>onMove(b.id)}>{ui('Move to…')}</button><button onClick={()=>onDelete(b.id)}>{ui('Delete')}</button></div>}</div>
   </div>;
  }
