@@ -945,3 +945,18 @@ html[data-theme="dark"] .mb-text-image-menu button.mb-image-remove{color:#ffabb2
  border-top-left-radius:var(--pp-classroom-radius,16px);
  border-top-right-radius:var(--pp-classroom-radius,16px);
 }
+
+/* Personal wallpaper must survive light theme's legacy background shorthand. */
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view,
+html:not([data-theme="dark"])[data-pp-student-background] #student-live-material{
+ background-image:linear-gradient(#ffffff33,#ffffff33),var(--pp-personal-bg)!important;
+}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view>.app-card,
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .pp-student-layout,
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view #student-public-content{
+ background:transparent!important;
+}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .student-portal-panel:has(:is(#public-week-calendar,#public-lessons-history)){
+ background:color-mix(in srgb,var(--card-bg,#fff) 75%,transparent)!important;
+ backdrop-filter:blur(5px);
+}
