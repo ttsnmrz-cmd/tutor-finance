@@ -1273,3 +1273,9 @@ html[data-theme] :is(#teacher-app,#student-live-material,.pp-homework-review) .m
 .mb-builder .mb-focus-toggle{display:inline-flex!important;align-items:center;justify-content:center;padding:6px!important}
 .mb-focus-toggle svg{width:20px;height:20px;flex-shrink:0}
 
+
+/* Keep the teacher lesson shell and wallpaper at least viewport-sized. */
+html[data-pp-teacher-wallpaper]:has(#teacher-app .mb-student-preview){background-image:var(--pp-teacher-wallpaper)!important;background-size:cover!important;background-position:center!important;background-attachment:fixed!important}
+html[data-pp-teacher-wallpaper] #teacher-app:has(.mb-student-preview){min-height:100dvh!important;background-size:cover!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
+#teacher-app:has(.mb-student-preview) :is(.native-layout,.native-workspace,#tab-materials,#classroom-materials-root,.mb-builder.mb-student-preview,.mb-preview-workspace){min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+#teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-workspace{min-height:var(--mb-workspace-min,0px)!important;align-items:stretch!important}
