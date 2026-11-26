@@ -1009,3 +1009,27 @@ html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app{
 }
 html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app :is(.native-workspace,.native-layout){background:transparent!important}
 html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-workspace>header,.native-sidebar,.app-card){background-color:rgba(255,255,255,.82)!important}
+
+/* Wallpaper surfaces are not modal surfaces. */
+html[data-pp-teacher-wallpaper] #teacher-app #tab-materials,
+html[data-pp-teacher-wallpaper] #teacher-app #tab-materials>.app-card,
+html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root,
+html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root .ml-layout{background:transparent!important}
+html[data-pp-teacher-wallpaper] #teacher-app :is(dialog,.modal-card,.modal-content).app-card,
+html[data-pp-teacher-wallpaper] #teacher-app [role="dialog"].app-card{background:#fff!important}
+html[data-theme="dark"] #teacher-app :is(dialog,.modal-card,.modal-content).app-card,
+html[data-theme="dark"] #teacher-app [role="dialog"].app-card{background:#30283b!important}
+html[data-pp-teacher-wallpaper] #teacher-app{background-image:var(--pp-teacher-wallpaper)!important;background-size:100% auto!important;background-repeat:repeat-y!important;background-position:center top!important;min-height:100vh}
+html[data-pp-teacher-wallpaper-style="dark"] #teacher-app{background-image:linear-gradient(#171125b8,#171125b8),var(--pp-teacher-wallpaper)!important}
+html[data-theme="dark"][data-pp-teacher-wallpaper] #teacher-app :is(.native-workspace,.native-layout){background:transparent!important}
+#teacher-header{position:relative!important;z-index:1000!important;overflow:visible!important}
+#teacher-header .profile-menu-wrap{position:relative;z-index:1001!important;overflow:visible!important}
+#teacher-header #profile-menu{z-index:1002!important}
+.pp-teacher-wallpaper-dialog{width:min(540px,92vw);max-height:85dvh;overflow:auto;padding:22px;border-radius:18px;border:1px solid #827a9066;background:#fff;color:#1f242d}
+html[data-theme="dark"] .pp-teacher-wallpaper-dialog{background:#292435;color:#f1eafa}
+.pp-teacher-wallpaper-dialog::backdrop{background:#17112588}
+.pp-teacher-wallpaper-dialog h2{font-size:20px;font-weight:700;margin:0 0 16px}
+.pp-teacher-wallpaper-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.pp-teacher-wallpaper-grid button{padding:8px;border:1px solid #827a9066;border-radius:12px;text-align:left;color:inherit}
+.pp-teacher-wallpaper-preview{height:100px;border-radius:8px;background-color:#827a9022;background-size:cover;background-position:center;margin-bottom:8px}
+.pp-teacher-wallpaper-dialog>button{padding:8px 14px;border:1px solid #827a9066;border-radius:9px}
