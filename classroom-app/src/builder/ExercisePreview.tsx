@@ -93,13 +93,13 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  function toggleFiller(){const next=!fillerOpen;setFillerOpen(next);syncFiller(next);}
  const viewportRef=useRef<HTMLElement>(null);
  useEffect(()=>{
-  const el=viewportRef.current;if(!el)return;
+  const el=viewportRef.current;if(!el||scopeKey.startsWith("homework:review:"))return;
   const resize=()=>{const top=el.getBoundingClientRect().top+window.scrollY;el.style.setProperty('min-height',Math.max(320,window.innerHeight-top-16)+'px','important');};
   resize();window.addEventListener('resize',resize);const observer=new ResizeObserver(resize);if(el.parentElement)observer.observe(el.parentElement);return()=>{window.removeEventListener('resize',resize);observer.disconnect();};
  },[]);
  const studentAway=!studentMode&&!!studentExercise&&studentExercise!==block?.id;
- return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section ref={viewportRef} style={{display:"flex",flexDirection:"column"}} className={"mb-builder mb-student-preview"+(homework?.id.startsWith("review:")?" mb-homework-review-preview":"")} aria-label={ui('Student preview')}>
-  {!homework?.id.startsWith("review:")&&<div className="mb-preview-top">
+ return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section ref={viewportRef} style={{display:"flex",flexDirection:"column"}} className={"mb-builder mb-student-preview"+(scopeKey.startsWith("homework:review:")?" mb-homework-review-preview":"")} aria-label={ui('Student preview')}>
+  {!scopeKey.startsWith("homework:review:")&&<div className="mb-preview-top">
    <div className="mb-preview-heading-row">
     <h1>{plan.title}{stage&&<><span className="mb-preview-crumb-separator" aria-hidden="true">›</span><span className="mb-preview-section-crumb">{stage.name}</span></>}</h1>
     {!studentMode&&<button className="mb-preview-back" onClick={onBack}>✎ {ui('Builder')}</button>}
