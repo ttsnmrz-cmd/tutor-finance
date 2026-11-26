@@ -54,3 +54,26 @@
  .mb-builder .mb-structure .mb-drag:focus-visible,
  .mb-builder .mb-structure .mb-drag:active{opacity:1}
 }
+
+/* Explicit insertion marker above the target row, including active exercises. */
+.mb-builder .mb-structure :is(.mb-structure-exercise,.mb-section-row)[data-drop-target="true"] {
+ position:relative!important;
+ overflow:visible!important;
+}
+.mb-builder .mb-structure :is(.mb-structure-exercise,.mb-section-row)[data-drop-target="true"]::before {
+ content:""!important;
+ display:block!important;
+ position:absolute!important;
+ top:-3px!important;
+ left:8px!important;
+ right:4px!important;
+ height:3px!important;
+ background:#a78bfa!important;
+ border-radius:3px!important;
+ z-index:20!important;
+ pointer-events:none!important;
+}
+.mb-builder .mb-structure :is(.mb-exercise-drop-end,.mb-section-drop-end)[data-drop-target="true"] {
+ outline:2px solid #a78bfa!important;
+ outline-offset:-2px!important;
+}
