@@ -1279,3 +1279,9 @@ html[data-pp-teacher-wallpaper]:has(#teacher-app .mb-student-preview){background
 html[data-pp-teacher-wallpaper] #teacher-app:has(.mb-student-preview){min-height:100dvh!important;background-size:cover!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
 #teacher-app:has(.mb-student-preview) :is(.native-layout,.native-workspace,#tab-materials,#classroom-materials-root,.mb-builder.mb-student-preview,.mb-preview-workspace){min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
 #teacher-app #classroom-materials-root .mb-builder.mb-student-preview .mb-preview-workspace{min-height:var(--mb-workspace-min,0px)!important;align-items:stretch!important}
+
+/* Center the teacher focus handle on the lower edge of the toolbar. */
+#teacher-app .mb-builder.mb-student-preview .mb-preview-top:has(.mb-focus-toggle){margin-bottom:12px!important}
+#teacher-app .mb-builder.mb-student-preview .mb-preview-tools-row{position:static!important}
+#teacher-app .mb-builder.mb-student-preview .mb-preview-tools-row>.mb-focus-toggle{position:absolute!important;left:50%;bottom:0;transform:translate(-50%,50%);grid-area:auto!important;z-index:2;width:38px;min-height:28px;height:28px;padding:3px!important;background:var(--pp-raised)!important;border:1px solid var(--pp-shell-border)!important;border-radius:8px!important}
+#teacher-app .mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-timer{grid-column:1/-1}
