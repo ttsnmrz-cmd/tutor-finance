@@ -977,3 +977,17 @@ html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.p
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .calendar-event-card{background:rgba(232,224,246,.85)!important;color:#1f242d!important}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.student-brand-header,.app-header){background:rgba(255,255,255,.85)!important;backdrop-filter:blur(8px)!important}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(#public-week-range,.pp-history-split h3,.pp-history-split label,.pp-history-split small,.calendar-empty-day,.calendar-weekday,.student-portal-panel > p){color:#30333e!important}
+
+/* Wallpaper dashboard: finance glass and shared header stacking. */
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances.student-portal-panel{background:rgba(255,255,255,.4)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances .student-theme-panel{background:rgba(255,255,255,.75)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances #public-payments,html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances #public-payments>div{background:transparent!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .app-header.student-brand-header[data-shared-header="1"]{background:rgba(255,255,255,.65)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}
+#student-public-view .student-brand-header[data-shared-header="1"]{position:relative!important;z-index:1100!important;overflow:visible!important}
+#student-public-view .student-brand-header[data-shared-header="1"] .pp-student-header-actions{overflow:visible!important}
+#student-public-view .pp-student-settings-menu{z-index:1200!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments){scrollbar-width:thin;scrollbar-color:#74658999 transparent}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar{width:7px;height:7px;background:transparent}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar-track{background:transparent}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar-thumb{background:#74658999;border-radius:10px}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar-button{display:none}
