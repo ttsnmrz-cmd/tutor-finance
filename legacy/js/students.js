@@ -1677,12 +1677,14 @@ async function openNativeHomeworkReview(studentId,assignmentId){
  const accept=document.createElement('button'),sendBack=document.createElement('button');
  for(const b of [accept,sendBack]){b.type='button';b.className='native-add-button';b.disabled=true;}
  accept.textContent=tr('Mark as reviewed','Принять работу');sendBack.textContent=tr('Return for correction','Вернуть на исправление');
- actions.append(sendBack,accept);d.append(title,close,host,feedback,status,actions);document.body.append(d);
+ const header=document.createElement('header');header.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px';title.style.cssText='margin:0;min-width:0;font-size:18px;font-weight:700';close.style.cssText='flex:none;margin:0';header.append(title,close);
+ const style=document.createElement('style');style.textContent='.pp-homework-review .mb-preview-top{display:none!important}.pp-homework-review .mb-preview-workspace{padding-top:0!important;margin-top:0!important}.pp-homework-review .mb-student-preview{padding:0!important;min-height:0!important;gap:0!important}';
+ d.classList.add('pp-homework-review');actions.append(sendBack,accept);d.append(style,header,host,feedback,status,actions);document.body.append(d);
  let cleanup;d.addEventListener('close',()=>{cleanup?.();d.remove();},{once:true});d.showModal();
  try{
   const rows=await db('/homework_assignments?select=id,title,status,material_snapshot,answers,teacher_feedback&student_id=eq.'+encodeURIComponent(studentId)+'&id=eq.'+encodeURIComponent(assignmentId),{headers});
   const row=rows?.[0];if(!row)throw Error(tr('Homework not found','Задание не найдено'));if(!d.isConnected)return;
-  title.textContent=row.title+' · '+tr('Homework review','Проверка домашней работы');
+  title.textContent=row.title+' › '+tr('Homework review','Проверка домашней работы');
   feedback.value=row.teacher_feedback||'';feedback.readOnly=row.status!=='submitted';
   accept.disabled=sendBack.disabled=row.status!=='submitted';
   const plan={...row.material_snapshot,stages:row.material_snapshot.stages.map(s=>({...s,homework:false}))};
