@@ -958,9 +958,9 @@ html:not([data-theme="dark"])[data-pp-student-background] #student-public-view #
 }
 html[data-pp-student-background] #student-public-view.pp-student-one-page .student-portal-panel:has(:is(#public-week-calendar,#public-lessons-history)),
 html[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances.student-portal-panel{
- background:color-mix(in srgb,var(--card-bg,#fff) 20%,transparent)!important;
- backdrop-filter:none!important;
- -webkit-backdrop-filter:none!important;
+ background:var(--pp-glass-surface)!important;
+ backdrop-filter:var(--pp-glass-blur)!important;
+ -webkit-backdrop-filter:var(--pp-glass-blur)!important;
 }
 
 /* Full-width wallpapers preserve aspect ratio and repeat vertically only. */
@@ -973,17 +973,17 @@ html[data-pp-student-background][data-pp-wallpaper] #student-live-material{
 }
 
 /* Light wallpaper dashboard: frosted surfaces, readable graphite text. */
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .student-portal-panel:has(:is(#public-week-calendar,#public-lessons-history)){background:rgba(255,255,255,.4)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;color:#1f242d!important}
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.calendar-day-column,.pp-student-lesson-row){background:rgba(255,255,255,.75)!important;color:#1f242d!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .student-portal-panel:has(:is(#public-week-calendar,#public-lessons-history)){background:var(--pp-glass-surface)!important;backdrop-filter:var(--pp-glass-blur)!important;-webkit-backdrop-filter:var(--pp-glass-blur)!important;color:#1f242d!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.calendar-day-column,.pp-student-lesson-row){background:var(--pp-glass-raised)!important;color:#1f242d!important}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .calendar-event-card{background:rgba(232,224,246,.85)!important;color:#1f242d!important}
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.student-brand-header,.app-header){background:rgba(255,255,255,.85)!important;backdrop-filter:blur(8px)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.student-brand-header,.app-header){background:var(--pp-glass-surface)!important;backdrop-filter:var(--pp-glass-blur)!important}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(#public-week-range,.pp-history-split h3,.pp-history-split label,.pp-history-split small,.calendar-empty-day,.calendar-weekday,.student-portal-panel > p){color:#30333e!important}
 
 /* Wallpaper dashboard: finance glass and shared header stacking. */
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances.student-portal-panel{background:rgba(255,255,255,.4)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances .student-theme-panel{background:rgba(255,255,255,.75)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances.student-portal-panel{background:var(--pp-glass-surface)!important;backdrop-filter:var(--pp-glass-blur)!important;-webkit-backdrop-filter:var(--pp-glass-blur)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances .student-theme-panel{background:var(--pp-glass-raised)!important}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances #public-payments,html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances #public-payments>div{background:transparent!important}
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .app-header.student-brand-header[data-shared-header="1"]{background:rgba(255,255,255,.65)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page .app-header.student-brand-header[data-shared-header="1"]{background:var(--pp-glass-surface)!important;backdrop-filter:var(--pp-glass-blur)!important;-webkit-backdrop-filter:var(--pp-glass-blur)!important}
 #student-public-view .student-brand-header[data-shared-header="1"]{position:relative!important;z-index:1100!important;overflow:visible!important}
 #student-public-view .student-brand-header[data-shared-header="1"] .pp-student-header-actions{overflow:visible!important}
 #student-public-view .pp-student-settings-menu{z-index:1200!important}
@@ -994,10 +994,10 @@ html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.p
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page :is(.pp-history-list,#public-lessons-history,#public-payments)::-webkit-scrollbar-button{display:none}
 
 /* Match the top-ups card to the other finance cards; keep payment rows clear. */
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances :is(div,section):has(> #public-payments){background:rgba(255,255,255,.75)!important;border-radius:12px!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances :is(div,section):has(> #public-payments){background:var(--pp-glass-raised)!important;border-radius:12px!important}
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances #public-payments{background:transparent!important}
 /* The cloned header may retain legacy utility classes. Target the actual role. */
-html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .student-brand-header.student-brand-header[data-app-header-role="student"],html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .app-header.app-header[data-app-header-role="student"]{background:rgba(255,255,255,.65)!important;background-color:rgba(255,255,255,.65)!important;background-image:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}
+html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .student-brand-header.student-brand-header[data-app-header-role="student"],html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .app-header.app-header[data-app-header-role="student"]{background:var(--pp-glass-surface)!important;background-color:var(--pp-glass-surface)!important;background-image:none!important;backdrop-filter:var(--pp-glass-blur)!important;-webkit-backdrop-filter:var(--pp-glass-blur)!important}
 
 /* Optional light teacher wallpaper; never changes learner or dark surfaces. */
 html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app{
@@ -1008,7 +1008,7 @@ html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app{
  min-height:100vh;
 }
 html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app :is(.native-workspace,.native-layout){background:transparent!important}
-html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-workspace>header,.native-sidebar,.app-card){background-color:rgba(255,255,255,.82)!important}
+html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-workspace>header,.native-sidebar,.app-card){background-color:var(--pp-glass-surface)!important}
 
 /* Wallpaper surfaces are not modal surfaces. */
 html[data-pp-teacher-wallpaper] #teacher-app #tab-materials,
@@ -1040,6 +1040,6 @@ html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.m
 html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.ml-preview.local-materials-preview > .ml-layout {background:transparent!important;box-shadow:none!important;border-color:transparent!important;}
 
 /* Shared shell borders: keep semantic exercise and active-state borders intact. */
-html[data-theme="dark"] #teacher-app {--pp-shell-border:#51475f;}
+
 html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main,#teacher-header,.native-workspace>header,.app-card,.native-metric-strip>*) {border-color:var(--pp-shell-border)!important;}
 html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main){border:1px solid var(--pp-shell-border)!important;}
