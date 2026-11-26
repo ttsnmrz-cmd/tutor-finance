@@ -1977,7 +1977,31 @@ function createAppHeader(role){
  if(subtitle){subtitle.removeAttribute('data-i18n');subtitle.textContent=homeworkText('Your space to learn','Твоё пространство для учёбы');}
  return prepareAppHeader(header,role);
 }
+const ppStudentBackgrounds={
+ cars:{en:'Racing cars',ru:'Машинки',color:'#182b45',art:'<path d="M0 180L320 20M0 230L320 70" stroke="#71839a" stroke-width="38"/><path d="M0 205L320 45" stroke="#f4d36c" stroke-width="3" stroke-dasharray="16 14"/><g transform="translate(85 72) rotate(-25 65 35)"><rect x="0" y="12" width="130" height="48" rx="18" fill="#e34b43"/><rect x="36" y="16" width="55" height="40" rx="10" fill="#17283c"/><path d="M8 20h15M8 52h15M108 20h14M108 52h14" stroke="#f8e9ae" stroke-width="6"/><path d="M28 12v48M98 12v48" stroke="#f7f7f7" stroke-width="4"/></g>'},
+ space:{en:'Space',ru:'Космос',color:'#191d45',art:'<g fill="#e6e9ff"><circle cx="20" cy="30" r="2"/><circle cx="170" cy="35" r="3"/><circle cx="290" cy="90" r="2"/><circle cx="65" cy="180" r="3"/><circle cx="240" cy="210" r="2"/></g><circle cx="95" cy="85" r="38" fill="#9b78d5"/><ellipse cx="95" cy="85" rx="65" ry="12" fill="none" stroke="#e4bd8c" stroke-width="8" transform="rotate(-25 95 85)"/><circle cx="245" cy="155" r="29" fill="#5a9cce"/><path d="M220 145q25 25 50 0" fill="none" stroke="#91d3c5" stroke-width="9"/>'},
+ animals:{en:'Animals',ru:'Животные',color:'#426b59',art:'<g fill="#91b894"><path d="M0 220L60 65l60 155M210 220l55-160 55 160"/><circle cx="25" cy="35" r="18"/><circle cx="290" cy="30" r="20"/></g><g transform="translate(110 65)"><path d="M0 0L45 22 90 0 83 65 45 100 7 65Z" fill="#dc8a47"/><path d="M7 48L45 100 83 48 45 65Z" fill="#fff0d6"/><circle cx="26" cy="43" r="5" fill="#28312d"/><circle cx="64" cy="43" r="5" fill="#28312d"/><circle cx="45" cy="72" r="6" fill="#28312d"/></g>'},
+ gaming:{en:'Gaming',ru:'Игровой мир',color:'#77a9c6',art:'<g shape-rendering="crispEdges"><path d="M0 170h40v-35h40v-35h40v35h40v35h40v-65h40v-35h40v35h40v135H0Z" fill="#437b65"/><path d="M0 190h320v50H0Z" fill="#806047"/><path d="M0 180h320v20H0Z" fill="#83b94e"/><path d="M35 30h60v15h20v15H20V45h15ZM210 20h60v15h20v15h-95V35h15Z" fill="#e7f2ef"/><path d="M145 145h30v30h-30Z" fill="#eac15e"/><path d="M150 150h20v5h-20Z" fill="#fff2b0"/></g>'}
+};
+function ppStudentBackgroundKey(){return 'pp-student-background:'+new URLSearchParams(location.search).get('student');}
+function ppStudentBackgroundChoice(){try{return localStorage.getItem(ppStudentBackgroundKey())||'default';}catch{return 'default';}}
+function ppStudentBackgroundImage(key){const item=ppStudentBackgrounds[key];return item?'url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240"><rect width="320" height="240" fill="'+item.color+'"/>'+item.art+'</svg>')+'")':'none';}
+function ppApplyStudentBackground(){
+ if(!new URLSearchParams(location.search).get('student'))return;
+ const key=ppStudentBackgroundChoice(),item=ppStudentBackgrounds[key];
+ document.documentElement.style.setProperty('--pp-personal-bg',ppStudentBackgroundImage(key));
+ document.documentElement.toggleAttribute('data-pp-student-background',!!item);
+ if(!document.getElementById('pp-personal-background-css')){const style=document.createElement('style');style.id='pp-personal-background-css';style.textContent='html[data-pp-student-background] #student-public-view,html[data-pp-student-background] #student-live-material{background-image:linear-gradient(#ffffff55,#ffffff55),var(--pp-personal-bg)!important;background-size:auto,320px 240px!important;background-repeat:repeat!important}html[data-theme="dark"][data-pp-student-background] #student-public-view,html[data-theme="dark"][data-pp-student-background] #student-live-material{background-image:linear-gradient(#16132088,#16132088),var(--pp-personal-bg)!important}html[data-pp-student-background] #student-live-material .pp-student-live-main{background:transparent!important}';document.head.append(style);}
+}
+function ppOpenStudentBackgrounds(){
+ const en=window.getLanguage?.()==='en';const d=document.createElement('dialog');d.style.cssText='margin:auto;width:min(480px,92vw);max-height:85vh;overflow:auto;padding:20px;border:1px solid #827a9066;border-radius:16px;background:'+(document.documentElement.dataset.theme==='dark'?'#292536;color:#eeeaf5':'#fff;color:#1f242d');
+ const h=document.createElement('h2');h.textContent=en?'Personalize your classroom':'Оформление кабинета';h.style.cssText='font-size:20px;font-weight:700;margin:0 0 16px';d.append(h);
+ const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px';
+ for(const key of ['default',...Object.keys(ppStudentBackgrounds)]){const item=ppStudentBackgrounds[key],b=document.createElement('button');b.type='button';b.style.cssText='border:1px solid #827a9066;border-radius:10px;padding:8px;color:inherit;text-align:left';const preview=document.createElement('div');preview.style.cssText='height:90px;border-radius:6px;margin-bottom:6px;background-color:#827a9022;background-size:cover;background-position:center';preview.style.backgroundImage=ppStudentBackgroundImage(key);const label=document.createElement('span');label.textContent=(item?(en?item.en:item.ru):(en?'Default':'Стандартный'))+(ppStudentBackgroundChoice()===key?' ✓':'');b.append(preview,label);b.onclick=()=>{try{localStorage.setItem(ppStudentBackgroundKey(),key);}catch{alert(en?'Unable to save background':'Не удалось сохранить фон');return;}ppApplyStudentBackground();d.close();};grid.append(b);}
+ d.append(grid);const close=document.createElement('button');close.type='button';close.textContent=en?'Close':'Закрыть';close.style.cssText='margin-top:16px;padding:8px 14px;border:1px solid #827a9066;border-radius:8px';close.onclick=()=>d.close();d.append(close);d.addEventListener('close',()=>d.remove(),{once:true});document.body.append(d);d.showModal();
+}
 function installStudentProfileMenu(actions){
+ ppApplyStudentBackground();
  actions.querySelectorAll('.pp-student-settings,.pp-student-theme-toggle').forEach(n=>n.remove());
  const wrap=document.createElement('div');wrap.className='pp-student-settings';
  const trigger=document.createElement('button');trigger.type='button';trigger.className='pp-student-settings-trigger';trigger.setAttribute('aria-label','Profile settings');trigger.setAttribute('aria-expanded','false');
@@ -1986,7 +2010,7 @@ function installStudentProfileMenu(actions){
  const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');};
  function refresh(){const en=window.getLanguage?.()==='en',dark=document.documentElement.dataset.theme==='dark';menu.replaceChildren();
  for(const [lang,label] of [['ru','Русский'],['en','English']]){const b=document.createElement('button');b.type='button';b.textContent=label+(lang===(en?'en':'ru')?' ✓':'');b.onclick=()=>{window.setLanguage?.(lang);close();location.reload();};menu.append(b);}
- const theme=document.createElement('button');theme.type='button';theme.textContent=dark?(en?'☀ Light theme':'☀ Светлая тема'):(en?'☾ Dark theme':'☾ Тёмная тема');theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();refresh();close();};menu.append(theme);}
+ const theme=document.createElement('button');theme.type='button';theme.textContent=dark?(en?'☀ Light theme':'☀ Светлая тема'):(en?'☾ Dark theme':'☾ Тёмная тема');theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();refresh();close();};menu.append(theme);const background=document.createElement('button');background.type='button';background.textContent=en?'🎨 Background':'🎨 Фон кабинета';background.onclick=()=>{close();ppOpenStudentBackgrounds();};menu.append(background);}
  trigger.onclick=()=>{if(!menu.hidden){close();return;}refresh();menu.hidden=false;trigger.setAttribute('aria-expanded','true');};
  wrap.addEventListener('focusout',e=>{if(!wrap.contains(e.relatedTarget))close();});wrap.addEventListener('keydown',e=>{if(e.key==='Escape'){close();trigger.focus();}});
  wrap.append(trigger,menu);actions.append(wrap);
