@@ -1096,3 +1096,8 @@ html[data-pp-teacher-wallpaper] .pp-homework-review :is(.pp-homework-heading,.pp
 #student-live-material[data-mode="homework"] .pp-homework-feedback strong{display:block;margin-bottom:4px}
 #student-live-material[data-mode="homework"] .pp-homework-feedback div{white-space:pre-wrap}
 html[data-pp-student-background] #student-live-material[data-mode="homework"] .pp-homework-feedback{background:var(--pp-glass-surface);backdrop-filter:var(--pp-glass-blur)}
+
+/* Submitted student homework: keep scores, hide inactive exercise actions. */
+#student-live-material[data-mode="homework"] .mb-student-body [inert] :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check) button,
+#student-live-material[data-mode="homework"] .mb-student-body [inert] :is(.mb-image-label-reset,.mb-image-label-check){display:none!important}
+#student-live-material[data-mode="homework"] .mb-student-body [inert] :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check){justify-content:center!important}
