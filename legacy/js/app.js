@@ -2318,6 +2318,14 @@ function renderPublicStudentCalendar(lessonRows){
   const grid=document.getElementById('public-week-calendar');
   const range=document.getElementById('public-week-range');
   if(!grid||!range){console.warn('Student calendar elements are missing from the page.');return;}
+  // The calendar's immediate wrapper includes both the heading and grid.
+  // Keep the glass surface on the outer portal panel, not this inner wrapper.
+  for(const el of [grid,grid.parentElement,range.parentElement?.parentElement]){
+    if(!el||el.classList.contains('student-portal-panel'))continue;
+    el.style.setProperty('background','transparent','important');
+    el.style.setProperty('backdrop-filter','none','important');
+    el.style.setProperty('-webkit-backdrop-filter','none','important');
+  }
   if(!publicStudentWeekAnchor){
     const tz=isValidTimezone(publicStudent?.timezone)?publicStudent.timezone:'Europe/Minsk';
     const today=todayISOInTimezone(tz);
