@@ -160,7 +160,7 @@ function studentRow(s){
   const isArchived=!!s.archived;
   const id=String(s.id);
 
-  return `<div class="native-student-row border rounded-2xl overflow-visible mb-2 ${isArchived?'opacity-60':''} ${String(nativeSelectedStudentId)===id?'is-selected':''}" data-student-id="${esc(id)}">
+  return `<div class="native-student-row border rounded-2xl overflow-hidden mb-2 ${isArchived?'opacity-60':''} ${String(nativeSelectedStudentId)===id?'is-selected':''}" data-student-id="${esc(id)}">
     <div onclick="toggleStudentDetail('${esc(id)}')" class="p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50">
       <div class="flex-1 min-w-0">
         <div class="font-semibold">${esc(s.name)}</div>
