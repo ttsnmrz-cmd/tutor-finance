@@ -611,3 +611,9 @@ html[data-theme="dark"] .mb-builder.mb-student-preview[data-homework-mode="true"
 .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress{gap:4px!important}
 html[data-theme] .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button{height:5px!important;border:0!important;border-radius:999px!important;box-shadow:none!important;outline:none!important;outline-offset:0!important}
 html[data-theme] .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button:focus-visible{outline:2px solid var(--purple,#7953a6)!important;outline-offset:2px!important}
+
+/* Lesson workspace fills remaining viewport; long content may grow naturally. */
+.mb-builder.mb-student-preview:not([data-homework-mode="true"]):not([data-homework-review="true"]) .mb-preview-workspace{min-height:var(--mb-workspace-min,0px)!important;align-items:stretch!important}
+.mb-builder.mb-student-preview .mb-preview-workspace>.mb-student-card{display:flex!important;flex-direction:column!important}
+.mb-builder.mb-student-preview .mb-student-card>.mb-student-body{flex:1 0 auto!important}
+.mb-builder.mb-student-preview .mb-student-card>.mb-preview-footer:last-child{margin-top:auto!important;flex-shrink:0}
