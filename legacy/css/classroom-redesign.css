@@ -744,7 +744,15 @@ dialog.app-card .student-theme-panel{border:1px solid var(--border-color);border
 #student-live-material[data-mode="homework"] > .app-header{flex:0 0 auto}
 #student-live-material[data-mode="homework"] .pp-student-live-main{display:flex!important;flex-direction:column;flex:1 1 0;min-height:0!important;height:auto!important;overflow:hidden!important;background:transparent!important;color:var(--text-color)!important}
 #student-live-material[data-mode="homework"] .pp-homework-content{flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain}
-#student-live-material[data-mode="homework"] .pp-homework-close{font-size:24px;line-height:1;min-width:40px;min-height:40px}
+#student-live-material[data-mode="homework"] .pp-homework-close{font-size:14px;line-height:1.2;min-height:40px;flex-shrink:0}
+#student-live-material[data-mode="homework"] .pp-homework-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:10px 16px;border:1px solid var(--pp-shell-border);border-radius:12px;background:var(--card-bg)}
+#student-live-material[data-mode="homework"] .pp-homework-heading strong{min-width:0;overflow-wrap:anywhere}
+#student-live-material[data-mode="homework"] .pp-homework-content .mb-breadcrumb{display:none!important}
+#student-live-material[data-mode="homework"] .pp-homework-content :is(.mb-student-preview,.mb-preview-workspace,.mb-student-card,.profiprofit-student-lesson){min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important}
+html:has(#student-live-material[data-mode="homework"]),body:has(#student-live-material[data-mode="homework"]){overflow:hidden!important}
+#student-live-material#student-live-material[data-mode="homework"]{position:fixed!important;inset:0!important;height:100dvh!important;max-height:100dvh!important;min-height:0!important;overflow:hidden!important}
+#student-live-material[data-mode="homework"] .pp-homework-toolbar{margin:0!important}
+html[data-pp-student-background] #student-live-material[data-mode="homework"] .pp-homework-heading{background:var(--pp-glass-surface);backdrop-filter:var(--pp-glass-blur)}
 #student-live-material[data-mode="homework"] .pp-homework-save-status{margin-left:auto}
 html[data-pp-student-background] #student-live-material[data-mode="homework"] .pp-homework-toolbar{background:var(--pp-glass-surface);backdrop-filter:var(--pp-glass-blur);-webkit-backdrop-filter:var(--pp-glass-blur)}
 #student-live-material[data-mode="homework"] .profiprofit-student-lesson{background:transparent!important}
