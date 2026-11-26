@@ -1142,3 +1142,9 @@ html[data-theme="dark"] #teacher-app #teacher-header #profile-menu{background:#3
 .pp-homework-review :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check) button,
 .pp-homework-review :is(.mb-image-label-reset,.mb-image-label-check){display:none!important}
 .pp-homework-review :is(.mb-image-label-actions,.mb-check-actions,.mb-inline-check){justify-content:center!important}
+
+/* Compact student homework status, no duplicate banner. */
+#student-live-material[data-mode="homework"] .mb-homework-readonly{display:none!important}
+.pp-homework-heading-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.pp-homework-state{display:inline-flex;align-items:center;border:1px solid currentColor;border-radius:8px;padding:3px 9px;font-size:12px;font-weight:600;color:var(--text-secondary);line-height:1.4}
+.pp-homework-view-icon{display:inline-flex;align-items:center;color:var(--text-secondary);cursor:help}
