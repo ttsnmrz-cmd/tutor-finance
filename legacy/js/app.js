@@ -3082,24 +3082,36 @@ function showPublicHomeworkMaterial(assignment,studentId){
  mount();
 }
 
-/* Teacher-only optional wallpaper, independent of learner preferences. */
+/* Teacher wallpaper picker. */
+function ppTeacherWallpaperChoice(){try{return localStorage.getItem('pp-teacher-wallpaper')||'default';}catch{return 'default';}}
+function ppTeacherWallpaperImage(key){
+ if(key==='default')return 'none';
+ const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl('Soft Lavender Wave Ribbons.png').data.publicUrl;
+ return 'url("'+url+'")';
+}
 function ppApplyTeacherWallpaper(){
- let enabled=false;
- try{enabled=localStorage.getItem('pp-teacher-wallpaper')==='lavender';}catch{}
- document.documentElement.toggleAttribute('data-pp-teacher-wallpaper',enabled);
- if(enabled){
-  const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl('Soft Lavender Wave Ribbons.png').data.publicUrl;
-  document.documentElement.style.setProperty('--pp-teacher-wallpaper','url("'+url+'")');
- }else document.documentElement.style.removeProperty('--pp-teacher-wallpaper');
+ const key=ppTeacherWallpaperChoice(),root=document.documentElement;
+ root.toggleAttribute('data-pp-teacher-wallpaper',key!=='default');
+ root.dataset.ppTeacherWallpaperStyle=key;
+ root.style.setProperty('--pp-teacher-wallpaper',ppTeacherWallpaperImage(key));
+}
+function ppOpenTeacherWallpaper(){
+ const en=window.getLanguage?.()==='en',d=document.createElement('dialog');
+ d.className='pp-teacher-wallpaper-dialog';
+ const title=document.createElement('h2');title.textContent=en?'Personalize your workspace':'Оформление рабочего пространства';
+ const grid=document.createElement('div');grid.className='pp-teacher-wallpaper-grid';
+ for(const [key,ru,label] of [['default','Стандартный','Default'],['lavender','Светлые волны','Light waves'],['dark','Тёмные волны','Dark waves']]){
+ const b=document.createElement('button');b.type='button';
+ const p=document.createElement('div');p.className='pp-teacher-wallpaper-preview';p.style.backgroundImage=ppTeacherWallpaperImage(key);if(key==='dark')p.style.filter='brightness(.35) saturate(1.3)';
+ const t=document.createElement('span');t.textContent=(en?label:ru)+(ppTeacherWallpaperChoice()===key?' ✓':'');b.append(p,t);
+ b.onclick=()=>{try{localStorage.setItem('pp-teacher-wallpaper',key);}catch{return;}ppApplyTeacherWallpaper();d.close();};grid.append(b);
+ }
+ const close=document.createElement('button');close.type='button';close.textContent=en?'Close':'Закрыть';close.onclick=()=>d.close();
+ d.append(title,grid,close);document.body.append(d);d.addEventListener('close',()=>d.remove(),{once:true});d.showModal();
 }
 function ppInstallTeacherWallpaperMenu(menu){
  let entry=menu.querySelector('[data-teacher-wallpaper]');
- if(!entry){
-  entry=document.createElement('button');entry.type='button';entry.className='profile-menu-item';entry.dataset.teacherWallpaper='1';
-  entry.onclick=()=>{try{localStorage.setItem('pp-teacher-wallpaper',document.documentElement.hasAttribute('data-pp-teacher-wallpaper')?'default':'lavender');}catch{return;}ppApplyTeacherWallpaper();ppInstallTeacherWallpaperMenu(menu);};
-  menu.insertBefore(entry,menu.querySelector('.profile-menu-divider'));
- }
- const en=window.getLanguage?.()==='en';
- entry.textContent=(en?'Lavender wallpaper':'Лавандовые обои')+(document.documentElement.hasAttribute('data-pp-teacher-wallpaper')?' ✓':'');
+ if(!entry){entry=document.createElement('button');entry.type='button';entry.className='profile-menu-item';entry.dataset.teacherWallpaper='1';entry.onclick=()=>{menu.classList.add('hidden');document.getElementById('profile-menu-button')?.setAttribute('aria-expanded','false');ppOpenTeacherWallpaper();};menu.insertBefore(entry,menu.querySelector('.profile-menu-divider'));}
+ entry.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 6-6 4 4 3-3 5 5"/></svg><span>'+(window.getLanguage?.()==='en'?'Wallpaper':'Обои')+'</span>';
 }
 document.addEventListener('DOMContentLoaded',ppApplyTeacherWallpaper);
