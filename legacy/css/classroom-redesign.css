@@ -1122,4 +1122,4 @@ html[data-theme="dark"] #teacher-app #tab-students button.native-student-edit{co
 html[data-theme="dark"] #teacher-app #tab-students button.native-student-edit:hover{background:rgba(160,139,192,.28)!important}
 
 /* Transparent brand mark: invert black to white and lift purple on dark surfaces. */
-html[data-theme="dark"] img[src*="ProfoProfit_logo"]{filter:invert(1) hue-rotate(180deg);}
+html[data-theme="dark"] img[src*="ProfoProfit_logo"]{content:url("/legacy/ProfiProfit-logo-dark.svg");filter:none;}
