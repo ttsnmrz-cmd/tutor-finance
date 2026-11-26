@@ -998,3 +998,14 @@ html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.p
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view.pp-student-one-page #student-portal-finances #public-payments{background:transparent!important}
 /* The cloned header may retain legacy utility classes. Target the actual role. */
 html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .student-brand-header.student-brand-header[data-app-header-role="student"],html:not([data-theme="dark"])[data-pp-student-background] #student-public-view .app-header.app-header[data-app-header-role="student"]{background:rgba(255,255,255,.65)!important;background-color:rgba(255,255,255,.65)!important;background-image:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}
+
+/* Optional light teacher wallpaper; never changes learner or dark surfaces. */
+html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app{
+ background-image:var(--pp-teacher-wallpaper)!important;
+ background-size:100% auto!important;
+ background-repeat:repeat-y!important;
+ background-position:center top!important;
+ min-height:100vh;
+}
+html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app :is(.native-workspace,.native-layout){background:transparent!important}
+html[data-pp-teacher-wallpaper]:not([data-theme="dark"]) #teacher-app :is(#teacher-header,.native-workspace>header,.native-sidebar,.app-card){background-color:rgba(255,255,255,.82)!important}
