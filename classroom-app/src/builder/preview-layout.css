@@ -535,3 +535,12 @@ html[data-theme="dark"] .mb-builder.mb-student-preview :is(.mb-fillers header h2
 .mb-builder.mb-student-preview :is(.mb-student-card,.mb-student-body,.mb-combined-element,.mb-student-content):has(.mb-word-bank){overflow:visible!important;}
 .mb-builder.mb-student-preview .mb-student-content>.mb-word-bank{position:sticky!important;top:var(--mb-word-bank-top,8px)!important;z-index:20;align-self:stretch;background:var(--card,#fff)!important;max-height:35dvh;overflow-y:auto;overscroll-behavior:contain;}
 html[data-theme="dark"] .mb-builder.mb-student-preview .mb-student-content>.mb-word-bank{background:var(--page,#30283b)!important;}
+
+/* Quiet navigation indicators in both preview toolbars. */
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button{height:5px!important;background:#e6e0ed!important;outline:none;}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button:is(.done,.completed,.visited,.past){background:#b9a7d0!important;}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button:is(.current,[aria-current=step]){background:#896db0!important;outline:1px solid #896db0!important;outline-offset:2px;}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button{background:#494052!important;}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button:is(.done,.completed,.visited,.past){background:#75638c!important;}
+html[data-theme="dark"] .mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button:is(.current,[aria-current=step]){background:#b39acb!important;outline-color:#b39acb!important;}
+.mb-builder.mb-student-preview .mb-preview-footer .mb-preview-progress>button:focus-visible{outline:2px solid var(--purple,#7953a6)!important;outline-offset:3px;}
