@@ -364,7 +364,7 @@ html[data-theme=dark] #teacher-app > .native-layout > .native-sidebar{background
 /* Shared dark-theme semantic palette for teacher and student dashboard surfaces.
    Keep these scoped to the two portal roots, not the Classroom editor. */
 html[data-theme="dark"] :is(#teacher-app, #student-public-view.pp-student-one-page) {
- --pp-dark-surface:#2D2637;
+ --pp-dark-surface:#211C2B;
  --pp-dark-surface-raised:#393245;
  --pp-dark-border:#51475f;
  --pp-dark-border-raised:#51475F;
@@ -609,7 +609,7 @@ html[data-theme="dark"] #student-public-view.pp-student-one-page #student-portal
 }
 html[data-theme="dark"] {
  --pp-shell-border:#51475f;
- --pp-glass-surface:rgba(45,38,55,.90);
+ --pp-glass-surface:rgba(33,28,43,.90);
  --pp-glass-raised:#393245;
 }
 html:not([data-theme="dark"]) #teacher-app,
