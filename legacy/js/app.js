@@ -1987,6 +1987,20 @@ const ppStudentBackgrounds={
 const ppWallpaperKeys=['cars','space','animals','gaming'];
 const ppWallpaperFiles={cars:'Neon Rainy Night Sports Cars-1.png',space:'Cinematic Multiplanet Nebula Panorama-2.png',animals:'Majestic Wildlife at Sunset-3.png',gaming:'Neon Sci-Fi Gaming Battlestation-4.png'};
 for(const key of ppWallpaperKeys){ppStudentBackgrounds['wallpaper-'+key]={...ppStudentBackgrounds[key],wallpaper:ppWallpaperFiles[key]};}
+let ppAppearanceReady=false,ppAppearanceQueue=Promise.resolve();
+function ppAppearanceSnapshot(){return {theme:document.documentElement.dataset.theme==='dark'?'dark':'light',wallpaper:ppStudentBackgroundChoice(),language:window.getLanguage?.()==='en'?'en':'ru'};}
+function ppSaveAppearance(initialize=false){
+ const id=new URLSearchParams(location.search).get('student');if(!id||(!ppAppearanceReady&&!initialize))return Promise.resolve();
+ const p=ppAppearanceSnapshot();
+ ppAppearanceQueue=ppAppearanceQueue.catch(()=>{}).then(async()=>{const {error}=await supabaseClient.rpc('save_student_appearance',{p_student_id:id,p_theme:p.theme,p_wallpaper:p.wallpaper,p_language:p.language,p_initialize:initialize});if(error)throw error;});
+ return ppAppearanceQueue.catch(e=>{console.warn('Appearance sync unavailable',e);if(!initialize)alert(p.language==='en'?'Settings saved on this device only. Sync failed.':'Настройки сохранены только на этом устройстве. Синхронизация не удалась.');});
+}
+async function ppLoadAppearance(id){
+ try{let {data,error}=await supabaseClient.rpc('get_student_appearance',{p_student_id:id});if(error)throw error;
+ if(!data){await ppSaveAppearance(true);const result=await supabaseClient.rpc('get_student_appearance',{p_student_id:id});if(result.error)throw result.error;data=result.data;}
+ if(data){applyTheme(data.theme);try{localStorage.setItem(ppStudentBackgroundKey(),data.wallpaper);}catch{}window.setLanguage?.(data.language);ppApplyStudentBackground();ppAppearanceReady=true;}
+ }catch(e){console.warn('Appearance load unavailable',e);}
+}
 function ppStudentBackgroundKey(){return 'pp-student-background:'+new URLSearchParams(location.search).get('student');}
 function ppStudentBackgroundChoice(){try{return localStorage.getItem(ppStudentBackgroundKey())||'default';}catch{return 'default';}}
 function ppStudentBackgroundImage(key){const item=ppStudentBackgrounds[key];if(item?.wallpaper){const url=supabaseClient.storage.from('classroom-backgrounds').getPublicUrl(item.wallpaper).data.publicUrl;return 'url("'+url+'?v=20261126-3")';}return item?'url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240"><rect width="320" height="240" fill="'+item.color+'"/>'+item.art+'</svg>')+'")':'none';}
@@ -2006,7 +2020,7 @@ function ppOpenStudentBackgrounds(){
  const en=window.getLanguage?.()==='en';const d=document.createElement('dialog');d.style.cssText='margin:auto;width:min(480px,92vw);max-height:85vh;overflow:auto;padding:20px;border:1px solid #827a9066;border-radius:16px;background:'+(document.documentElement.dataset.theme==='dark'?'#292536;color:#eeeaf5':'#fff;color:#1f242d');
  const h=document.createElement('h2');h.textContent=en?'Personalize your classroom':'Оформление кабинета';h.style.cssText='font-size:20px;font-weight:700;margin:0 0 16px';d.append(h);
  const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px';
- for(const key of ['default','wallpapers-heading',...ppWallpaperKeys.map(k=>'wallpaper-'+k),'illustrations-heading',...ppWallpaperKeys]){if(key.endsWith('-heading')){const heading=document.createElement('h3');heading.style.cssText='grid-column:1/-1;font-size:14px;font-weight:700;margin:8px 0 0';heading.textContent=key==='wallpapers-heading'?(en?'Wallpapers':'Обои'):(en?'Illustrations':'Иллюстрации');grid.append(heading);continue;}const item=ppStudentBackgrounds[key],b=document.createElement('button');b.type='button';b.style.cssText='border:1px solid #827a9066;border-radius:10px;padding:8px;color:inherit;text-align:left';const preview=document.createElement('div');preview.style.cssText='height:90px;border-radius:6px;margin-bottom:6px;background-color:#827a9022;background-size:cover;background-position:center';preview.style.backgroundImage=ppStudentBackgroundImage(key);const label=document.createElement('span');label.textContent=(item?(en?item.en:item.ru):(en?'Default':'Стандартный'))+(ppStudentBackgroundChoice()===key?' ✓':'');b.append(preview,label);b.onclick=()=>{try{localStorage.setItem(ppStudentBackgroundKey(),key);}catch{alert(en?'Unable to save background':'Не удалось сохранить фон');return;}ppApplyStudentBackground();d.close();};grid.append(b);}
+ for(const key of ['default','wallpapers-heading',...ppWallpaperKeys.map(k=>'wallpaper-'+k),'illustrations-heading',...ppWallpaperKeys]){if(key.endsWith('-heading')){const heading=document.createElement('h3');heading.style.cssText='grid-column:1/-1;font-size:14px;font-weight:700;margin:8px 0 0';heading.textContent=key==='wallpapers-heading'?(en?'Wallpapers':'Обои'):(en?'Illustrations':'Иллюстрации');grid.append(heading);continue;}const item=ppStudentBackgrounds[key],b=document.createElement('button');b.type='button';b.style.cssText='border:1px solid #827a9066;border-radius:10px;padding:8px;color:inherit;text-align:left';const preview=document.createElement('div');preview.style.cssText='height:90px;border-radius:6px;margin-bottom:6px;background-color:#827a9022;background-size:cover;background-position:center';preview.style.backgroundImage=ppStudentBackgroundImage(key);const label=document.createElement('span');label.textContent=(item?(en?item.en:item.ru):(en?'Default':'Стандартный'))+(ppStudentBackgroundChoice()===key?' ✓':'');b.append(preview,label);b.onclick=()=>{try{localStorage.setItem(ppStudentBackgroundKey(),key);}catch{alert(en?'Unable to save background':'Не удалось сохранить фон');return;}ppApplyStudentBackground();void ppSaveAppearance();d.close();};grid.append(b);}
  d.append(grid);const close=document.createElement('button');close.type='button';close.textContent=en?'Close':'Закрыть';close.style.cssText='margin-top:16px;padding:8px 14px;border:1px solid #827a9066;border-radius:8px';close.onclick=()=>d.close();d.append(close);d.addEventListener('close',()=>d.remove(),{once:true});document.body.append(d);d.showModal();
 }
 function installStudentProfileMenu(actions){
@@ -2018,8 +2032,8 @@ function installStudentProfileMenu(actions){
  const menu=document.createElement('div');menu.className='pp-student-settings-menu';menu.hidden=true;
  const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');};
  function refresh(){const en=window.getLanguage?.()==='en',dark=document.documentElement.dataset.theme==='dark';menu.replaceChildren();
- for(const [lang,label] of [['ru','Русский'],['en','English']]){const b=document.createElement('button');b.type='button';b.textContent=label+(lang===(en?'en':'ru')?' ✓':'');b.onclick=()=>{window.setLanguage?.(lang);close();location.reload();};menu.append(b);}
- const theme=document.createElement('button');theme.type='button';theme.textContent=dark?(en?'☀ Light theme':'☀ Светлая тема'):(en?'☾ Dark theme':'☾ Тёмная тема');theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();refresh();close();};menu.append(theme);const background=document.createElement('button');background.type='button';background.textContent=en?'🎨 Background':'🎨 Фон кабинета';background.onclick=()=>{close();ppOpenStudentBackgrounds();};menu.append(background);}
+ for(const [lang,label] of [['ru','Русский'],['en','English']]){const b=document.createElement('button');b.type='button';b.textContent=label+(lang===(en?'en':'ru')?' ✓':'');b.onclick=async()=>{window.setLanguage?.(lang);close();await ppSaveAppearance();location.reload();};menu.append(b);}
+ const theme=document.createElement('button');theme.type='button';theme.textContent=dark?(en?'☀ Light theme':'☀ Светлая тема'):(en?'☾ Dark theme':'☾ Тёмная тема');theme.onclick=()=>{if(typeof toggleDarkMode==='function')toggleDarkMode();void ppSaveAppearance();refresh();close();};menu.append(theme);const background=document.createElement('button');background.type='button';background.textContent=en?'🎨 Background':'🎨 Фон кабинета';background.onclick=()=>{close();ppOpenStudentBackgrounds();};menu.append(background);}
  trigger.onclick=()=>{if(!menu.hidden){close();return;}refresh();menu.hidden=false;trigger.setAttribute('aria-expanded','true');};
  wrap.addEventListener('focusout',e=>{if(!wrap.contains(e.relatedTarget))close();});wrap.addEventListener('keydown',e=>{if(e.key==='Escape'){close();trigger.focus();}});
  wrap.append(trigger,menu);actions.append(wrap);
@@ -2416,6 +2430,7 @@ async function initPublicStudent(){
       return true;
     }
 
+    await ppLoadAppearance(id);
     nameEl.textContent='Ученик: '+publicStudent.name;
     const live=await supabaseClient.rpc('get_public_student_live_status',{p_student_id:id});
     if(!live.error&&Array.isArray(live.data))publicStudentLiveStatuses=new Map(live.data.map(x=>[String(x.calendar_lesson_id),x]));
