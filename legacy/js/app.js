@@ -2087,12 +2087,12 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-live-notes textarea{flex:1;min-height:0;resize:none;border:0;outline:0;box-shadow:none;cursor:default}
  #student-live-material .pp-student-profile-wrap{position:relative}
  #student-live-material .pp-student-profile-button{width:44px;height:44px;border-radius:12px;background:#eee8f7;color:#4b287e;font-size:26px}
- #student-live-material .pp-student-profile-menu{position:absolute;right:0;top:52px;z-index:100;background:white;color:#292336;border:1px solid #e4dcef;box-shadow:0 12px 30px #24143225;border-radius:12px;padding:14px;min-width:190px}
+ #student-live-material .pp-student-profile-menu{position:absolute;right:0;top:52px;z-index:100;background:var(--card-bg);color:var(--text-color);border:1px solid #e4dcef;box-shadow:0 12px 30px #24143225;border-radius:12px;padding:14px;min-width:190px}
  #student-live-material .pp-student-profile-menu[hidden]{display:none}
  #student-live-material .pp-student-profile-menu label,#student-live-material .pp-student-profile-menu button{display:block;margin-top:14px}
  #student-live-material .pp-student-profile-menu select{padding:5px}
- #student-live-material .pp-student-live-main{background:#fff;border-radius:var(--pp-classroom-radius,16px);padding:18px}
- #student-live-material .pp-student-pointer{background:#fff;border-radius:var(--pp-classroom-radius,16px);overflow:hidden}
+ #student-live-material .pp-student-live-main{background:var(--card-bg);border-radius:var(--pp-classroom-radius,16px);padding:18px}
+ #student-live-material .pp-student-pointer{background:var(--card-bg);border-radius:var(--pp-classroom-radius,16px);overflow:hidden}
  #student-live-material .pp-student-profile-menu{min-width:240px;padding:18px;border-radius:18px;font-size:15px}
  #student-live-material .pp-student-menu-title{display:block;color:#746e84;font-size:14px;font-weight:600;margin-bottom:18px}
  #student-live-material .pp-student-profile-menu label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0;padding:12px 0}
@@ -2110,18 +2110,23 @@ function ensureStudentPortalLayout(){
  #student-live-material .pp-student-live-layout{padding:14px}
  
 
- #student-live-material .mb-builder.mb-student-preview .mb-student-card{border-color:#dfe3e8!important}
- #student-live-material .mb-builder.mb-student-preview .mb-preview-notes{border-color:#dfe3e8!important}
+ #student-live-material .mb-builder.mb-student-preview .mb-student-card{border-color:var(--border-color)!important}
+ #student-live-material .mb-builder.mb-student-preview .mb-preview-notes{border-color:var(--border-color)!important}
  #student-live-material .pp-student-live-main{min-width:0;flex:1}
  #student-live-material .pp-student-live-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,27%);gap:14px}
- #student-live-material .pp-student-live-notes{background:#fff;border:1px solid #dfe3e8;border-radius:var(--pp-classroom-radius,16px);padding:14px}
- #student-live-material .pp-student-live-notes textarea{width:100%;min-height:340px;background:#f4f5f7;border-radius:10px;padding:12px;resize:vertical}
+ #student-live-material .pp-student-live-notes{background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--pp-classroom-radius,16px);padding:14px}
+ #student-live-material .pp-student-live-notes textarea{width:100%;min-height:340px;background:var(--accent-soft);border-radius:10px;padding:12px;resize:vertical}
  #student-live-material .pp-student-live-tools{display:flex;gap:10px;align-items:center;margin-bottom:12px}
  #student-live-material .pp-student-pointer{position:relative}
  #student-live-material .pp-student-pointer canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;z-index:2;pointer-events:none}
  #student-live-material .pp-student-pointer.drawing canvas{pointer-events:auto;cursor:crosshair}
  @media(max-width:780px){#student-live-material .pp-student-live-content{grid-template-columns:1fr}.pp-student-sidebar{width:58px}.pp-student-sidebar-label{display:none}}
- `;document.head.append(style);
+ 
+ #student-live-material .pp-student-pointer,#student-live-material .pp-student-live-notes{background:var(--card-bg)!important;color:var(--text-color)!important;border-radius:var(--pp-classroom-radius,16px)!important;overflow:hidden}
+ #student-live-material .pp-student-notes-content{background:var(--accent-soft)!important;color:var(--text-color)!important}
+ #student-live-material .pp-student-live-main{color:var(--text-color)}
+ #student-live-material .pp-student-pointer .mb-builder{background:var(--card-bg)}
+`;document.head.append(style);
 }
 // The public student dashboard is rendered before its first tab click.
 // Initialize the shared teacher-style shell as soon as the portal becomes visible.
@@ -2188,7 +2193,7 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  columns.append(drawWrap,notes);main.append(columns);layout.append(main);overlay.append(layout);
  const richNotes=document.createElement('div');
  richNotes.className='pp-student-notes-content';
- richNotes.style.cssText='flex:1;min-height:340px;background:#f4f5f7;border-radius:10px;padding:12px;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap';
+ richNotes.style.cssText='flex:1;min-height:340px;background:var(--accent-soft);color:var(--text-color);border-radius:10px;padding:12px;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap';
  richNotes.textContent=noteArea.placeholder;
  noteArea.replaceWith(richNotes);
  let previousNotes=null;
