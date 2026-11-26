@@ -588,6 +588,6 @@ html[data-theme="dark"] .mb-fillers .mb-filler-settings :is(button,select),html[
 html[data-theme="dark"] .mb-fillers .mb-memory-cell[data-state="matched"]{background:#203f32!important;color:#b6f2cc!important;border-color:#26965b!important;}
 .mb-fillers .mb-memory-cell{min-width:0;overflow-wrap:anywhere;}
 
-.mb-builder.mb-student-preview.mb-homework-review-preview{padding:0!important;margin:0!important;gap:0!important;min-height:0!important;height:auto!important;}
-.mb-builder.mb-student-preview.mb-homework-review-preview .mb-preview-workspace{padding:0!important;margin:0!important;gap:0!important;min-height:0!important;}
-.mb-builder.mb-student-preview.mb-homework-review-preview .mb-student-card{margin:0!important;min-height:0!important;}
+.mb-builder.mb-student-preview[data-homework-review="true"]{padding:0!important;margin:0!important;gap:0!important;min-height:0!important;height:auto!important;}
+.mb-builder.mb-student-preview[data-homework-review="true"] .mb-preview-workspace{padding:0!important;margin:0!important;gap:0!important;min-height:0!important;}
+.mb-builder.mb-student-preview[data-homework-review="true"] .mb-student-card{margin:0!important;min-height:0!important;}
