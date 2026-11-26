@@ -1990,7 +1990,7 @@ for(const key of ppWallpaperKeys){ppStudentBackgrounds['wallpaper-'+key]={...ppS
 let ppAppearanceReady=false,ppAppearanceQueue=Promise.resolve();
 function ppAppearanceSnapshot(){return {theme:document.documentElement.dataset.theme==='dark'?'dark':'light',wallpaper:ppStudentBackgroundChoice(),language:window.getLanguage?.()==='en'?'en':'ru'};}
 function ppSaveAppearance(initialize=false){
- const id=new URLSearchParams(location.search).get('student');if(!id||(!ppAppearanceReady&&!initialize))return Promise.resolve();
+ const id=new URLSearchParams(location.search).get('student');if(!id)return Promise.resolve();
  const p=ppAppearanceSnapshot();
  ppAppearanceQueue=ppAppearanceQueue.catch(()=>{}).then(async()=>{const {error}=await supabaseClient.rpc('save_student_appearance',{p_student_id:id,p_theme:p.theme,p_wallpaper:p.wallpaper,p_language:p.language,p_initialize:initialize});if(error)throw error;});
  return ppAppearanceQueue.catch(e=>{console.warn('Appearance sync unavailable',e);if(!initialize)alert(p.language==='en'?'Settings saved on this device only. Sync failed.':'Настройки сохранены только на этом устройстве. Синхронизация не удалась.');});
