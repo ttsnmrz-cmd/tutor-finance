@@ -889,3 +889,13 @@ table[data-table-width] tr> :first-child:nth-last-child(2){width:var(--pp-table-
 
 /* Keep callouts below preceding floated images and isolate their contents. */
 [data-callout]{clear:both;display:flow-root;}
+
+.mb-text-image-menu{display:grid;gap:12px;padding:14px;color:var(--text-color);background:var(--card-bg);}
+.mb-text-image-menu .mb-image-layout-options{display:flex;flex-wrap:wrap;gap:5px;}
+.mb-text-image-menu button,.mb-text-image-menu select,.mb-text-image-menu input{font:inherit;font-size:13px;border:1px solid var(--border-color);border-radius:8px;padding:8px;color:inherit;background:var(--card-bg);box-sizing:border-box;}
+.mb-text-image-menu button[aria-pressed="true"]{background:#4e2a84;color:#fff;border-color:#8065ac;}
+.mb-text-image-menu label{display:grid;gap:5px;font-size:12px;}
+.mb-text-image-menu input,.mb-text-image-menu select{width:100%;min-height:34px;}
+.mb-text-image-menu button.mb-image-remove{color:#b43d48;border-color:currentColor;justify-self:start;}
+html[data-theme="dark"] .mb-text-image-menu{background:#2c2638;color:#f0eafa;}
+html[data-theme="dark"] .mb-text-image-menu button.mb-image-remove{color:#ffabb2;}
