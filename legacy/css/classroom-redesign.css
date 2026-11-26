@@ -1065,3 +1065,14 @@ html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main){border:1
  display:none!important;
 }
 #student-live-material[data-mode="homework"] .pp-homework-content {overflow-y:auto!important;overflow-x:hidden!important;}
+
+/* Public homework: the shared renderer uses buttons for progress and an inline
+   important min-height. Keep the title outside and let content size naturally. */
+#student-live-material#student-live-material[data-mode="homework"] .pp-homework-content[data-classroom-root] .mb-preview-top,
+#student-live-material#student-live-material[data-mode="homework"] .mb-student-card > .mb-preview-footer:first-child,
+#student-live-material#student-live-material[data-mode="homework"] .mb-preview-footer:has(.mb-preview-progress > button:only-child) {
+ display:none!important;
+}
+#student-live-material[data-mode="homework"] .pp-homework-heading{padding:4px 12px}
+#student-live-material[data-mode="homework"] .pp-homework-content{padding:0!important;margin:0!important}
+#student-live-material[data-mode="homework"] .pp-homework-content .mb-preview-workspace{margin:0!important;padding:0!important}
