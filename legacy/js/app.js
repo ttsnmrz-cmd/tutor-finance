@@ -2006,8 +2006,10 @@ const ppStudentBackgrounds={
 const ppWallpaperKeys=['cars','space','animals','gaming'];
 const ppWallpaperFiles={cars:'Neon Rainy Night Sports Cars-1.png',space:'Cinematic Multiplanet Nebula Panorama-2.png',animals:'Majestic Wildlife at Sunset-3.png',gaming:'Neon Sci-Fi Gaming Battlestation-4.png'};
 for(const key of ppWallpaperKeys){ppStudentBackgrounds['wallpaper-'+key]={...ppStudentBackgrounds[key],wallpaper:ppWallpaperFiles[key]};}
-const ppExtraWallpaperKeys=['wallpaper-city-light','wallpaper-luxury-light','wallpaper-gaming-light'];
+const ppExtraWallpaperKeys=['wallpaper-city-light','wallpaper-luxury-light','wallpaper-gaming-light','wallpaper-blue-dark','wallpaper-blue-light'];
 Object.assign(ppStudentBackgrounds,{
+ 'wallpaper-blue-dark':{ru:'Синие волны — тёмные',en:'Blue Waves — Dark',wallpaper:'Electric Blue Geometric Waves-2.png'},
+ 'wallpaper-blue-light':{ru:'Синие волны — светлые',en:'Blue Waves — Light',wallpaper:'Abstract Blue Wave Gradient Wallpaper-1.png'},
  'wallpaper-city-light':{ru:'Город будущего',en:'Futuristic City',wallpaper:'Futuristic City Workspace and Sports Car-2.png'},
  'wallpaper-luxury-light':{ru:'Студия мечты',en:'Luxury Tech Studio',wallpaper:'Luxury Tech Studio with Supercar.png'},
  'wallpaper-gaming-light':{ru:'Комната мечты айтишника',en:'Dream Gaming Room',wallpaper:'Modern Gaming Workspace with Sunset Views-1.png'}
