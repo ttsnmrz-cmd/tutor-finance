@@ -1292,3 +1292,7 @@ html[data-theme="dark"] #teacher-app .mb-builder.mb-student-preview .mb-preview-
 /* Keep homework pagination visible even when the exercise content scrolls. */
 #student-live-material[data-mode="homework"] .mb-student-card>.mb-preview-footer{display:flex!important;flex-shrink:0!important}
 #student-live-material[data-mode="homework"] .mb-student-card>.mb-preview-footer:first-child{position:sticky!important;top:0;z-index:10;background:var(--pp-surface)!important;margin-top:0!important}
+
+/* Student lesson notes: override generic dialog sizing, keep scrolling inside. */
+html[data-theme] dialog.pp-student-lesson-dialog[open],html dialog.pp-student-lesson-dialog[open]{width:min(50vw,760px)!important;max-width:calc(100vw - 32px)!important;min-width:0!important;height:auto!important;max-height:85dvh!important;overflow-y:auto!important;overflow-x:hidden!important;margin:auto!important;inset:0!important;box-sizing:border-box!important;}
+@media(max-width:900px){html[data-theme] dialog.pp-student-lesson-dialog[open],html dialog.pp-student-lesson-dialog[open]{width:min(680px,calc(100vw - 32px))!important;}}
