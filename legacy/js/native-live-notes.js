@@ -20,14 +20,19 @@ async function renderNativeLessonNotes(student){
   root.replaceChildren();
   const layout=document.createElement('div');layout.className='pp-history-split';
   const ru=document.documentElement.lang==='ru';
-  const details=document.createElement('div');details.style.whiteSpace='pre-wrap';details.style.overflowWrap='anywhere';
-  details.textContent=ru?'Выберите занятие':'Select a lesson';
-  const show=l=>{const note=ids.get(String(l.id));details.textContent=note?.plain||(ru?'Нет заметок':'No notes yet.');};
-  for(const title of ['Lessons','Notes']){
-    const col=document.createElement('section'),heading=document.createElement('h3'),list=document.createElement('div');
-    heading.textContent=ru?(title==='Lessons'?'Занятия':'Заметки'):title;list.className='pp-history-list';col.append(heading,list);layout.append(col);
-    for(const l of lessonsForStudent){const note=ids.get(String(l.id));if(title==='Notes'&&!note)continue;const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=historyDateLabel(l.date)+(title==='Lessons'&&note?' ▤':'');if(title==='Notes'&&historyMaterialTitle(note.title)){const h=document.createElement('strong');h.className='pp-note-title';h.textContent=historyMaterialTitle(note.title);button.prepend(h);}button.onclick=()=>show(l);list.append(button);}
-    if(title==='Notes'){col.append(details);show(lessonsForStudent.find(l=>ids.has(String(l.id)))||lessonsForStudent[0]);}
-  }
+  const buttons=new Map();
+  const makeColumn=title=>{const col=document.createElement('section'),heading=document.createElement('h3'),list=document.createElement('div');heading.textContent=title;list.className='pp-history-list';col.append(heading,list);layout.append(col);return list;};
+  const lessons=makeColumn(ru?'Занятия':'Lessons'),details=makeColumn(ru?'Заметки':'Notes');
+  const show=l=>{
+    const note=ids.get(String(l.id));
+    for(const [id,button] of buttons){const active=id===String(l.id);button.setAttribute('aria-pressed',String(active));button.style.background=active?'rgba(112,80,158,.20)':'';button.style.borderColor=active?'#896DB0':'';}
+    const card=document.createElement('button');card.type='button';card.className='pp-student-lesson-row';
+    const title=document.createElement('strong');title.className='pp-note-title';title.textContent=historyMaterialTitle(note.title)||(ru?'Заметки урока':'Lesson notes');
+    const excerpt=document.createElement('small');excerpt.textContent=String(note.plain||'').trim().split(/\r?\n/)[0];excerpt.style.cssText='display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%';
+    card.style.minWidth='0';card.append(title,excerpt);details.replaceChildren(card);
+    card.onclick=()=>{const dialog=document.createElement('dialog');dialog.className='app-card';dialog.style.cssText='width:min(640px,92vw);max-height:80dvh;overflow:auto;box-sizing:border-box';const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label',ru?'Закрыть':'Close');close.style.cssText='float:right';close.onclick=()=>dialog.close();const h=document.createElement('h3');h.textContent=title.textContent;const body=document.createElement('div');body.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere';body.textContent=note.plain;dialog.append(close,h,body);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();};
+  };
+  for(const l of lessonsForStudent){const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=historyDateLabel(l.date)+' ▤';button.onclick=()=>show(l);buttons.set(String(l.id),button);lessons.append(button);}
+  show(lessonsForStudent[0]);
   root.append(layout);
 }
