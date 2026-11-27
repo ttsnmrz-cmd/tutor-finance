@@ -645,7 +645,7 @@ function fillStudentSelects(){
 
   const p=document.getElementById('add-payment-student');
 
-  if(p){const previous=p.value;p.innerHTML='<option value="" disabled selected>Выберите ученика</option>'+studentOptions;if(previous&&Array.from(p.options).some(o=>o.value===previous))p.value=previous;const button=document.getElementById('add-payment-submit');if(button)button.disabled=!p.value;}
+  if(p){const previous=p.value;p.innerHTML='<option value="" disabled selected>Выберите ученика</option>'+studentOptions;if(previous&&Array.from(p.options).some(o=>o.value===previous))p.value=previous;const button=document.getElementById('add-payment-submit');if(button)button.disabled=!p.value||paymentSubmissions.add.busy||paymentSubmissions.add.committed;}
 }
 
 function updateLessonGroupButton(){
