@@ -1882,6 +1882,23 @@ async function openPublicCalendarLesson(index){
  showPublicLessonMaterial(data,studentId,Number(l.id));
  }catch(e){window.alert('Unable to open lesson: '+(e.message||e));}
 }
+let publicQuickActionsLoading=false;
+function setPublicQuickActionsLoading(loading){
+ publicQuickActionsLoading=loading;
+ const bar=document.querySelector('#student-public-view .pp-student-quick-actions');
+ if(!bar)return;
+ bar.setAttribute('aria-busy',String(loading));
+ let indicator=bar.querySelector('[data-quick-loading]');
+ if(loading&&!indicator){
+  indicator=document.createElement('span');indicator.dataset.quickLoading='1';indicator.setAttribute('role','status');
+  indicator.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;width:100%;color:inherit';
+  const spinner=document.createElement('span');spinner.style.cssText='width:20px;height:20px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%';
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)spinner.animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:800,iterations:Infinity});
+  indicator.append(spinner,document.createTextNode(window.getLanguage?.()==='en'?'Loading…':'Загрузка…'));bar.append(indicator);
+ }
+ if(!loading)indicator?.remove();
+ for(const child of bar.querySelectorAll('.pp-student-join')){if(loading)child.style.setProperty('display','none','important');else child.style.removeProperty('display');}
+}
 function ensureStudentQuickActions(){
  const header=document.querySelector('#student-public-view .student-brand-header[data-shared-header="1"]');
  if(!header)return null;
@@ -1892,6 +1909,7 @@ function ensureStudentQuickActions(){
  let url;try{url=new URL(publicStudent?.google_meet_url||'');}catch{}
  meet.hidden=!(url?.protocol==='https:'&&url.hostname==='meet.google.com');
  if(!meet.hidden)meet.href=url.href;else meet.removeAttribute('href');
+ if(publicQuickActionsLoading)setPublicQuickActionsLoading(true);
  return bar;
 }
 function updatePublicJoinButton(){
@@ -1902,6 +1920,7 @@ function updatePublicJoinButton(){
  const candidates=publicStudentCalendarLessons.filter(l=>!['cancelled_free','cancelled_charge','rescheduled'].includes(l.status)&&publicStudentLiveStatuses.get(String(l.id))?.has_material);
  const lesson=candidates.find(l=>publicCalendarTimeStatus(l)==='in_progress')||candidates.find(l=>publicCalendarTimeStatus(l)==='scheduled')||candidates[candidates.length-1];
  button.hidden=!lesson;
+ if(publicQuickActionsLoading)setPublicQuickActionsLoading(true);
  button.textContent=window.getLanguage?.()==='en'?'Join lesson →':'Перейти на занятие →';
  button.onclick=async()=>{if(!lesson||button.disabled)return;button.disabled=true;try{await openPublicCalendarLesson(publicStudentCalendarLessons.indexOf(lesson));}finally{button.disabled=false;}};
 }
@@ -2405,6 +2424,7 @@ async function initPublicStudent(){
   const errorEl=document.getElementById('student-public-error');
 
   const loader=showAppLoadingOverlay();
+  publicQuickActionsLoading=true;
   view.classList.remove('hidden');
   nameEl.textContent='Загрузка...';
   errorEl.textContent='';
@@ -2442,7 +2462,9 @@ async function initPublicStudent(){
     if(!live.error&&Array.isArray(live.data))publicStudentLiveStatuses=new Map(live.data.map(x=>[String(x.calendar_lesson_id),x]));
     else if(live.error)console.warn('Live status unavailable:',live.error.message);
     await openStudentCabinet();
+    loader.remove();
     await refreshPublicHomework(id);
+    setPublicQuickActionsLoading(false);
     await restorePublicHomework(id);
     // Restore an active lesson after a refresh, without requiring the student
     // to return to the dashboard or confirm joining again.
@@ -2465,6 +2487,7 @@ async function initPublicStudent(){
     errorEl.textContent=
       e?.message||'Не удалось загрузить данные ученика.';
   }finally{
+    setPublicQuickActionsLoading(false);
     loader.remove();
   }
 
@@ -3035,6 +3058,7 @@ async function refreshPublicHomework(studentId){
  let button=actions.querySelector('.pp-student-homework');
  if(!button){button=document.createElement('button');button.type='button';button.className='pp-student-join pp-student-homework';actions.append(button);}
  button.hidden=false;
+ if(publicQuickActionsLoading)setPublicQuickActionsLoading(true);
  button.textContent=homeworkText('Homework','Домашняя работа');
  button.onclick=()=>openPublicHomeworkList(studentId);
  try{
