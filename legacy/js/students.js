@@ -1136,6 +1136,7 @@ async function editGroup(id){
 }
 
 function openAdd(type){
+  if(type==='payment'&&Object.values(paymentSubmissions).some(state=>state.busy))return;
   showModal('add-modal');
   showAddForm(type||'student');
 }

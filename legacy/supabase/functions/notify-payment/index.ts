@@ -103,20 +103,34 @@ Deno.serve(async (req) => {
     const { data: claim, error: claimError } = await db.from("telegram_payment_notifications")
       .insert({ payment_id: String(payment.id), student_id: student.id, teacher_id: user.id, recipient_type: recipient.type, delivery_status: "claimed" })
       .select("id").maybeSingle();
-    if (claimError?.code === "23505") { skipped++; continue; }
+    if (claimError?.code === "23505") {
+      skipped++;
+      const previous = await db.from("telegram_payment_notifications").select("delivery_status")
+        .eq("payment_id", String(payment.id)).eq("recipient_type", recipient.type).maybeSingle();
+      if (previous.error || previous.data?.delivery_status !== "sent") {
+        errors.push(`delivery_unconfirmed:${recipient.type}`);
+      }
+      continue;
+    }
     if (claimError || !claim) { errors.push(`claim:${recipient.type}`); continue; }
+    let accepted = false;
     try {
       await send(recipient.chat, recipient.message);
-      sent++;
-      await db.from("telegram_payment_notifications")
-        .update({ delivery_status: "sent", delivered_at: new Date().toISOString() }).eq("id", claim.id);
+      accepted = true;
     } catch {
-      // A timeout can occur AFTER Telegram accepted a message. Retain the
-      // durable claim even after crashes/ambiguous errors; never auto-resend.
-      await db.from("telegram_payment_notifications")
-        .update({ delivery_status: "unknown" }).eq("id", claim.id);
       errors.push(`delivery_unconfirmed:${recipient.type}`);
       console.error("Payment notification delivery unconfirmed; claim retained");
+    }
+    try {
+      const status = accepted ? "sent" : "unknown";
+      const result = await db.from("telegram_payment_notifications")
+        .update({ delivery_status: status, delivered_at: accepted ? new Date().toISOString() : null })
+        .eq("id", claim.id).select("delivery_status").maybeSingle();
+      if (result.error || result.data?.delivery_status !== status) throw new Error("Status write failed");
+      if (accepted) sent++;
+    } catch {
+      errors.push(`status_write:${recipient.type}`);
+      console.error("Payment notification status was not confirmed; claim retained");
     }
   }
   return json({ ok: true, sent, skipped, errors, balance, lessons_covered: wholeLessons });
