@@ -43,6 +43,28 @@ function displayTime(v){
     '.'+
     String(a[1]||'00').padStart(2,'0');
 }
+let ppCurrentHourTimer;
+function ppHighlightCurrentHour(){
+ const c=document.getElementById('week-calendar'),scroller=document.getElementById('native-calendar-scroll');
+ if(!c||!scroller)return;
+ const today=todayISOInTimezone(getTeacherTimezone());
+ const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:getTeacherTimezone(),hour:'2-digit',hourCycle:'h23'}).format(new Date()));
+ const active=hour>=7&&hour<23&&Array.from(c.querySelectorAll('.native-day-track')).some(t=>t.dataset.date===today);
+ const top=(hour-7)*72;
+ for(const track of c.querySelectorAll('.native-day-track')){
+  let band=track.querySelector('.pp-current-hour-band');
+  if(!active){band?.remove();continue;}
+  if(!band){band=document.createElement('div');band.className='pp-current-hour-band';band.setAttribute('aria-hidden','true');band.style.cssText='position:absolute;left:0;right:0;height:72px;box-sizing:border-box;pointer-events:none;background:rgba(137,105,192,.16);border-top:1px solid rgba(137,105,192,.65);border-bottom:1px solid rgba(137,105,192,.65)';track.prepend(band);}
+  band.style.top=top+'px';
+ }
+ for(const [i,label] of Array.from(scroller.querySelectorAll('.native-time-axis span')).entries()){
+  const selected=active&&i===hour-7;
+  label.style.fontWeight=selected?'800':'';
+  label.style.color=selected?'var(--text-color)':'';
+  label.style.background=selected?'rgba(137,105,192,.25)':'';
+  label.style.borderRadius=selected?'5px':'';
+ }
+}
 function renderWeek(){
   const c=document.getElementById('week-calendar');
   if(!c)return;
@@ -114,6 +136,8 @@ function renderWeek(){
   const oldAxis=scroller.querySelector('.native-time-axis');
   if(oldAxis)oldAxis.remove();
   scroller.insertAdjacentHTML('afterbegin',axis);
+  ppHighlightCurrentHour();
+  if(!ppCurrentHourTimer)ppCurrentHourTimer=setInterval(ppHighlightCurrentHour,15000);
   const weekId=days[0].toISOString().slice(0,10);
   if(scroller.dataset.week!==weekId){
     scroller.dataset.week=weekId;
