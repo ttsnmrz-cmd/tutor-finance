@@ -2245,6 +2245,7 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  richNotes.style.cssText='flex:1;min-height:340px;background:var(--accent-soft);color:var(--text-color);border-radius:10px;padding:12px;overflow:auto;overflow-wrap:anywhere;white-space:pre-wrap';
  richNotes.textContent=noteArea.placeholder;
  noteArea.replaceWith(richNotes);
+ notesTitle.style.cssText+=';display:flex;align-items:center;justify-content:space-between';notesTitle.append(ppNotesCopyButton(richNotes));
  let previousNotes=null;
  async function refreshNotes(){
    if(!richNotes.isConnected)return;
@@ -2282,6 +2283,20 @@ function showPublicLessonMaterial(data,studentId,lessonId){
  setTimeout(refreshMaterial,1500);
 }
 
+function ppNotesCopyButton(body){
+ const button=document.createElement('button');button.type='button';
+ const label=()=>window.getLanguage?.()==='en'?'Copy notes':'Копировать заметки';
+ button.title=label();button.setAttribute('aria-label',label());
+ button.style.cssText='display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;color:inherit;border:1px solid var(--border-color);border-radius:8px;background:transparent';
+ const icon='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>';
+ button.innerHTML=icon;
+ button.onclick=async()=>{const plain=body.innerText||body.textContent||'';if(!plain.trim())return;try{
+  if(navigator.clipboard?.write&&typeof ClipboardItem!=='undefined'){try{await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([plain],{type:'text/plain'}),'text/html':new Blob([body.innerHTML],{type:'text/html'})})]);}catch{await navigator.clipboard.writeText(plain);}}
+  else await navigator.clipboard.writeText(plain);
+  button.textContent='✓';button.title=window.getLanguage?.()==='en'?'Copied!':'Скопировано!';setTimeout(()=>{button.innerHTML=icon;button.title=label();},1200);
+ }catch{window.prompt(label(),plain);}};
+ return button;
+}
 function renderSharedLessonNotes(richNotes,value){
    const html=String(value?.html||'');
    if(!html){richNotes.textContent=value?.plain||'No teacher notes yet.';return;}
@@ -2331,7 +2346,7 @@ async function renderPublicLessonsHistory(rows){
  function applyNotesFilter(){for(const [id,button] of cards)button.style.display=filter.checked&&!withNotes.has(String(id))?'none':'';empty.style.display=filter.checked&&!withNotes.size?'':'none';}
  filter.onchange=applyNotesFilter;
  function label(l){return historyDateLabel(l.date);}
- function open(l,value){const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;const heading=dialog.querySelector('[data-lesson-heading]');heading.textContent=historyMaterialTitle(value?.title)|| (window.getLanguage?.()==='en'?'Lesson notes':'Заметки урока');const date=document.createElement('span');date.className='pp-lesson-note-date';date.textContent=label(l);heading.append(date);renderSharedLessonNotes(dialog.querySelector('[data-lesson-notes]'),value);if(!dialog.open)dialog.showModal();}
+ function open(l,value){const dialog=document.getElementById('pp-student-lesson-dialog');if(!dialog)return;const heading=dialog.querySelector('[data-lesson-heading]');heading.textContent=historyMaterialTitle(value?.title)|| (window.getLanguage?.()==='en'?'Lesson notes':'Заметки урока');const date=document.createElement('span');date.className='pp-lesson-note-date';date.textContent=label(l);heading.append(date);const body=dialog.querySelector('[data-lesson-notes]');renderSharedLessonNotes(body,value);heading.append(ppNotesCopyButton(body));if(!dialog.open)dialog.showModal();}
  function card(l){const button=document.createElement('button');button.type='button';button.className='pp-student-lesson-row';button.textContent=label(l);return button;}
  for(const l of past){const button=card(l);cards.set(l.id,button);lessons.append(button);button.onclick=async()=>{const {data,error}=await supabaseClient.rpc('get_public_calendar_notes',{p_student_id:studentId,p_calendar_lesson_id:Number(l.id)});if(!error)open(l,data);};}
  if(!past.length){lessons.textContent='No completed lessons yet.';notes.textContent='No notes yet.';return;}
