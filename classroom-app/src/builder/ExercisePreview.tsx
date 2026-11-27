@@ -17,7 +17,7 @@ import {MatchingPreview} from './MatchingExercise';
 import {LiveAnswerContext,LiveAnswerBlock,useLiveAnswer} from './liveAnswers';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import type {Block,Plan} from '../planning/model';
-import {PreviewControls,PreviewNotes} from './PreviewWorkspaceTools';
+import {PreviewControls,PreviewNotes,PreviewSelectionActions} from './PreviewWorkspaceTools';
 import {ui} from '../i18n';
 import {FormattedText,formatOf} from './textFormatting';
 import {exerciseLabel} from './commands';
@@ -109,6 +109,7 @@ export function ExercisePreview({plan,selected,onBack,scopeKey,assetScope='',stu
  },[]);
  const studentAway=!studentMode&&!!studentExercise&&studentExercise!==block?.id;
  return <TextImageScope.Provider value={assetScope}><LiveAnswerContext.Provider value={{student:studentMode,review:scopeKey.startsWith('homework:review:'),enabled:!!liveSessionId||!!homework,values:remoteAnswers,send:sendAnswer}}><section ref={viewportRef} style={{display:"flex",flexDirection:"column"}} className="mb-builder mb-student-preview" data-focus-mode={focusMode?"true":undefined} data-homework-mode={homework?"true":undefined} data-homework-review={scopeKey.startsWith("homework:review:")?"true":undefined} aria-label={ui('Student preview')}>
+  {studentMode&&homework&&<PreviewSelectionActions studentMode/>}
   {!scopeKey.startsWith("homework:review:")&&<div className="mb-preview-top">
    <div className="mb-preview-heading-row">
     {studentMode&&!homework&&<button type="button" className="mb-focus-toggle" aria-pressed={focusMode} aria-label={ui(focusMode?"Show header":"Hide header")} title={ui(focusMode?"Show header":"Hide header")} onClick={()=>setFocusMode(v=>!v)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18"/><path d={focusMode?"m9 13 3 3 3-3":"m9 16 3-3 3 3"}/></svg></button>}
