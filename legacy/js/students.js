@@ -837,17 +837,31 @@ async function copyTelegramStudentLink(id){
 }
 
 async function copyStudentLink(id,button){
-  const url=new URL(location.href);
-  url.search='';
+  const url=new URL('/',location.origin);
   url.searchParams.set('student',id);
-
-  try{
-    await navigator.clipboard.writeText(url.toString());
-    if(button){const old=button.textContent;button.textContent='✓ Copied';setTimeout(()=>{button.textContent=old;},1800);}else alert('Ссылка для ученика скопирована.');
-  }catch(e){
-    prompt('Скопируйте ссылку:',url.toString());
+  const value=url.toString();
+  const ru=document.documentElement.lang==='ru';
+  function fallback(){
+    const field=document.createElement('textarea');
+    field.value=value;
+    field.style.cssText='position:fixed;left:0;top:0;opacity:0;pointer-events:none';
+    document.body.append(field);
+    try{field.focus();field.select();return document.execCommand('copy');}
+    catch(e){return false;}
+    finally{field.remove();button?.focus();}
+  }
+  let copied=false;
+  try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);copied=true;}}catch(e){}
+  if(!copied)copied=fallback();
+  if(!copied){prompt(ru?'Скопируйте ссылку:':'Copy student link:',value);return;}
+  if(button){
+    const old=button.innerHTML;
+    button.disabled=true;
+    button.textContent=ru?'✓ Скопировано':'✓ Copied';
+    setTimeout(()=>{button.innerHTML=old;button.disabled=false;},1800);
   }
 }
+window.copyStudentLink=copyStudentLink;
 
 async function toggleArchive(id){
   const s=students.find(x=>String(x.id)===String(id));
