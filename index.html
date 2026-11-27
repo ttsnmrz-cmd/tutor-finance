@@ -170,24 +170,15 @@ html[data-theme="dark"] #lesson-modal .soft-input{border-color:#746b84!important
 <button onclick="teacherLogout()" class="profile-menu-item profile-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-6"/></svg><span>Выйти</span></button>
 </div></div></div></header>
 
-<div id="landing-page">
-<div class="max-w-5xl mx-auto px-4 py-6 md:py-10">
-<header class="flex items-center justify-between mb-10">
-  <div class="flex items-center gap-3">
-    <img src="/legacy/ProfoProfit_logo svg.svg" alt="ProfiProfit" class="w-14 h-14 object-contain rounded-xl">
-    <div><div class="text-xl font-bold">ProfiProfit</div><div class="text-xs text-slate-500">Управление занятиями и оплатами</div></div>
-  </div>
-  <button data-language-toggle type="button" class="px-3 py-2 rounded-xl bg-slate-100 font-semibold" aria-label="Switch language">EN</button>
-</header>
-
-<section class="grid md:grid-cols-2 gap-8 items-center mb-16">
-  <div>
-    <div class="inline-flex px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold mb-4">Для преподавателей</div>
-    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">Меньше ручной работы.<br>Больше контроля над оплатами.</h1>
-    <p class="text-lg text-slate-500 leading-relaxed mb-6">ProfiProfit помогает вести календарь занятий, отслеживать посещаемость, оплаты и баланс учеников — без таблиц и сложных систем.</p>
-    
-  </div>
-  <div id="auth" class="app-card rounded-3xl p-6 scroll-mt-6">
+<div id="landing-page"><link rel="stylesheet" href="/legacy/css/landing-page.css?v=1"><div class="lp-wrap">
+<header class="lp-nav"><div class="flex items-center gap-3"><img src="/legacy/ProfoProfit_logo svg.svg" alt="ProfiProfit" class="w-14 h-14 object-contain rounded-xl"><div><div class="text-xl font-bold">ProfiProfit</div><div class="text-xs">Lessons, students and payments</div></div></div><div class="lp-actions"><button data-language-toggle type="button" class="lp-button">EN</button><button type="button" class="lp-button" onclick="toggleDarkMode()" aria-label="Toggle theme">◐</button><a class="lp-button" href="#auth">Войти</a></div></header>
+<section class="lp-hero"><div><div class="lp-kicker">В основе — методика. В центре — преподаватель.</div><h1>Создавайте уроки, которые хочется преподавать.</h1><p>От идеи до интерактивного занятия. Материалы, ученики и финансы в едином пространстве.</p><div class="lp-actions" style="margin-top:24px"><a class="lp-button lp-primary" href="#lp-access">Попробовать ProfiProfit</a></div></div>
+<div class="lp-glass"><strong>Lesson Builder</strong><div class="lp-builder"><div><div class="lp-stage ">Warm-up</div><div class="lp-stage ">Lead-in</div><div class="lp-stage ">Presentation</div><div class="lp-stage lp-stage-active">Practice</div><div class="lp-stage ">Production</div><div class="lp-stage ">Cool-down</div></div><div class="lp-demo"><small>Practice · Inline Choice</small><p>Choose the correct option.</p><div>She <select aria-label="Choose the correct verb" id="lp-demo-answer"><option value="">…</option><option>go</option><option>goes</option><option>going</option></select> to work by bus.</div><div class="lp-hint">Teacher hint: goes</div><div class="lp-actions" style="margin-top:12px"><button type="button" class="lp-button lp-primary" onclick="document.getElementById('lp-demo-result').textContent=document.getElementById('lp-demo-answer').value==='goes'?(document.documentElement.lang==='en'?'Correct!':'Верно!'):(document.documentElement.lang==='en'?'Try again.':'Попробуйте ещё раз.')">Проверить ответ</button><button type="button" class="lp-button" onclick="document.getElementById('lp-demo-answer').value='';document.getElementById('lp-demo-result').textContent=''">↺</button></div><p id="lp-demo-result" role="status"></p></div></div></div></section>
+<section class="lp-section"><h2>Методика встроена в продукт</h2><div class="lp-grid"><article class="lp-glass"><h3>Структура урока</h3><p>Организуйте материалы по этапам PPP или создайте собственный сценарий.</p></article><article class="lp-glass"><h3>Подсказки только для преподавателя</h3><p>Правильные ответы и приватные заметки всегда под рукой.</p></article><article class="lp-glass"><h3>Интерактивные упражнения</h3><p>Перетаскивание, выбор ответов и автоматическая проверка.</p></article></div></section>
+<section class="lp-section lp-glass lp-split"><div><h2>Ваши ученики. Ваши деньги. Ваши правила.</h2><p>Принимайте оплату наличными или переводом. ProfiProfit помогает вести учёт, не проводя платежи через платформу.</p></div><div><div class="lp-zero">0%</div><p>Комиссии с платежей учеников</p></div></section>
+<section class="lp-section"><h2>Всё остальное тоже под контролем</h2><div class="lp-grid"><article class="lp-glass"><h3>Синхронные занятия</h3><p>Общие упражнения и заметки во время урока.</p></article><article class="lp-glass"><h3>Домашние задания</h3><p>Назначайте упражнения и отслеживайте выполнение.</p></article><article class="lp-glass"><h3>Кабинет ученика</h3><p>Материалы, история занятий и баланс по персональной ссылке.</p></article></div></section>
+<section id="lp-access" class="lp-section lp-glass"><h2>Кто вы?</h2><div class="lp-grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))"><details><summary>Я преподаватель</summary><p>Ранний доступ для преподавателей. Приём заявок через Telegram готовится.</p></details><details><summary>Я ученик</summary><p>Обратитесь к своему преподавателю за персональной ссылкой на кабинет ученика.</p></details></div></section>
+<section class="lp-auth"><h2>Уже есть аккаунт?</h2><div id="auth" class="app-card rounded-3xl p-6 scroll-mt-6">
     <div class="flex gap-2 p-1 bg-slate-100 rounded-xl mb-5">
       <button id="auth-tab-login" onclick="showAuthMode('login')" class="flex-1 rounded-lg bg-white shadow-sm py-2 font-semibold text-sm">Войти</button>
       <button id="auth-tab-register" onclick="showAuthMode('register')" class="flex-1 rounded-lg py-2 font-semibold text-sm text-slate-500">Регистрация</button>
@@ -211,33 +202,7 @@ html[data-theme="dark"] #lesson-modal .soft-input{border-color:#746b84!important
       <button onclick="registerTeacher()" class="primary-btn w-full rounded-xl py-2 font-semibold">Зарегистрироваться</button>
       <p id="teacher-register-error" class="text-sm text-red-600"></p>
     </div>
-  </div>
-</section>
-
-<section class="mb-16">
-  <div class="max-w-2xl mb-6"><div class="text-xs uppercase tracking-[.18em] text-indigo-500 font-semibold mb-2">Зачем ProfiProfit</div><h2 class="text-3xl font-bold mb-3">Всё, что нужно преподавателю для финансового учёта</h2><p class="text-slate-500 leading-relaxed">Занятия, группы, посещаемость и оплаты находятся в одном месте, поэтому не приходится собирать информацию из календаря, заметок и таблиц.</p></div>
-  <div class="grid md:grid-cols-3 gap-4">
-    <div class="app-card rounded-2xl p-5"><div class="text-2xl mb-3">📅</div><h3 class="font-bold mb-2">Занятия</h3><p class="text-sm text-slate-500">Календарь, повторяющиеся занятия и статусы проведённых, перенесённых и отменённых уроков.</p></div>
-    <div class="app-card rounded-2xl p-5"><div class="text-2xl mb-3">💳</div><h3 class="font-bold mb-2">Оплаты</h3><p class="text-sm text-slate-500">Пополнения, списания и актуальный баланс каждого ученика.</p></div>
-    <div class="app-card rounded-2xl p-5"><div class="text-2xl mb-3">👥</div><h3 class="font-bold mb-2">Группы</h3><p class="text-sm text-slate-500">Стоимость занятия группы рассчитывается автоматически с учётом участников.</p></div>
-  </div>
-</section>
-
-<section class="mb-12">
-  <div class="rounded-3xl bg-slate-900 text-white p-6 md:p-8">
-    <div class="text-xs uppercase tracking-[.18em] text-indigo-300 font-semibold mb-2">Дальше</div>
-    <h2 class="text-3xl font-bold mb-4" style="color:#ffffff !important;-webkit-text-fill-color:#ffffff !important;text-shadow:none !important;">Как будем развивать ProfiProfit</h2>
-    <div class="grid md:grid-cols-3 gap-6">
-      <div><div class="font-bold mb-1">01 · Удобство</div><p class="text-sm text-slate-300">Более быстрый ввод занятий и оплат, удобная работа с группами и посещаемостью.</p></div>
-      <div><div class="font-bold mb-1">02 · Аналитика</div><p class="text-sm text-slate-300">Отчёты по доходам, загрузке, ученикам и группам.</p></div>
-      <div><div class="font-bold mb-1">03 · Кабинет ученика</div><p class="text-sm text-slate-300">Развитие личного кабинета и прозрачное взаимодействие с учениками.</p></div>
-    </div>
-  </div>
-</section>
-
-<footer class="text-center text-sm text-slate-400 py-6">© <span id="current-year"></span> ProfiProfit</footer>
-</div>
-</div>
+  </div></section><footer class="lp-footer">© <span id="current-year"></span> ProfiProfit</footer></div></div>
 
 <div id="lesson-modal" class="hidden fixed inset-0 modal-bg z-50 items-center justify-center p-4 overflow-y-auto"><div class="app-card rounded-3xl p-6 w-full max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto space-y-3">
 <div class="flex items-center justify-between gap-2"><h2 id="lesson-modal-title" class="text-xl font-bold">Новое занятие</h2><div class="flex items-center gap-2"><button id="calendar-live-open" type="button" onclick="openCalendarLivePicker()" class="hidden shrink-0 rounded-xl border border-indigo-300 bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-700">▶ Перейти к занятию</button><button onclick="closeLessonModal()" class="text-2xl text-slate-400" aria-label="Закрыть">×</button></div></div><input type="hidden" id="edit-id">
