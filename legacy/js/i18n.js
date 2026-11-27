@@ -120,6 +120,7 @@
   function setLanguage(next) {
     language = next === 'en' ? 'en' : 'ru';
     localStorage.setItem(STORAGE_KEY, language);
+    localStorage.setItem('mec:language', language);
     window.dispatchEvent(new CustomEvent('profiprofit:language',{detail:{language}}));
     updateButtons();
     translateNode(document.body);
@@ -130,6 +131,7 @@
     if (typeof updateCurrencyLabel === 'function') updateCurrencyLabel();
     if (typeof applyTheme === 'function') { try { applyTheme(localStorage.getItem('profiprofit-theme') === 'dark' ? 'dark' : 'light'); } catch(e) { applyTheme('light'); } }
   }
+  window.addEventListener('classroom:language', event => { const next=event.detail?.language; if ((next==='en'||next==='ru') && next!==language) setLanguage(next); });
   window.getLanguage = () => language;
   window.setLanguage = setLanguage;
   window.toggleLanguage = () => setLanguage(language === 'ru' ? 'en' : 'ru');
