@@ -63,15 +63,23 @@ async function submitPayment(kind){
       }
       if(pending&&(pending.details.p_student_id!==details.p_student_id||pending.details.p_amount!==details.p_amount||pending.details.p_date!==details.p_date)){
         const original=students.find(s=>String(s.id)===pending.details.p_student_id);
-        if(!original)throw new Error(paymentText('The student for the unconfirmed payment is unavailable. Check the payment history before continuing.','Ученик из неподтверждённого платежа недоступен. Проверьте историю платежей перед продолжением.'));
+        if(!original){
+          offerPaymentRecovery(pending,paymentText('The original student is unavailable. Check the pending payment.','Исходный ученик недоступен. Проверьте неподтверждённый платёж.'));
+          return;
+        }
         amountField.value=String(pending.details.p_amount);
         dateField.value=pending.details.p_date;
         studentField.value=pending.details.p_student_id;
         if(kind==='student')document.getElementById('student-payment-name').textContent=original.name;
-        showPaymentWarning(paymentText('A previous payment is unconfirmed. Its student, amount and date have been restored. Review them and press Save to check that payment.','Предыдущий платёж не подтверждён. Ученик, сумма и дата восстановлены. Проверьте их и нажмите «Сохранить», чтобы уточнить результат.'));
+        offerPaymentRecovery(pending,paymentText('A previous payment is unconfirmed. Its student, amount and date have been restored. Review them and press Save to check that payment.','Предыдущий платёж не подтверждён. Ученик, сумма и дата восстановлены. Проверьте их и нажмите «Сохранить», чтобы уточнить результат.'));
         return null;
       }
-      if(!students.some(s=>String(s.id)===details.p_student_id)||!Number.isFinite(details.p_amount)||details.p_amount===0||!details.p_date){
+      const hasStudent=students.some(s=>String(s.id)===details.p_student_id);
+      if(pending&&!hasStudent){
+        offerPaymentRecovery(pending,paymentText('The original student is unavailable. Check the pending payment.','Исходный ученик недоступен. Проверьте неподтверждённый платёж.'));
+        return;
+      }
+      if(!hasStudent||!Number.isFinite(details.p_amount)||details.p_amount===0||!details.p_date){
         throw new Error(paymentText('Select a student, a non-zero amount and a date.','Выберите ученика, ненулевую сумму и дату.'));
       }
       const operation=pending||{id:crypto.randomUUID(),details};
@@ -91,20 +99,19 @@ async function submitPayment(kind){
         // A rejection of a retry does not rule out an earlier successful write.
         if(!pending&&['22003','22007','22008','22P02','23502','23503','23514','42501','PGRST202'].includes(code)){
           try{localStorage.removeItem(storageKey);}catch{}
+          throw error;
         }
-        throw error;
+        offerPaymentRecovery(operation);
+        return;
       }
       const payment=Array.isArray(response)?response[0]:response;
-      if(!payment?.id)throw new Error(paymentText('Payment result is unconfirmed. Retry the original payment.','Результат не подтверждён. Повторите исходный платёж.'));
+      if(!payment?.id){
+        offerPaymentRecovery(operation);
+        return;
+      }
       state.committed=true;
       try{localStorage.removeItem(storageKey);}catch{/* Keeping the original key is safer than issuing a new one. */}
-      let warning='';
-      try{
-        const {error,data}=await supabaseClient.functions.invoke('notify-payment',{body:{payment_id:String(payment.id)}});
-        if(error||data?.errors?.length)throw new Error('Notification unconfirmed');
-      }catch{
-        warning=paymentText('Payment saved. Telegram delivery could not be confirmed.','Платёж сохранён. Доставку уведомления в Telegram подтвердить не удалось.');
-      }
+      const warning=await paymentNotificationWarning(payment.id);
       try{
         closeModal(kind==='add'?'add-modal':'student-payment-modal');
         await loadData();
@@ -123,7 +130,72 @@ async function submitPayment(kind){
   }
 }
 
-function showPaymentWarning(message){
+async function paymentNotificationWarning(paymentId){
+  try{
+    const {error,data}=await supabaseClient.functions.invoke('notify-payment',{body:{payment_id:String(paymentId)}});
+    if(!error&&!data?.errors?.length)return '';
+  }catch{}
+  return paymentText('Payment saved. Telegram delivery could not be confirmed.','Платёж сохранён. Доставку уведомления в Telegram подтвердить не удалось.');
+}
+
+function offerPaymentRecovery(operation,message=paymentText(
+  'Payment result is unconfirmed. Retry the same payment or check and close the attempt.',
+  'Результат не подтверждён. Повторите тот же платёж или проверьте и закройте попытку.'
+)){
+  showPaymentWarning(message,()=>void reconcilePendingPayment(operation.id));
+}
+
+async function reconcilePendingPayment(operationId){
+  if(Object.values(paymentSubmissions).some(state=>state.busy))return;
+  if(!window.confirm(paymentText(
+    'Check this payment? If it was not saved, the server will close this attempt so it cannot create a payment later.',
+    'Проверить платёж? Если он не сохранён, сервер закроет эту попытку, и она больше не сможет создать платёж.'
+  )))return;
+  try{
+    await navigator.locks.request('profiprofit:payment-submit',{ifAvailable:true},async lock=>{
+      if(!lock)throw new Error('Payment lock unavailable');
+      const {data:{session},error}=await supabaseClient.auth.getSession();
+      if(error||!session?.user?.id||!session.access_token)throw new Error('Payment session unavailable');
+      const key='pp-payment-operation:v2:'+session.user.id;
+      const pending=JSON.parse(localStorage.getItem(key)||'null');
+      if(pending?.id!==operationId){
+        showPaymentWarning(paymentText('This operation is no longer pending in this account. Check payment history.','Эта операция больше не ожидает проверки в текущей учётной записи. Проверьте историю платежей.'));
+        return;
+      }
+      const result=await db('/rpc/reconcile_payment_operation',{
+        method:'POST',headers:{...headers,Authorization:'Bearer '+session.access_token},
+        body:JSON.stringify({p_operation_id:operationId})
+      });
+      if(!['saved','removed','cancelled'].includes(result?.status)||(result.status==='saved'&&!result.id))throw new Error('Payment recovery result not confirmed');
+      localStorage.removeItem(key);
+      if(result.status==='saved'){
+        for(const [kind,state] of Object.entries(paymentSubmissions)){
+          state.committed=true;
+          paymentBusy(kind,false);
+        }
+        const warning=await paymentNotificationWarning(result.id);
+        try{
+          closeModal('add-modal');
+          closeModal('student-payment-modal');
+          await loadData();
+          renderStudents();
+        }catch{
+          showPaymentWarning(paymentText('Payment found. Reload the page to refresh the history.','Платёж найден. Перезагрузите страницу, чтобы обновить историю.')+(warning?' '+warning:''));
+          return;
+        }
+        showPaymentWarning(warning||paymentText('The original payment was saved. Open a new form for another payment.','Исходный платёж сохранён. Для нового платежа откройте форму заново.'));
+      }else{
+        showPaymentWarning(result.status==='removed'
+          ?paymentText('The original payment was previously removed. This attempt is closed.','Исходный платёж ранее удалён. Эта попытка закрыта.')
+          :paymentText('No payment was recorded. The server closed this attempt. You can enter a new payment.','Платёж не был записан. Сервер закрыл эту попытку. Теперь можно внести новый платёж.'));
+      }
+    });
+  }catch{
+    offerPaymentRecovery({id:operationId},paymentText('Could not confirm the result. The original key is kept. Check the payment again when connected.','Результат не подтверждён. Исходный ключ сохранён. Проверьте платёж ещё раз после восстановления связи.'));
+  }
+}
+
+function showPaymentWarning(message,recover){
   document.getElementById('payment-warning')?.remove();
   const notice=document.createElement('div');
   notice.id='payment-warning';
@@ -137,6 +209,15 @@ function showPaymentWarning(message){
   close.className='soft-input rounded-lg px-3 py-1';
   close.textContent=paymentText('Dismiss','Закрыть');
   close.onclick=()=>notice.remove();
-  notice.append(text,document.createTextNode(' '),close);
+  notice.append(text,document.createTextNode(' '));
+  if(recover){
+    const check=document.createElement('button');
+    check.type='button';
+    check.className=close.className;
+    check.textContent=paymentText('Check pending payment','Проверить платёж');
+    check.onclick=recover;
+    notice.append(check,document.createTextNode(' '));
+  }
+  notice.append(close);
   document.body.append(notice);
 }

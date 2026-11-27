@@ -10,7 +10,7 @@ const source=fs.readFileSync(path.join(root,'legacy/js/payment-creation.js'),'ut
 function deferred(){let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};}
 function setup(options={}){
   const storage=options.storage||new Map(), server=options.server||new Map();
-  const errors=[], requests=[], notifications=[], warnings=[];
+  const errors=[], requests=[], notifications=[], warnings=[], reconciliationRequests=[], confirmations=[];
   const lock=options.lock||{held:false};
   const elements=new Map();
   function el(id){
@@ -26,10 +26,18 @@ function setup(options={}){
     students:[{id:'student-1',name:'Test student'},{id:'student-2',name:'Other student'}],headers:{},
     document:{getElementById:el,querySelector:()=>el('student-save')},
     navigator:{locks:options.noLocks?null:{async request(name,settings,callback){if(lock.held)return callback(null);lock.held=true;try{return await callback({name});}finally{lock.held=false;}}}},
+    window:{confirm(message){confirmations.push(message);return options.confirmRecovery!==false;}},
     sessionStorage:{getItem:k=>options.legacy?.get(k)||null,removeItem:k=>options.legacy?.delete(k)},
     localStorage:{getItem:k=>storage.get(k)||null,setItem(k,v){if(options.storageFails)throw Error('blocked');storage.set(k,v);},removeItem:k=>storage.delete(k)},
     supabaseClient:{auth:{async getSession(){if(options.authGate)await options.authGate.promise;return {data:{session:{user:{id:options.teacher||'teacher-1'},access_token:'LOCAL_TEST_TOKEN'}}};}},functions:{async invoke(name,body){notifications.push(body);if(options.notificationGate)await options.notificationGate.promise;if(options.notificationFails)throw Error('unavailable');return {};}}},
     async db(url,opt){
+      if(url==='/rpc/reconcile_payment_operation'){
+        const payload=JSON.parse(opt.body);
+        reconciliationRequests.push(payload);
+        if(options.reconcileFails)throw Error('reconciliation response lost');
+        const payment=server.get(payload.p_operation_id);
+        return payment?{status:'saved',id:payment.id}:{status:'cancelled'};
+      }
       assert.equal(url,'/rpc/create_payment_once');requests.push(JSON.parse(opt.body));
       if(options.networkGate)await options.networkGate.promise;
       if(options.databaseError)throw new Error(JSON.stringify({code:options.databaseError}));
@@ -43,10 +51,10 @@ function setup(options={}){
     showError:e=>errors.push(e.message)
   });
   vm.runInContext(source,ctx);
-  ctx.showPaymentWarning=message=>warnings.push(message);
+  ctx.showPaymentWarning=(message,recovery)=>{warnings.push(message);ctx.recovery=recovery;};
   // Execute the real entry points, not a copy of their implementation.
   vm.runInContext(studentSource.slice(studentSource.indexOf('async function saveStudentPayment(){'),studentSource.indexOf('function switchStudentSettingsTab')),ctx);
-  return {ctx,el,errors,requests,notifications,server,storage,warnings};
+  return {ctx,el,errors,requests,notifications,server,storage,warnings,reconciliationRequests,confirmations};
 }
 for(const [kind,handler] of [['student','saveStudentPayment'],['add','addPayment']]){
   test(kind+': rapid clicks/Enter are guarded before awaiting Auth',async()=>{
@@ -117,7 +125,7 @@ test('all HTML entry points load helper before students/app, with updated cache 
   for(const name of ['index.html','404.html','legacy/index.html','legacy/404.html','legacy/classroom.html']){
     const html=fs.readFileSync(path.join(root,name),'utf8');
     assert.ok(html.indexOf('js/payment-creation.js?')<html.indexOf('js/students.js?'));
-    assert.match(html,/js\/app\.js\?v=20261127-payment-idempotency-v2/);
+    assert.match(html,/js\/app\.js\?v=20261127-payment-idempotency-v3/);
   }
   assert.ok(!studentSource.includes("const createdPayments=await db("));
 });
@@ -176,4 +184,47 @@ test('another tab stays blocked while the first payment is updating notification
   assert.equal(first.server.size,1);
   await second.ctx.addPayment();assert.equal(second.requests.length,0);
   notificationGate.resolve();await saving;
+});
+
+test('explicit recovery finds the committed payment without another create or balance change',async()=>{
+  const t=setup({loseFirstResponse:true,notificationFails:true});
+  await t.ctx.saveStudentPayment();
+  assert.equal(typeof t.ctx.recovery,'function');
+  const id=t.requests[0].p_operation_id;
+  await t.ctx.reconcilePendingPayment(id);
+  assert.deepEqual(t.reconciliationRequests,[{p_operation_id:id}]);
+  assert.equal(t.requests.length,1);
+  assert.equal(t.server.size,1);
+  assert.equal(t.storage.size,0);
+  await t.ctx.addPayment();
+  assert.equal(t.requests.length,1);
+  assert.match(t.warnings.at(-1),/Payment saved.*Telegram/);
+});
+
+test('only confirmed cancellation releases the key, with a Russian message',async()=>{
+  const first=setup({databaseError:'57014',language:'ru'});
+  await first.ctx.addPayment();
+  const id=first.requests[0].p_operation_id;
+  const retry=setup({language:'ru',storage:first.storage,server:first.server});
+  await retry.ctx.reconcilePendingPayment(id);
+  assert.match(retry.confirmations[0],/сервер закроет/);
+  assert.match(retry.warnings.at(-1),/Платёж не был записан/);
+  assert.equal(retry.storage.size,0);
+  await retry.ctx.addPayment();
+  assert.equal(retry.server.size,1);
+  assert.notEqual(retry.requests[0].p_operation_id,id);
+});
+
+test('declined confirmation and lost recovery response preserve the original key',async()=>{
+  const first=setup({loseFirstResponse:true});
+  await first.ctx.addPayment();
+  const id=first.requests[0].p_operation_id;
+  const declined=setup({storage:first.storage,confirmRecovery:false});
+  await declined.ctx.reconcilePendingPayment(id);
+  assert.equal(declined.reconciliationRequests.length,0);
+  const failed=setup({storage:first.storage,reconcileFails:true});
+  await failed.ctx.reconcilePendingPayment(id);
+  assert.match(failed.warnings.at(-1),/original key is kept/);
+  assert.equal(JSON.parse(first.storage.values().next().value).id,id);
+  assert.equal(failed.requests.length,0);
 });
