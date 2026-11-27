@@ -1057,19 +1057,12 @@ html[data-pp-teacher-wallpaper] #teacher-app #classroom-materials-root section.m
 html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main,#teacher-header,.native-workspace>header,.app-card,.native-metric-strip>*) {border-color:var(--pp-shell-border)!important;}
 html[data-theme="dark"] #teacher-app :is(.native-sidebar,#teacher-main){border:1px solid var(--pp-shell-border)!important;}
 
-/* Homework navigation: one exercise needs no pagination; multiple use bottom only. */
-#student-live-material[data-mode="homework"] .mb-student-card > .mb-preview-footer:first-child,
-#student-live-material[data-mode="homework"] .mb-preview-footer:has(.mb-preview-progress > span:only-child),
-#student-live-material[data-mode="homework"] .mb-preview-footer:has(.mb-preview-progress):has(button:first-child:disabled):has(button:last-child:disabled) {
- display:none!important;
-}
+/* Homework navigation must remain available at the top and bottom. */
 #student-live-material[data-mode="homework"] .pp-homework-content {overflow-y:auto!important;overflow-x:hidden!important;}
 
 /* Public homework: the shared renderer uses buttons for progress and an inline
    important min-height. Keep the title outside and let content size naturally. */
-#student-live-material#student-live-material[data-mode="homework"] .pp-homework-content[data-classroom-root] .mb-preview-top,
-#student-live-material#student-live-material[data-mode="homework"] .mb-student-card > .mb-preview-footer:first-child,
-#student-live-material#student-live-material[data-mode="homework"] .mb-preview-footer:has(.mb-preview-progress > button:only-child) {
+#student-live-material#student-live-material[data-mode="homework"] .pp-homework-content[data-classroom-root] .mb-preview-top {
  display:none!important;
 }
 #student-live-material[data-mode="homework"] .pp-homework-heading{padding:4px 12px}
@@ -1295,3 +1288,7 @@ html[data-theme="dark"] #teacher-app .mb-builder.mb-student-preview .mb-preview-
 #teacher-app .mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls{display:flex!important;flex-wrap:nowrap!important;align-items:center;justify-content:flex-end;margin-left:auto!important;max-width:100%;gap:8px}
 #teacher-app .mb-preview-controls>.mb-preview-timer{flex:0 0 auto;flex-wrap:nowrap!important;white-space:nowrap;margin:0!important}
 @container (max-width:650px){#teacher-app .mb-preview-tools-row:has(.mb-preview-timer)>.mb-preview-controls{flex-wrap:wrap!important;justify-content:flex-end;width:100%}}
+
+/* Keep homework pagination visible even when the exercise content scrolls. */
+#student-live-material[data-mode="homework"] .mb-student-card>.mb-preview-footer{display:flex!important;flex-shrink:0!important}
+#student-live-material[data-mode="homework"] .mb-student-card>.mb-preview-footer:first-child{position:sticky!important;top:0;z-index:10;background:var(--pp-surface)!important;margin-top:0!important}
