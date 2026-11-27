@@ -39,3 +39,13 @@ type HomeworkOptions={id:string;answers:Record<string,unknown>;readOnly:boolean;
  root.render(<ExercisePreview plan={plan} selected={plan.blocks?.[0]?.id||''} onBack={()=>{}} scopeKey={'homework:'+options.id} studentMode assetScope={options.id.startsWith('review:')?'':'public-image:'+JSON.stringify({studentId:new URLSearchParams(location.search).get('student'),assignmentId:options.id})} homework={options}/>);
  return ()=>root.unmount();
 };
+
+import {StudentNotebook} from './builder/StudentNotebook';
+(window as Window & {mountProfiProfitNotebook?:(target:HTMLElement,studentId:string,today:string,client:SupabaseClient,onClose:()=>void)=>()=>void}).mountProfiProfitNotebook=(target,studentId,today,client,onClose)=>{
+ setProfiProfitSupabase(client);
+ setLanguage(localStorage.getItem('profiprofit-language')==='en'?'en':'ru');
+ target.setAttribute('data-classroom-root','');
+ const root=createRoot(target);
+ root.render(<StudentNotebook studentId={studentId} today={today} onClose={onClose}/>);
+ return ()=>root.unmount();
+};
