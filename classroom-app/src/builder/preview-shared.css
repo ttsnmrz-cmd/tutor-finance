@@ -195,3 +195,6 @@ html[data-theme="dark"] .mb-builder :is(.mb-rich-input,.mb-gap-editable,.mb-stud
 .mb-builder :is(span,font)[style*="background-color: rgb(243, 223, 171)"],
 .mb-builder :is(span,font)[style*="background-color:#F3DFAB" i],
 .mb-builder :is(span,font)[style*="background-color: #F3DFAB" i]{color:#1F242D!important;border-radius:4px;padding-inline:.08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* Keep the active exercise formatting controls within reach while scrolling. */
+.mb-builder :is(.mb-rich-field,.mb-gap-surface,.mb-inline-author)>.mb-format-toolbar{position:sticky;top:var(--mb-format-toolbar-top,8px);z-index:35;background:var(--card);border-radius:12px;padding:4px;box-shadow:0 2px 8px #20113012}
