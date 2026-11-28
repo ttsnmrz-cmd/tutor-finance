@@ -1136,6 +1136,7 @@ async function editGroup(id){
 }
 
 function openAdd(type){
+  if(type==='payment'&&Object.values(paymentSubmissions).some(state=>state.busy))return;
   showModal('add-modal');
   showAddForm(type||'student');
 }
@@ -1153,6 +1154,8 @@ function setAddTab(type){
 }
 
 function showAddForm(type){
+  if(paymentSubmissions.add.busy)return;
+  if(type==='payment'&&!beginPaymentForm('add'))return;
   setAddTab(type);
   const c=document.getElementById('add-form');
 
@@ -1193,7 +1196,7 @@ function showAddForm(type){
     fillStudentSelects();
 
     c.innerHTML=`<div class="space-y-3">
-      <select id="add-payment-student" required aria-label="Выберите ученика" onchange="document.getElementById('add-payment-submit').disabled=!this.value" class="soft-input w-full rounded-xl px-3 py-2"></select>
+      <select id="add-payment-student" required aria-label="Выберите ученика" onchange="paymentBusy('add',false)" class="soft-input w-full rounded-xl px-3 py-2"></select>
 
       <input id="add-payment-amount" type="number" step="0.01" class="soft-input w-full rounded-xl px-3 py-2" placeholder="Сумма">
 
@@ -1454,6 +1457,7 @@ async function removeFromGroup(gid,sid){
 }
 
 function openStudentPayment(id){
+  if(!beginPaymentForm('student'))return;
   const s=students.find(
     x=>String(x.id)===String(id)
   );
@@ -1476,6 +1480,7 @@ function openStudentPayment(id){
     'student-payment-date'
   ).value=localISO(new Date());
 
+  paymentBusy('student',false);
   showModal('student-payment-modal');
 
   setTimeout(
@@ -1486,163 +1491,8 @@ function openStudentPayment(id){
   );
 }
 
-async function saveStudentPayment(){
-  try{
-    const id=document
-      .getElementById('student-payment-id')
-      .value;
-
-    const raw=document
-      .getElementById('student-payment-amount')
-      .value.trim();
-
-    const date=document
-      .getElementById('student-payment-date')
-      .value;
-
-    const amount=Number(raw);
-
-    const s=students.find(
-      x=>String(x.id)===String(id)
-    );
-
-    const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
-    if(sessionError||!session?.user?.id||!session.access_token){
-      throw new Error('Сессия истекла. Войдите в аккаунт снова.');
-    }
-    const user=session.user;
-    headers.Authorization='Bearer '+session.access_token;
-
-    if(
-      !s||
-      raw===''||
-      !Number.isFinite(amount)||
-      amount===0||
-      !date
-    ){
-      return showError(
-        new Error(
-          'Введите сумму, отличную от нуля'
-        )
-      );
-    }
-
-    const createdPayments=await db(
-      '/payments',
-      {
-        method:'POST',
-        headers:{
-          ...headers,
-          Prefer:'return=representation'
-        },
-        body:JSON.stringify({
-          student:s.name,
-          student_id:s.id,
-          amount,
-          date,
-          teacher_id:user.id
-        })
-      }
-    );
-
-    const createdPayment=Array.isArray(createdPayments)?createdPayments[0]:createdPayments;
-    if(createdPayment?.id){
-      try{
-        const {data,error}=await supabaseClient.functions.invoke('notify-payment',{
-          body:{payment_id:String(createdPayment.id)}
-        });
-        if(error)console.warn('Payment saved, but Telegram notification failed:',error);
-        else if(data?.errors?.length)console.warn('Payment saved, but some Telegram notifications failed:',data.errors);
-      }catch(notificationError){
-        console.warn('Payment saved, but Telegram notification failed:',notificationError);
-      }
-    }
-
-    closeModal('student-payment-modal');
-
-    await loadData();
-    renderStudents();
-
-    document
-      .getElementById('detail-'+id)
-      ?.classList.remove('hidden');
-
-  }catch(e){
-    showError(e);
-  }
-}
-
-async function addPayment(){
-  try{
-    const studentValue=document.getElementById('add-payment-student').value;
-    if(!studentValue)return showError(new Error(getLanguage()==='en'?'Select a student':'Выберите ученика'));
-    const s=students.find(x=>String(x.id)===String(studentValue.replace(/^student:/,'')));
-
-    const amount=Number(
-      document
-        .getElementById('add-payment-amount')
-        .value
-    );
-
-    const date=document
-      .getElementById('add-payment-date')
-      .value;
-
-    if(!s||!amount||!date){
-      return showError(
-        new Error('Заполните данные платежа')
-      );
-    }
-
-    const {data:{session},error:sessionError}=await supabaseClient.auth.getSession();
-    if(sessionError||!session?.user?.id||!session.access_token){
-      throw new Error('Сессия истекла. Войдите в аккаунт снова.');
-    }
-    const user=session.user;
-    headers.Authorization='Bearer '+session.access_token;
-
-    const createdPayments=await db(
-      '/payments',
-      {
-        method:'POST',
-        headers:{
-          ...headers,
-          Prefer:'return=representation'
-        },
-        body:JSON.stringify({
-          student:s.name,
-          student_id:s.id,
-          amount,
-          date,
-          teacher_id:user.id
-        })
-      }
-    );
-
-    const createdPayment=Array.isArray(createdPayments)?createdPayments[0]:createdPayments;
-    if(createdPayment?.id){
-      try{
-        const {data,error}=await supabaseClient.functions.invoke('notify-payment',{
-          body:{payment_id:String(createdPayment.id)}
-        });
-        if(error)console.warn('Payment saved, but Telegram notification failed:',error);
-        else if(data?.errors?.length)console.warn('Payment saved, but some Telegram notifications failed:',data.errors);
-      }catch(notificationError){
-        // The payment is already safely saved; a notification failure must not
-        // make the user think the payment itself failed or invite a duplicate.
-        console.warn('Payment saved, but Telegram notification failed:',notificationError);
-      }
-    }
-
-    closeModal('add-modal');
-
-    await loadData();
-    renderStudents();
-
-  }catch(e){
-    showError(e);
-  }
-}
+async function saveStudentPayment(){return submitPayment('student');}
+async function addPayment(){return submitPayment('add');}
 
 function switchStudentSettingsTab(tab){const modal=document.getElementById('student-modal');if(!modal)return;for(const name of ['general','telegram']){document.getElementById('student-settings-'+name)?.classList.toggle('hidden',name!==tab);modal.querySelector('[data-student-settings-tab="'+name+'"]')?.setAttribute('aria-pressed',String(name===tab));}}
 

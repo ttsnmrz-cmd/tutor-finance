@@ -1,0 +1,150 @@
+TAP version 13
+# Subtest: student: rapid clicks/Enter are guarded before awaiting Auth
+ok 1 - student: rapid clicks/Enter are guarded before awaiting Auth
+  ---
+  duration_ms: 7.2794
+  type: 'test'
+  ...
+# Subtest: student: slow connection keeps button busy and ignores repeated activation
+ok 2 - student: slow connection keeps button busy and ignores repeated activation
+  ---
+  duration_ms: 10.4049
+  type: 'test'
+  ...
+# Subtest: student: lost response and reload reuse the persisted UUID
+ok 3 - student: lost response and reload reuse the persisted UUID
+  ---
+  duration_ms: 2.8406
+  type: 'test'
+  ...
+# Subtest: student: rendering failure after commit cannot save again
+ok 4 - student: rendering failure after commit cannot save again
+  ---
+  duration_ms: 3.1867
+  type: 'test'
+  ...
+# Subtest: student: new explicit form permits an identical intentional payment
+ok 5 - student: new explicit form permits an identical intentional payment
+  ---
+  duration_ms: 1.5418
+  type: 'test'
+  ...
+# Subtest: student: edited unresolved details restore the original operation
+ok 6 - student: edited unresolved details restore the original operation
+  ---
+  duration_ms: 2.3035
+  type: 'test'
+  ...
+# Subtest: add: rapid clicks/Enter are guarded before awaiting Auth
+ok 7 - add: rapid clicks/Enter are guarded before awaiting Auth
+  ---
+  duration_ms: 3.1269
+  type: 'test'
+  ...
+# Subtest: add: slow connection keeps button busy and ignores repeated activation
+ok 8 - add: slow connection keeps button busy and ignores repeated activation
+  ---
+  duration_ms: 7.1627
+  type: 'test'
+  ...
+# Subtest: add: lost response and reload reuse the persisted UUID
+ok 9 - add: lost response and reload reuse the persisted UUID
+  ---
+  duration_ms: 4.0715
+  type: 'test'
+  ...
+# Subtest: add: rendering failure after commit cannot save again
+ok 10 - add: rendering failure after commit cannot save again
+  ---
+  duration_ms: 1.8833
+  type: 'test'
+  ...
+# Subtest: add: new explicit form permits an identical intentional payment
+ok 11 - add: new explicit form permits an identical intentional payment
+  ---
+  duration_ms: 1.6687
+  type: 'test'
+  ...
+# Subtest: add: edited unresolved details restore the original operation
+ok 12 - add: edited unresolved details restore the original operation
+  ---
+  duration_ms: 1.492
+  type: 'test'
+  ...
+# Subtest: storage unavailable fails closed without a POST
+ok 13 - storage unavailable fails closed without a POST
+  ---
+  duration_ms: 1.2511
+  type: 'test'
+  ...
+# Subtest: both entry points share an in-flight guard
+ok 14 - both entry points share an in-flight guard
+  ---
+  duration_ms: 2.8581
+  type: 'test'
+  ...
+# Subtest: a field change during saving keeps spinner, disabled state and original label
+ok 15 - a field change during saving keeps spinner, disabled state and original label
+  ---
+  duration_ms: 2.5592
+  type: 'test'
+  ...
+# Subtest: definitive SQL rejection releases key for correction; key conflict does not
+ok 16 - definitive SQL rejection releases key for correction; key conflict does not
+  ---
+  duration_ms: 2.675
+  type: 'test'
+  ...
+# Subtest: notification and modal failures cannot change a committed payment
+ok 17 - notification and modal failures cannot change a committed payment
+  ---
+  duration_ms: 1.1466
+  type: 'test'
+  ...
+# Subtest: RU pending label and invalid input release the form without POST
+ok 18 - RU pending label and invalid input release the form without POST
+  ---
+  duration_ms: 0.8794
+  type: 'test'
+  ...
+# Subtest: all HTML entry points load helper before students/app, with updated cache URLs
+ok 19 - all HTML entry points load helper before students/app, with updated cache URLs
+  ---
+  duration_ms: 3.4338
+  type: 'test'
+  ...
+# (node:28048) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: 20 concurrent function calls send once to each intended recipient
+ok 20 - 20 concurrent function calls send once to each intended recipient
+  ---
+  duration_ms: 113.6571
+  type: 'test'
+  ...
+# Subtest: ambiguous Telegram timeout retains claim across handler restart/retry
+ok 21 - ambiguous Telegram timeout retains claim across handler restart/retry
+  ---
+  duration_ms: 25.5735
+  type: 'test'
+  ...
+# Subtest: claim-store failure fails closed without sending
+ok 22 - claim-store failure fails closed without sending
+  ---
+  duration_ms: 2.173
+  type: 'test'
+  ...
+# Subtest: historical notification claims prevent automatic replay
+ok 23 - historical notification claims prevent automatic replay
+  ---
+  duration_ms: 2.8278
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 381.3846

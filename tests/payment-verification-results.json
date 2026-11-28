@@ -1,0 +1,20 @@
+{
+  "baseCommit": "7d65fff2369fb6e96ac316940de3be0b69624192",
+  "branch": "fix/payment-idempotency-2026-11-27",
+  "unitTests": 23,
+  "unitPassed": 23,
+  "postgresIntegrationPassed": true,
+  "postgresDatabase": "pp_payment_test_1795802085944",
+  "concurrentPaymentRequests": 12,
+  "createdPaymentsForSameKey": 1,
+  "intentionalEqualPayments": 2,
+  "concurrentNotificationClaims": 12,
+  "successfulClaims": 1,
+  "historicalSentinelUnchanged": true,
+  "studentStatsUnchanged": true,
+  "notificationBalanceAndRecipientsUnchanged": true,
+  "autoCompleteMigrationUnchanged": true,
+  "manualBrowserAndMobile": "NOT_COMPLETED: initial localhost unavailable; native browser stopped upon user input",
+  "productionChanged": false,
+  "realTelegramSent": false
+}
