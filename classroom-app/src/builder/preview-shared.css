@@ -194,4 +194,4 @@ html[data-theme="dark"] .mb-builder :is(.mb-rich-input,.mb-gap-editable,.mb-stud
 /* Keep the existing mustard marker readable in both themes and shared lesson views. */
 .mb-builder :is(span,font)[style*="background-color: rgb(243, 223, 171)"],
 .mb-builder :is(span,font)[style*="background-color:#F3DFAB" i],
-.mb-builder :is(span,font)[style*="background-color: #F3DFAB" i]{color:#1F242D!important}
+.mb-builder :is(span,font)[style*="background-color: #F3DFAB" i]{color:#1F242D!important;border-radius:4px;padding-inline:.08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
